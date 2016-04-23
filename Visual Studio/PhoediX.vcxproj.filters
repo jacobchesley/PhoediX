@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="App">
+      <UniqueIdentifier>{cd94259c-cd2d-40b1-a5e2-3d2d6becb19c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{dbe9f329-8e41-4a77-b38d-993e76af04f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Main Window">
+      <UniqueIdentifier>{4dfa147e-3773-42e0-8c62-43eb17c69f96}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
+      <Filter>GUI\Main Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\App\PhoediX.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h">
+      <Filter>GUI\Main Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\App\PhoediX.h">
+      <Filter>App</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
