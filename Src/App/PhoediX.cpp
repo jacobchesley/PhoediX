@@ -9,6 +9,8 @@ bool PhoediX::OnInit(){
 		return false;
 	}
    
+	wxInitAllImageHandlers();
+
     // Create and show the main window
 	MainWindow * mainWindow = new MainWindow();
 	mainWindow->Show();
