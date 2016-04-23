@@ -9,6 +9,9 @@
 	#include "wx/wx.h"
 #endif
 
+#include "Processing\Processor\Processor.h"
+#include "Processing\ImageFileLoader\ImageFileLoader.h"
+
 /**
 	Main Window is the main display window of PhoediX.
 */
@@ -22,6 +25,19 @@ public:
 
 private:
 
+	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
 	void SetSizeProperties();
+
+	wxMenuBar * menuBar;
+	wxMenu * menuFile;
+	wxMenu * menuView;
+	wxMenu * menuHelp;
+
+	Processor * processor;
+
+	enum MenuBar {
+		ID_SHOW_LOAD_FILE,
+		ID_EXIT
+	};
 };		
 #endif
