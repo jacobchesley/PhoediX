@@ -37,10 +37,16 @@
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
+    <ClCompile Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.cpp" />
+    <ClCompile Include="..\Src\Processing\Image\Image.cpp" />
+    <ClCompile Include="..\Src\Processing\Processor\Processor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\App\PhoediX.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
+    <ClInclude Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.h" />
+    <ClInclude Include="..\Src\Processing\Image\Image.h" />
+    <ClInclude Include="..\Src\Processing\Processor\Processor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>PhoediX</ProjectName>

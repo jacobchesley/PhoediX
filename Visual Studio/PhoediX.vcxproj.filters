@@ -10,6 +10,18 @@
     <Filter Include="GUI\Main Window">
       <UniqueIdentifier>{4dfa147e-3773-42e0-8c62-43eb17c69f96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Processing">
+      <UniqueIdentifier>{8baa457c-9358-402d-8a24-082efdbb0843}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Processing\Image">
+      <UniqueIdentifier>{30aafe82-533a-4b01-86fc-ec6abb264e84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Processing\Processor">
+      <UniqueIdentifier>{7e310b13-b9eb-420a-87dd-fc3b17008232}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Processing\ImageFileLoader">
+      <UniqueIdentifier>{f871a832-8b56-4768-b315-01693f04f805}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -18,6 +30,15 @@
     <ClCompile Include="..\Src\App\PhoediX.cpp">
       <Filter>App</Filter>
     </ClCompile>
+    <ClCompile Include="..\Src\Processing\Image\Image.cpp">
+      <Filter>Processing\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Processing\Processor\Processor.cpp">
+      <Filter>Processing\Processor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.cpp">
+      <Filter>Processing\ImageFileLoader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h">
@@ -25,6 +46,15 @@
     </ClInclude>
     <ClInclude Include="..\Src\App\PhoediX.h">
       <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Processing\Image\Image.h">
+      <Filter>Processing\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Processing\Processor\Processor.h">
+      <Filter>Processing\Processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.h">
+      <Filter>Processing\ImageFileLoader</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
