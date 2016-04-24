@@ -13,7 +13,48 @@ Image::Image() {
 	imageDataBlue16 = NULL;
 }
 
-void Image::SetDataFrom8(int8_t * inData, int inWidth, int inHeight) {
+Image::~Image() {
+
+	this->Destroy();
+}
+
+void Image::Destroy() {
+
+	if (imageDataRed8 != NULL) {
+		delete[] imageDataRed8;
+		imageDataRed8 = NULL;
+	}
+
+	if (imageDataGreen8 != NULL) {
+		delete[] imageDataGreen8;
+		imageDataGreen8 = NULL;
+	}
+
+	if (imageDataBlue8 != NULL) {
+		delete[] imageDataBlue8;
+		imageDataBlue8 = NULL;
+	}
+
+	// Delete current 16 bit image data if it exists
+	if (imageDataRed16 != NULL) {
+		delete[] imageDataRed16;
+		imageDataRed16 = NULL;
+	}
+
+	if (imageDataGreen16 != NULL) {
+		delete[] imageDataGreen16;
+		imageDataGreen16 = NULL;
+	}
+
+	if (imageDataBlue16 != NULL) {
+		delete[] imageDataBlue16;
+		imageDataBlue16 = NULL;
+	}
+
+	width = 0;
+	height = 0;
+}
+void Image::SetDataFrom8(unsigned char * inData, int inWidth, int inHeight) {
 
 	width = inWidth;
 	height = inHeight;
@@ -39,9 +80,9 @@ void Image::SetDataFrom8(int8_t * inData, int inWidth, int inHeight) {
 		}
 
 		// Create new image data
-		imageDataRed16 = new int16_t[size / 3];
-		imageDataGreen16 = new int16_t[size / 3];
-		imageDataBlue16 = new int16_t[size / 3];
+		imageDataRed16 = new uint16_t[size / 3];
+		imageDataGreen16 = new uint16_t[size / 3];
+		imageDataBlue16 = new uint16_t[size / 3];
 
 		// Go through each pixel containing red, green and blue, and scale to 16 bit data
 		int index = 0;
@@ -74,9 +115,9 @@ void Image::SetDataFrom8(int8_t * inData, int inWidth, int inHeight) {
 	}
 
 	// Create new image data
-	imageDataRed8 = new int8_t[size / 3];
-	imageDataGreen8 = new int8_t[size / 3];
-	imageDataBlue8 = new int8_t[size / 3];
+	imageDataRed8 = new uint8_t[size / 3];
+	imageDataGreen8 = new uint8_t[size / 3];
+	imageDataBlue8 = new uint8_t[size / 3];
 
 	// Go through each pixel containing red, green and blue, and scale to 16 bit data
 	int index = 0;
@@ -86,7 +127,6 @@ void Image::SetDataFrom8(int8_t * inData, int inWidth, int inHeight) {
 		imageDataBlue8[index] = inData[i + 2];
 		index += 1;
 	}
-	
 }
 
 void Image::SetDataFrom16(int16_t * inData, int inWidth, int inHeight) {
@@ -115,9 +155,9 @@ void Image::SetDataFrom16(int16_t * inData, int inWidth, int inHeight) {
 		}
 
 		// Create new image data
-		imageDataRed16 = new int16_t[size / 3];
-		imageDataGreen16 = new int16_t[size / 3];
-		imageDataBlue16 = new int16_t[size / 3];
+		imageDataRed16 = new uint16_t[size / 3];
+		imageDataGreen16 = new uint16_t[size / 3];
+		imageDataBlue16 = new uint16_t[size / 3];
 
 		// Go through each pixel containing red, green and blue, and scale to 16 bit data
 		int index = 0;
@@ -131,7 +171,7 @@ void Image::SetDataFrom16(int16_t * inData, int inWidth, int inHeight) {
 
 	// Always need to have 8 bit data available for display
 
-	// Delete current 16 bit image data if it exists
+	// Delete current 8 bit image data if it exists
 	if (imageDataRed8 != NULL) {
 		delete[] imageDataRed8;
 		imageDataRed8 = NULL;
@@ -148,9 +188,9 @@ void Image::SetDataFrom16(int16_t * inData, int inWidth, int inHeight) {
 	}
 
 	// Create new image data
-	imageDataRed8 = new int8_t[size / 3];
-	imageDataGreen8 = new int8_t[size / 3];
-	imageDataBlue8 = new int8_t[size / 3];
+	imageDataRed8 = new uint8_t[size / 3];
+	imageDataGreen8 = new uint8_t[size / 3];
+	imageDataBlue8 = new uint8_t[size / 3];
 
 	// Go through each pixel containing red, green and blue, and scale to 16 bit data
 	int index = 0;
@@ -171,27 +211,27 @@ int Image::GetHeight() {
 	return height;
 }
 
-int8_t * Image::Get8BitDataRed() {
+uint8_t * Image::Get8BitDataRed() {
 	return imageDataRed8;
 }
 
-int8_t * Image::Get8BitDataGreen() {
+uint8_t * Image::Get8BitDataGreen() {
 	return imageDataGreen8;
 }
 
-int8_t * Image::Get8BitDataBlue() {
+uint8_t * Image::Get8BitDataBlue() {
 	return imageDataBlue8;
 }
 
-int16_t * Image::Get16BitDataRed() {
+uint16_t * Image::Get16BitDataRed() {
 	return imageDataRed16;
 }
 
-int16_t * Image::Get16BitDataGreen() {
+uint16_t * Image::Get16BitDataGreen() {
 	return imageDataGreen16;
 }
 
-int16_t * Image::Get16BitDataBlue() {
+uint16_t * Image::Get16BitDataBlue() {
 	return imageDataBlue16;
 }
 

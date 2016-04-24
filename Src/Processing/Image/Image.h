@@ -3,28 +3,44 @@
 
 #include <stdint.h>
 
+#ifdef CHECK_MEMORY_LEAK
+#define CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#ifndef DBG_NEW
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+#define new DBG_NEW
+#endif
+#endif  // _DEBUG
+#endif
+
 class Image {
 public:
 	Image();
+	~Image();
+
+	void Destroy();
 
 	void Enable16Bit();
 	void Disable16Bit();
 
 	int GetColorDepth();
 
-	void SetDataFrom8(int8_t * inData, int inWidth, int inHeight);
+	void SetDataFrom8(unsigned char * inData, int inWidth, int inHeight);
 	void SetDataFrom16(int16_t * inData, int inWidth, int inHeight);
 
 	int GetWidth();
 	int GetHeight();
 
-	int8_t * Get8BitDataRed();
-	int8_t * Get8BitDataGreen();
-	int8_t * Get8BitDataBlue();
+	uint8_t * Get8BitDataRed();
+	uint8_t * Get8BitDataGreen();
+	uint8_t * Get8BitDataBlue();
 
-	int16_t * Get16BitDataRed();
-	int16_t * Get16BitDataGreen();
-	int16_t * Get16BitDataBlue();
+	uint16_t * Get16BitDataRed();
+	uint16_t * Get16BitDataGreen();
+	uint16_t * Get16BitDataBlue();
 
 private:
 	
@@ -33,13 +49,13 @@ private:
 	int width;
 	int height;
 
-	int8_t * imageDataRed8;
-	int8_t * imageDataGreen8;
-	int8_t * imageDataBlue8;
+	uint8_t * imageDataRed8;
+	uint8_t * imageDataGreen8;
+	uint8_t * imageDataBlue8;
 
-	int16_t * imageDataRed16;
-	int16_t * imageDataGreen16;
-	int16_t * imageDataBlue16;
+	uint16_t * imageDataRed16;
+	uint16_t * imageDataGreen16;
+	uint16_t * imageDataBlue16;
 
 };
 
