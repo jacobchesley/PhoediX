@@ -27,7 +27,12 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	processor = new Processor();
 
+	sizer = new wxBoxSizer(wxHORIZONTAL);
+	this->SetSizer(sizer);
+
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
+	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
 }
 
 void MainWindow::SetSizeProperties(){
@@ -44,5 +49,14 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)){
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
 		return;
 	}
-	ImageFileLoader::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
+	ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
+	imagePanel = new ImagePanel(this, processor->GetImage());
+	this->GetSizer()->Add(imagePanel, 1, wxEXPAND, 1);
+}
+
+void MainWindow::OnClose(wxCloseEvent& closeEvent) {
+
+	delete processor;
+	closeEvent.Skip();
+	this->Destroy();
 }
