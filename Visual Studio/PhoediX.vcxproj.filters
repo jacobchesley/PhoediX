@@ -19,8 +19,14 @@
     <Filter Include="Processing\Processor">
       <UniqueIdentifier>{7e310b13-b9eb-420a-87dd-fc3b17008232}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Processing\ImageFileLoader">
+    <Filter Include="Processing\ImageHandler">
       <UniqueIdentifier>{f871a832-8b56-4768-b315-01693f04f805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Image Display">
+      <UniqueIdentifier>{d0dead5d-d4ed-4033-ac23-17387391f18d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Image Display\ImagePanel">
+      <UniqueIdentifier>{96cc56e1-fb09-4ae8-99d0-064c7f581eb0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,8 +42,11 @@
     <ClCompile Include="..\Src\Processing\Processor\Processor.cpp">
       <Filter>Processing\Processor</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.cpp">
-      <Filter>Processing\ImageFileLoader</Filter>
+    <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp">
+      <Filter>Processing\ImageHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp">
+      <Filter>GUI\Image Display\ImagePanel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,8 +62,11 @@
     <ClInclude Include="..\Src\Processing\Processor\Processor.h">
       <Filter>Processing\Processor</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.h">
-      <Filter>Processing\ImageFileLoader</Filter>
+    <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h">
+      <Filter>Processing\ImageHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.h">
+      <Filter>GUI\Image Display\ImagePanel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

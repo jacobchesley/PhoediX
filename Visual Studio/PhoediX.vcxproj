@@ -36,15 +36,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
+    <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
-    <ClCompile Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.cpp" />
+    <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp" />
     <ClCompile Include="..\Src\Processing\Image\Image.cpp" />
     <ClCompile Include="..\Src\Processing\Processor\Processor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\App\PhoediX.h" />
+    <ClInclude Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
-    <ClInclude Include="..\Src\Processing\ImageFileLoader\ImageFileLoader.h" />
+    <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h" />
     <ClInclude Include="..\Src\Processing\Image\Image.h" />
     <ClInclude Include="..\Src\Processing\Processor\Processor.h" />
   </ItemGroup>
@@ -192,7 +194,7 @@
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(wxWidgets)\lib\vc_lib\mswud;$(wxWidgets)\include;$(wxWidgets);..\Src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;_WINDOWS;NOPCH;CHECK_MEMORY_LEAK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -322,7 +324,7 @@
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>.\..\..\lib\vc_dll\mswu;.\..\..\include;.;.\..\..\samples;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;NDEBUG;_UNICODE;WXUSINGDLL;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;NDEBUG;_UNICODE;WXUSINGDLL;_WINDOWS;NOPCH;CHECK_MEMORY_LEAK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
