@@ -28,6 +28,21 @@
     <Filter Include="GUI\Image Display\ImagePanel">
       <UniqueIdentifier>{96cc56e1-fb09-4ae8-99d0-064c7f581eb0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Edit List">
+      <UniqueIdentifier>{d0bbebbc-7405-45a4-acc1-a3130a65d5d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Edit List Panel">
+      <UniqueIdentifier>{5919b110-647d-4536-b8fb-e6c41dc736e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Edit Item">
+      <UniqueIdentifier>{6e41f53a-aea5-4435-8c94-a8a5de334468}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debugging">
+      <UniqueIdentifier>{c5189e70-5404-47f9-ac04-3856307e8644}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Colors">
+      <UniqueIdentifier>{3f7c50e9-b82a-4414-987b-873d91a78813}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -48,6 +63,15 @@
     <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp">
       <Filter>GUI\Image Display\ImagePanel</Filter>
     </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\EditListItem\EditListItem.cpp">
+      <Filter>GUI\Edit List\Edit Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.cpp">
+      <Filter>GUI\Edit List\Edit List Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Colors\Colors.cpp">
+      <Filter>GUI\Colors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h">
@@ -67,6 +91,18 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.h">
       <Filter>GUI\Image Display\ImagePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\EditListItem\EditListItem.h">
+      <Filter>GUI\Edit List\Edit Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h">
+      <Filter>Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.h">
+      <Filter>GUI\Edit List\Edit List Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Colors\Colors.h">
+      <Filter>GUI\Colors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

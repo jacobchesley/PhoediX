@@ -36,6 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
+    <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\EditListItem\EditListItem.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
     <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp" />
@@ -44,6 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\App\PhoediX.h" />
+    <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
+    <ClInclude Include="..\Src\GUI\Colors\Colors.h" />
+    <ClInclude Include="..\Src\GUI\EditList\EditListItem\EditListItem.h" />
+    <ClInclude Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
     <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h" />
@@ -212,7 +219,7 @@
       <AdditionalIncludeDirectories>.\..\..\lib\vc_lib\mswud;.\..\..\include;.;.\..\..\samples;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw30ud_core.lib;wxbase30ud.lib;wxmsw30ud_adv.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;kernel32.lib;user32.lib;gdi32.lib;comdlg32.lib;winspool.lib;winmm.lib;shell32.lib;comctl32.lib;ole32.lib;oleaut32.lib;uuid.lib;rpcrt4.lib;advapi32.lib;wsock32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31ud_core.lib;wxbase31ud.lib;wxmsw31ud_adv.lib;wxmsw31ud_aui.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;kernel32.lib;user32.lib;gdi32.lib;comdlg32.lib;winspool.lib;winmm.lib;shell32.lib;comctl32.lib;ole32.lib;oleaut32.lib;uuid.lib;rpcrt4.lib;advapi32.lib;wsock32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\Build\Debug\PhoediX.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(wxWidgets)\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -254,7 +261,7 @@
       <AdditionalIncludeDirectories>.\..\..\lib\vc_lib\mswu;.\..\..\include;.;.\..\..\samples;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wxmsw30u_core.lib;wxbase30u.lib;wxmsw30u_adv.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;kernel32.lib;user32.lib;gdi32.lib;comdlg32.lib;winspool.lib;winmm.lib;shell32.lib;comctl32.lib;ole32.lib;oleaut32.lib;uuid.lib;rpcrt4.lib;advapi32.lib;wsock32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31u_core.lib;wxbase31u.lib;wxmsw31u_adv.lib;wxmsw31u_aui.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;kernel32.lib;user32.lib;gdi32.lib;comdlg32.lib;winspool.lib;winmm.lib;shell32.lib;comctl32.lib;ole32.lib;oleaut32.lib;uuid.lib;rpcrt4.lib;advapi32.lib;wsock32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\Build\Release\PhoediX.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(wxWidgets)\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
