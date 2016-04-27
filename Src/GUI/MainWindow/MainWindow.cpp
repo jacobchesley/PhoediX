@@ -2,7 +2,7 @@
 
 MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDefaultSize){
 	this->SetSizeProperties();
-
+	
 	// Create and add menu bar with menus
 	menuBar = new wxMenuBar;
 
@@ -24,15 +24,25 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	// Set the status bar
 	this->CreateStatusBar();
+	statusBarText = NULL;
+	this->GetStatusBar()->SetBackgroundColour(Colors::BackDarkDarkDarkGrey);
+	this->GetStatusBar()->SetForegroundColour(Colors::TextLightGrey);
+	this->SetStatusbarText("test");
 
 	processor = new Processor();
 
-	sizer = new wxBoxSizer(wxHORIZONTAL);
-	this->SetSizer(sizer);
+	auiManager.SetManagedWindow(this);
+	auiManager.GetArtProvider()->SetColor(wxAuiPaneDockArtSetting::wxAUI_DOCKART_BACKGROUND_COLOUR, Colors::BackDarkDarkGrey);
 
+	editList = new EditListPanel(this);
+	auiManager.AddPane(editList,  wxRIGHT, "Edit List");
+	auiManager.GetPane(editList).MinSize(wxSize(editList->GetSize().GetWidth() + 200, 50));
+	auiManager.Update();
+		
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
+
 }
 
 void MainWindow::SetSizeProperties(){
@@ -51,11 +61,23 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)){
 	}
 	ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
 	imagePanel = new ImagePanel(this, processor->GetImage());
-	this->GetSizer()->Add(imagePanel, 1, wxEXPAND, 1);
+	imagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	auiManager.AddPane(imagePanel, wxLEFT);
+	auiManager.Update();
+}
+
+
+void MainWindow::SetStatusbarText(wxString text) {
+	if (statusBarText != NULL) {
+		statusBarText->Destroy();
+	}
+	statusBarText = new wxStaticText(this->GetStatusBar(), -1, text, wxPoint(10, 5));
+	statusBarText->Show();
 }
 
 void MainWindow::OnClose(wxCloseEvent& closeEvent) {
 
+	auiManager.UnInit();
 	delete processor;
 	closeEvent.Skip();
 	this->Destroy();

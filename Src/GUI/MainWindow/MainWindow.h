@@ -9,22 +9,14 @@
 	#include "wx/wx.h"
 #endif
 
+#include "wx\aui\aui.h"
+
 #include "Processing\Processor\Processor.h"
 #include "Processing\ImageHandler\ImageHandler.h"
 #include "GUI\ImageDisplay\ImagePanel\ImagePanel.h"
-
-#ifdef CHECK_MEMORY_LEAK
-#define CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#ifdef _DEBUG
-#ifndef DBG_NEW
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-#define new DBG_NEW
-#endif
-#endif  // _DEBUG
-#endif
+#include "GUI\EditList\EditListPanel\EditListPanel.h"
+#include "GUI\Colors\Colors.h"
+#include "Debugging\MemoryLeakCheck.h"
 
 /**
 	Main Window is the main display window of PhoediX.
@@ -42,17 +34,21 @@ private:
 	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
 	void SetSizeProperties();
 
+	void SetStatusbarText(wxString text);
 	void OnClose(wxCloseEvent& closeEvent);
 
-	wxBoxSizer * sizer;
+	wxAuiManager auiManager;
 
 	wxMenuBar * menuBar;
 	wxMenu * menuFile;
 	wxMenu * menuView;
 	wxMenu * menuHelp;
+	wxStaticText * statusBarText;
 
 	Processor * processor;
+
 	ImagePanel * imagePanel;
+	EditListPanel * editList;
 
 	enum MenuBar {
 		ID_SHOW_LOAD_FILE,
