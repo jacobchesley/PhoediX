@@ -10,12 +10,9 @@ ImagePanel::ImagePanel(wxWindow * parent, Image * image) : wxPanel(parent) {
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&ImagePanel::OnSize, this);
 
 	this->SetDoubleBuffered(true);
-
-	this->Redraw();
 }
 
 void ImagePanel::Render(wxDC & dc) {
-
 
 	// Get current width and height
 	int newWidth = this->GetSize().GetWidth();
@@ -43,9 +40,11 @@ void ImagePanel::Render(wxDC & dc) {
 		unsigned char * imageData = (unsigned char *)malloc(sizeof(unsigned char) * img->GetWidth() * img->GetHeight() * 3);
 		ImageHandler::CopyImageData8(img, imageData);
 		wxImage tempImage = wxImage(img->GetWidth(), img->GetHeight(), imageData);
-
+		
 		// Convert wxImage to wxBitmap, with scaled width and height
-		bitmapDraw = wxBitmap(tempImage.Scale(newWidth, newHeight, wxIMAGE_QUALITY_HIGH));
+		if (tempImage.IsOk()) {
+			bitmapDraw = wxBitmap(tempImage.Scale(newWidth, newHeight, wxIMAGE_QUALITY_HIGH));
+		}
 
 		oldWidth = newWidth;
 		oldHeight = newHeight;
