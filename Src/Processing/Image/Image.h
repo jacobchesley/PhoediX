@@ -2,19 +2,7 @@
 #define IMAGE_H
 
 #include <stdint.h>
-
-#ifdef CHECK_MEMORY_LEAK
-#define CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
-#ifdef _DEBUG
-#ifndef DBG_NEW
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-#define new DBG_NEW
-#endif
-#endif  // _DEBUG
-#endif
+#include "Debugging\MemoryLeakCheck.h"
 
 class Image {
 public:
@@ -28,8 +16,8 @@ public:
 
 	int GetColorDepth();
 
-	void SetDataFrom8(unsigned char * inData, int inWidth, int inHeight);
-	void SetDataFrom16(int16_t * inData, int inWidth, int inHeight);
+	void SetDataFrom8(uint8_t * inData, int inWidth, int inHeight);
+	void SetDataFrom16(uint16_t * inData, int inWidth, int inHeight);
 
 	int GetWidth();
 	int GetHeight();

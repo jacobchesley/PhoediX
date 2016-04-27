@@ -20,6 +20,7 @@ Image::~Image() {
 
 void Image::Destroy() {
 
+	// Delete current 8 bit image data if it exists
 	if (imageDataRed8 != NULL) {
 		delete[] imageDataRed8;
 		imageDataRed8 = NULL;
@@ -54,7 +55,7 @@ void Image::Destroy() {
 	width = 0;
 	height = 0;
 }
-void Image::SetDataFrom8(unsigned char * inData, int inWidth, int inHeight) {
+void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 
 	width = inWidth;
 	height = inHeight;
@@ -129,7 +130,7 @@ void Image::SetDataFrom8(unsigned char * inData, int inWidth, int inHeight) {
 	}
 }
 
-void Image::SetDataFrom16(int16_t * inData, int inWidth, int inHeight) {
+void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 
 	width = inWidth;
 	height = inHeight;
