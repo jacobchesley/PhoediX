@@ -6,7 +6,7 @@ void ImageHandler::LoadImageFromFile(wxString fileName, Image * image) {
 	image->SetDataFrom8(fileImage.GetData(), fileImage.GetWidth(), fileImage.GetHeight());
 }
 
-void ImageHandler::CopyImageData8(Image * image, unsigned char * outArray) {
+void ImageHandler::CopyImageData8(Image * image, uint8_t * outArray) {
 	
 	int dataSize = image->GetWidth() * image->GetHeight() * 3;
 	
@@ -21,7 +21,6 @@ void ImageHandler::CopyImageData8(Image * image, unsigned char * outArray) {
 		outArray[i + 1] = greenData[index];
 		outArray[i + 2] = blueData[index];
 
-		int test = redData[index];
 		index += 1;
 	}
 }
