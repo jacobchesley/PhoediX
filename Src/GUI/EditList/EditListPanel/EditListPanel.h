@@ -9,7 +9,9 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI\EditList\AvailableEdits\AvailableEdits.h"
 #include "GUI\EditList\EditListItem\EditListItem.h"
+#include "GUI\EditList\EditSelection\EditSelection.h"
 #include "GUI\Colors\Colors.h"
 #include "Debugging\MemoryLeakCheck.h"
 
@@ -17,15 +19,28 @@ class EditListPanel : public wxPanel {
 public:
 
 	EditListPanel(wxWindow * parent);
-	
+	wxVector<Edit> edits;
+
 private:
 
+	void InitializeEdits();
+	void OnAddEdit(wxCommandEvent& WXUNUSED(event));
+
+	void AddEditToPanel(wxCommandEvent& addEvt);
 	void MoveEditUp(wxCommandEvent& upEvt);
 	void MoveEditDown(wxCommandEvent& downEvt);
-	void DeleteEdit(wxCommandEvent& Evt);
+	void DeleteEdit(wxCommandEvent& deleteEvt);
 
 	wxStaticText * titleText;
 	wxBoxSizer * mainSizer;
+	wxBoxSizer * bottomButtonsSizer;
+	wxButton * addEditButton;
+
+	EditSelection * editSelection;
+
+	enum Buttons {
+		ADD_EDIT_BUTTON = 100
+	};
 
 	class EditListScroll : public wxScrolledWindow {
 	public:
@@ -34,6 +49,7 @@ private:
 		void DeleteEdit(size_t index);
 		void MoveEditUp(size_t index);
 		void MoveEditDown(size_t index);
+		int GetNextID();
 
 	private:
 
@@ -41,8 +57,7 @@ private:
 		wxBoxSizer * sizer;
 		wxVector<EditListItem*> editList;
 	};
-
-
+	
 	EditListScroll * scroller;
 
 };

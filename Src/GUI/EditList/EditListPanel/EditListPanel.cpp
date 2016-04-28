@@ -4,34 +4,63 @@ EditListPanel::EditListPanel(wxWindow * parent) : wxPanel(parent) {
 
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
-
+	this->SetBackgroundColour(Colors::BackDarkGrey);
+	
 	titleText = new wxStaticText(this, -1, "List of Edits");
 	titleText->SetForegroundColour(Colors::TextLightGrey);
-	titleText->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	this->GetSizer()->Add(titleText, 0, wxALIGN_CENTER, 1);
-	this->GetSizer()->AddSpacer(20);
+	titleText->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
 	scroller = new EditListScroll(this);
+
+	Icons icons;
+	addEditButton = new wxButton(this, EditListPanel::Buttons::ADD_EDIT_BUTTON, "Add Edit", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	addEditButton->SetForegroundColour(Colors::TextLightGrey);
+	addEditButton->SetBackgroundColour(Colors::BackGrey);
+	addEditButton->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
+	editSelection = new EditSelection(this);
+
+	this->GetSizer()->AddSpacer(5);
+	this->GetSizer()->Add(titleText, 0, wxALIGN_CENTER, 1);
+	this->GetSizer()->AddSpacer(20);
 	this->GetSizer()->Add(scroller, 1, wxEXPAND);
-	
-	this->SetBackgroundColour(Colors::BackDarkGrey);
+	this->GetSizer()->Add(addEditButton, 0, wxALIGN_CENTER);
+	this->GetSizer()->AddSpacer(5);
 	this->Fit();
 
-	int bestWidth = this->GetSize().GetWidth() + 5;
-	int bestHeight = this->GetSize().GetHeight() + 50;
-	this->SetInitialSize(wxSize(bestWidth, bestHeight));
-	this->Refresh();
-
-	scroller->AddEdit(new EditListItem(scroller, "Brightness", 0));
-	scroller->AddEdit(new EditListItem(scroller, "Conttrast", 1));
-	scroller->AddEdit(new EditListItem(scroller, "Curves", 2));
-	scroller->AddEdit(new EditListItem(scroller, "Noise RD", 3));
-	scroller->AddEdit(new EditListItem(scroller, "Greyscale", 4));
-	scroller->AddEdit(new EditListItem(scroller, "Blur", 5));
-
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditListPanel::OnAddEdit, this, EditListPanel::Buttons::ADD_EDIT_BUTTON);
 	this->Bind(EDIT_UP_EVENT, (wxObjectEventFunction)&EditListPanel::MoveEditUp, this, ID_EDIT_UP);
 	this->Bind(EDIT_DOWN_EVENT, (wxObjectEventFunction)&EditListPanel::MoveEditDown, this, ID_EDIT_DOWN);
 	this->Bind(EDIT_DELETE_EVENT, (wxObjectEventFunction)&EditListPanel::DeleteEdit, this, ID_EDIT_DELETE);
+	this->Bind(EDIT_ADD_EVENT, (wxObjectEventFunction)&EditListPanel::AddEditToPanel, this, ID_EDIT_ADD);
+
+	this->InitializeEdits();
+}
+
+void EditListPanel::InitializeEdits() {
+	
+	AvailableEdits available;
+	wxVector<Edit> allEdits = available.GetAvailableEdits();
+
+	for (size_t i = 0; i < allEdits.size(); i++) {
+
+		wxString editName = allEdits.at(i).GetName();
+		wxString editDescription = allEdits.at(i).GetDescription();
+		editSelection->AddEditSelection(editName, editDescription);
+	}
+}
+
+void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
+	editSelection->Show();
+}
+
+
+void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
+
+	int editID = addEvt.GetInt();
+	AvailableEdits available;
+
+	scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID()));
 }
 
 void EditListPanel::MoveEditUp(wxCommandEvent& upEvt) {
@@ -147,4 +176,8 @@ void EditListPanel::EditListScroll::RedrawEdits() {
 
 	// Fit inside the scroll bars
 	this->FitInside();
+}
+
+int EditListPanel::EditListScroll::GetNextID() {
+	return editList.size();
 }
