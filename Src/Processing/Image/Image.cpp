@@ -120,7 +120,7 @@ void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 	imageDataGreen8 = new uint8_t[size / 3];
 	imageDataBlue8 = new uint8_t[size / 3];
 
-	// Go through each pixel containing red, green and blue, and scale to 16 bit data
+	// Go through each pixel containing red, green and blue, and copy to 8 bit data
 	int index = 0;
 	for (int i = 0; i < size; i += 3) {
 		imageDataRed8[index] = inData[i];
@@ -160,7 +160,7 @@ void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 		imageDataGreen16 = new uint16_t[size / 3];
 		imageDataBlue16 = new uint16_t[size / 3];
 
-		// Go through each pixel containing red, green and blue, and scale to 16 bit data
+		// Go through each pixel containing red, green and blue, and copy to 16 bit data
 		int index = 0;
 		for (int i = 0; i < size; i += 3) {
 			imageDataRed16[index] = inData[i];
@@ -193,7 +193,7 @@ void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 	imageDataGreen8 = new uint8_t[size / 3];
 	imageDataBlue8 = new uint8_t[size / 3];
 
-	// Go through each pixel containing red, green and blue, and scale to 16 bit data
+	// Go through each pixel containing red, green and blue, and scale to 8 bit data
 	int index = 0;
 	for (int i = 0; i < size; i += 3) {
 		imageDataRed8[index] = (int8_t) (inData[i] / 256);
