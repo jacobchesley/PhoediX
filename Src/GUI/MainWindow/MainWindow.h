@@ -37,7 +37,7 @@ private:
 	void SetStatusbarText(wxString text);
 	void OnClose(wxCloseEvent& closeEvent);
 
-	wxAuiManager auiManager;
+	wxAuiManager * auiManager;
 
 	wxMenuBar * menuBar;
 	wxMenu * menuFile;

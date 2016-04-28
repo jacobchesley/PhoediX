@@ -31,14 +31,14 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	processor = new Processor();
 
-	auiManager.SetManagedWindow(this);
-	auiManager.GetArtProvider()->SetColor(wxAuiPaneDockArtSetting::wxAUI_DOCKART_BACKGROUND_COLOUR, Colors::BackDarkDarkGrey);
+
+	auiManager = new wxAuiManager(this);
+	auiManager->GetArtProvider()->SetColor(wxAuiPaneDockArtSetting::wxAUI_DOCKART_BACKGROUND_COLOUR, Colors::BackDarkDarkGrey);
 
 	editList = new EditListPanel(this);
-	auiManager.AddPane(editList,  wxRIGHT, "Edit List");
-	auiManager.GetPane(editList).MinSize(wxSize(editList->GetSize().GetWidth() + 200, 50));
-	auiManager.Update();
-		
+	auiManager->AddPane(editList,  wxRIGHT, "Edit List");
+	auiManager->GetPane(editList).MinSize(wxSize(editList->GetSize().GetWidth() + 200, 50));
+	
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
@@ -62,8 +62,8 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)){
 	ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
 	imagePanel = new ImagePanel(this, processor->GetImage());
 	imagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
-	auiManager.AddPane(imagePanel, wxLEFT);
-	auiManager.Update();
+	auiManager->AddPane(imagePanel, wxLEFT);
+	auiManager->Update();
 }
 
 
@@ -77,7 +77,8 @@ void MainWindow::SetStatusbarText(wxString text) {
 
 void MainWindow::OnClose(wxCloseEvent& closeEvent) {
 
-	auiManager.UnInit();
+	auiManager->UnInit();
+	delete auiManager;
 	delete processor;
 	closeEvent.Skip();
 	this->Destroy();
