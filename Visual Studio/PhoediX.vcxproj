@@ -37,8 +37,11 @@
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditListItem\EditListItem.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\EditSelection\EditSelection.cpp" />
+    <ClCompile Include="..\Src\GUI\Icons\Icons.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
     <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp" />
@@ -49,8 +52,14 @@
     <ClInclude Include="..\Src\App\PhoediX.h" />
     <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
     <ClInclude Include="..\Src\GUI\Colors\Colors.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditListItem\EditListItem.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.h" />
+    <ClInclude Include="..\Src\GUI\EditList\EditSelection\EditSelection.h" />
+    <ClInclude Include="..\Src\GUI\Icons\delete_button.h" />
+    <ClInclude Include="..\Src\GUI\Icons\down_button.h" />
+    <ClInclude Include="..\Src\GUI\Icons\Icons.h" />
+    <ClInclude Include="..\Src\GUI\Icons\up_button.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
     <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h" />
@@ -212,6 +221,8 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_DEPRECATE=1;_CRT_NON_CONFORMING_SWPRINTFS=1;_SCL_SECURE_NO_WARNINGS=1;__WXMSW__;_UNICODE;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>

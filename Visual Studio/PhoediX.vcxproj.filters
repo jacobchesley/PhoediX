@@ -43,6 +43,15 @@
     <Filter Include="GUI\Colors">
       <UniqueIdentifier>{3f7c50e9-b82a-4414-987b-873d91a78813}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Icons">
+      <UniqueIdentifier>{a56d6e64-36fd-433f-b8d8-b73d2950e87d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Edit Selection">
+      <UniqueIdentifier>{c2196757-d6b7-49ad-96ba-75d544fbc4b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits">
+      <UniqueIdentifier>{515b4f56-856a-4b9f-99bd-7d03ab5c358b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -71,6 +80,15 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp">
       <Filter>GUI\Colors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Icons\Icons.cpp">
+      <Filter>GUI\Icons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\EditSelection\EditSelection.cpp">
+      <Filter>GUI\Edit List\Edit Selection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp">
+      <Filter>GUI\Edit List\Available Edits</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +121,24 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\Colors\Colors.h">
       <Filter>GUI\Colors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Icons\up_button.h">
+      <Filter>GUI\Icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Icons\Icons.h">
+      <Filter>GUI\Icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Icons\down_button.h">
+      <Filter>GUI\Icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Icons\delete_button.h">
+      <Filter>GUI\Icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\EditSelection\EditSelection.h">
+      <Filter>GUI\Edit List\Edit Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h">
+      <Filter>GUI\Edit List\Available Edits</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
