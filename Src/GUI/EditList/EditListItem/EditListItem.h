@@ -10,6 +10,7 @@
 #endif
 
 #include "GUI\Colors\Colors.h"
+#include "GUI\Icons\Icons.h"
 #include "Debugging\MemoryLeakCheck.h"
 
 enum {

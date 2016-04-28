@@ -1,4 +1,4 @@
-#include "EditListItem.h"
+﻿#include "EditListItem.h"
 
 wxDEFINE_EVENT(EDIT_UP_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EDIT_DOWN_EVENT, wxCommandEvent);
@@ -15,22 +15,29 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence) : wx
 	textSizer = new wxBoxSizer(wxVERTICAL);
 	titleText = new wxStaticText(this, - 1, title);
 	titleText->SetForegroundColour(Colors::TextWhite);
-	titleText->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+	titleText->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	textSizer->AddSpacer(5);
 	textSizer->Add(titleText, 0, wxALIGN_CENTER, 1);
 	textSizer->AddSpacer(5);
 
-	this->GetSizer()->Add(textSizer, 1, wxEXPAND);
-
 	upDownButtonSizer = new wxBoxSizer(wxVERTICAL);
-	upButton = new wxButton(this, EditListItem::Buttons::UP_BUTTON, "UP");
-	downButton = new wxButton(this, EditListItem::Buttons::DOWN_BUTTON, "DO");
-	deleteButton = new wxButton(this, EditListItem::Buttons::DELETE_BUTTON, "X");
+	upButton = new wxButton(this, EditListItem::Buttons::UP_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	downButton = new wxButton(this, EditListItem::Buttons::DOWN_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	deleteButton = new wxButton(this, EditListItem::Buttons::DELETE_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 
-	upDownButtonSizer->Add(upButton, 0);
-	upDownButtonSizer->AddSpacer(5);
-	upDownButtonSizer->Add(downButton, 0);
+	upButton->SetBackgroundColour(this->GetBackgroundColour());
+	downButton->SetBackgroundColour(this->GetBackgroundColour());
+	deleteButton->SetBackgroundColour(this->GetBackgroundColour());
 
+	Icons icons;
+	upButton->SetBitmap(icons.UpButton.Rescale(17, 17, wxIMAGE_QUALITY_HIGH));
+	downButton->SetBitmap(icons.DownButton.Rescale(17, 17, wxIMAGE_QUALITY_HIGH));
+	deleteButton->SetBitmap(icons.DeleteButton.Rescale(22, 22, wxIMAGE_QUALITY_HIGH));
+
+	upDownButtonSizer->Add(upButton);
+	upDownButtonSizer->Add(downButton);
+
+	this->GetSizer()->Add(textSizer, 1, wxEXPAND);
 	this->GetSizer()->Add(upDownButtonSizer, 0, wxEXPAND);
 	this->GetSizer()->Add(deleteButton, 0, wxEXPAND);
 
