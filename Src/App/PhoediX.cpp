@@ -1,6 +1,5 @@
 #include "PhoediX.h"
 
-
 IMPLEMENT_APP(PhoediX)
 
 // 'Main program' equivalent: the program execution "starts" here
