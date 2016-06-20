@@ -10,6 +10,8 @@
 #endif
 
 #include "GUI\Colors\Colors.h"
+#include "GUI\AUI Manager\AUIManager.h"
+#include "GUI\EditList\EditWindow\EditWindow.h"
 #include "GUI\Icons\Icons.h"
 #include "Debugging\MemoryLeakCheck.h"
 
@@ -26,7 +28,12 @@ wxDECLARE_EVENT(EDIT_DELETE_EVENT, wxCommandEvent);
 
 class EditListItem : public wxPanel {
 public:
-	EditListItem(wxWindow * parent, wxString title = wxEmptyString, int Sequence = 0);
+	EditListItem(wxWindow * parent, wxString title = wxEmptyString, int Sequence = 0, EditWindow * editWindow = NULL);
+	~EditListItem();
+
+	EditWindow* GetEditWindow();
+
+	void DestroyItem();
 
 	void SetTitle(wxString title);
 	wxString GetTitle();
@@ -39,20 +46,24 @@ private:
 	void OnUp(wxCommandEvent& WXUNUSED(event));
 	void OnDown(wxCommandEvent& WXUNUSED(event));
 	void OnDelete(wxCommandEvent& WXUNUSED(event));
+	void OnOpenEdit(wxCommandEvent& WXUNUSED(event));
 	
 	wxWindow * parWindow;
 	wxBoxSizer * sizer;
 	wxBoxSizer * textSizer;
 	wxBoxSizer * upDownButtonSizer;
 
-	wxStaticText * titleText;
+	wxButton * titleText;
 	wxButton * upButton;
 	wxButton * downButton;
 	wxButton * deleteButton;
 
+	EditWindow * editWin;
+
 	size_t seq;
 
 	enum Buttons{
+		OPEN_EDIT_BUTTON,
 		UP_BUTTON,
 		DOWN_BUTTON,
 		DELETE_BUTTON
