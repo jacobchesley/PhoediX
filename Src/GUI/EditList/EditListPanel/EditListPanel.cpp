@@ -1,6 +1,6 @@
 #include "EditListPanel.h"
 
-EditListPanel::EditListPanel(wxWindow * parent) : wxPanel(parent) {
+EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel(parent) {
 
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
@@ -19,6 +19,17 @@ EditListPanel::EditListPanel(wxWindow * parent) : wxPanel(parent) {
 	addEditButton->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	editSelection = new EditSelection(this);
+	wxAuiPaneInfo editSelectionInfo = wxAuiPaneInfo();
+	editSelectionInfo.Float();
+	editSelectionInfo.Caption("Edit Selection");
+	editSelectionInfo.CloseButton(true);
+	editSelectionInfo.PinButton(true);
+	editSelectionInfo.DestroyOnClose(false);
+	editSelectionInfo.Hide();
+	editSelectionInfo.BestSize(editSelection->GetVirtualSize());
+
+	PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(editSelection, editSelectionInfo);
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
 	this->GetSizer()->AddSpacer(5);
 	this->GetSizer()->Add(titleText, 0, wxALIGN_CENTER, 1);
@@ -33,6 +44,9 @@ EditListPanel::EditListPanel(wxWindow * parent) : wxPanel(parent) {
 	this->Bind(EDIT_DOWN_EVENT, (wxObjectEventFunction)&EditListPanel::MoveEditDown, this, ID_EDIT_DOWN);
 	this->Bind(EDIT_DELETE_EVENT, (wxObjectEventFunction)&EditListPanel::DeleteEdit, this, ID_EDIT_DELETE);
 	this->Bind(EDIT_ADD_EVENT, (wxObjectEventFunction)&EditListPanel::AddEditToPanel, this, ID_EDIT_ADD);
+	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageEvt, this, ID_REPROCESS_IMAGE);
+
+	proc = processor;
 
 	this->InitializeEdits();
 }
@@ -50,17 +64,65 @@ void EditListPanel::InitializeEdits() {
 	}
 }
 
-void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
-	editSelection->Show();
+void EditListPanel::ReprocessImageEvt(wxCommandEvent& WXUNUSED(event)) {
+	this->ReprocessImage();
 }
 
+void EditListPanel::ReprocessImage() {
+
+	// Delete the current list of internally stored edits in the processor
+	proc->DeleteEdits();
+
+	// Create a vector of Edit list Items that are displayed on the panel
+	wxVector<EditListItem*> editList = scroller->GetEditList();
+	for (size_t i = 0; i < editList.size(); i++) {
+
+		// Add each edit from the edit window, to the processor
+		if (editList.at(i)->GetEditWindow() != NULL) {
+			editList.at(i)->GetEditWindow()->AddEditToProcessor();
+		}
+	}
+
+	// Process the edits
+	proc->ProcessEdits();
+}
+
+void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editSelection).Show();
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+}
 
 void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
+	// Get the edit ID to add to the panel
 	int editID = addEvt.GetInt();
-	AvailableEdits available;
 
-	scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID()));
+	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(editID, this, proc);
+
+	// If a new edit window was created
+	if (newEditWindow != NULL) {
+
+		// Create the info to style the AUI Pane
+		wxAuiPaneInfo editWindowInfo = wxAuiPaneInfo();
+		editWindowInfo.DestroyOnClose(false);
+		editWindowInfo.CloseButton(true);
+		editWindowInfo.PinButton(true);
+		editWindowInfo.Caption(newEditWindow->GetName());
+		editWindowInfo.Float();
+		editWindowInfo.Show();
+		editWindowInfo.BestSize(newEditWindow->GetClientSize());
+
+		// Add new edit window to AUI manager
+		PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(newEditWindow, editWindowInfo);
+		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+	}
+
+	// Add a new Edit List Item to the Edit List scroll panel
+	AvailableEdits available;
+	scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), newEditWindow));
+
+	// Reprocess the image with the new edit added
+	this->ReprocessImage();
 }
 
 void EditListPanel::MoveEditUp(wxCommandEvent& upEvt) {
@@ -68,6 +130,7 @@ void EditListPanel::MoveEditUp(wxCommandEvent& upEvt) {
 	// Get edit number that is requesting to be moved up
 	int editNum = upEvt.GetInt();
 	scroller->MoveEditUp(editNum);
+	this->ReprocessImage();
 }
 
 void EditListPanel::MoveEditDown(wxCommandEvent& downEvt) {
@@ -75,6 +138,7 @@ void EditListPanel::MoveEditDown(wxCommandEvent& downEvt) {
 	// Get edit number that is requesting to be moved down
 	int editNum = downEvt.GetInt();
 	scroller->MoveEditDown(editNum);
+	this->ReprocessImage();
 }
 
 void EditListPanel::DeleteEdit(wxCommandEvent& deleteEvt) {
@@ -82,10 +146,12 @@ void EditListPanel::DeleteEdit(wxCommandEvent& deleteEvt) {
 	// Get edit number that is requesting to be deleted
 	int editNum = deleteEvt.GetInt();
 	scroller->DeleteEdit(editNum);
+	this->ReprocessImage();
 }
 
 EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
+	parWindow = parent;
 	sizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(sizer);
 	this->FitInside();
@@ -101,6 +167,23 @@ void EditListPanel::EditListScroll::AddEdit(EditListItem * edit) {
 
 	// Fit inside the scroll bars
 	this->FitInside();
+
+	// Get the parents original size
+	wxSize originalParSize = parWindow->GetClientSize();
+
+	// Set the client size of parent and this to min size needed to not show scrollbars
+	this->SetClientSize(this->GetVirtualSize());
+	parWindow->SetClientSize(this->GetVirtualSize());
+
+	// Set best size and min size of parent to min size needed to not show scrollbars
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(parWindow).BestSize(this->GetVirtualSize());
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(parWindow).MinSize(this->GetVirtualSize());
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+
+	// Make minimum size of parent the original min size.  This panel is still the size that it does not 
+	// show scroll bars, but can get smaller now
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(parWindow).MinSize(originalParSize);
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
 void EditListPanel::EditListScroll::MoveEditUp(size_t index) {
@@ -158,9 +241,15 @@ void EditListPanel::EditListScroll::DeleteEdit(size_t index) {
 	// Remove all edit items from the sizer, but do not destroy them
 	this->GetSizer()->Clear();
 
-	// Destroy and erase the one edit item we no longer want
-	editList.at(index)->Destroy();
+	// Remove the edit window from AUI Manager if it exists
+	if (editList.at(index)->GetEditWindow() != NULL) {
+		PhoedixAUIManager::GetPhoedixAUIManager()->DetachPane(editList.at(index)->GetEditWindow());
+	}
+
+	//Destroy and erase the one edit item we no longer want
+	editList.at(index)->DestroyItem();
 	editList.erase(editList.begin() + index);
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
 	this->RedrawEdits();
 }
@@ -180,4 +269,8 @@ void EditListPanel::EditListScroll::RedrawEdits() {
 
 int EditListPanel::EditListScroll::GetNextID() {
 	return editList.size();
+}
+
+wxVector<EditListItem*> EditListPanel::EditListScroll::GetEditList() {
+	return editList;
 }

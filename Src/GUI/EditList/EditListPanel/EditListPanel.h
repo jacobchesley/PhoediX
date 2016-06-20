@@ -10,21 +10,28 @@
 #endif
 
 #include "GUI\EditList\AvailableEdits\AvailableEdits.h"
+#include "GUI\EditList\AvailableEditWindows\AvailableEditWindows.h"
 #include "GUI\EditList\EditListItem\EditListItem.h"
 #include "GUI\EditList\EditSelection\EditSelection.h"
+#include "GUI\AUI Manager\AUIManager.h"
 #include "GUI\Colors\Colors.h"
+#include "Processing\Processor\Processor.h"
 #include "Debugging\MemoryLeakCheck.h"
 
 class EditListPanel : public wxPanel {
 public:
 
-	EditListPanel(wxWindow * parent);
+	EditListPanel(wxWindow * parent, Processor * processor);
 	wxVector<Edit> edits;
 
 private:
 
 	void InitializeEdits();
+
 	void OnAddEdit(wxCommandEvent& WXUNUSED(event));
+
+	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
+	void ReprocessImage();
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
 	void MoveEditUp(wxCommandEvent& upEvt);
@@ -37,6 +44,8 @@ private:
 	wxButton * addEditButton;
 
 	EditSelection * editSelection;
+
+	Processor * proc;
 
 	enum Buttons {
 		ADD_EDIT_BUTTON = 100
@@ -51,8 +60,11 @@ private:
 		void MoveEditDown(size_t index);
 		int GetNextID();
 
+		wxVector<EditListItem*> GetEditList();
+
 	private:
 
+		wxWindow * parWindow;
 		void RedrawEdits();
 		wxBoxSizer * sizer;
 		wxVector<EditListItem*> editList;
