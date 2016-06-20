@@ -2,7 +2,7 @@
 
 wxDEFINE_EVENT(EDIT_ADD_EVENT, wxCommandEvent);
 
-EditSelection::EditSelection(wxWindow * parent) : wxFrame(parent, -1, "Edit Selection") {
+EditSelection::EditSelection(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	parWindow = parent;
 	mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -26,6 +26,9 @@ EditSelection::EditSelection(wxWindow * parent) : wxFrame(parent, -1, "Edit Sele
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditSelection::OnAdd, this, EditSelection::Buttons::ADD_EDIT);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&EditSelection::OnClose, this);
+
+	this->FitInside();
+	this->SetScrollRate(5, 5);
 }
 
 void EditSelection::OnClose(wxCommandEvent& WXUNUSED(event)) {
@@ -33,8 +36,14 @@ void EditSelection::OnClose(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void EditSelection::AddEditSelection(wxString editName, wxString editDescription) {
+
+	// Insert new edit into the list
 	long index = editList->InsertItem(editList->GetItemCount(), editName);
 	editList->SetItem(index, 1, editDescription);
+
+	// Size each column to the max size needed to show all the text
+	editList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	editList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 }
 
 void EditSelection::OnAdd(wxCommandEvent& WXUNUSED(event)) {
@@ -48,15 +57,13 @@ void EditSelection::OnAdd(wxCommandEvent& WXUNUSED(event)) {
 		long index = editList->GetNextItem(i, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 		wxString editName = editList->GetItemText(index, 0);
 		wxString editDescription = editList->GetItemText(index, 1);
+		
+		// Het the edit ID from the edit name
+		int editID = available.GetIDFromName(editName);
 
-			
-		if (available.GetIDFromName(editName) == available.GetIDFromDescription(editDescription)) {
-
-			int editID = available.GetIDFromName(editName);
-			wxCommandEvent evt(EDIT_ADD_EVENT, ID_EDIT_ADD);
-			evt.SetInt(editID);
-			wxPostEvent(parWindow, evt);
-			
-		}
+		// Send add edit event with edit ID to parent window (the edit panel)
+		wxCommandEvent evt(EDIT_ADD_EVENT, ID_EDIT_ADD);
+		evt.SetInt(editID);
+		wxPostEvent(parWindow, evt);		
 	}
 }

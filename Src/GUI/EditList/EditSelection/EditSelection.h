@@ -20,7 +20,7 @@ enum {
 
 wxDECLARE_EVENT(EDIT_ADD_EVENT, wxCommandEvent);
 
-class EditSelection : public wxFrame {
+class EditSelection : public wxScrolledWindow {
 
 public:
 	EditSelection(wxWindow * parent);
