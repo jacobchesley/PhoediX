@@ -14,6 +14,9 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuFile->AppendSeparator();
 	menuFile->Append(MainWindow::MenuBar::ID_EXIT, _("Exit"));
 
+	menuView->Append(MainWindow::MenuBar::ID_SHOW_IMAGE, _("Show Image"));
+	menuView->Append(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit list"));
+
 	// Append menus to menu bar
 	menuBar->Append(menuFile, _("&File"));
 	menuBar->Append(menuView, _("&View"));
@@ -22,6 +25,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	// Set the menu bar
 	this->SetMenuBar(menuBar);
 
+	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
+
 	// Set the status bar
 	this->CreateStatusBar();
 	statusBarText = NULL;
@@ -29,20 +34,47 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->GetStatusBar()->SetForegroundColour(Colors::TextLightGrey);
 	this->SetStatusbarText("test");
 
-	processor = new Processor();
-
+	processor = new Processor(this);
 
 	auiManager = new wxAuiManager(this);
 	auiManager->GetArtProvider()->SetColor(wxAuiPaneDockArtSetting::wxAUI_DOCKART_BACKGROUND_COLOUR, Colors::BackDarkDarkGrey);
+	PhoedixAUIManager::SetPhoedixAUIManager(auiManager);
 
-	editList = new EditListPanel(this);
-	auiManager->AddPane(editList,  wxRIGHT, "Edit List");
-	auiManager->GetPane(editList).MinSize(wxSize(editList->GetSize().GetWidth() + 200, 50));
+	editList = new EditListPanel(this, processor);
+	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
+	editListInfo.Right();
+	editListInfo.Caption("Edit List");
+	editListInfo.CloseButton(true);
+	editListInfo.PinButton(true);
+	editListInfo.DestroyOnClose(false);
+	auiManager->AddPane(editList, editListInfo);
+
+	imagePanel = new ZoomImagePanel(this, processor->GetImage());
+	imagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
+
+	wxAuiPaneInfo imageInfo = wxAuiPaneInfo();
+	imageInfo.Center();
+	imageInfo.CloseButton(true);
+	imageInfo.PinButton(true);
+	imageInfo.DestroyOnClose(false);
+
+	auiManager->AddPane(imagePanel, imageInfo);
+	auiManager->Update();
 	
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowImage, this, MainWindow::MenuBar::ID_SHOW_IMAGE);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowEditList, this, MainWindow::MenuBar::ID_SHOW_EDIT_LIST);
+	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
 
+
+	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor);
+	imgPanelThread->Run();
+
+	ImageHandler::LoadImageFromwxImage(new wxImage(0,0), processor->GetImage());
+	processor->SetOriginalImage(processor->GetImage());
+	
 }
 
 void MainWindow::SetSizeProperties(){
@@ -59,13 +91,23 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)){
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
 		return;
 	}
+
+	delete processor->GetOriginalImage();
 	ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
-	imagePanel = new ImagePanel(this, processor->GetImage());
-	imagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
-	auiManager->AddPane(imagePanel, wxLEFT);
+	processor->SetOriginalImage(processor->GetImage());
+	processor->SetUpdated(true);
+}
+
+
+void MainWindow::ShowImage(wxCommandEvent& WXUNUSED(event)) {
+	auiManager->GetPane(imagePanel).Show();
 	auiManager->Update();
 }
 
+void MainWindow::ShowEditList(wxCommandEvent& WXUNUSED(event)) {
+	auiManager->GetPane(editList).Show();
+	auiManager->Update();
+}
 
 void MainWindow::SetStatusbarText(wxString text) {
 	if (statusBarText != NULL) {
@@ -75,11 +117,42 @@ void MainWindow::SetStatusbarText(wxString text) {
 	statusBarText->Show();
 }
 
+void MainWindow::RecieveMessageFromProcessor(wxCommandEvent& messageEvt) {
+	this->SetStatusbarText(messageEvt.GetString());
+}
+
 void MainWindow::OnClose(wxCloseEvent& closeEvent) {
 
+	imgPanelThread->StopWatching();
 	auiManager->UnInit();
 	delete auiManager;
-	delete processor;
 	closeEvent.Skip();
 	this->Destroy();
+
+	delete processor;
+}
+
+MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor) : wxThread(wxTHREAD_DETACHED) {
+	imgPanel = imagePanel;
+	proc = processor;
+	continueWatch = true;
+}
+
+wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
+
+	while (continueWatch) {
+		if (proc->GetUpdated() && !proc->GetLocked()) {
+			proc->Lock();
+			imgPanel->ChangeImage(proc->GetImage());
+			imgPanel->Redraw();
+			proc->Unlock();
+			proc->SetUpdated(false);
+		}
+		this->Sleep(100);
+	}
+	return (wxThread::ExitCode)0;
+}
+
+void MainWindow::ImagePanelUpdateThread::StopWatching() {
+	continueWatch = false;
 }
