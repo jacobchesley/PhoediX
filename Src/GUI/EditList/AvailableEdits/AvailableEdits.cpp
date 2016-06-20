@@ -2,7 +2,6 @@
 
 Edit::Edit(int editID, wxString editName, wxString editDescription) {
 
-
 	id = editID;
 	name = editName;
 	description = editDescription;
@@ -26,6 +25,8 @@ AvailableEdits::AvailableEdits() {
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_SCALE_BRIGHTNESS, "Scale Brightness", "Scale the images brightness with a multiplicative value."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CONTRAST, "Adjust Contrast", "Adjust the images contrast, to give a more vivid or flat look."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_GREYSCALE, "Convert to Greyscale", "Convert the image to greyscale, choosing one of three defined methods of doing so."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CHANNEL_TRANSFORM, "Channel Transform", "Transform RGB Channels, to create new tones such as sepia and more."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ROTATE, "Rotate Image", "Rotate image 90, 180 or 270 degrees"));
 }
 
 wxVector<Edit> AvailableEdits::GetAvailableEdits() {
