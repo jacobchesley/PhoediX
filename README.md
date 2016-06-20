@@ -23,14 +23,4 @@ General PhoediX capabilites Coming Soon:
 * Edit a Raw Image - using LibRaw
 * Save Raw Image edit parameters (PhoediX project?)
 
-
-## Building Libraries required and PhoediX itself ##
-
-### 1. Build wxWidgets ###
-* [[How to Build wxWidgets for PhoediX]]
-
-### 2. Build Libraw ###
-* [[How to Build LibRaw for PhoediX]]
-
-### 3. Build PhoediX ###
-* [[How to Build PhoediX]]
+Head on over to the Wiki to learn how to build PhoediX from source!
