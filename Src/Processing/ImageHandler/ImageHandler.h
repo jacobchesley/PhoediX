@@ -16,6 +16,7 @@ class ImageHandler {
 public:
 	static void LoadImageFromFile(wxString fileName, Image * image);
 	static void SaveImageToFile(wxString fileName, Image * image);
+	static void LoadImageFromwxImage(wxImage* inImage, Image * image);
 	static void CopyImageData8(Image * image, uint8_t * outArray);
 	static void CopyImageData16(Image * image, uint16_t * outArray);
 };

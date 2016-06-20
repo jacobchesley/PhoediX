@@ -6,6 +6,16 @@ void ImageHandler::LoadImageFromFile(wxString fileName, Image * image) {
 	image->SetDataFrom8(fileImage.GetData(), fileImage.GetWidth(), fileImage.GetHeight());
 }
 
+void ImageHandler::LoadImageFromwxImage(wxImage* inImage, Image * image) {
+
+	if (inImage->IsOk()) {
+		image->SetDataFrom8(inImage->GetData(), inImage->GetWidth(), inImage->GetHeight());
+	}
+	else {
+		image->SetDataFrom8(NULL, 0, 0);
+	}
+}
+
 void ImageHandler::CopyImageData8(Image * image, uint8_t * outArray) {
 	
 	int dataSize = image->GetWidth() * image->GetHeight() * 3;
