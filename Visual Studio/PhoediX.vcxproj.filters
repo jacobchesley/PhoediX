@@ -52,6 +52,45 @@
     <Filter Include="GUI\Edit List\Available Edits">
       <UniqueIdentifier>{515b4f56-856a-4b9f-99bd-7d03ab5c358b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Image Display\ZoomImagePanel">
+      <UniqueIdentifier>{448177a1-a797-43fc-8ff8-6515159f1e5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Controls">
+      <UniqueIdentifier>{12b5f6c3-64a7-4532-93fb-0b2d3029f1d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Controls\Double Slider">
+      <UniqueIdentifier>{142ee05b-d801-4715-8698-a8769101ac85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Processing\Processor Edit">
+      <UniqueIdentifier>{7226847e-aebb-4289-b367-b5eb1fb26691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Edit Window">
+      <UniqueIdentifier>{c42d52d7-d5a3-4e4e-a236-9e6c0bdf06d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows">
+      <UniqueIdentifier>{fcecefef-6be0-41d3-94a3-eef9fa49714c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Shift Brightness">
+      <UniqueIdentifier>{cb467c56-fbd7-4f53-8323-8666b846504b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Scale Brightness">
+      <UniqueIdentifier>{373d0714-b389-47a1-af21-dec711d6ef8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Contrast">
+      <UniqueIdentifier>{15c973d2-3bcb-4b4f-be8a-9b4d0a84a4bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Greyscale">
+      <UniqueIdentifier>{0862c298-9941-40fc-a409-6ebe76d6323b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\AUI Manager">
+      <UniqueIdentifier>{975ed145-4266-4562-8a91-d1da79a2e9de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Rotation">
+      <UniqueIdentifier>{64fd5cfd-b250-42fc-88f9-e846009bdc97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform">
+      <UniqueIdentifier>{3e13dec2-a021-47e3-bf9e-6faec7bb1647}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -89,6 +128,42 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp">
       <Filter>GUI\Edit List\Available Edits</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.cpp">
+      <Filter>GUI\Image Display\ZoomImagePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.cpp">
+      <Filter>GUI\Controls\Double Slider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.cpp">
+      <Filter>Processing\Processor Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\EditWindow\EditWindow.cpp">
+      <Filter>GUI\Edit List\Edit Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Contrast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\AUI Manager\AUIManager.cpp">
+      <Filter>GUI\AUI Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleBrightnessWindow\ScaleBrightnessWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale Brightness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftBrightnessWindow\ShiftBrightnessWindowcpp.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift Brightness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Rotation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +214,42 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h">
       <Filter>GUI\Edit List\Available Edits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h">
+      <Filter>GUI\Image Display\ZoomImagePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.h">
+      <Filter>GUI\Controls\Double Slider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.h">
+      <Filter>Processing\Processor Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\EditWindow\EditWindow.h">
+      <Filter>GUI\Edit List\Edit Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Contrast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h">
+      <Filter>GUI\AUI Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleBrightnessWindow\ScaleBrightnessWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale Brightness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftBrightnessWindow\ShiftBrightnessWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift Brightness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Rotation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
