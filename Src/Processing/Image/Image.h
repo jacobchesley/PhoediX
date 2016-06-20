@@ -7,6 +7,7 @@
 class Image {
 public:
 	Image();
+	Image(const Image& imageToCopy);
 	~Image();
 
 	void Destroy();
@@ -21,6 +22,9 @@ public:
 
 	int GetWidth();
 	int GetHeight();
+
+	void SetWidth(int newWidth);
+	void SetHeight(int newHeight);
 
 	uint8_t * Get8BitDataRed();
 	uint8_t * Get8BitDataGreen();

@@ -1,8 +1,9 @@
 #include "Image.h"
+#include <string.h>
 
 Image::Image() {
 
-	bit16Enabled = true;
+	bit16Enabled = false;
 
 	imageDataRed8 = NULL;
 	imageDataGreen8 = NULL;
@@ -11,6 +12,39 @@ Image::Image() {
 	imageDataRed16 = NULL;
 	imageDataGreen16 = NULL;
 	imageDataBlue16 = NULL;
+	width = 0;
+	height = 0;
+}
+
+Image::Image(const Image& imageToCopy) {
+
+	width = imageToCopy.width;
+	height = imageToCopy.height;
+	bit16Enabled = imageToCopy.bit16Enabled;
+
+	int size = width * height;
+
+	imageDataRed8 = new uint8_t[size];
+	imageDataGreen8 = new uint8_t[size];
+	imageDataBlue8 = new uint8_t[size];
+	
+	memcpy(imageDataRed8, imageToCopy.imageDataRed8, sizeof(uint8_t) * size);
+	memcpy(imageDataGreen8, imageToCopy.imageDataGreen8, sizeof(uint8_t) * size);
+	memcpy(imageDataBlue8, imageToCopy.imageDataBlue8, sizeof(uint8_t) * size);
+
+	imageDataRed16 = NULL;
+	imageDataGreen16 = NULL;
+	imageDataBlue16 = NULL;
+
+	if (bit16Enabled) {
+		imageDataRed16 = new uint16_t[size];
+		imageDataGreen16 = new uint16_t[size];
+		imageDataBlue16 = new uint16_t[size];
+		
+		memcpy(imageDataRed16, imageToCopy.imageDataRed16, sizeof(uint16_t) * size);
+		memcpy(imageDataGreen16, imageToCopy.imageDataGreen16, sizeof(uint16_t) * size);
+		memcpy(imageDataBlue16, imageToCopy.imageDataBlue16, sizeof(uint16_t) * size);
+	}
 }
 
 Image::~Image() {
@@ -20,6 +54,7 @@ Image::~Image() {
 
 void Image::Destroy() {
 
+	if (width < 1 || height < 1) { return; }
 	// Delete current 8 bit image data if it exists
 	if (imageDataRed8 != NULL) {
 		delete[] imageDataRed8;
@@ -204,6 +239,14 @@ void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 	
 }
 
+void Image::SetWidth(int newWidth) {
+	width = newWidth;
+}
+
+void Image::SetHeight(int newHeight) {
+	height = newHeight;
+}
+
 int Image::GetWidth() {
 	return width;
 }
@@ -242,8 +285,54 @@ int Image::GetColorDepth() {
 
 void Image::Enable16Bit() {
 	bit16Enabled = true;
+
+	int size = width * height;;
+
+	// Delete current 16 bit image data if it exists
+	if (imageDataRed16 != NULL) {
+		delete[] imageDataRed16;
+		imageDataRed16 = NULL;
+	}
+
+	if (imageDataGreen16 != NULL) {
+		delete[] imageDataGreen16;
+		imageDataGreen16 = NULL;
+	}
+
+	if (imageDataBlue16 != NULL) {
+		delete[] imageDataBlue16;
+		imageDataBlue16 = NULL;
+	}
+
+	// Create new image data
+	imageDataRed16 = new uint16_t[size];
+	imageDataGreen16 = new uint16_t[size];
+	imageDataBlue16 = new uint16_t[size];
+
+	// Go through each pixel containing red, green and blue, and scale to 16 bit data
+	for (int i = 0; i < size; i ++) {
+		imageDataRed16[i] = imageDataRed8[i] * 256;
+		imageDataGreen16[i] = imageDataGreen8[i] * 256;
+		imageDataBlue16[i] = imageDataBlue8[i] * 256;
+	}
 }
 
 void Image::Disable16Bit() {
 	bit16Enabled = false;
+
+	// Delete current 16 bit image data if it exists
+	if (imageDataRed16 != NULL) {
+		delete[] imageDataRed16;
+		imageDataRed16 = NULL;
+	}
+
+	if (imageDataGreen16 != NULL) {
+		delete[] imageDataGreen16;
+		imageDataGreen16 = NULL;
+	}
+
+	if (imageDataBlue16 != NULL) {
+		delete[] imageDataBlue16;
+		imageDataBlue16 = NULL;
+	}
 }
