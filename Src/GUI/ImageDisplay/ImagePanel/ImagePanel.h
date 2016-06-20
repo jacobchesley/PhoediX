@@ -18,8 +18,11 @@
 
 class ImagePanel : public wxPanel {
 public:
+	ImagePanel(wxWindow * parent);
 	ImagePanel(wxWindow * parent, Image * image);
 	void Redraw();
+	void SetZoom(double zoomFactor);
+	void ResizeImgOnResize(bool doResize);
 
 private:
 	void OnPaint(wxPaintEvent & evt);
@@ -31,8 +34,9 @@ private:
 	int oldWidth;
 	int oldHeight;
 
-	bool resizeImageOnResize;
+	double zoom;
 	bool keepAspect;
+	bool resize;
 
 };
 

@@ -1,10 +1,10 @@
 #include "ImagePanel.h"
 
-ImagePanel::ImagePanel(wxWindow * parent, Image * image) : wxPanel(parent) {
+ImagePanel::ImagePanel(wxWindow * parent) : wxPanel(parent) {
 
-	img = image;
-	resizeImageOnResize = true;
+	zoom = 1.0;
 	keepAspect = true;
+	resize = false;
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&ImagePanel::OnSize, this);
@@ -12,11 +12,30 @@ ImagePanel::ImagePanel(wxWindow * parent, Image * image) : wxPanel(parent) {
 	this->SetDoubleBuffered(true);
 }
 
+ImagePanel::ImagePanel(wxWindow * parent, Image * image) : wxPanel(parent) {
+
+	img = image;
+	zoom = 1.0;
+	keepAspect = true;
+	resize = false;
+
+	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImagePanel::OnPaint, this);
+	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&ImagePanel::OnSize, this);
+
+	this->SetDoubleBuffered(true);
+}
+
+
 void ImagePanel::Render(wxDC & dc) {
 
 	// Get current width and height
 	int newWidth = this->GetSize().GetWidth();
 	int newHeight = this->GetSize().GetHeight();
+
+	OutputDebugStringA("Draw Width - ");
+	OutputDebugStringA(std::to_string(newWidth).c_str());
+	OutputDebugStringA("Draw Height - ");
+	OutputDebugStringA(std::to_string(newHeight).c_str());
 
 	if (oldHeight != newHeight || oldWidth != newWidth) {
 
@@ -43,7 +62,12 @@ void ImagePanel::Render(wxDC & dc) {
 		
 		// Convert wxImage to wxBitmap, with scaled width and height
 		if (tempImage.IsOk()) {
-			bitmapDraw = wxBitmap(tempImage.Scale(newWidth, newHeight, wxIMAGE_QUALITY_HIGH));
+			if (resize) {
+				bitmapDraw = wxBitmap(tempImage.Scale(newWidth * zoom, newHeight * zoom, wxIMAGE_QUALITY_HIGH));
+			}
+			else {
+				bitmapDraw = wxBitmap(tempImage);
+			}
 		}
 
 		oldWidth = newWidth;
@@ -67,6 +91,11 @@ void ImagePanel::OnPaint(wxPaintEvent& event) {
 }
 
 void ImagePanel::OnSize(wxSizeEvent& event) {
+	this->SetSize(img->GetWidth(), img->GetHeight());
 	Refresh();
 	event.Skip();
+}
+
+void ImagePanel::SetZoom(double zoomFactor) {
+	zoom = zoomFactor;
 }
