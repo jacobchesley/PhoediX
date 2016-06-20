@@ -638,6 +638,8 @@ void Processor::RotateCustom(double angleDegrees) {
 	int dataSize = width * height;
 	int x = 0;
 	int y = 0;
+	double newXD = 0.0;
+	double newYD = 0.0;
 	int newX = 0;
 	int newY = 0;
 
@@ -670,12 +672,16 @@ void Processor::RotateCustom(double angleDegrees) {
 		y -= pivotY;
 
 		// Rotate point
-		newX = (x * angleCos) - (y * angleSin);
-		newY = (x * angleSin) + (y * angleCos);
+		newXD = (x * angleCos) - (y * angleSin);
+		newYD = (x * angleSin) + (y * angleCos);
 
 		// Shift back
-		newX += pivotX;
-		newY += pivotY;
+		newXD += pivotX;
+		newYD += pivotY;
+
+		// Round double to int
+		newX = wxRound(newXD);
+		newY = wxRound(newYD);
 
 		// Veirfy pixel location is in bounds of original image size
 		if(newX > 0 && newX < width && newY > 0 && newY < height){
