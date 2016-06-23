@@ -23,6 +23,11 @@ public :
 	int GetParamsSize();
 	double GetParam(size_t index);
 
+	void AddFlag(int flag);
+	void ClearFlags();
+	int GetFlagsSize();
+	double GetFlag(size_t index);
+
 	int GetEditType();
 	void SetEditType(int editType);
 
@@ -46,11 +51,14 @@ public :
 		ROTATE_CUSTOM_NEAREST,
 		ROTATE_CUSTOM_BILINEAR,
 		ROTATE_CUSTOM_BICUBIC,
+		MIRROR_VERTICAL,
+		MIRROR_HORIZONTAL
 	};
 	
 private:
 	int edit;
 	wxVector<double> params;
+	wxVector<int> flags;
 
 	bool doMultithread;
 	int numThread;

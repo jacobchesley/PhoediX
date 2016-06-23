@@ -27,6 +27,22 @@ double ProcessorEdit::GetParam(size_t index) {
 	return params.at(index);
 }
 
+void ProcessorEdit::AddFlag(int flag) {
+	flags.push_back(flag);
+}
+
+void ProcessorEdit::ClearFlags() {
+	flags.clear();
+}
+
+int ProcessorEdit::GetFlagsSize() {
+	return flags.size();
+}
+
+double ProcessorEdit::GetFlag(size_t index) {
+	return flags.at(index);
+}
+
 int ProcessorEdit::GetEditType() {
 	return edit;
 }
