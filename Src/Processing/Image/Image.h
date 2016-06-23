@@ -25,6 +25,7 @@ public:
 
 	void SetWidth(int newWidth);
 	void SetHeight(int newHeight);
+	void InitImage();
 
 	uint8_t * Get8BitDataRed();
 	uint8_t * Get8BitDataGreen();

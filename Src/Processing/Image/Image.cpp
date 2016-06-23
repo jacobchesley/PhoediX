@@ -247,6 +247,79 @@ void Image::SetHeight(int newHeight) {
 	height = newHeight;
 }
 
+void Image::InitImage() {
+
+	int size = width * height * 3;
+
+	// Convert the 8 bit data into 16 bit data
+	if (bit16Enabled) {
+
+		// Delete current 16 bit image data if it exists
+		if (imageDataRed16 != NULL) {
+			delete[] imageDataRed16;
+			imageDataRed16 = NULL;
+		}
+
+		if (imageDataGreen16 != NULL) {
+			delete[] imageDataGreen16;
+			imageDataGreen16 = NULL;
+		}
+
+		if (imageDataBlue16 != NULL) {
+			delete[] imageDataBlue16;
+			imageDataBlue16 = NULL;
+		}
+
+		// Create new image data
+		imageDataRed16 = new uint16_t[size / 3];
+		imageDataGreen16 = new uint16_t[size / 3];
+		imageDataBlue16 = new uint16_t[size / 3];
+
+		// Go through each pixel containing red, green and blue, and init to 0
+		int index = 0;
+		for (int i = 0; i < size; i += 3) {
+			imageDataRed16[index] = 0;
+			imageDataGreen16[index] = 0;
+			imageDataBlue16[index] = 0;
+			index += 1;
+		}
+	}
+
+	// Always need to have 8 bit data available for display
+
+	// Copy the 8 bit data
+
+	// Delete current 16 bit image data if it exists
+	if (imageDataRed8 != NULL) {
+		delete[] imageDataRed8;
+		imageDataRed8 = NULL;
+	}
+
+	if (imageDataGreen8 != NULL) {
+		delete[] imageDataGreen8;
+		imageDataGreen8 = NULL;
+	}
+
+	if (imageDataBlue8 != NULL) {
+		delete[] imageDataBlue8;
+		imageDataBlue8 = NULL;
+	}
+
+	// Create new image data
+	imageDataRed8 = new uint8_t[size / 3];
+	imageDataGreen8 = new uint8_t[size / 3];
+	imageDataBlue8 = new uint8_t[size / 3];
+
+	// Go through each pixel containing red, green and blue, and init to 0
+	int index = 0;
+	for (int i = 0; i < size; i += 3) {
+		imageDataRed8[index] = 0;
+		imageDataGreen8[index] = 0;
+		imageDataBlue8[index] = 0;
+		index += 1;
+	}
+}
+
 int Image::GetWidth() {
 	return width;
 }
