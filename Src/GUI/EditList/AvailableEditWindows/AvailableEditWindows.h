@@ -11,12 +11,13 @@
 
 #include "GUI\EditList\EditWindow\EditWindow.h"
 
+#include "ChannelTransformWindow\ChannelTransformWindow.h"
 #include "ContrastWindow\ContrastWindow.h"
 #include "GreyscaleWindow\ConvertGreyscaleWindow.h"
+#include "MirrorWindow\MirrorWindow.h"
+#include "RotationWindow\RotationWindow.h"
 #include "ScaleBrightnessWindow\ScaleBrightnessWindow.h"
 #include "ShiftBrightnessWindow\ShiftBrightnessWindow.h"
-#include "RotationWindow\RotationWindow.h"
-#include "ChannelTransformWindow\ChannelTransformWindow.h"
 
 #include "GUI\EditList\AvailableEdits\AvailableEdits.h"
 #include "Debugging\MemoryLeakCheck.h"

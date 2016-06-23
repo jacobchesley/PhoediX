@@ -30,6 +30,10 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 		case AvailableEditIDS::EDIT_ID_CHANNEL_TRANSFORM:
 			newEditWindow = new ChannelTransformWindow(parent, "Channel Transform", processor);
 			break;
+
+		case AvailableEditIDS::EDIT_ID_MIRROR:
+			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
+			break;
 	}
 
 	return newEditWindow;
