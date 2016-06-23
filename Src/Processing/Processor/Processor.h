@@ -50,6 +50,12 @@ public:
 	void Unlock();
 	bool GetLocked();
 
+	enum RotationCropping{
+		KEEP_SIZE,
+		FIT,
+		EXPAND
+	};
+
 private:
 
 	Image * img;
@@ -71,11 +77,19 @@ private:
 		double greenRedScale, double greenGreenScale, double greenBlueScale,
 		double blueRedScale, double blueGreenScale, double blueBlueScale, 
 		int dataStart = -1, int dataEnd = -1);
+
 	void Rotate90CW();
 	void Rotate180();
-	void RotateCustom(double angleDegrees);
-	void RotateCustomBilinear(double angleDegrees);
-	void RotateCustomBicubic(double angleDegrees);
+	void RotateCustom(double angleDegrees, int crop = RotationCropping::KEEP_SIZE);
+	void RotateCustomBilinear(double angleDegrees, int crop = RotationCropping::KEEP_SIZE);
+	void RotateCustomBicubic(double angleDegrees, int crop = RotationCropping::KEEP_SIZE);
+	int GetExpandedRotationWidth(double angleDegrees, int originalWidth, int originalHeight);
+	int GetExpandedRotationHeight(double angleDegrees, int originalWidth, int originalHeight);
+	int GetFittedRotationWidth(double angleDegrees, int originalWidth, int originalHeight);
+	int GetFittedRotationHeight(double angleDegrees, int originalWidth, int originalHeight);
+
+	void MirrorHorizontal();
+	void MirrorVertical();
 
 	void SendMessageToParent(wxString message);
 

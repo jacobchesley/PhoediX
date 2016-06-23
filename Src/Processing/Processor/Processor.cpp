@@ -625,40 +625,68 @@ void Processor::Rotate180() {
 	delete tempImage;
 }
 
-void Processor::RotateCustom(double angleDegrees) {
+void Processor::RotateCustom(double angleDegrees, int crop) {
 
 	angleDegrees *= -1.0;
 	double angleSin = sin(angleDegrees * pi / 180.0);
 	double angleCos = cos(angleDegrees * pi / 180.0);
-	int pivotX = img->GetWidth() / 2;
-	int pivotY = img->GetHeight() / 2;
+	double pivotX = (double)img->GetWidth() / 2.0;
+	double pivotY = (double)img->GetHeight() / 2.0;
 
 	int width = img->GetWidth();
 	int height = img->GetHeight();
 	int dataSize = width * height;
 	int x = 0;
 	int y = 0;
-	double newXD = 0.0;
-	double newYD = 0.0;
-	int newX = 0;
-	int newY = 0;
+	double newX = 0;
+	double newY = 0;
 
 	// Get pointers to 8 bit data
 	uint8_t * redData8 = img->Get8BitDataRed();
 	uint8_t * greenData8 = img->Get8BitDataGreen();
 	uint8_t * blueData8 = img->Get8BitDataBlue();
 
-	Image * tempImage = new Image(*img);
-	uint8_t * redData8Dup = tempImage->Get8BitDataRed();
-	uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
-	uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
+	Image * rotatedImage = new Image();
 
-	// Set duplicate data to 0
-	for (int i = 0; i < dataSize; i++) {
-		redData8Dup[i] = 0;
-		greenData8Dup[i] = 0;
-		blueData8Dup[i] = 0;
+	int newWidth = 0;
+	int newHeight = 0;
+	int dWidth = 0;
+	int dHeight = 0;
+	int newDataSize = 0;
+
+	if(crop == Processor::RotationCropping::EXPAND){
+		rotatedImage->SetWidth(this->GetExpandedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->SetHeight(this->GetExpandedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+		dWidth = newWidth - width;
+		dHeight = newHeight - height;
 	}
+	
+	else if(crop == Processor::RotationCropping::FIT){
+		rotatedImage->SetWidth(this->GetFittedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->SetHeight(this->GetFittedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+		dWidth = newWidth - width;
+		dHeight = newHeight - height;
+	}
+	else{
+		rotatedImage->SetWidth(img->GetWidth());
+		rotatedImage->SetHeight(img->GetHeight());
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+	}
+
+	uint8_t * redData8Dup = rotatedImage->Get8BitDataRed();
+	uint8_t * greenData8Dup = rotatedImage->Get8BitDataGreen();
+	uint8_t * blueData8Dup = rotatedImage->Get8BitDataBlue();
 
 	int newI = 0;
 	for (int i = 0; i < dataSize; i++) {
@@ -667,21 +695,24 @@ void Processor::RotateCustom(double angleDegrees) {
 		x = i % width;
 		y = i / width;
 		
+		x -= dWidth/2.0;
+		y -= dHeight/2.0;
+
 		// Shift by pivot point
 		x -= pivotX;
 		y -= pivotY;
 
 		// Rotate point
-		newXD = (x * angleCos) - (y * angleSin);
-		newYD = (x * angleSin) + (y * angleCos);
+		newX = (x * angleCos) - (y * angleSin);
+		newY = (x * angleSin) + (y * angleCos);
 
 		// Shift back
-		newXD += pivotX;
-		newYD += pivotY;
+		newX += pivotX;
+		newY += pivotY;
 
 		// Round double to int
-		newX = wxRound(newXD);
-		newY = wxRound(newYD);
+		newX = wxRound(newX);
+		newY = wxRound(newY);
 
 		// Veirfy pixel location is in bounds of original image size
 		if(newX > 0 && newX < width && newY > 0 && newY < height){
@@ -696,15 +727,6 @@ void Processor::RotateCustom(double angleDegrees) {
 		}
 	}
 
-	for (int i = 0; i < dataSize; i++) {
-
-		// Get red, green and blue temporary pixels
-		redData8[i] = redData8Dup[i];
-		greenData8[i] = greenData8Dup[i];
-		blueData8[i] = blueData8Dup[i];
-
-	}
-
 	// If 16 bit image is enabled
 	if (img->GetColorDepth() == 16) {
 
@@ -713,9 +735,9 @@ void Processor::RotateCustom(double angleDegrees) {
 		uint16_t * greenData16 = img->Get16BitDataGreen();
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
-		uint16_t * redData16Dup = tempImage->Get16BitDataRed();
-		uint16_t * greenData16Dup = tempImage->Get16BitDataGreen();
-		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
+		uint16_t * redData16Dup = rotatedImage->Get16BitDataRed();
+		uint16_t * greenData16Dup = rotatedImage->Get16BitDataGreen();
+		uint16_t * blueData16Dup = rotatedImage->Get16BitDataBlue();
 
 		// Set duplicate data to 0
 		for (int i = 0; i < dataSize; i++) {
@@ -729,6 +751,9 @@ void Processor::RotateCustom(double angleDegrees) {
 			// Get x and y coordinates from current index of data
 			x = i % width;
 			y = i / width;
+
+			x -= dWidth/2.0;
+			y -= dHeight/2.0;
 
 			// Shift by pivot point
 			x -= pivotX;
@@ -754,23 +779,16 @@ void Processor::RotateCustom(double angleDegrees) {
 				blueData16Dup[i] = blueData16[newI];
 			}
 		}
-
-		// Copy data from duplicate back to original image
-		for (int i = 0; i < dataSize; i++) {
-
-			// Get red, green and blue temporary pixels
-			redData16[i] = redData16Dup[i];
-			greenData16[i] = greenData16Dup[i];
-			blueData16[i] = blueData16Dup[i];
-		}
 	}
 
-	delete tempImage;
+	delete img;
+	img = new Image(*rotatedImage);
+	delete rotatedImage;
 }
 
-void Processor::RotateCustomBilinear(double angleDegrees) {
+void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 
-	double useNearestNeighborDistance = 0.000000001;
+	double useNearestNeighborDistance = 0.0001;
 
 	angleDegrees *= -1.0;
 	double angleSin = sin(angleDegrees * pi / 180.0);
@@ -780,7 +798,6 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 
 	int width = img->GetWidth();
 	int height = img->GetHeight();
-	int dataSize = width * height;
 	int x = 0;
 	int y = 0;
 	double newX = 0;
@@ -795,17 +812,47 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 	uint8_t * greenData8 = img->Get8BitDataGreen();
 	uint8_t * blueData8 = img->Get8BitDataBlue();
 
-	Image * tempImage = new Image(*img);
-	uint8_t * redData8Dup = tempImage->Get8BitDataRed();
-	uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
-	uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
+	Image * rotatedImage = new Image();
 
-	// Set duplicate data to 0
-	for (int i = 0; i < dataSize; i++) {
-		redData8Dup[i] = 0;
-		greenData8Dup[i] = 0;
-		blueData8Dup[i] = 0;
+	int newWidth = 0;
+	int newHeight = 0;
+	int dWidth = 0;
+	int dHeight = 0;
+	int newDataSize = 0;
+
+	if(crop == Processor::RotationCropping::EXPAND){
+		rotatedImage->SetWidth(this->GetExpandedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->SetHeight(this->GetExpandedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+		dWidth = newWidth - width;
+		dHeight = newHeight - height;
 	}
+	
+	else if(crop == Processor::RotationCropping::FIT){
+		rotatedImage->SetWidth(this->GetFittedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->SetHeight(this->GetFittedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+		dWidth = newWidth - width;
+		dHeight = newHeight - height;
+	}
+	else{
+		rotatedImage->SetWidth(img->GetWidth());
+		rotatedImage->SetHeight(img->GetHeight());
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+	}
+
+	uint8_t * redData8Dup = rotatedImage->Get8BitDataRed();
+	uint8_t * greenData8Dup = rotatedImage->Get8BitDataGreen();
+	uint8_t * blueData8Dup = rotatedImage->Get8BitDataBlue();
 
 	// Neighbors of exact rotation location
 	int point1 = 0;
@@ -832,11 +879,14 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 	double weight4 = 0.0;
 	double weightSum = 1.0;
 
-	for (int i = 0; i < dataSize; i++) {
+	for (int i = 0; i < newDataSize; i++) {
 
 		// Get x and y coordinates from current index of data
-		x = i % width;
-		y = i / width;
+		x = i % newWidth;
+		y = i / newWidth;
+
+		x -= dWidth/2.0;
+		y -= dHeight/2.0;
 
 		// Shift by pivot point
 		x -= pivotX;
@@ -851,7 +901,7 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 		newY += pivotY;
 
 		// Veirfy pixel location is in bounds of original image size
-		if (newX > 0 && newX < width && newY > 0 && newY < height) {
+		if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1) {
 
 			// new X is not on border of image
 			if (newX > 0 && newX < width - 1) {
@@ -953,15 +1003,6 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 		}
 	}
 
-	// Copy from duplicate data back to original data
-	for (int i = 0; i < dataSize; i++) {
-
-		// Get red, green and blue temporary pixels
-		redData8[i] = redData8Dup[i];
-		greenData8[i] = greenData8Dup[i];
-		blueData8[i] = blueData8Dup[i];
-	}
-
 	// If 16 bit image is enabled
 	if (img->GetColorDepth() == 16) {
 
@@ -970,22 +1011,18 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 		uint16_t * greenData16 = img->Get16BitDataGreen();
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
-		uint16_t * redData16Dup = tempImage->Get16BitDataRed();
-		uint16_t * greenData16Dup = tempImage->Get16BitDataGreen();
-		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
+		uint16_t * redData16Dup = rotatedImage->Get16BitDataRed();
+		uint16_t * greenData16Dup = rotatedImage->Get16BitDataGreen();
+		uint16_t * blueData16Dup = rotatedImage->Get16BitDataBlue();
 
-		// Set duplicate data to 0
-		for (int i = 0; i < dataSize; i++) {
-			redData16Dup[i] = 0;
-			greenData16Dup[i] = 0;
-			blueData16Dup[i] = 0;
-		}
-
-		for (int i = 0; i < dataSize; i++) {
+		for (int i = 0; i < newDataSize; i++) {
 
 			// Get x and y coordinates from current index of data
-			x = i % width;
-			y = i / width;
+			x = i % newWidth;
+			y = i / newWidth;
+
+			x -= dWidth/2.0;
+			y -= dHeight/2.0;
 
 			// Shift by pivot point
 			x -= pivotX;
@@ -1000,7 +1037,7 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 			newY += pivotY;
 
 			// Veirfy pixel location is in bounds of original image size
-			if (newX > 0 && newX < width && newY > 0 && newY < height) {
+			if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1) {
 
 				// new X is not on border of image
 				if (newX > 0 && newX < width - 1) {
@@ -1101,23 +1138,16 @@ void Processor::RotateCustomBilinear(double angleDegrees) {
 				blueData16Dup[i] = (uint16_t)tempBlue;
 			}
 		}
-
-		// Copy from duplicate data back to original data
-		for (int i = 0; i < dataSize; i++) {
-
-			// Get red, green and blue temporary pixels
-			redData16[i] = redData16Dup[i];
-			greenData16[i] = greenData16Dup[i];
-			blueData16[i] = blueData16Dup[i];
-		}
 	}
 
-	delete tempImage;
+	delete img;
+	img = new Image(*rotatedImage);
+	delete rotatedImage;
 }
 
-void Processor::RotateCustomBicubic(double angleDegrees) {
+void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 
-	double useNearestNeighborDistance = 0.000000001;
+	double useNearestNeighborDistance = 0.0001;
 
 	angleDegrees *= -1.0;
 	double angleSin = sin(angleDegrees * pi / 180.0);
@@ -1127,7 +1157,6 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 
 	int width = img->GetWidth();
 	int height = img->GetHeight();
-	int dataSize = width * height;
 	int x = 0;
 	int y = 0;
 	double newX = 0;
@@ -1142,17 +1171,47 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 	uint8_t * greenData8 = img->Get8BitDataGreen();
 	uint8_t * blueData8 = img->Get8BitDataBlue();
 
-	Image * tempImage = new Image(*img);
-	uint8_t * redData8Dup = tempImage->Get8BitDataRed();
-	uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
-	uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
+	Image * rotatedImage = new Image();
 
-	// Set duplicate data to 0
-	for (int i = 0; i < dataSize; i++) {
-		redData8Dup[i] = 0;
-		greenData8Dup[i] = 0;
-		blueData8Dup[i] = 0;
+	int newWidth = 0;
+	int newHeight = 0;
+	int dWidth = 0;
+	int dHeight = 0;
+	int newDataSize = 0;
+
+	if(crop == Processor::RotationCropping::EXPAND){
+		rotatedImage->SetWidth(this->GetExpandedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->SetHeight(this->GetExpandedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+		dWidth = newWidth - width;
+		dHeight = newHeight - height;
 	}
+	
+	else if(crop == Processor::RotationCropping::FIT){
+		rotatedImage->SetWidth(this->GetFittedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->SetHeight(this->GetFittedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+		dWidth = newWidth - width;
+		dHeight = newHeight - height;
+	}
+	else{
+		rotatedImage->SetWidth(img->GetWidth());
+		rotatedImage->SetHeight(img->GetHeight());
+		rotatedImage->InitImage();
+		newWidth= rotatedImage->GetWidth();
+		newHeight= rotatedImage->GetHeight();
+		newDataSize = newWidth * newHeight;
+	}
+
+	uint8_t * redData8Dup = rotatedImage->Get8BitDataRed();
+	uint8_t * greenData8Dup = rotatedImage->Get8BitDataGreen();
+	uint8_t * blueData8Dup = rotatedImage->Get8BitDataBlue();
 
 	int point1 = 0; int point2 = 0; int point3 = 0; int point4 = 0;
 	int point5 = 0; int point6 = 0; int point7 = 0; int point8 = 0;
@@ -1174,11 +1233,14 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 
 	double weightSum = 1.0;
 
-	for (int i = 0; i < dataSize; i++) {
+	for (int i = 0; i < newDataSize; i++) {
 
 		// Get x and y coordinates from current index of data
-		x = i % width;
-		y = i / width;
+		x = i % newWidth;
+		y = i / newWidth;
+
+		x -= dWidth/2.0;
+		y -= dHeight/2.0;
 
 		// Shift by pivot point
 		x -= pivotX;
@@ -1193,7 +1255,7 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 		newY += pivotY;
 
 		// Veirfy pixel location is in bounds of original image size
-		if (newX > 0 && newX < width && newY > 0 && newY < height) {
+		if (newX > 1 && newX < width - 2 && newY > 1 && newY < height - 2) {
 
 			// new X is not on border of image
 			if (newX > 1 && newX < width - 2) {
@@ -1216,7 +1278,7 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 				point5 = wxRound(floor(newY))-1;
 				point6 = wxRound(floor(newY));
 				point7 = wxRound(ceil(newY));
-				point8 = wxRound(ceil(newY));
+				point8 = wxRound(ceil(newY)) + 1;
 			}
 
 			// new Y is on border.
@@ -1438,15 +1500,6 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 		}
 	}
 
-	// Copy from duplicate data back to original data
-	for (int i = 0; i < dataSize; i++) {
-
-		// Get red, green and blue temporary pixels
-		redData8[i] = redData8Dup[i];
-		greenData8[i] = greenData8Dup[i];
-		blueData8[i] = blueData8Dup[i];
-	}
-
 	// If 16 bit image is enabled
 	if (img->GetColorDepth() == 16) {
 
@@ -1455,22 +1508,15 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 		uint16_t * greenData16 = img->Get16BitDataGreen();
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
-		uint16_t * redData16Dup = tempImage->Get16BitDataRed();
-		uint16_t * greenData16Dup = tempImage->Get16BitDataGreen();
-		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
+		uint16_t * redData16Dup = rotatedImage->Get16BitDataRed();
+		uint16_t * greenData16Dup = rotatedImage->Get16BitDataGreen();
+		uint16_t * blueData16Dup = rotatedImage->Get16BitDataBlue();
 
-		// Set duplicate data to 0
-		for (int i = 0; i < dataSize; i++) {
-			redData16Dup[i] = 0;
-			greenData16Dup[i] = 0;
-			blueData16Dup[i] = 0;
-		}
-
-		for (int i = 0; i < dataSize; i++) {
+		for (int i = 0; i < newDataSize; i++) {
 
 			// Get x and y coordinates from current index of data
-			x = i % width;
-			y = i / width;
+			x = i % newWidth;
+			y = i / newWidth;
 
 			// Shift by pivot point
 			x -= pivotX;
@@ -1485,7 +1531,7 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 			newY += pivotY;
 
 			// Veirfy pixel location is in bounds of original image size
-			if (newX > 0 && newX < width && newY > 0 && newY < height) {
+			if (newX > 1 && newX < width - 2 && newY > 1 && newY < height - 2) {
 
 				// new X is not on border of image
 				if (newX > 1 && newX < width - 2) {
@@ -1729,18 +1775,226 @@ void Processor::RotateCustomBicubic(double angleDegrees) {
 				blueData16Dup[i] = (uint16_t)tempBlue;
 			}
 		}
+	}
 
-		// Copy from duplicate data back to original data
-		for (int i = 0; i < dataSize; i++) {
+	delete img;
+	img = new Image(*rotatedImage);
+	delete rotatedImage;
+}
 
-			// Get red, green and blue temporary pixels
-			redData16[i] = redData16Dup[i];
-			greenData16[i] = greenData16Dup[i];
-			blueData16[i] = blueData16Dup[i];
+int Processor::GetExpandedRotationWidth(double angleDegrees, int originalWidth, int originalHeight){
+
+	if(angleDegrees < 0.0){
+			angleDegrees += 180.0;
+	}
+	if((angleDegrees < 90.0 && angleDegrees > 0.0)|| (angleDegrees > -90.0 && angleDegrees < 0.0)){
+		return (int)(((double)originalWidth * cos(angleDegrees * pi / 180.0)) + ((double)originalHeight * sin(angleDegrees * pi / 180.0)));
+	}
+	else if((angleDegrees > 90.0 && angleDegrees < 180.0) || (angleDegrees < -90.0 && angleDegrees > -180.0)){
+		angleDegrees -= 90.0;
+		return (int)(((double)originalHeight * cos(angleDegrees * pi / 180.0)) + ((double)originalWidth * sin(angleDegrees * pi / 180.0)));
+	}
+	else if(angleDegrees == 90 || angleDegrees == -90){
+		return originalHeight;
+	}
+	else{
+		return originalWidth;
+	}
+}
+
+int Processor::GetExpandedRotationHeight(double angleDegrees, int originalWidth, int originalHeight){
+
+	if(angleDegrees < 0.0){
+			angleDegrees *= -1.0;
+	}
+	if((angleDegrees < 90.0 && angleDegrees > 0.0)|| (angleDegrees > -90.0 && angleDegrees < 0.0)){
+		return (int)(((double)originalWidth * sin(angleDegrees * pi / 180.0)) + ((double)originalHeight * cos(angleDegrees * pi / 180.0)));
+	}
+	else if((angleDegrees > 90.0 && angleDegrees < 180.0) || (angleDegrees < -90.0 && angleDegrees > -180.0)){
+		angleDegrees -= 90.0;
+		return (int)(((double)originalHeight * sin(angleDegrees * pi / 180.0)) + ((double)originalWidth * cos(angleDegrees * pi / 180.0)));
+	}
+	else if(angleDegrees == 90 || angleDegrees == -90){
+		return originalWidth;
+	}
+	else{
+		return originalHeight;
+	}
+}
+
+int Processor::GetFittedRotationWidth(double angleDegrees, int originalWidth, int originalHeight){
+
+	if(angleDegrees == 0.0 || angleDegrees == 180.0 || angleDegrees == -180.0){
+		return originalWidth;
+	}
+	else if(angleDegrees == 90.0 || angleDegrees == -90.0){
+		return originalHeight;
+	}
+
+	double absoluteSin = sin(angleDegrees * pi / 180.0);
+	double absoluteCos = cos(angleDegrees * pi / 180.0);
+	if(absoluteSin < 0.0){ absoluteSin *= -1.0; }
+	if(absoluteCos < 0.0){ absoluteCos *= -1.0; }
+
+	int shorterSide = 0;
+	int longerSide = 0;
+
+	bool doSwap = false;
+	if(originalWidth > originalHeight){
+		longerSide = originalWidth; 
+		shorterSide = originalHeight;
+	}
+	else{
+		longerSide = originalHeight; 
+		shorterSide = originalWidth;
+		doSwap = true;
+	}
+
+	if(shorterSide < 2.0 * absoluteSin * absoluteCos * longerSide){
+		if(!doSwap){
+			return (int)((0.5 * shorterSide)/absoluteSin);
+		}
+		else{
+			return (int)((0.5 * shorterSide)/absoluteCos);
 		}
 	}
-	delete tempImage;
+	else{
+
+		double absoulteCos2 = absoluteCos * absoluteCos;
+		double absoulteSin2 = absoluteSin * absoluteSin;
+		double absoulteCos2MinAbsolulteSin2 = absoulteCos2 - absoulteSin2;
+
+		return (int)(((originalWidth * absoluteCos) - (originalHeight * absoluteSin))/absoulteCos2MinAbsolulteSin2);
+	}
 }
+
+int Processor::GetFittedRotationHeight(double angleDegrees, int originalWidth, int originalHeight){
+
+	if(angleDegrees == 0.0 || angleDegrees == 180.0 || angleDegrees == -180.0){
+		return originalHeight;
+	}
+	else if(angleDegrees == 90.0 || angleDegrees == -90.0){
+		return originalWidth;
+	}
+
+	double absoluteSin = sin(angleDegrees * pi / 180.0);
+	double absoluteCos = cos(angleDegrees * pi / 180.0);
+	if(absoluteSin < 0.0){ absoluteSin *= -1.0; }
+	if(absoluteCos < 0.0){ absoluteCos *= -1.0; }
+
+	int shorterSide = 0;
+	int longerSide = 0;
+
+	bool doSwap = false;
+	if(originalWidth > originalHeight){
+		longerSide = originalWidth; 
+		shorterSide = originalHeight;
+	}
+	else{
+		longerSide = originalHeight; 
+		shorterSide = originalWidth;
+		doSwap = true;
+	}
+
+	if(shorterSide < 2.0 * absoluteSin * absoluteCos * longerSide){
+		if(!doSwap){
+			return (int)((0.5 * shorterSide)/absoluteCos);
+		}
+		else{
+			return (int)((0.5 * shorterSide)/absoluteSin);
+		}
+	}
+	else{
+
+		double absoulteCos2 = absoluteCos * absoluteCos;
+		double absoulteSin2 = absoluteSin * absoluteSin;
+		double absoulteCos2MinAbsolulteSin2 = absoulteCos2 - absoulteSin2;
+
+		return (int)(((originalHeight * absoluteCos) - (originalWidth * absoluteSin))/absoulteCos2MinAbsolulteSin2);
+	}
+}
+
+void Processor::MirrorHorizontal(){
+
+	int width = img->GetWidth();
+	int height = img->GetHeight();
+	int dataSize = width * height;
+
+	// Get pointers to 8 bit data
+	uint8_t * redData8 = img->Get8BitDataRed();
+	uint8_t * greenData8 = img->Get8BitDataGreen();
+	uint8_t * blueData8 = img->Get8BitDataBlue();
+
+	int32_t tempRed;
+	int32_t tempGreen;
+	int32_t tempBlue;
+
+	int x = 0;
+	int y = 0;
+
+	int widthOver2 = width / 2;
+
+	int newI = 0;
+	for (int i = 0; i < dataSize; i++) {
+
+		x = i % width;
+		y = i / width;
+
+		if (x < widthOver2) {
+
+			newI = (y * height) + (width - x);
+
+			tempRed = redData8[i];
+			redData8[i] = 0; //redData8[newI];
+			redData8[newI] = tempRed;
+
+			tempGreen = greenData8[i];
+			greenData8[i] = 0;//greenData8[newI];
+			greenData8[newI] = tempGreen;
+
+			tempBlue = blueData8[i];
+			blueData8[i] = 0;//blueData8[newI];
+			blueData8[newI] = tempBlue;
+		}
+	}
+
+	if (img->GetColorDepth() == 16) {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		for (int i = 0; i < dataSize; i++) {
+
+			x = i % width;
+			y = i / width;
+
+			if (x < widthOver2) {
+
+				newI = (y * height) + (width - x);
+
+				tempRed = redData16[i];
+				redData16[i] = redData16[newI];
+				redData16[newI] = tempRed;
+
+				tempGreen = greenData16[i];
+				greenData16[i] = greenData16[newI];
+				greenData16[newI] = tempGreen;
+
+				tempBlue = blueData16[i];
+				blueData16[i] = blueData16[newI];
+				blueData16[newI] = tempBlue;
+			}
+		}
+	}
+
+}
+
+void Processor::MirrorVertical(){
+
+}
+
 
 Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED){
 	procParent = processor;
@@ -1935,7 +2189,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Perform an edit on the data through the processor
 				double angle = curEdit->GetParam(0);
-				procParent->RotateCustom(angle);
+				int cropFlag = curEdit->GetFlag(0);
+				procParent->RotateCustom(angle, cropFlag);
 				procParent->SetUpdated(true);
 			}
 			break;
@@ -1947,7 +2202,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Perform an edit on the data through the processor
 				double angle = curEdit->GetParam(0);
-				procParent->RotateCustomBilinear(angle);
+				int cropFlag = curEdit->GetFlag(0);
+				procParent->RotateCustomBilinear(angle, cropFlag);
 				procParent->SetUpdated(true);
 			}
 			break;
@@ -1959,7 +2215,29 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Perform an edit on the data through the processor
 				double angle = curEdit->GetParam(0);
-				procParent->RotateCustomBicubic(angle);
+				int cropFlag = curEdit->GetFlag(0);
+				procParent->RotateCustomBicubic(angle, cropFlag);
+				procParent->SetUpdated(true);
+			}
+			break;
+
+			// Peform a custom angle clockwise roctation using bicubic interpolation
+			case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
+
+				procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				procParent->MirrorHorizontal();
+				procParent->SetUpdated(true);
+			}
+			break;
+
+			case ProcessorEdit::EditType::MIRROR_VERTICAL: {
+
+				procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				procParent->MirrorVertical();
 				procParent->SetUpdated(true);
 			}
 			break;
