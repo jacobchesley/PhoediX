@@ -26,7 +26,8 @@ AvailableEdits::AvailableEdits() {
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CONTRAST, "Adjust Contrast", "Adjust the images contrast, to give a more vivid or flat look."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_GREYSCALE, "Convert to Greyscale", "Convert the image to greyscale, choosing one of three defined methods of doing so."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CHANNEL_TRANSFORM, "Channel Transform", "Transform RGB Channels, to create new tones such as sepia and more."));
-	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ROTATE, "Rotate Image", "Rotate image 90, 180 or 270 degrees"));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ROTATE, "Rotate Image", "Rotate image 90, 180, 270, or custom amount of degrees"));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_MIRROR, "Mirror Image", "Mirror image horizontally or vertically"));
 }
 
 wxVector<Edit> AvailableEdits::GetAvailableEdits() {
