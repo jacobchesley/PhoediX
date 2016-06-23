@@ -14,9 +14,13 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	editLabel->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
 	rotationMethodLabel = new wxStaticText(this, -1, "Rotation Type");
+	rotationInterpolationLabel = new wxStaticText(this, -1, "Interpolation Method");
+	rotationCropLabel = new wxStaticText(this, -1, "Cropping");
 	customRotationLabel = new wxStaticText(this, -1, "Custom Angle");
 
 	rotationMethodLabel->SetForegroundColour(Colors::TextLightGrey);
+	rotationInterpolationLabel->SetForegroundColour(Colors::TextLightGrey);
+	rotationCropLabel->SetForegroundColour(Colors::TextLightGrey);
 	customRotationLabel->SetForegroundColour(Colors::TextLightGrey);
 
 	rotationMethod = new wxComboBox(this, -1);
@@ -27,11 +31,18 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	rotationMethod->AppendString("Custom Angle");
 	rotationMethod->SetSelection(0);
 
-	wxArrayString interpolationMethods = wxArrayString();
-	interpolationMethods.push_back("Nearest Pixel");
-	interpolationMethods.push_back("Bilinear");
-	interpolationMethods.push_back("bicubic");
-	customRotationInterpolation = new wxRadioBox(this, -1, "Interpolation Method", wxDefaultPosition, wxDefaultSize, interpolationMethods);
+	customRotationInterpolation = new wxComboBox(this, -1);
+	customRotationInterpolation->AppendString("Nearest Neightbor");
+	customRotationInterpolation->AppendString("Bilinear");
+	customRotationInterpolation->AppendString("Bicubic");
+	customRotationInterpolation->SetSelection(2);
+
+	customRotationCrop = new wxComboBox(this, -1);
+	customRotationCrop->AppendString("Keep Size");
+	customRotationCrop->AppendString("Fit");
+	customRotationCrop->AppendString("Expand");
+	customRotationCrop->SetSelection(0);
+
 	customRotationSlider = new DoubleSlider(this, 0.0, -180.0, 180.0, 100000);
 
 	customRotationSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
@@ -42,13 +53,17 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	rotationMethod->SetForegroundColour(Colors::TextLightGrey);
 	customRotationInterpolation->SetBackgroundColour(this->GetBackgroundColour());
 	customRotationInterpolation->SetForegroundColour(Colors::TextLightGrey);
+	customRotationCrop->SetBackgroundColour(this->GetBackgroundColour());
+	customRotationCrop->SetForegroundColour(Colors::TextLightGrey);
 	customRotationSlider->SetForegroundColour(Colors::TextLightGrey);
 	customRotationSlider->SetBackgroundColour(parent->GetBackgroundColour());
 
 	gridSizer->Add(rotationMethodLabel);
 	gridSizer->Add(rotationMethod);
-	gridSizer->Add(0, 0);
+	gridSizer->Add(rotationInterpolationLabel);
 	gridSizer->Add(customRotationInterpolation);
+	gridSizer->Add(rotationCropLabel);
+	gridSizer->Add(customRotationCrop);
 	gridSizer->Add(customRotationLabel);
 	gridSizer->Add(customRotationSlider);
 
@@ -65,18 +80,42 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
 	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RotationWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RotationWindow::OnCombo, this);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
+
+	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
+	wxPostEvent(this, comboEvt);
 }
 
 void RotationWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+}
+
+void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
+
+	if(rotationMethod->GetSelection() == 4){
+		rotationInterpolationLabel->Show();
+		customRotationInterpolation->Show();
+		customRotationLabel->Show();
+		customRotationSlider->Show();
+		rotationCropLabel->Show();
+		customRotationCrop->Show();
+	}
+	else{
+		rotationInterpolationLabel->Hide();
+		customRotationInterpolation->Hide();
+		customRotationLabel->Hide();
+		customRotationSlider->Hide();
+		rotationCropLabel->Hide();
+		customRotationCrop->Hide();
+	}
 }
 
 void RotationWindow::AddEditToProcessor() {
@@ -102,19 +141,30 @@ void RotationWindow::AddEditToProcessor() {
 
 	else if (rotationSelection == 4) {
 
+		int crop = Processor::RotationCropping::KEEP_SIZE;
+
+		if(customRotationCrop->GetSelection() == 1){
+			crop = Processor::RotationCropping::FIT;
+		}
+		if(customRotationCrop->GetSelection() == 2){
+			crop = Processor::RotationCropping::EXPAND;
+		}
 		if (customRotationInterpolation->GetSelection() == 0) {
 			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST);
 			rotateEdit->AddParam(customRotationSlider->GetValue());
+			rotateEdit->AddFlag(crop);
 			proc->AddEdit(rotateEdit);
 		}
 		else if (customRotationInterpolation->GetSelection() == 1) {
 			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR);
 			rotateEdit->AddParam(customRotationSlider->GetValue());
+			rotateEdit->AddFlag(crop);
 			proc->AddEdit(rotateEdit);
 		}
 		else if (customRotationInterpolation->GetSelection() == 2) {
 			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC);
 			rotateEdit->AddParam(customRotationSlider->GetValue());
+			rotateEdit->AddFlag(crop);
 			proc->AddEdit(rotateEdit);
 		}
 	}

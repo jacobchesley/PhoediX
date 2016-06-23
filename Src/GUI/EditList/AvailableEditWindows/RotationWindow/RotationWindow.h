@@ -24,15 +24,19 @@ private:
 	wxStaticText * editLabel;
 
 	wxStaticText * rotationMethodLabel;
+	wxStaticText * rotationInterpolationLabel;
+	wxStaticText * rotationCropLabel;
 	wxStaticText * customRotationLabel;
 
 	wxComboBox * rotationMethod;
-	wxRadioBox * customRotationInterpolation;
+	wxComboBox * customRotationInterpolation;
+	wxComboBox * customRotationCrop;
 	DoubleSlider * customRotationSlider;
 
 	wxButton * processButton;
 
 	Processor * proc;
 
+	void OnCombo(wxCommandEvent& WXUNUSED(event));
 };
 #endif#pragma once
