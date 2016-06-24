@@ -17,6 +17,7 @@ public:
 	static wxColor BackDarkDarkDarkGrey;
 	static wxColor BackDarkDarkGrey;
 	static wxColor BackDarkGrey;
+	static wxColor BackMedDarkGrey;
 	static wxColor BackGrey;
 	static wxColor BackLightGrey;
 	static wxColor BackLightLightGrey;
