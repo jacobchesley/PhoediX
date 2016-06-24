@@ -15,6 +15,7 @@
 #include "ContrastWindow\ContrastWindow.h"
 #include "GreyscaleWindow\ConvertGreyscaleWindow.h"
 #include "MirrorWindow\MirrorWindow.h"
+#include "RGBCurvesWindow\RGBCurvesWindow.h"
 #include "RotationWindow\RotationWindow.h"
 #include "ScaleBrightnessWindow\ScaleBrightnessWindow.h"
 #include "ShiftBrightnessWindow\ShiftBrightnessWindow.h"

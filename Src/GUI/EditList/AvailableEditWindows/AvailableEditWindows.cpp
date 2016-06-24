@@ -34,6 +34,10 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 		case AvailableEditIDS::EDIT_ID_MIRROR:
 			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
 			break;
+
+		case AvailableEditIDS::EDIT_ID_RGB_CURVES:
+			newEditWindow = new RGBCurvesWindow(parent, "RGB Curves", processor);
+			break;
 	}
 
 	return newEditWindow;
