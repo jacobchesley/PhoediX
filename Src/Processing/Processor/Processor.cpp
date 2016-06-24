@@ -30,7 +30,7 @@ Image* Processor::GetOriginalImage() {
 }
 
 void  Processor::RevertToOriginalImage() {
-	
+
 	delete img;
 	img = new Image(*originalImg);
 	didUpdate = true;
@@ -62,7 +62,7 @@ void Processor::Disable16Bit() {
 }
 
 void Processor::ProcessEdits() {
-	
+
 	if (this->GetLocked()) { return; }
 	this->ProcessEdits(editListInternal);
 }
@@ -122,6 +122,71 @@ void Processor::SendMessageToParent(wxString message) {
 	}
 }
 
+void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey) {
+
+	int dataSize = img->GetWidth() * img->GetHeight();
+
+	// Get pointers to 8 bit data
+	uint8_t * redData8 = img->Get8BitDataRed();
+	uint8_t * greenData8 = img->Get8BitDataGreen();
+	uint8_t * blueData8 = img->Get8BitDataBlue();
+
+	// Initialize the histrogram to 0
+	for (int i = 0; i < 256; i++) {
+		outputHistogramRed[i] = 0;
+		outputHistogramGreen[i] = 0;
+		outputHistogramBlue[i] = 0;
+	}
+
+	int grey = 0;
+
+	// Compute the histogram for red, green, blue and grey
+	for (int i = 0; i < dataSize; i++) {
+		outputHistogramRed[redData8[i]] += 1;
+		outputHistogramGreen[greenData8[i]] += 1;
+		outputHistogramBlue[blueData8[i]] += 1;
+
+		// Compute grey scale level
+		grey = (int)((redData8[i] * 0.2126) + (greenData8[i] * 0.7152) + (blueData8[i] * 0.0722));
+		grey = grey > 255 ? 255 : grey;
+		grey = grey < 0 ? 0 : grey;
+		outputHistogramGrey[grey] += 1;
+	}
+}
+
+void Processor::Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey) {
+
+	int dataSize = img->GetWidth() * img->GetHeight();
+
+	// Get pointers to 16 bit data
+	uint16_t * redData16 = img->Get16BitDataRed();
+	uint16_t * greenData16 = img->Get16BitDataGreen();
+	uint16_t * blueData16 = img->Get16BitDataBlue();
+
+	// Initialize the histrogram to 0
+	for (int i = 0; i < 65536; i++) {
+		outputHistogramRed[i] = 0;
+		outputHistogramGreen[i] = 0;
+		outputHistogramBlue[i] = 0;
+	}
+
+	int grey = 0;
+
+	// Compute the histogram for red, green, blue and grey
+	for (int i = 0; i < dataSize; i++) {
+		outputHistogramRed[redData16[i]] += 1;
+		outputHistogramGreen[greenData16[i]] += 1;
+		outputHistogramBlue[blueData16[i]] += 1;
+
+		// Compute grey scale level
+		grey = (int)((redData16[i] * 0.2126) + (greenData16[i] * 0.7152) + (blueData16[i] * 0.0722));
+		grey = grey > 255 ? 255 : grey;
+		grey = grey < 0 ? 0 : grey;
+		outputHistogramGrey[grey] += 1;
+	}
+}
+
+
 void Processor::ShiftBrightness(double all, double red, double green, double blue, int dataStart, int dataEnd) {
 
 	// Calculate 8 bit shift values.  Need 16 bits because this is now signed
@@ -167,7 +232,7 @@ void Processor::ShiftBrightness(double all, double red, double green, double blu
 		tempRed = (tempRed < 0) ? 0 : tempRed;
 		tempGreen = (tempGreen < 0) ? 0 : tempGreen;
 		tempBlue = (tempBlue < 0) ? 0 : tempBlue;
-		
+
 		// Set the new pixel to the 8 bit data
 		redData8[i] = (uint8_t)tempRed;
 		greenData8[i] = (uint8_t)tempGreen;
@@ -404,7 +469,7 @@ void Processor::ConvertGreyscale(double redScale, double greenScale, double blue
 
 		// Perform greyscale conversion
 		tempGrey = (redScale * (redData8[i])) + (greenScale * (greenData8[i])) + (blueScale * (blueData8[i]));
-	
+
 		// handle overflow or underflow
 		tempGrey = (tempGrey > 255) ? 255 : tempGrey;
 		tempGrey = (tempGrey < 0) ? 0 : tempGrey;
@@ -535,7 +600,7 @@ void Processor::Rotate90CW() {
 	uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
 	uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
 
-	
+
 	for (int i = 0; i < dataSize; i++) {
 
 		// Get x and y coordinates from current index of data
@@ -597,7 +662,7 @@ void Processor::Rotate180() {
 
 	for (int i = 0; i < dataSize; i++) {
 
-		redData8[i] = redData8Dup[dataSize -i -1];
+		redData8[i] = redData8Dup[dataSize - i - 1];
 		greenData8[i] = greenData8Dup[dataSize - i - 1];
 		blueData8[i] = blueData8Dup[dataSize - i - 1];
 	}
@@ -654,35 +719,25 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 	int dHeight = 0;
 	int newDataSize = 0;
 
-	if(crop == Processor::RotationCropping::EXPAND){
+	if (crop == Processor::RotationCropping::EXPAND) {
 		rotatedImage->SetWidth(this->GetExpandedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
 		rotatedImage->SetHeight(this->GetExpandedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
-		dWidth = newWidth - width;
-		dHeight = newHeight - height;
 	}
-	
-	else if(crop == Processor::RotationCropping::FIT){
+	else if (crop == Processor::RotationCropping::FIT) {
 		rotatedImage->SetWidth(this->GetFittedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
 		rotatedImage->SetHeight(this->GetFittedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
-		dWidth = newWidth - width;
-		dHeight = newHeight - height;
 	}
-	else{
+	else {
 		rotatedImage->SetWidth(img->GetWidth());
 		rotatedImage->SetHeight(img->GetHeight());
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
 	}
+
+	rotatedImage->InitImage();
+	newWidth = rotatedImage->GetWidth();
+	newHeight = rotatedImage->GetHeight();
+	newDataSize = newWidth * newHeight;
+	dWidth = newWidth - width;
+	dHeight = newHeight - height;
 
 	uint8_t * redData8Dup = rotatedImage->Get8BitDataRed();
 	uint8_t * greenData8Dup = rotatedImage->Get8BitDataGreen();
@@ -694,9 +749,9 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 		// Get x and y coordinates from current index of data
 		x = i % width;
 		y = i / width;
-		
-		x -= dWidth/2.0;
-		y -= dHeight/2.0;
+
+		x -= dWidth / 2.0;
+		y -= dHeight / 2.0;
 
 		// Shift by pivot point
 		x -= pivotX;
@@ -715,7 +770,7 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 		newY = wxRound(newY);
 
 		// Veirfy pixel location is in bounds of original image size
-		if(newX > 0 && newX < width && newY > 0 && newY < height){
+		if (newX > 0 && newX < width && newY > 0 && newY < height) {
 
 			// Get new single dimmension array index from new x and y location
 			newI = newY * width + newX;
@@ -752,13 +807,13 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 			x = i % width;
 			y = i / width;
 
-			x -= dWidth/2.0;
-			y -= dHeight/2.0;
+			x -= dWidth / 2.0;
+			y -= dHeight / 2.0;
 
 			// Shift by pivot point
 			x -= pivotX;
 			y -= pivotY;
-			
+
 			// rotate point
 			newX = (x * angleCos) - (y * angleSin);
 			newY = (x * angleSin) + (y * angleCos);
@@ -820,35 +875,25 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 	int dHeight = 0;
 	int newDataSize = 0;
 
-	if(crop == Processor::RotationCropping::EXPAND){
+	if (crop == Processor::RotationCropping::EXPAND) {
 		rotatedImage->SetWidth(this->GetExpandedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
 		rotatedImage->SetHeight(this->GetExpandedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
-		dWidth = newWidth - width;
-		dHeight = newHeight - height;
 	}
-	
-	else if(crop == Processor::RotationCropping::FIT){
+	else if (crop == Processor::RotationCropping::FIT) {
 		rotatedImage->SetWidth(this->GetFittedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
 		rotatedImage->SetHeight(this->GetFittedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
-		dWidth = newWidth - width;
-		dHeight = newHeight - height;
 	}
-	else{
+	else {
 		rotatedImage->SetWidth(img->GetWidth());
 		rotatedImage->SetHeight(img->GetHeight());
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
 	}
+
+	rotatedImage->InitImage();
+	newWidth = rotatedImage->GetWidth();
+	newHeight = rotatedImage->GetHeight();
+	newDataSize = newWidth * newHeight;
+	dWidth = newWidth - width;
+	dHeight = newHeight - height;
 
 	uint8_t * redData8Dup = rotatedImage->Get8BitDataRed();
 	uint8_t * greenData8Dup = rotatedImage->Get8BitDataGreen();
@@ -885,8 +930,8 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 		x = i % newWidth;
 		y = i / newWidth;
 
-		x -= dWidth/2.0;
-		y -= dHeight/2.0;
+		x -= dWidth / 2.0;
+		y -= dHeight / 2.0;
 
 		// Shift by pivot point
 		x -= pivotX;
@@ -901,7 +946,7 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 		newY += pivotY;
 
 		// Veirfy pixel location is in bounds of original image size
-		if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1) {
+		if (newX > 0 && newX < width && newY > 0 && newY < height) {
 
 			// new X is not on border of image
 			if (newX > 0 && newX < width - 1) {
@@ -986,7 +1031,7 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 			tempRed = ((weight1 * redData8[newI1]) + (weight2 * redData8[newI2]) + (weight3 * redData8[newI3]) + (weight4 * redData8[newI4])) / weightSum;
 			tempGreen = ((weight1 * greenData8[newI1]) + (weight2 * greenData8[newI2]) + (weight3 * greenData8[newI3]) + (weight4 * greenData8[newI4])) / weightSum;
 			tempBlue = ((weight1 * blueData8[newI1]) + (weight2 * blueData8[newI2]) + (weight3 * blueData8[newI3]) + (weight4 * blueData8[newI4])) / weightSum;
-			
+
 			// handle overflow or underflow
 			tempRed = (tempRed > 255) ? 255 : tempRed;
 			tempGreen = (tempGreen > 255) ? 255 : tempGreen;
@@ -1021,8 +1066,8 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 			x = i % newWidth;
 			y = i / newWidth;
 
-			x -= dWidth/2.0;
-			y -= dHeight/2.0;
+			x -= dWidth / 2.0;
+			y -= dHeight / 2.0;
 
 			// Shift by pivot point
 			x -= pivotX;
@@ -1037,7 +1082,7 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 			newY += pivotY;
 
 			// Veirfy pixel location is in bounds of original image size
-			if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1) {
+			if (newX > 0 && newX < width && newY > 0 && newY < height) {
 
 				// new X is not on border of image
 				if (newX > 0 && newX < width - 1) {
@@ -1179,35 +1224,25 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 	int dHeight = 0;
 	int newDataSize = 0;
 
-	if(crop == Processor::RotationCropping::EXPAND){
+	if (crop == Processor::RotationCropping::EXPAND) {
 		rotatedImage->SetWidth(this->GetExpandedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
 		rotatedImage->SetHeight(this->GetExpandedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
-		dWidth = newWidth - width;
-		dHeight = newHeight - height;
 	}
-	
-	else if(crop == Processor::RotationCropping::FIT){
+	else if (crop == Processor::RotationCropping::FIT) {
 		rotatedImage->SetWidth(this->GetFittedRotationWidth(angleDegrees, img->GetWidth(), img->GetHeight()));
 		rotatedImage->SetHeight(this->GetFittedRotationHeight(angleDegrees, img->GetWidth(), img->GetHeight()));
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
-		dWidth = newWidth - width;
-		dHeight = newHeight - height;
 	}
-	else{
+	else {
 		rotatedImage->SetWidth(img->GetWidth());
 		rotatedImage->SetHeight(img->GetHeight());
-		rotatedImage->InitImage();
-		newWidth= rotatedImage->GetWidth();
-		newHeight= rotatedImage->GetHeight();
-		newDataSize = newWidth * newHeight;
 	}
+
+	rotatedImage->InitImage();
+	newWidth = rotatedImage->GetWidth();
+	newHeight = rotatedImage->GetHeight();
+	newDataSize = newWidth * newHeight;
+	dWidth = newWidth - width;
+	dHeight = newHeight - height;
 
 	uint8_t * redData8Dup = rotatedImage->Get8BitDataRed();
 	uint8_t * greenData8Dup = rotatedImage->Get8BitDataGreen();
@@ -1239,8 +1274,8 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 		x = i % newWidth;
 		y = i / newWidth;
 
-		x -= dWidth/2.0;
-		y -= dHeight/2.0;
+		x -= dWidth / 2.0;
+		y -= dHeight / 2.0;
 
 		// Shift by pivot point
 		x -= pivotX;
@@ -1255,7 +1290,7 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 		newY += pivotY;
 
 		// Veirfy pixel location is in bounds of original image size
-		if (newX > 1 && newX < width - 2 && newY > 1 && newY < height - 2) {
+		if (newX > 0 && newX < width && newY > 0 && newY < height) {
 
 			// new X is not on border of image
 			if (newX > 1 && newX < width - 2) {
@@ -1275,10 +1310,10 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 
 			// new Y is not on border of image
 			if (newY > 1 && newY < height - 2) {
-				point5 = wxRound(floor(newY))-1;
+				point5 = wxRound(floor(newY)) - 1;
 				point6 = wxRound(floor(newY));
 				point7 = wxRound(ceil(newY));
-				point8 = wxRound(ceil(newY)) + 1;
+				point8 = wxRound(ceil(newY));
 			}
 
 			// new Y is on border.
@@ -1459,11 +1494,11 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 			weight9 = 1.0 / distance9;  weight10 = 1.0 / distance10;  weight11 = 1.0 / distance11;  weight12 = 1.0 / distance12;
 			weight13 = 1.0 / distance13;  weight14 = 1.0 / distance14;  weight15 = 1.0 / distance15;  weight16 = 1.0 / distance16;
 
-			weightSum =  weight1 + weight2 + weight3 + weight4 + weight5 + weight6 + weight7 + weight8 + 
-			             weight9 + weight10 + weight11 + weight12 + weight13 + weight14 + weight15 + weight16;
+			weightSum = weight1 + weight2 + weight3 + weight4 + weight5 + weight6 + weight7 + weight8 +
+				weight9 + weight10 + weight11 + weight12 + weight13 + weight14 + weight15 + weight16;
 
 			// Get new single dimmension array index from new x and y location
-			newI1 = point5 * width + point1;  newI2 = point5 * width + point2;  newI3 = point5 * width + point3;  newI4 = point5 * width + point4;  
+			newI1 = point5 * width + point1;  newI2 = point5 * width + point2;  newI3 = point5 * width + point3;  newI4 = point5 * width + point4;
 			newI5 = point6 * width + point1;  newI6 = point6 * width + point2;  newI7 = point6 * width + point3;  newI8 = point6 * width + point4;
 			newI9 = point7 * width + point1;  newI10 = point7 * width + point2;  newI11 = point7 * width + point3;  newI12 = point7 * width + point4;
 			newI13 = point8 * width + point1;  newI14 = point8 * width + point2;  newI15 = point8 * width + point3;  newI16 = point8 * width + point4;
@@ -1531,7 +1566,7 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 			newY += pivotY;
 
 			// Veirfy pixel location is in bounds of original image size
-			if (newX > 1 && newX < width - 2 && newY > 1 && newY < height - 2) {
+			if (newX > 0 && newX < width && newY > 0 && newY < height) {
 
 				// new X is not on border of image
 				if (newX > 1 && newX < width - 2) {
@@ -1782,139 +1817,139 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 	delete rotatedImage;
 }
 
-int Processor::GetExpandedRotationWidth(double angleDegrees, int originalWidth, int originalHeight){
+int Processor::GetExpandedRotationWidth(double angleDegrees, int originalWidth, int originalHeight) {
 
-	if(angleDegrees < 0.0){
-			angleDegrees += 180.0;
+	if (angleDegrees < 0.0) {
+		angleDegrees += 180.0;
 	}
-	if((angleDegrees < 90.0 && angleDegrees > 0.0)|| (angleDegrees > -90.0 && angleDegrees < 0.0)){
+	if ((angleDegrees < 90.0 && angleDegrees > 0.0) || (angleDegrees > -90.0 && angleDegrees < 0.0)) {
 		return (int)(((double)originalWidth * cos(angleDegrees * pi / 180.0)) + ((double)originalHeight * sin(angleDegrees * pi / 180.0)));
 	}
-	else if((angleDegrees > 90.0 && angleDegrees < 180.0) || (angleDegrees < -90.0 && angleDegrees > -180.0)){
+	else if ((angleDegrees > 90.0 && angleDegrees < 180.0) || (angleDegrees < -90.0 && angleDegrees > -180.0)) {
 		angleDegrees -= 90.0;
 		return (int)(((double)originalHeight * cos(angleDegrees * pi / 180.0)) + ((double)originalWidth * sin(angleDegrees * pi / 180.0)));
 	}
-	else if(angleDegrees == 90 || angleDegrees == -90){
+	else if (angleDegrees == 90 || angleDegrees == -90) {
 		return originalHeight;
 	}
-	else{
+	else {
 		return originalWidth;
 	}
 }
 
-int Processor::GetExpandedRotationHeight(double angleDegrees, int originalWidth, int originalHeight){
+int Processor::GetExpandedRotationHeight(double angleDegrees, int originalWidth, int originalHeight) {
 
-	if(angleDegrees < 0.0){
-			angleDegrees *= -1.0;
+	if (angleDegrees < 0.0) {
+		angleDegrees *= -1.0;
 	}
-	if((angleDegrees < 90.0 && angleDegrees > 0.0)|| (angleDegrees > -90.0 && angleDegrees < 0.0)){
+	if ((angleDegrees < 90.0 && angleDegrees > 0.0) || (angleDegrees > -90.0 && angleDegrees < 0.0)) {
 		return (int)(((double)originalWidth * sin(angleDegrees * pi / 180.0)) + ((double)originalHeight * cos(angleDegrees * pi / 180.0)));
 	}
-	else if((angleDegrees > 90.0 && angleDegrees < 180.0) || (angleDegrees < -90.0 && angleDegrees > -180.0)){
+	else if ((angleDegrees > 90.0 && angleDegrees < 180.0) || (angleDegrees < -90.0 && angleDegrees > -180.0)) {
 		angleDegrees -= 90.0;
 		return (int)(((double)originalHeight * sin(angleDegrees * pi / 180.0)) + ((double)originalWidth * cos(angleDegrees * pi / 180.0)));
 	}
-	else if(angleDegrees == 90 || angleDegrees == -90){
+	else if (angleDegrees == 90 || angleDegrees == -90) {
 		return originalWidth;
 	}
-	else{
+	else {
 		return originalHeight;
 	}
 }
 
-int Processor::GetFittedRotationWidth(double angleDegrees, int originalWidth, int originalHeight){
+int Processor::GetFittedRotationWidth(double angleDegrees, int originalWidth, int originalHeight) {
 
-	if(angleDegrees == 0.0 || angleDegrees == 180.0 || angleDegrees == -180.0){
+	if (angleDegrees == 0.0 || angleDegrees == 180.0 || angleDegrees == -180.0) {
 		return originalWidth;
 	}
-	else if(angleDegrees == 90.0 || angleDegrees == -90.0){
+	else if (angleDegrees == 90.0 || angleDegrees == -90.0) {
 		return originalHeight;
 	}
 
 	double absoluteSin = sin(angleDegrees * pi / 180.0);
 	double absoluteCos = cos(angleDegrees * pi / 180.0);
-	if(absoluteSin < 0.0){ absoluteSin *= -1.0; }
-	if(absoluteCos < 0.0){ absoluteCos *= -1.0; }
+	if (absoluteSin < 0.0) { absoluteSin *= -1.0; }
+	if (absoluteCos < 0.0) { absoluteCos *= -1.0; }
 
 	int shorterSide = 0;
 	int longerSide = 0;
 
 	bool doSwap = false;
-	if(originalWidth > originalHeight){
-		longerSide = originalWidth; 
+	if (originalWidth > originalHeight) {
+		longerSide = originalWidth;
 		shorterSide = originalHeight;
 	}
-	else{
-		longerSide = originalHeight; 
+	else {
+		longerSide = originalHeight;
 		shorterSide = originalWidth;
 		doSwap = true;
 	}
 
-	if(shorterSide < 2.0 * absoluteSin * absoluteCos * longerSide){
-		if(!doSwap){
-			return (int)((0.5 * shorterSide)/absoluteSin);
+	if (shorterSide < 2.0 * absoluteSin * absoluteCos * longerSide) {
+		if (!doSwap) {
+			return (int)((0.5 * shorterSide) / absoluteSin);
 		}
-		else{
-			return (int)((0.5 * shorterSide)/absoluteCos);
+		else {
+			return (int)((0.5 * shorterSide) / absoluteCos);
 		}
 	}
-	else{
+	else {
 
 		double absoulteCos2 = absoluteCos * absoluteCos;
 		double absoulteSin2 = absoluteSin * absoluteSin;
 		double absoulteCos2MinAbsolulteSin2 = absoulteCos2 - absoulteSin2;
 
-		return (int)(((originalWidth * absoluteCos) - (originalHeight * absoluteSin))/absoulteCos2MinAbsolulteSin2);
+		return (int)(((originalWidth * absoluteCos) - (originalHeight * absoluteSin)) / absoulteCos2MinAbsolulteSin2);
 	}
 }
 
-int Processor::GetFittedRotationHeight(double angleDegrees, int originalWidth, int originalHeight){
+int Processor::GetFittedRotationHeight(double angleDegrees, int originalWidth, int originalHeight) {
 
-	if(angleDegrees == 0.0 || angleDegrees == 180.0 || angleDegrees == -180.0){
+	if (angleDegrees == 0.0 || angleDegrees == 180.0 || angleDegrees == -180.0) {
 		return originalHeight;
 	}
-	else if(angleDegrees == 90.0 || angleDegrees == -90.0){
+	else if (angleDegrees == 90.0 || angleDegrees == -90.0) {
 		return originalWidth;
 	}
 
 	double absoluteSin = sin(angleDegrees * pi / 180.0);
 	double absoluteCos = cos(angleDegrees * pi / 180.0);
-	if(absoluteSin < 0.0){ absoluteSin *= -1.0; }
-	if(absoluteCos < 0.0){ absoluteCos *= -1.0; }
+	if (absoluteSin < 0.0) { absoluteSin *= -1.0; }
+	if (absoluteCos < 0.0) { absoluteCos *= -1.0; }
 
 	int shorterSide = 0;
 	int longerSide = 0;
 
 	bool doSwap = false;
-	if(originalWidth > originalHeight){
-		longerSide = originalWidth; 
+	if (originalWidth > originalHeight) {
+		longerSide = originalWidth;
 		shorterSide = originalHeight;
 	}
-	else{
-		longerSide = originalHeight; 
+	else {
+		longerSide = originalHeight;
 		shorterSide = originalWidth;
 		doSwap = true;
 	}
 
-	if(shorterSide < 2.0 * absoluteSin * absoluteCos * longerSide){
-		if(!doSwap){
-			return (int)((0.5 * shorterSide)/absoluteCos);
+	if (shorterSide < 2.0 * absoluteSin * absoluteCos * longerSide) {
+		if (!doSwap) {
+			return (int)((0.5 * shorterSide) / absoluteCos);
 		}
-		else{
-			return (int)((0.5 * shorterSide)/absoluteSin);
+		else {
+			return (int)((0.5 * shorterSide) / absoluteSin);
 		}
 	}
-	else{
+	else {
 
 		double absoulteCos2 = absoluteCos * absoluteCos;
 		double absoulteSin2 = absoluteSin * absoluteSin;
 		double absoulteCos2MinAbsolulteSin2 = absoulteCos2 - absoulteSin2;
 
-		return (int)(((originalHeight * absoluteCos) - (originalWidth * absoluteSin))/absoulteCos2MinAbsolulteSin2);
+		return (int)(((originalHeight * absoluteCos) - (originalWidth * absoluteSin)) / absoulteCos2MinAbsolulteSin2);
 	}
 }
 
-void Processor::MirrorHorizontal(){
+void Processor::MirrorHorizontal() {
 
 	int width = img->GetWidth();
 	int height = img->GetHeight();
@@ -1939,21 +1974,20 @@ void Processor::MirrorHorizontal(){
 
 		x = i % width;
 		y = i / width;
+		newI = (y * width) + (width - x);
 
-		if (x < widthOver2) {
-
-			newI = (y * height) + (width - x);
+		if (x < widthOver2 && newI < dataSize) {
 
 			tempRed = redData8[i];
-			redData8[i] = 0; //redData8[newI];
+			redData8[i] = redData8[newI];
 			redData8[newI] = tempRed;
 
 			tempGreen = greenData8[i];
-			greenData8[i] = 0;//greenData8[newI];
+			greenData8[i] = greenData8[newI];
 			greenData8[newI] = tempGreen;
 
 			tempBlue = blueData8[i];
-			blueData8[i] = 0;//blueData8[newI];
+			blueData8[i] = blueData8[newI];
 			blueData8[newI] = tempBlue;
 		}
 	}
@@ -1969,10 +2003,9 @@ void Processor::MirrorHorizontal(){
 
 			x = i % width;
 			y = i / width;
+			newI = (y * width) + (width - x);
 
-			if (x < widthOver2) {
-
-				newI = (y * height) + (width - x);
+			if (x < widthOver2  && newI < dataSize) {
 
 				tempRed = redData16[i];
 				redData16[i] = redData16[newI];
@@ -1988,15 +2021,84 @@ void Processor::MirrorHorizontal(){
 			}
 		}
 	}
-
 }
 
-void Processor::MirrorVertical(){
+void Processor::MirrorVertical() {
 
+	int width = img->GetWidth();
+	int height = img->GetHeight();
+	int dataSize = width * height;
+
+	// Get pointers to 8 bit data
+	uint8_t * redData8 = img->Get8BitDataRed();
+	uint8_t * greenData8 = img->Get8BitDataGreen();
+	uint8_t * blueData8 = img->Get8BitDataBlue();
+
+	int32_t tempRed;
+	int32_t tempGreen;
+	int32_t tempBlue;
+
+	int x = 0;
+	int y = 0;
+
+	int heightOver2 = height / 2;
+
+	int newI = 0;
+	for (int i = 0; i < dataSize; i++) {
+
+		x = i % width;
+		y = i / width;
+		newI = (width *(height - y)) + x;
+
+		if (y < heightOver2  && newI < dataSize) {
+
+			tempRed = redData8[i];
+			redData8[i] = redData8[newI];
+			redData8[newI] = tempRed;
+
+			tempGreen = greenData8[i];
+			greenData8[i] = greenData8[newI];
+			greenData8[newI] = tempGreen;
+
+			tempBlue = blueData8[i];
+			blueData8[i] = blueData8[newI];
+			blueData8[newI] = tempBlue;
+		}
+	}
+
+	if (img->GetColorDepth() == 16) {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		for (int i = 0; i < dataSize; i++) {
+
+			x = i % width;
+			y = i / width;
+			newI = (width *(height - y)) + x;
+
+			if (y < heightOver2 && newI < dataSize) {
+
+				tempRed = redData16[i];
+				redData16[i] = redData16[newI];
+				redData16[newI] = tempRed;
+
+				tempGreen = greenData16[i];
+				greenData16[i] = greenData16[newI];
+				greenData16[newI] = tempGreen;
+
+				tempBlue = blueData16[i];
+				blueData16[i] = blueData16[newI];
+				blueData16[newI] = tempBlue;
+			}
+		}
+	}
 }
 
 
-Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED){
+Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
 	editVec.push_back(edit);
 }
@@ -2008,7 +2110,7 @@ Processor::ProcessThread::ProcessThread(Processor * processor, wxVector<Processo
 
 wxThread::ExitCode Processor::ProcessThread::Entry() {
 
-	while(procParent->GetLocked()) {
+	while (procParent->GetLocked()) {
 		this->Sleep(10);
 	}
 	procParent->Lock();
@@ -2019,7 +2121,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	numEditsStr << numEdits;
 
 	// Go through each edit one by one.  Each of these will invoke at least 1 child thread for the edit itself
-	for (size_t editIndex = 0; editIndex < numEdits; editIndex++){
+	for (size_t editIndex = 0; editIndex < numEdits; editIndex++) {
 
 		// Get the next edit to take place
 		ProcessorEdit * curEdit = editVec.at(editIndex);
@@ -2031,216 +2133,217 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 		curEditStr << (editIndex + 1);
 
 		wxString fullEditNumStr = " (" + curEditStr + "//" + numEditsStr + ")";
-		
+
 		switch (editToComplete) {
 
 			// Peform a Shift Brightness edit
-			case ProcessorEdit::EditType::SHIFT_BRIGHTNESS: {
+		case ProcessorEdit::EditType::SHIFT_BRIGHTNESS: {
 
-				procParent->SendMessageToParent("Processing Shift Brightness Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Shift Brightness Edit" + fullEditNumStr);
 
-				// Get all parameters from the edit
-				double allBrightShift = curEdit->GetParam(0);
-				double redBrightShift = curEdit->GetParam(1);
-				double greenBrightShift = curEdit->GetParam(2);
-				double blueBrightShift = curEdit->GetParam(3);
+			// Get all parameters from the edit
+			double allBrightShift = curEdit->GetParam(0);
+			double redBrightShift = curEdit->GetParam(1);
+			double greenBrightShift = curEdit->GetParam(2);
+			double blueBrightShift = curEdit->GetParam(3);
 
-				// Perform an edit on the data through the processor
-				procParent->ShiftBrightness(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->ShiftBrightness(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift);
+			procParent->SetUpdated(true);
+		}
+														break;
 
-			// Peform a Scale Brightness edit
-			case ProcessorEdit::EditType::SCALE_BRIGHTNESS: {
+														// Peform a Scale Brightness edit
+		case ProcessorEdit::EditType::SCALE_BRIGHTNESS: {
 
-				procParent->SendMessageToParent("Processing Scale Brightness Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Scale Brightness Edit" + fullEditNumStr);
 
-				// Get all parameters from the edit
-				double allBrightScale = curEdit->GetParam(0);
-				double redBrightScale = curEdit->GetParam(1);
-				double greenBrightScale = curEdit->GetParam(2);
-				double blueBrightScale = curEdit->GetParam(3);
+			// Get all parameters from the edit
+			double allBrightScale = curEdit->GetParam(0);
+			double redBrightScale = curEdit->GetParam(1);
+			double greenBrightScale = curEdit->GetParam(2);
+			double blueBrightScale = curEdit->GetParam(3);
 
-				// Perform an edit on the data through the processor
-				procParent->ScaleBrightness(allBrightScale, redBrightScale, greenBrightScale, blueBrightScale);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->ScaleBrightness(allBrightScale, redBrightScale, greenBrightScale, blueBrightScale);
+			procParent->SetUpdated(true);
+		}
+														break;
 
-			// Peform an Adjust Contrast edit
-			case ProcessorEdit::EditType::ADJUST_CONTRAST: {
+														// Peform an Adjust Contrast edit
+		case ProcessorEdit::EditType::ADJUST_CONTRAST: {
 
-				procParent->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
 
-				// Get all parameters from the edit
-				double allContrast = curEdit->GetParam(0);
-				double redContrast = curEdit->GetParam(1);
-				double greenContrast = curEdit->GetParam(2);
-				double blueContrast = curEdit->GetParam(3);
+			// Get all parameters from the edit
+			double allContrast = curEdit->GetParam(0);
+			double redContrast = curEdit->GetParam(1);
+			double greenContrast = curEdit->GetParam(2);
+			double blueContrast = curEdit->GetParam(3);
 
-				// Perform an edit on the data through the processor
-				procParent->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast);
-				procParent->SetUpdated(true);
-			}
-			break;		
+			// Perform an edit on the data through the processor
+			procParent->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast);
+			procParent->SetUpdated(true);
+		}
+													   break;
 
-			// Peform a greyscale conversion, averaging RGB values
-			case ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG: {
+													   // Peform a greyscale conversion, averaging RGB values
+		case ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG: {
 
-				procParent->SendMessageToParent("Processing Greyscale (Average) Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Greyscale (Average) Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->ConvertGreyscale((1.0/3.0), (1.0 / 3.0), (1.0 / 3.0));
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->ConvertGreyscale((1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0));
+			procParent->SetUpdated(true);
+		}
+															 break;
 
-			// Peform a greyscale conversion, using humany eyesight values
-			case ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE: {
+															 // Peform a greyscale conversion, using humany eyesight values
+		case ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE: {
 
-				procParent->SendMessageToParent("Processing Greyscale (Human Eyesight) Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Greyscale (Human Eyesight) Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->ConvertGreyscale(0.2126, 0.7152, 0.0722);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->ConvertGreyscale(0.2126, 0.7152, 0.0722);
+			procParent->SetUpdated(true);
+		}
+															 break;
 
-			// Peform a greyscale conversion, using custom scalars
-			case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM: {
+															 // Peform a greyscale conversion, using custom scalars
+		case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM: {
 
-				procParent->SendMessageToParent("Processing Greyscale (Custom) Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Greyscale (Custom) Edit" + fullEditNumStr);
 
-				// Get all parameters from the edit
-				double redScale = curEdit->GetParam(0);
-				double greenScale = curEdit->GetParam(1);
-				double blueScale = curEdit->GetParam(2);
+			// Get all parameters from the edit
+			double redScale = curEdit->GetParam(0);
+			double greenScale = curEdit->GetParam(1);
+			double blueScale = curEdit->GetParam(2);
 
-				// Perform an edit on the data through the processor
-				procParent->ConvertGreyscale(redScale, greenScale, blueScale);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->ConvertGreyscale(redScale, greenScale, blueScale);
+			procParent->SetUpdated(true);
+		}
+																break;
 
-			// Peform a greyscale conversion, using custom scalars
-			case ProcessorEdit::EditType::CHANNEL_TRANSFORM: {
+																// Peform a greyscale conversion, using custom scalars
+		case ProcessorEdit::EditType::CHANNEL_TRANSFORM: {
 
-				procParent->SendMessageToParent("Processing Channel Transform Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Channel Transform Edit" + fullEditNumStr);
 
-				// Get all parameters from the edit
-				double redRedScale = curEdit->GetParam(0);
-				double redGreenScale = curEdit->GetParam(1);
-				double redBlueScale = curEdit->GetParam(2);
-				double greenRedScale = curEdit->GetParam(3);
-				double greenGreenScale = curEdit->GetParam(4);
-				double greenBlueScale = curEdit->GetParam(5);
-				double blueRedScale = curEdit->GetParam(6);
-				double blueGreenScale = curEdit->GetParam(7);
-				double blueBlueScale = curEdit->GetParam(8);
+			// Get all parameters from the edit
+			double redRedScale = curEdit->GetParam(0);
+			double redGreenScale = curEdit->GetParam(1);
+			double redBlueScale = curEdit->GetParam(2);
+			double greenRedScale = curEdit->GetParam(3);
+			double greenGreenScale = curEdit->GetParam(4);
+			double greenBlueScale = curEdit->GetParam(5);
+			double blueRedScale = curEdit->GetParam(6);
+			double blueGreenScale = curEdit->GetParam(7);
+			double blueBlueScale = curEdit->GetParam(8);
 
-				// Perform an edit on the data through the processor
-				procParent->ChannelScale(redRedScale, redGreenScale, redBlueScale,
-					greenRedScale, greenGreenScale, greenBlueScale,
-					blueRedScale, blueGreenScale, blueBlueScale);
+			// Perform an edit on the data through the processor
+			procParent->ChannelScale(redRedScale, redGreenScale, redBlueScale,
+				greenRedScale, greenGreenScale, greenBlueScale,
+				blueRedScale, blueGreenScale, blueBlueScale);
 
-				procParent->SetUpdated(true);
-			}
-																	break;
+			procParent->SetUpdated(true);
+		}
+														 break;
 
-			// Peform a 90 degree clockwise roctation
-			case ProcessorEdit::EditType::ROTATE_90_CW: {
+														 // Peform a 90 degree clockwise roctation
+		case ProcessorEdit::EditType::ROTATE_90_CW: {
 
-				procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->Rotate90CW();
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->Rotate90CW();
+			procParent->SetUpdated(true);
+		}
+													break;
 
-			// Peform a 180 degree clockwise roctation
-			case ProcessorEdit::EditType::ROTATE_180: {
+													// Peform a 180 degree clockwise roctation
+		case ProcessorEdit::EditType::ROTATE_180: {
 
-				procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->Rotate180();
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->Rotate180();
+			procParent->SetUpdated(true);
+		}
+												  break;
 
-			// Peform a 270 degree clockwise roctation (90 counter clockwise)
-			case ProcessorEdit::EditType::ROTATE_270_CW: {
+												  // Peform a 270 degree clockwise roctation (90 counter clockwise)
+		case ProcessorEdit::EditType::ROTATE_270_CW: {
 
-				procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->Rotate180();
-				procParent->Rotate90CW();
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->Rotate180();
+			procParent->Rotate90CW();
+			procParent->SetUpdated(true);
+		}
+													 break;
 
-			// Peform a custom angle clockwise roctation
-			case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
+													 // Peform a custom angle clockwise roctation
+		case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
 
-				procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(0);
-				int cropFlag = curEdit->GetFlag(0);
-				procParent->RotateCustom(angle, cropFlag);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			double angle = curEdit->GetParam(0);
+			int cropFlag = curEdit->GetFlag(0);
+			procParent->RotateCustom(angle, cropFlag);
+			procParent->SetUpdated(true);
+		}
+															 break;
 
-			// Peform a custom angle clockwise roctation using bilinear interpolation
-			case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
+															 // Peform a custom angle clockwise roctation using bilinear interpolation
+		case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
 
-				procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(0);
-				int cropFlag = curEdit->GetFlag(0);
-				procParent->RotateCustomBilinear(angle, cropFlag);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			double angle = curEdit->GetParam(0);
+			int cropFlag = curEdit->GetFlag(0);
+			procParent->RotateCustomBilinear(angle, cropFlag);
+			procParent->SetUpdated(true);
+		}
+															  break;
 
-			// Peform a custom angle clockwise roctation using bicubic interpolation
-			case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
+															  // Peform a custom angle clockwise roctation using bicubic interpolation
+		case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
 
-				procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(0);
-				int cropFlag = curEdit->GetFlag(0);
-				procParent->RotateCustomBicubic(angle, cropFlag);
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			double angle = curEdit->GetParam(0);
+			int cropFlag = curEdit->GetFlag(0);
+			procParent->RotateCustomBicubic(angle, cropFlag);
+			procParent->SetUpdated(true);
+		}
+															 break;
 
-			// Peform a custom angle clockwise roctation using bicubic interpolation
-			case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
+															 // Peform a horizontal image flip
+		case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
 
-				procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->MirrorHorizontal();
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->MirrorHorizontal();
+			procParent->SetUpdated(true);
+		}
+														 break;
 
-			case ProcessorEdit::EditType::MIRROR_VERTICAL: {
+														 // Peform a vertical image flip
+		case ProcessorEdit::EditType::MIRROR_VERTICAL: {
 
-				procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
+			procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
 
-				// Perform an edit on the data through the processor
-				procParent->MirrorVertical();
-				procParent->SetUpdated(true);
-			}
-			break;
+			// Perform an edit on the data through the processor
+			procParent->MirrorVertical();
+			procParent->SetUpdated(true);
+		}
+													   break;
 		}
 	}
 

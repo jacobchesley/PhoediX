@@ -50,6 +50,9 @@ public:
 	void Unlock();
 	bool GetLocked();
 
+	void Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
+	void Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
+
 	enum RotationCropping{
 		KEEP_SIZE,
 		FIT,
