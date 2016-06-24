@@ -38,12 +38,15 @@
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
     <ClCompile Include="..\Src\GUI\AUI Manager\AUIManager.cpp" />
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
+    <ClCompile Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleBrightnessWindow\ScaleBrightnessWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftBrightnessWindow\ShiftBrightnessWindowcpp.cpp" />
@@ -59,18 +62,22 @@
     <ClCompile Include="..\Src\Processing\Image\Image.cpp" />
     <ClCompile Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.cpp" />
     <ClCompile Include="..\Src\Processing\Processor\Processor.cpp" />
+    <ClCompile Include="..\Src\Spline\Spline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\App\PhoediX.h" />
     <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
     <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h" />
     <ClInclude Include="..\Src\GUI\Colors\Colors.h" />
+    <ClInclude Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.h" />
     <ClInclude Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleBrightnessWindow\ScaleBrightnessWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftBrightnessWindow\ShiftBrightnessWindow.h" />
@@ -89,6 +96,7 @@
     <ClInclude Include="..\Src\Processing\Image\Image.h" />
     <ClInclude Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.h" />
     <ClInclude Include="..\Src\Processing\Processor\Processor.h" />
+    <ClInclude Include="..\Src\Spline\Spline.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>PhoediX</ProjectName>

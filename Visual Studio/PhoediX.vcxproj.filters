@@ -91,6 +91,21 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform">
       <UniqueIdentifier>{3e13dec2-a021-47e3-bf9e-6faec7bb1647}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Mirror">
+      <UniqueIdentifier>{3e3111cd-5214-44ba-8f86-9556dccceae8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Spline">
+      <UniqueIdentifier>{98afdffe-5c8c-4731-82ff-7bfcebbffeeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Controls\Curves Panel">
+      <UniqueIdentifier>{43b2ff32-25c2-47d6-b0ba-a2a71118cfb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\RGB Curves">
+      <UniqueIdentifier>{d2fa990e-09ca-4496-91f8-9039f581ea46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\LAB Curves">
+      <UniqueIdentifier>{b26d7dd9-6127-4060-8284-13abc782e238}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -164,6 +179,18 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Mirror</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Spline\Spline.cpp">
+      <Filter>Spline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.cpp">
+      <Filter>GUI\Controls\Curves Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\RGB Curves</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +277,18 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Mirror</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Spline\Spline.h">
+      <Filter>Spline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.h">
+      <Filter>GUI\Controls\Curves Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\RGB Curves</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
