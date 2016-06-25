@@ -19,9 +19,16 @@ public :
 	ProcessorEdit(int editType, bool multiTheads = false, int numThreads = 0);
 
 	void AddParam(double param);
+	void AddIntArray(int * addArray, int arraySize);
 	void ClearParams();
+	void ClearIntArray();
+
 	int GetParamsSize();
+	int GetIntArraySize();
+
 	double GetParam(size_t index);
+	int * GetIntArray(size_t index);
+	int GetIntArraySize(size_t index);
 
 	void AddFlag(int flag);
 	void ClearFlags();
@@ -52,13 +59,18 @@ public :
 		ROTATE_CUSTOM_BILINEAR,
 		ROTATE_CUSTOM_BICUBIC,
 		MIRROR_VERTICAL,
-		MIRROR_HORIZONTAL
+		MIRROR_HORIZONTAL,
+		RGB_CURVES,
+		LAB_CURVES
 	};
 	
 private:
 	int edit;
 	wxVector<double> params;
 	wxVector<int> flags;
+
+	wxVector<int*> intArrays;
+	wxVector<int> intArraySizes;
 
 	bool doMultithread;
 	int numThread;
