@@ -80,6 +80,9 @@ private:
 		double greenRedScale, double greenGreenScale, double greenBlueScale,
 		double blueRedScale, double blueGreenScale, double blueBlueScale, 
 		int dataStart = -1, int dataEnd = -1);
+	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
+		int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16);
+	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16);
 
 	void Rotate90CW();
 	void Rotate180();

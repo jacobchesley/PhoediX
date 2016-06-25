@@ -44,6 +44,7 @@ void Processor::DeleteEdits() {
 
 	// Delete all edits in the internal vector
 	for (size_t i = 0; i < editListInternal.size(); i++) {
+		editListInternal.at(i)->ClearIntArray();
 		delete editListInternal.at(i);
 	}
 
@@ -580,6 +581,102 @@ void Processor::ChannelScale(double redRedScale, double redGreenScale, double re
 	}
 }
 
+void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
+	int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16) {
+
+	int width = img->GetWidth();
+	int height = img->GetHeight();
+	int dataSize = width * height;
+
+	// Get pointers to 8 bit data
+	uint8_t * redData8 = img->Get8BitDataRed();
+	uint8_t * greenData8 = img->Get8BitDataGreen();
+	uint8_t * blueData8 = img->Get8BitDataBlue();
+
+	int32_t tempRed;
+	int32_t tempGreen;
+	int32_t tempBlue;
+
+	for (int i = 0; i < dataSize; i++) {
+
+		// Apply red curve and bright curve to red channel
+		tempRed = redCurve8[redData8[i]];
+		tempRed = (tempRed > 255) ? 255 : tempRed;
+		tempRed = (tempRed < 0) ? 0 : tempRed;
+		tempRed = brightCurve8[tempRed];
+
+		// Apply green curve and bright curve to green channel
+		tempGreen = greenCurve8[greenData8[i]];
+		tempGreen = (tempGreen > 255) ? 255 : tempGreen;
+		tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+		tempGreen = brightCurve8[tempGreen];
+
+		// Apply blue curve and bright curve to blue channel
+		tempBlue = blueCurve8[blueData8[i]];
+		tempBlue = (tempBlue > 255) ? 255 : tempBlue;
+		tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+		tempBlue = brightCurve8[tempBlue];
+
+		// handle overflow or underflow
+		tempRed = (tempRed > 255) ? 255 : tempRed;
+		tempGreen = (tempGreen > 255) ? 255 : tempGreen;
+		tempBlue = (tempBlue > 255) ? 255 : tempBlue;
+
+		tempRed = (tempRed < 0) ? 0 : tempRed;
+		tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+		tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+
+		// Set the new pixel to the 8 bit data
+		redData8[i] = (uint8_t)tempRed;
+		greenData8[i] = (uint8_t)tempGreen;
+		blueData8[i] = (uint8_t)tempBlue;
+	}
+
+	// If 16 bit image is enabled
+	if (img->GetColorDepth() == 16) {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		for (int i = 0; i < dataSize; i++) {
+
+			// Apply red curve and bright curve to red channel
+			tempRed = redCurve16[redData16[i]];
+			tempRed = (tempRed > 65535) ? 65535: tempRed;
+			tempRed = (tempRed < 0) ? 0 : tempRed;
+			tempRed = brightCurve16[tempRed];
+
+			// Apply green curve and bright curve to green channel
+			tempGreen = greenCurve16[greenData16[i]];
+			tempGreen = (tempGreen > 65535) ? 65535 : tempGreen;
+			tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+			tempGreen = brightCurve16[tempGreen];
+
+			// Apply blue curve and bright curve to blue channel
+			tempBlue = blueCurve16[blueData16[i]];
+			tempBlue = (tempBlue > 65535) ? 65535 : tempBlue;
+			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+			tempBlue = brightCurve16[tempBlue];
+
+			// handle overflow or underflow
+			tempRed = (tempRed > 65535) ? 65535 : tempRed;
+			tempGreen = (tempGreen > 65535) ? 65535 : tempGreen;
+			tempBlue = (tempBlue > 65535) ? 65535 : tempBlue;
+
+			tempRed = (tempRed < 0) ? 0 : tempRed;
+			tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+
+			// Set the new pixel to the 16 bit data
+			redData16[i] = (uint16_t)tempRed;
+			greenData16[i] = (uint16_t)tempGreen;
+			blueData16[i] = (uint16_t)tempBlue;
+		}
+	}
+}
+
 void Processor::Rotate90CW() {
 
 	int width = img->GetWidth();
@@ -744,11 +841,11 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 	uint8_t * blueData8Dup = rotatedImage->Get8BitDataBlue();
 
 	int newI = 0;
-	for (int i = 0; i < dataSize; i++) {
+	for (int i = 0; i < newDataSize; i++) {
 
 		// Get x and y coordinates from current index of data
-		x = i % width;
-		y = i / width;
+		x = i % newWidth;
+		y = i / newWidth;
 
 		x -= dWidth / 2.0;
 		y -= dHeight / 2.0;
@@ -801,11 +898,11 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 			blueData16Dup[i] = 0;
 		}
 
-		for (int i = 0; i < dataSize; i++) {
+		for (int i = 0; i < newDataSize; i++) {
 
 			// Get x and y coordinates from current index of data
-			x = i % width;
-			y = i / width;
+			x = i % newWidth;
+			y = i / newWidth;
 
 			x -= dWidth / 2.0;
 			y -= dHeight / 2.0;
@@ -946,7 +1043,7 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 		newY += pivotY;
 
 		// Veirfy pixel location is in bounds of original image size
-		if (newX > 0 && newX < width && newY > 0 && newY < height) {
+		if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1) {
 
 			// new X is not on border of image
 			if (newX > 0 && newX < width - 1) {
@@ -1082,7 +1179,7 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 			newY += pivotY;
 
 			// Veirfy pixel location is in bounds of original image size
-			if (newX > 0 && newX < width && newY > 0 && newY < height) {
+			if (newX > 1 && newX < width - 1 && newY > 1 && newY < height - 1) {
 
 				// new X is not on border of image
 				if (newX > 0 && newX < width - 1) {
@@ -1290,7 +1387,7 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 		newY += pivotY;
 
 		// Veirfy pixel location is in bounds of original image size
-		if (newX > 0 && newX < width && newY > 0 && newY < height) {
+		if (newX > 2 && newX < width - 2 && newY > 2 && newY < height - 2) {
 
 			// new X is not on border of image
 			if (newX > 1 && newX < width - 2) {
@@ -1566,7 +1663,7 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 			newY += pivotY;
 
 			// Veirfy pixel location is in bounds of original image size
-			if (newX > 0 && newX < width && newY > 0 && newY < height) {
+			if (newX > 2 && newX < width - 2 && newY > 2 && newY < height - 2) {
 
 				// new X is not on border of image
 				if (newX > 1 && newX < width - 2) {
@@ -2136,7 +2233,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 		switch (editToComplete) {
 
-			// Peform a Shift Brightness edit
+		// Peform a Shift Brightness edit
 		case ProcessorEdit::EditType::SHIFT_BRIGHTNESS: {
 
 			procParent->SendMessageToParent("Processing Shift Brightness Edit" + fullEditNumStr);
@@ -2151,9 +2248,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->ShiftBrightness(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift);
 			procParent->SetUpdated(true);
 		}
-														break;
+		break;
 
-														// Peform a Scale Brightness edit
+		// Peform a Scale Brightness edit
 		case ProcessorEdit::EditType::SCALE_BRIGHTNESS: {
 
 			procParent->SendMessageToParent("Processing Scale Brightness Edit" + fullEditNumStr);
@@ -2168,9 +2265,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->ScaleBrightness(allBrightScale, redBrightScale, greenBrightScale, blueBrightScale);
 			procParent->SetUpdated(true);
 		}
-														break;
+		break;
 
-														// Peform an Adjust Contrast edit
+		// Peform an Adjust Contrast edit
 		case ProcessorEdit::EditType::ADJUST_CONTRAST: {
 
 			procParent->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
@@ -2185,9 +2282,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast);
 			procParent->SetUpdated(true);
 		}
-													   break;
+		break;
 
-													   // Peform a greyscale conversion, averaging RGB values
+		// Peform a greyscale conversion, averaging RGB values
 		case ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG: {
 
 			procParent->SendMessageToParent("Processing Greyscale (Average) Edit" + fullEditNumStr);
@@ -2196,9 +2293,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->ConvertGreyscale((1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0));
 			procParent->SetUpdated(true);
 		}
-															 break;
+		break;
 
-															 // Peform a greyscale conversion, using humany eyesight values
+		// Peform a greyscale conversion, using humany eyesight values
 		case ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE: {
 
 			procParent->SendMessageToParent("Processing Greyscale (Human Eyesight) Edit" + fullEditNumStr);
@@ -2207,9 +2304,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->ConvertGreyscale(0.2126, 0.7152, 0.0722);
 			procParent->SetUpdated(true);
 		}
-															 break;
+		break;
 
-															 // Peform a greyscale conversion, using custom scalars
+		// Peform a greyscale conversion, using custom scalars
 		case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM: {
 
 			procParent->SendMessageToParent("Processing Greyscale (Custom) Edit" + fullEditNumStr);
@@ -2223,9 +2320,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->ConvertGreyscale(redScale, greenScale, blueScale);
 			procParent->SetUpdated(true);
 		}
-																break;
+		break;
 
-																// Peform a greyscale conversion, using custom scalars
+		// Peform a greyscale conversion, using custom scalars
 		case ProcessorEdit::EditType::CHANNEL_TRANSFORM: {
 
 			procParent->SendMessageToParent("Processing Channel Transform Edit" + fullEditNumStr);
@@ -2248,9 +2345,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 			procParent->SetUpdated(true);
 		}
-														 break;
+		break;
 
-														 // Peform a 90 degree clockwise roctation
+		// Peform a 90 degree clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_90_CW: {
 
 			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
@@ -2259,9 +2356,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->Rotate90CW();
 			procParent->SetUpdated(true);
 		}
-													break;
+		break;
 
-													// Peform a 180 degree clockwise roctation
+		// Peform a 180 degree clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_180: {
 
 			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
@@ -2270,9 +2367,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->Rotate180();
 			procParent->SetUpdated(true);
 		}
-												  break;
+		break;
 
-												  // Peform a 270 degree clockwise roctation (90 counter clockwise)
+		// Peform a 270 degree clockwise roctation (90 counter clockwise)
 		case ProcessorEdit::EditType::ROTATE_270_CW: {
 
 			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
@@ -2282,9 +2379,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->Rotate90CW();
 			procParent->SetUpdated(true);
 		}
-													 break;
+		break;
 
-													 // Peform a custom angle clockwise roctation
+		// Peform a custom angle clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
 
 			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
@@ -2295,9 +2392,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->RotateCustom(angle, cropFlag);
 			procParent->SetUpdated(true);
 		}
-															 break;
+		break;
 
-															 // Peform a custom angle clockwise roctation using bilinear interpolation
+		// Peform a custom angle clockwise roctation using bilinear interpolation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
 
 			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
@@ -2308,9 +2405,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->RotateCustomBilinear(angle, cropFlag);
 			procParent->SetUpdated(true);
 		}
-															  break;
+		break;
 
-															  // Peform a custom angle clockwise roctation using bicubic interpolation
+		// Peform a custom angle clockwise roctation using bicubic interpolation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
 
 			procParent->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
@@ -2321,9 +2418,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->RotateCustomBicubic(angle, cropFlag);
 			procParent->SetUpdated(true);
 		}
-															 break;
+		break;
 
-															 // Peform a horizontal image flip
+		// Peform a horizontal image flip
 		case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
 
 			procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
@@ -2332,9 +2429,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->MirrorHorizontal();
 			procParent->SetUpdated(true);
 		}
-														 break;
+		break;
 
-														 // Peform a vertical image flip
+		 // Peform a vertical image flip
 		case ProcessorEdit::EditType::MIRROR_VERTICAL: {
 
 			procParent->SendMessageToParent("Processing Mirror Edit" + fullEditNumStr);
@@ -2343,7 +2440,31 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			procParent->MirrorVertical();
 			procParent->SetUpdated(true);
 		}
-													   break;
+		break;
+
+		// Peform a vertical image flip
+		case ProcessorEdit::EditType::RGB_CURVES: {
+
+			procParent->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
+
+			// Get 8 bit curve data
+			int * brightCurve8 = curEdit->GetIntArray(0);
+			int * redCurve8 = curEdit->GetIntArray(1);
+			int * greenCurve8 = curEdit->GetIntArray(2);
+			int * blueCurve8 = curEdit->GetIntArray(3);
+
+			// Get 16 bit curve data
+			int * brightCurve16 = curEdit->GetIntArray(4);
+			int * redCurve16 = curEdit->GetIntArray(5);
+			int * greenCurve16 = curEdit->GetIntArray(6);
+			int * blueCurve16 = curEdit->GetIntArray(7);
+
+			// Perform an edit on the data through the processor
+			procParent->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
+				brightCurve16, redCurve16, greenCurve16, blueCurve16);
+			procParent->SetUpdated(true);
+		}
+		break;
 		}
 	}
 
