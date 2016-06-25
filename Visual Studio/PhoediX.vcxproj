@@ -45,6 +45,7 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.cpp" />
@@ -76,6 +77,7 @@
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.h" />

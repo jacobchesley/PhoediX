@@ -192,6 +192,9 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\RGB Curves</Filter>
     </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\LAB Curves</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h">
@@ -289,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\RGB Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\LAB Curves</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
