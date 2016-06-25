@@ -21,6 +21,32 @@ enum {
 
 wxDECLARE_EVENT(PROCESSOR_MESSAGE_EVENT, wxCommandEvent);
 
+
+enum ColorSpaceENUM {
+	ADOBE_RGB,
+	PROPHOTO_RGB,
+	sRGB,
+	WIDE_GAMUT_RGB
+};
+
+struct RGB {
+	float R;
+	float G;
+	float B;
+};
+
+struct XYZ {
+	float X;
+	float Y;
+	float Z;
+};
+
+struct LAB {
+	float L;
+	float A;
+	float B;
+};
+
 class Processor {
 public:
 
@@ -82,7 +108,7 @@ private:
 		int dataStart = -1, int dataEnd = -1);
 	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
 		int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16);
-	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16);
+	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int colorSpace);
 
 	void Rotate90CW();
 	void Rotate180();
@@ -96,6 +122,11 @@ private:
 
 	void MirrorHorizontal();
 	void MirrorVertical();
+
+	void RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace = sRGB);
+	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace = sRGB);
+	void XYZtoLAB(XYZ * xyz, LAB * lab);
+	void LABtoXYZ(LAB * lab, XYZ * xyz);
 
 	void SendMessageToParent(wxString message);
 

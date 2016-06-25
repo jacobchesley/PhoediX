@@ -677,6 +677,150 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 	}
 }
 
+void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int colorSpace){
+
+	int numSteps = 65535;
+	int width = img->GetWidth();
+	int height = img->GetHeight();
+	int dataSize = width * height;
+
+	// Get pointers to 8 bit data
+	uint8_t * redData8 = img->Get8BitDataRed();
+	uint8_t * greenData8 = img->Get8BitDataGreen();
+	uint8_t * blueData8 = img->Get8BitDataBlue();
+
+	RGB rgb;
+	XYZ xyz;
+	LAB lab;
+
+	int lScale;
+	int aScale;
+	int bScale;
+
+	int newL;
+	int newA;
+	int newB;
+
+	int32_t tempRed;
+	int32_t tempGreen;
+	int32_t tempBlue;
+
+	for (int i = 0; i < dataSize; i++) {
+
+		// Convert RGB to LAB color space
+		rgb.R = (float)redData8[i] / 256.0;
+		rgb.G = (float)greenData8[i] / 256.0;
+		rgb.B = (float)blueData8[i] / 256.0;
+		this->RGBtoXYZ(&rgb, &xyz, colorSpace);
+		this->XYZtoLAB(&xyz, &lab);
+
+		// Scale LAB to ints, 16 bits of precision
+		lScale = (lab.L / 100.0f) * numSteps;
+		aScale = ((lab.A + 128.0f)/256.0f)* numSteps;
+		bScale = ((lab.B + 128.0f)/256.0f) * numSteps;
+
+		// Apply LAB Curve
+		newL = lCurve16[lScale];
+		newA = aCurve16[aScale];
+		newB = bCurve16[bScale];
+
+		// Scale LAB back
+		lab.L = (float)(newL / (float)numSteps);
+		lab.A = (float)(newA / (float)numSteps);
+		lab.B = (float)(newB / (float)numSteps);
+
+		lab.L *= 100.0;
+		lab.A *= 256.0;
+		lab.B *= 256.0;
+
+		lab.A -= 128.0f;
+		lab.B -= 128.0f;
+
+		// Convert LAB back to RGB color space
+		this->LABtoXYZ(&lab, &xyz);
+		this->XYZtoRGB(&xyz, &rgb);
+		tempRed = (int32_t)(rgb.R * 256.0);
+		tempGreen = (int32_t)(rgb.G * 256.0);
+		tempBlue = (int32_t)(rgb.B * 256.0);
+
+		// handle overflow or underflow
+		tempRed = (tempRed > 255) ? 255 : tempRed;
+		tempGreen = (tempGreen > 255) ? 255 : tempGreen;
+		tempBlue = (tempBlue > 255) ? 255 : tempBlue;
+
+		tempRed = (tempRed < 0) ? 0 : tempRed;
+		tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+		tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+
+		// Set the new pixel to the 8 bit data
+		redData8[i] = (uint8_t)tempRed;
+		greenData8[i] = (uint8_t)tempGreen;
+		blueData8[i] = (uint8_t)tempBlue;
+	}
+
+	// If 16 bit image is enabled
+	if (img->GetColorDepth() == 16) {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		for (int i = 0; i < dataSize; i++) {
+
+			// Convert RGB to LAB color space
+			rgb.R = (float)redData16[i] / 65535.0;
+			rgb.G = (float)greenData16[i] / 65535.0;
+			rgb.B = (float)blueData16[i] / 65535.0;
+			this->RGBtoXYZ(&rgb, &xyz, colorSpace);
+			this->XYZtoLAB(&xyz, &lab);
+
+			// Scale LAB to ints, 16 bits of precision
+			lScale = (lab.L / 100.0f) * numSteps;
+			aScale = ((lab.A + 128.0f) / 256.0f)* numSteps;
+			bScale = ((lab.B + 128.0f) / 256.0f) * numSteps;
+
+			// Apply LAB Curve
+			newL = lCurve16[lScale];
+			newA = aCurve16[aScale];
+			newB = bCurve16[bScale];
+
+			// Scale LAB back
+			lab.L = (float)(newL / (float)numSteps);
+			lab.A = (float)(newA / (float)numSteps);
+			lab.B = (float)(newB / (float)numSteps);
+
+			lab.L *= 100.0;
+			lab.A *= 256.0;
+			lab.B *= 256.0;
+
+			lab.A -= 128.0f;
+			lab.B -= 128.0f;
+
+			// Convert LAB back to RGB color space
+			this->LABtoXYZ(&lab, &xyz);
+			this->XYZtoRGB(&xyz, &rgb);
+			tempRed = (int32_t)(rgb.R * 65535.0);
+			tempGreen = (int32_t)(rgb.G * 65535.0);
+			tempBlue = (int32_t)(rgb.B * 65535.0);
+
+			// handle overflow or underflow
+			tempRed = (tempRed > 65535) ? 65535 : tempRed;
+			tempGreen = (tempGreen > 65535) ? 65535 : tempGreen;
+			tempBlue = (tempBlue > 65535) ? 65535 : tempBlue;
+
+			tempRed = (tempRed < 0) ? 0 : tempRed;
+			tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+
+			// Set the new pixel to the 16 bit data
+			redData16[i] = (uint16_t)tempRed;
+			greenData16[i] = (uint16_t)tempGreen;
+			blueData16[i] = (uint16_t)tempBlue;
+		}
+	}
+}
+
 void Processor::Rotate90CW() {
 
 	int width = img->GetWidth();
@@ -2194,6 +2338,184 @@ void Processor::MirrorVertical() {
 	}
 }
 
+void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace) {
+
+	float tempR = rgb->R;
+	float tempG = rgb->G;
+	float tempB = rgb->B;
+
+	if (tempR > 0.04045f) {
+		tempR = pow(((tempR + 0.055f) / 1.055f), 2.4f);
+	}
+	else {
+		tempR = tempR / 12.92f;
+	}
+	if (tempG > 0.04045f) {
+		tempG = pow(((tempG + 0.055f) / 1.055f), 2.4f);
+	}
+	else {
+		tempG = tempG / 12.92f;
+	}
+	if (tempB > 0.04045f) {
+		tempB = pow(((tempB + 0.055f) / 1.055f), 2.4f);
+	}
+	else {
+		tempB = tempB / 12.92f;
+	}
+
+	tempR *= 100.0f;
+	tempG *= 100.0f;
+	tempB *= 100.0f;
+
+	switch (colorSpace) {
+
+	case ADOBE_RGB:
+		xyz->X = (tempR * 0.5767309f) + (tempG * 0.1855540f) + (tempB * 0.1881852f);
+		xyz->Y = (tempR * 0.2973769f) + (tempG * 0.6273491f) + (tempB * 0.0752741f);
+		xyz->Z = (tempR * 0.0270343f) + (tempG * 0.0706872f) + (tempB * 0.9911085f);
+		break;
+
+	case PROPHOTO_RGB:
+		xyz->X = (tempR * 0.7976749f) + (tempG * 0.1351917f) + (tempB * 0.0313534f);
+		xyz->Y = (tempR * 0.2880402f) + (tempG * 0.7118741f) + (tempB * 0.0000857f);
+		xyz->Z = (tempR * 0.0000000f) + (tempG * 0.0000000f) + (tempB * 0.8252100f);
+		break;
+
+	case sRGB:
+		xyz->X = (tempR * 0.4124564f) + (tempG * 0.3575761f) + (tempB * 0.1804375f);
+		xyz->Y = (tempR * 0.2126729f) + (tempG * 0.7151522f) + (tempB * 0.0721750f);
+		xyz->Z = (tempR * 0.0193339f) + (tempG * 0.1191920f) + (tempB * 0.9503041f);
+		break;
+
+	case WIDE_GAMUT_RGB:
+		xyz->X = (tempR * 0.7161046f) + (tempG * 0.1009296f) + (tempB * 0.1471858f);
+		xyz->Y = (tempR * 0.2581874f) + (tempG * 0.7249378f) + (tempB * 0.0168748f);
+		xyz->Z = (tempR * 0.0000000f) + (tempG * 0.0517813f) + (tempB * 0.7734287f);
+		break;
+	}
+}
+
+void Processor::XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace) {
+
+	float tempX = (float)xyz->X / 100.0f;
+	float tempY = (float)xyz->Y / 100.0f;
+	float tempZ = (float)xyz->Z / 100.0f;
+
+	float tempR = 0.0f;
+	float tempG = 0.0f;
+	float tempB = 0.0f;
+
+	switch (colorSpace) {
+
+	case ADOBE_RGB:
+		tempR = (tempX *  2.0413690f) + (tempY * -0.5649464f) + (tempZ * -0.3446944f);
+		tempG = (tempX * -0.9692660f) + (tempY *  1.8760108f) + (tempZ *  0.0415560f);
+		tempB = (tempX *  0.0134474f) + (tempY * -0.1183897f) + (tempZ *  1.0154096f);
+		break;
+
+	case PROPHOTO_RGB:
+		tempR = (tempX *  1.3459433f) + (tempY * -0.2556075f) + (tempZ * -0.0511118f);
+		tempG = (tempX * -0.5445989f) + (tempY *  1.5081673f) + (tempZ *  0.0205351f);
+		tempB = (tempX *  0.0000000f) + (tempY *  0.0000000f) + (tempZ *  1.2118128f);
+		break;
+
+	case sRGB:
+		tempR = (tempX *  3.2404542f) + (tempY * -1.5371385f) + (tempZ * -0.4985314f);
+		tempG = (tempX * -0.9692660f) + (tempY *  1.8760108f) + (tempZ *  0.0415560f);
+		tempB = (tempX *  0.0556434f) + (tempY * -0.2040259f) + (tempZ *  1.0572252f);
+		break;
+
+	case WIDE_GAMUT_RGB:
+		tempR = (tempX *  1.4628067f) + (tempY * -0.1840623f) + (tempZ * -0.2743606f);
+		tempG = (tempX * -0.5217933f) + (tempY *  1.4472381f) + (tempZ *  0.0677227f);
+		tempB = (tempX *  0.0349342f) + (tempY * -0.0968930f) + (tempZ *  1.2884099f);
+		break;
+	}
+
+	if (tempR > 0.0031308f) {
+		tempR = 1.055f * pow(tempR, 1.0f / 2.4f) - 0.055f;
+	}
+	else {
+		tempR = 12.92f * tempR;
+	}
+	if (tempG > 0.0031308f) {
+		tempG = 1.055f * pow(tempG, 1.0f / 2.4f) - 0.055f;
+	}
+	else {
+		tempG = 12.92f * tempG;
+	}
+	if (tempB > 0.0031308f) {
+		tempB = 1.055f * pow(tempB, 1.0f / 2.4f) - 0.055f;
+	}
+	else {
+		tempB = 12.92f * tempB;
+	}
+
+	rgb->R = tempR;
+	rgb->G = tempG;
+	rgb->B = tempB;
+}
+
+void Processor::XYZtoLAB(XYZ * xyz, LAB * lab) {
+
+	float tempX = xyz->X / 95.047f;
+	float tempY = xyz->Y / 100.000f;
+	float tempZ = xyz->Z / 108.883f;
+
+	if (tempX > 0.008856f) {
+		tempX = pow(tempX, 1.0f / 3.0f);
+	}
+	else {
+		tempX = (7.787f * tempX) + (16.0f / 116.0f);
+	}
+	if (tempY  > 0.008856f) {
+		tempY = pow(tempY, 1.0f / 3.0f);
+	}
+	else {
+		tempY = (7.787f * tempY) + (16.0f / 116.0f);
+	}
+	if (tempZ > 0.008856f) {
+		tempZ = pow(tempZ, 1.0f / 3.0f);
+	}
+	else {
+		tempZ = (7.787f * tempZ) + (16.0f / 116.0f);
+	}
+
+	lab->L = (116.0f * tempY) - 16.0f;
+	lab->A = 500.0f  * (tempX - tempY);
+	lab->B = 200.0f  * (tempY - tempZ);
+
+}
+
+void Processor::LABtoXYZ(LAB * lab, XYZ * xyz) {
+
+	float tempY = (lab->L + 16.0f) / 116.0f;
+	float tempX = (lab->A / 500.0f) + tempY;
+	float tempZ = tempY - (lab->B / 200.0F);
+
+	if (tempY*tempY*tempY > 0.008856) {
+		tempY = tempY*tempY*tempY;
+	}
+	else {
+		tempY = (tempY - (16.0f / 116.0f)) / 7.787f;
+	}
+	if (tempX*tempX*tempX > 0.008856) {
+		tempX = tempX*tempX*tempX;
+	}
+	else {
+		tempX = (tempX - (16.0f / 116.0f)) / 7.787f;
+	}
+	if (tempZ*tempZ*tempZ > 0.008856) {
+		tempZ = tempZ*tempZ*tempZ;
+	}
+	else {
+		tempZ = (tempZ - (16.0f / 116.0f)) / 7.787f;
+	}
+
+	xyz->X = tempX * 95.047f;
+	xyz->Y = tempY * 100.0f;
+	xyz->Z = tempZ * 108.883f;
+}
 
 Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
@@ -2442,27 +2764,48 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 		}
 		break;
 
-		// Peform a vertical image flip
+		// Peform RGB Curves edit
 		case ProcessorEdit::EditType::RGB_CURVES: {
 
-			procParent->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
+			if (curEdit->GetNumIntArrays() == 8) {
+				procParent->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
 
-			// Get 8 bit curve data
-			int * brightCurve8 = curEdit->GetIntArray(0);
-			int * redCurve8 = curEdit->GetIntArray(1);
-			int * greenCurve8 = curEdit->GetIntArray(2);
-			int * blueCurve8 = curEdit->GetIntArray(3);
+				// Get 8 bit curve data
+				int * brightCurve8 = curEdit->GetIntArray(0);
+				int * redCurve8 = curEdit->GetIntArray(1);
+				int * greenCurve8 = curEdit->GetIntArray(2);
+				int * blueCurve8 = curEdit->GetIntArray(3);
 
-			// Get 16 bit curve data
-			int * brightCurve16 = curEdit->GetIntArray(4);
-			int * redCurve16 = curEdit->GetIntArray(5);
-			int * greenCurve16 = curEdit->GetIntArray(6);
-			int * blueCurve16 = curEdit->GetIntArray(7);
+				// Get 16 bit curve data
+				int * brightCurve16 = curEdit->GetIntArray(4);
+				int * redCurve16 = curEdit->GetIntArray(5);
+				int * greenCurve16 = curEdit->GetIntArray(6);
+				int * blueCurve16 = curEdit->GetIntArray(7);
 
-			// Perform an edit on the data through the processor
-			procParent->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
-				brightCurve16, redCurve16, greenCurve16, blueCurve16);
-			procParent->SetUpdated(true);
+				// Perform an edit on the data through the processor
+				procParent->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
+					brightCurve16, redCurve16, greenCurve16, blueCurve16);
+				procParent->SetUpdated(true);
+			}
+		}
+		break;
+
+		// Peform LAB Curves edit
+		case ProcessorEdit::EditType::LAB_CURVES: {
+
+			if (curEdit->GetNumIntArrays() == 3) {
+				procParent->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
+
+				// Get LAB curve data
+				int * lCurve16 = curEdit->GetIntArray(0);
+				int * aCurve16 = curEdit->GetIntArray(1);
+				int * bCurve16 = curEdit->GetIntArray(2);
+
+				int colorSpace = curEdit->GetParam(0);
+				// Perform an edit on the data through the processor
+				procParent->LABCurves(lCurve16, aCurve16, bCurve16, colorSpace);
+				procParent->SetUpdated(true);
+			}
 		}
 		break;
 		}
