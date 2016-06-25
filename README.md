@@ -8,11 +8,11 @@ The current list of image edits PhoediX is capable of are:
 * **Grayscale Conversion** (Average channels, human eyesight multipliers, and custom channel multipliers).
 * **Channel Transform** (Each channel is created by all channels using multipliers.  Example - Sepia Tone).
 * **Image Rotation** (90, 180, and 270 Clockwise.  Nearest Neighbor, Bilinear and Bicubic interpolation use for custom angles)
+* **RGB Curves** (A brightness curves tool for brightness, red, green and blue channels)
+* **LAB Curves** (A curves tool for LAB color space)
 
 Edits Coming Soon:
 
-* **RGB Curves**
-* **LAB Curves**
 * **Raw File Processing using LibRaw**
 
 General PhoediX capabilites Coming Soon:
