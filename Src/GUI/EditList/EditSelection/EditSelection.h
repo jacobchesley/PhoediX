@@ -9,8 +9,8 @@
 #include "wx/wx.h"
 #endif
 
-#include "GUI\EditList\AvailableEdits\AvailableEdits.h"
 #include "wx\listctrl.h"
+#include "GUI\EditList\AvailableEdits\AvailableEdits.h"
 #include "GUI\Colors\Colors.h"
 #include "Debugging\MemoryLeakCheck.h"
 
