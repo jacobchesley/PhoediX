@@ -95,25 +95,4 @@ void RGBCurvesWindow::AddEditToProcessor() {
 	rgbCurveEdit->AddIntArray(blueCurve16, numSteps16);
 
 	proc->AddEdit(rgbCurveEdit);
-
-	/*
-	std::vector<float> brightVectorF;
-	std::vector<float> redVectorF;
-	std::vector<float> greenVectorF;
-	std::vector<float> blueVectorF;
-
-	
-	brightVectorF.resize(brightVector.size());
-	redVectorF.resize(redVector.size());
-	greenVectorF.resize(greenVector.size());
-	blueVectorF.resize(blueVector.size());
-
-	for (std::vector<float>::size_type i = 0; i < brightVector.size(); i++) {
-
-		brightVectorF[i] = (float)brightVector[i];
-		redVectorF[i] = (float)redVector[i];
-		greenVectorF[i] = (float)greenVector[i];
-		blueVectorF[i] = (float)blueVector[i];
-	}
-	*/
 }
