@@ -51,6 +51,11 @@ int ProcessorEdit::GetIntArraySize(size_t index) {
 	return intArraySizes.at(index);
 }
 
+int ProcessorEdit::GetNumIntArrays() {
+	return intArraySizes.size();
+}
+
+
 void ProcessorEdit::AddFlag(int flag) {
 	flags.push_back(flag);
 }

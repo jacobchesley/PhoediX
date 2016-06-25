@@ -24,6 +24,7 @@ public :
 	void ClearIntArray();
 
 	int GetParamsSize();
+	int GetNumIntArrays();
 	int GetIntArraySize();
 
 	double GetParam(size_t index);
