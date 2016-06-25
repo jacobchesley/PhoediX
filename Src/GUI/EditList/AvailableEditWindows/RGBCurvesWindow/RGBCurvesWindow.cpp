@@ -41,19 +41,68 @@ RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor
 
 void RGBCurvesWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
-	int numSteps = 65536;
-	
+	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
+	wxPostEvent(parWindow, evt);
+}
 
-	std::vector<int> brightVector = brightCurve->GetColorCurveMap(numSteps, (float)numSteps);
-	std::vector<int> redVector = redCurve->GetColorCurveMap(numSteps, (float)numSteps);
-	std::vector<int> greenVector = greenCurve->GetColorCurveMap(numSteps, (float)numSteps);
-	std::vector<int> blueVector = blueCurve->GetColorCurveMap(numSteps, (float)numSteps);
+void RGBCurvesWindow::AddEditToProcessor() {
 
+	int numSteps8 = 256;
+	std::vector<int> brightVector8 = brightCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+	std::vector<int> redVector8 = redCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+	std::vector<int> greenVector8 = greenCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+	std::vector<int> blueVector8 = blueCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+
+	int * brightCurve8 = new int[numSteps8];
+	int * redCurve8 = new int[numSteps8];
+	int * greenCurve8 = new int[numSteps8];
+	int * blueCurve8 = new int[numSteps8];
+
+	for (size_t i = 0; i < numSteps8; i++) {
+		brightCurve8[i] = brightVector8[i];
+		redCurve8[i] = redVector8[i];
+		greenCurve8[i] =greenVector8[i];
+		blueCurve8[i] = blueVector8[i];
+	}
+
+	int numSteps16 = 65536;
+	std::vector<int> brightVector16 = brightCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+	std::vector<int> redVector16 = redCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+	std::vector<int> greenVector16 = greenCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+	std::vector<int> blueVector16 = blueCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+
+	int * brightCurve16 = new int[numSteps16];
+	int * redCurve16 = new int[numSteps16];
+	int * greenCurve16 = new int[numSteps16];
+	int * blueCurve16 = new int[numSteps16];
+
+	for (size_t i = 0; i < numSteps8; i++) {
+		brightCurve16[i] = brightVector16[i];
+		redCurve16[i] = redVector16[i];
+		greenCurve16[i] = greenVector16[i];
+		blueCurve16[i] = blueVector16[i];
+	}
+
+	ProcessorEdit * rgbCurveEdit = new ProcessorEdit(ProcessorEdit::EditType::RGB_CURVES);
+	rgbCurveEdit->AddIntArray(brightCurve8, numSteps8);
+	rgbCurveEdit->AddIntArray(redCurve8, numSteps8);
+	rgbCurveEdit->AddIntArray(greenCurve8, numSteps8);
+	rgbCurveEdit->AddIntArray(blueCurve8, numSteps8);
+
+	rgbCurveEdit->AddIntArray(brightCurve16, numSteps16);
+	rgbCurveEdit->AddIntArray(redCurve16, numSteps16);
+	rgbCurveEdit->AddIntArray(greenCurve16, numSteps16);
+	rgbCurveEdit->AddIntArray(blueCurve16, numSteps16);
+
+	proc->AddEdit(rgbCurveEdit);
+
+	/*
 	std::vector<float> brightVectorF;
 	std::vector<float> redVectorF;
 	std::vector<float> greenVectorF;
 	std::vector<float> blueVectorF;
 
+	
 	brightVectorF.resize(brightVector.size());
 	redVectorF.resize(redVector.size());
 	greenVectorF.resize(greenVector.size());
@@ -66,4 +115,5 @@ void RGBCurvesWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 		greenVectorF[i] = (float)greenVector[i];
 		blueVectorF[i] = (float)blueVector[i];
 	}
+	*/
 }

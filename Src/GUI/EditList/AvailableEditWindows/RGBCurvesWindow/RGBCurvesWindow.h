@@ -34,6 +34,8 @@ public:
 
 	RGBCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void Process(wxCommandEvent& WXUNUSED(event));
+
+	void AddEditToProcessor();
 };
 
 #endif
