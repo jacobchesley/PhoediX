@@ -25,7 +25,7 @@ class EditWindow : public wxScrolledWindow{
 		wxString GetName();
 		void SetName(wxString editName);
 
-		void SetParamsAndFlags(ProcessorEdit * edit);
+		virtual void SetParamsAndFlags(ProcessorEdit * edit);
 
 		enum {
 			ID_PROCESS_EDITS
