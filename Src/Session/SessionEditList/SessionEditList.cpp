@@ -59,7 +59,7 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 			}
 
 			// Get all parameters for the edit
-			if (editNodeChildren->GetName() == "Paramerers") {
+			if (editNodeChildren->GetName() == "Parameters") {
 
 				wxXmlNode * editNodeParameters = editNodeChildren->GetChildren();
 
@@ -99,6 +99,50 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 				// Add parameters to new edit
 				for (size_t i = 0; i < numParams; i++) {
 					newEdit->AddParam(params.at(i));
+				}
+			}
+
+			// Get all flags for the edit
+			if (editNodeChildren->GetName() == "Flags") {
+
+				wxXmlNode * editNodeFlags = editNodeChildren->GetChildren();
+
+				// Count number of flags
+				size_t numFlags = 0;
+				wxVector<double> flags;
+				while (editNodeFlags) {
+					numFlags += 1;
+					editNodeFlags = editNodeFlags->GetNext();
+				}
+
+				// Resize the flags vector to account for all parameters
+				flags.resize(numFlags);
+
+				// Get all parameters and place in correct order
+				editNodeFlags = editNodeChildren->GetChildren();
+				wxString editFlagNumStr;
+				size_t flagIdx = 0;
+				int flag;
+				while (editNodeFlags) {
+
+					// Get flag number
+					editFlagNumStr = editNodeFlags->GetName();
+					editFlagNumStr = editFlagNumStr.SubString(4, editFlagNumStr.length());
+					flagIdx = wxAtoi(editFlagNumStr);
+
+					// Get param value
+					flag = wxAtoi(editNodeFlags->GetChildren()[0].GetContent());
+
+					// Add to param vector
+					flags[flagIdx] = flag;
+
+					// Get next parameter
+					editNodeFlags = editNodeFlags->GetNext();
+				}
+
+				// Add parameters to new edit
+				for (size_t i = 0; i < numFlags; i++) {
+					newEdit->AddFlag(flags.at(i));
 				}
 			}
 			
@@ -164,7 +208,7 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 			flagStr << curEdit->GetFlag(flagIndex);
 
 			wxXmlNode * flagNode = new wxXmlNode(flagsNode, wxXML_ELEMENT_NODE, "Flag" + flagIdx);
-			flagNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", paramStr));
+			flagNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", flagStr));
 		}
 	}
 }
