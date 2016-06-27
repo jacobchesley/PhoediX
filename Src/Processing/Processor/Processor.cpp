@@ -45,7 +45,7 @@ void Processor::DeleteEdits() {
 	// Delete all edits in the internal vector
 	for (size_t i = 0; i < editListInternal.size(); i++) {
 		editListInternal.at(i)->ClearIntArray();
-		//delete editListInternal.at(i);
+		delete editListInternal.at(i);
 	}
 
 	// Clear the vector
