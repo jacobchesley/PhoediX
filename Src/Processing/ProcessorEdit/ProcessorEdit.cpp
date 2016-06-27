@@ -5,10 +5,8 @@ ProcessorEdit::ProcessorEdit() {
 	numThread = 0;
 }
 
-ProcessorEdit::ProcessorEdit(int editType, bool multiThead, int numThreads) {
-	edit = editType;
-	doMultithread = multiThead;
-	numThread = numThreads;
+ProcessorEdit::ProcessorEdit(int editType) {
+	this->SetEditType(editType);
 }
 
 void ProcessorEdit::AddParam(double param) {
@@ -55,7 +53,6 @@ int ProcessorEdit::GetNumIntArrays() {
 	return intArraySizes.size();
 }
 
-
 void ProcessorEdit::AddFlag(int flag) {
 	flags.push_back(flag);
 }
@@ -78,20 +75,100 @@ int ProcessorEdit::GetEditType() {
 
 void ProcessorEdit::SetEditType(int editType) {
 	edit = editType;
+
+	switch (edit) {
+
+		case EditType::ADJUST_CONTRAST:
+			tag = "ADJUST_CONTRAST";
+			break;
+
+		case EditType::CHANNEL_TRANSFORM:
+			tag = "CHANNEL_TRANSFORM";
+			break;
+
+		case EditType::CONVERT_GREYSCALE_AVG:
+			tag = "CONVERT_GREYSCALE_AVG";
+			break;
+
+		case EditType::CONVERT_GREYSCALE_CUSTOM:
+			tag = "CONVERT_GREYSCALE_CUSTOM";
+			break;
+
+		case EditType::CONVERT_GREYSCALE_EYE:
+			tag = "CONVERT_GREYSCALE_EYE";
+			break;
+
+		case EditType::LAB_CURVES:
+			tag = "LAB_CURVES";
+			break;
+
+		case EditType::MIRROR_HORIZONTAL:
+			tag = "MIRROR_HORIZONTAL";
+			break;
+
+		case EditType::MIRROR_VERTICAL:
+			tag = "MIRROR_VERTICAL";
+			break;
+
+		case EditType::RGB_CURVES:
+			tag = "RGB_CURVES";
+			break;
+
+		case EditType::ROTATE_180:
+			tag = "ROTATE_180";
+			break;
+
+		case EditType::ROTATE_270_CW:
+			tag = "ROTATE_270_CW";
+			break;
+
+		case EditType::ROTATE_90_CW:
+			tag = "ROTATE_90_CW";
+			break;
+
+		case EditType::ROTATE_CUSTOM_BICUBIC:
+			tag = "ROTATE_CUSTOM_BICUBIC";
+			break;
+
+		case EditType::ROTATE_CUSTOM_BILINEAR:
+			tag = "ROTATE_CUSTOM_BILINEAR";
+			break;
+
+		case EditType::ROTATE_CUSTOM_NEAREST:
+			tag = "ROTATE_CUSTOM_NEAREST";
+			break;
+
+		case EditType::SCALE_BRIGHTNESS:
+			tag = "SCALE_BRIGHTNESS";
+			break;
+
+		case EditType::SHIFT_BRIGHTNESS:
+			tag = "SHIFT_BRIGHTNESS";
+			break;
+	}
 }
 
-bool ProcessorEdit::GetMultithread() {
-	return doMultithread;
+void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
+
+	if (inTag == "ADJUST_CONTRAST") { edit = EditType::ADJUST_CONTRAST; tag = inTag; }
+	else if (inTag == "CHANNEL_TRANSFORMT") { edit = EditType::CHANNEL_TRANSFORM; tag = inTag; }
+	else if (inTag == "CONVERT_GREYSCALE_AVG") { edit = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
+	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { edit = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
+	else if (inTag == "CONVERT_GREYSCALE_EYE") { edit = EditType::CONVERT_GREYSCALE_EYE; tag = inTag; }
+	else if (inTag == "LAB_CURVES") { edit = EditType::LAB_CURVES; tag = inTag; }
+	else if (inTag == "MIRROR_HORIZONTAL") { edit = EditType::MIRROR_HORIZONTAL; tag = inTag; }
+	else if (inTag == "MIRROR_VERTICAL") { edit = EditType::MIRROR_VERTICAL; tag = inTag; }
+	else if (inTag == "RGB_CURVES") { edit = EditType::RGB_CURVES; tag = inTag; }
+	else if (inTag == "ROTATE_180") { edit = EditType::ROTATE_180; tag = inTag; }
+	else if (inTag == "ROTATE_270_CW") { edit = EditType::ROTATE_270_CW; tag = inTag; }
+	else if (inTag == "ROTATE_90_CW") { edit = EditType::ROTATE_90_CW; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_BICUBIC") { edit = EditType::ROTATE_CUSTOM_BICUBIC; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_BILINEAR") { edit = EditType::ROTATE_CUSTOM_BILINEAR; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_NEAREEST") { edit = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
+	else if (inTag == "SCALE_BRIGHTNESS") { edit = EditType::SCALE_BRIGHTNESS; tag = inTag; }
+	else if (inTag == "SHIFT_BRIGHTNESS") { edit = EditType::SHIFT_BRIGHTNESS; tag = inTag; }
 }
 
-void ProcessorEdit::SetMultithread(bool multiThread) {
-	doMultithread = multiThread;
-}
-
-int ProcessorEdit::GetNumThreads(){
-	return numThread;
-}
-
-void ProcessorEdit::SetNumThreads(int numThreads) {
-	numThread = numThreads;
+wxString ProcessorEdit::GetEditTag() {
+	return tag;
 }

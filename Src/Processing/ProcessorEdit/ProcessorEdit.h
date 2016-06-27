@@ -16,7 +16,7 @@ class ProcessorEdit {
 public :
 	
 	ProcessorEdit();
-	ProcessorEdit(int editType, bool multiTheads = false, int numThreads = 0);
+	ProcessorEdit(int editType);
 
 	void AddParam(double param);
 	void AddIntArray(int * addArray, int arraySize);
@@ -38,12 +38,9 @@ public :
 
 	int GetEditType();
 	void SetEditType(int editType);
+	void SetEditTypeFromTag(wxString inTag);
 
-	void SetMultithread(bool multiThread);
-	bool GetMultithread();
-
-	int GetNumThreads();
-	void SetNumThreads(int numThreads);
+	wxString GetEditTag();
 
 	enum EditType {
 		SHIFT_BRIGHTNESS,
@@ -67,6 +64,7 @@ public :
 	
 private:
 	int edit;
+	wxString tag;
 	wxVector<double> params;
 	wxVector<int> flags;
 

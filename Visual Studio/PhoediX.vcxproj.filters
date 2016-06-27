@@ -106,6 +106,12 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\LAB Curves">
       <UniqueIdentifier>{b26d7dd9-6127-4060-8284-13abc782e238}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Session">
+      <UniqueIdentifier>{a87f00ef-5f3d-4da3-b7fa-1d79740acc8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Session\Session Edit List">
+      <UniqueIdentifier>{5f817431-a4c7-4d0e-aee5-33dfe3372bff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -194,6 +200,12 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\LAB Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Session\SessionEditList\SessionEditList.cpp">
+      <Filter>Session\Session Edit List</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Session\Session.cpp">
+      <Filter>Session</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -295,6 +307,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\LAB Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Session\Session.h">
+      <Filter>Session</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Session\SessionEditList\SessionEditList.h">
+      <Filter>Session\Session Edit List</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

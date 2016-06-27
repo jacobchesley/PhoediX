@@ -9,6 +9,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "Processing\ProcessorEdit\ProcessorEdit.h"
 #include "wx\event.h"
 
 enum {
@@ -23,6 +24,8 @@ class EditWindow : public wxScrolledWindow{
 		virtual void AddEditToProcessor();
 		wxString GetName();
 		void SetName(wxString editName);
+
+		void SetParamsAndFlags(ProcessorEdit * edit);
 
 		enum {
 			ID_PROCESS_EDITS

@@ -24,6 +24,9 @@ public:
 	EditListPanel(wxWindow * parent, Processor * processor);
 	wxVector<Edit> edits;
 
+	void AddEditsToProcessor();
+	void AddEditWindows(wxVector<ProcessorEdit*> edits);
+
 private:
 
 	void InitializeEdits();
@@ -34,6 +37,7 @@ private:
 	void ReprocessImage();
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
+	void AddEditWindowToPanel(EditWindow * window, int editID);
 	void MoveEditUp(wxCommandEvent& upEvt);
 	void MoveEditDown(wxCommandEvent& downEvt);
 	void DeleteEdit(wxCommandEvent& deleteEvt);
@@ -56,6 +60,7 @@ private:
 		EditListScroll(wxWindow * parent);
 		void AddEdit(EditListItem * item);
 		void DeleteEdit(size_t index);
+		void DeleteAllEdits();
 		void MoveEditUp(size_t index);
 		void MoveEditDown(size_t index);
 		int GetNextID();

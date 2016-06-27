@@ -61,6 +61,7 @@ public:
 	void AddEdit(ProcessorEdit * edit);
 	void ProcessEdits();
 	void DeleteEdits();
+	wxVector<ProcessorEdit*> GetEditVector();
 
 	void Enable16Bit();
 	void Disable16Bit();

@@ -28,6 +28,8 @@ class AvailableEditWindows {
 
 	public:
 		static EditWindow* GetEditWindow(int editID, wxWindow* parent, Processor * processor);
+		static EditWindow* GetEditWindow(ProcessorEdit * edit, wxWindow* parent, Processor * processor);
+		static int GetEditIDFromEdit(ProcessorEdit * edit);
 };
 
 #endif

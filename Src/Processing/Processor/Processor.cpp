@@ -45,11 +45,15 @@ void Processor::DeleteEdits() {
 	// Delete all edits in the internal vector
 	for (size_t i = 0; i < editListInternal.size(); i++) {
 		editListInternal.at(i)->ClearIntArray();
-		delete editListInternal.at(i);
+		//delete editListInternal.at(i);
 	}
 
 	// Clear the vector
 	editListInternal.clear();
+}
+
+wxVector<ProcessorEdit*> Processor::GetEditVector() {
+	return editListInternal;
 }
 
 void Processor::Enable16Bit() {
@@ -2794,7 +2798,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 		case ProcessorEdit::EditType::LAB_CURVES: {
 
 			if (curEdit->GetNumIntArrays() == 3) {
-				procParent->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
+				procParent->SendMessageToParent("Processing LAB Curves Edit" + fullEditNumStr);
 
 				// Get LAB curve data
 				int * lCurve16 = curEdit->GetIntArray(0);

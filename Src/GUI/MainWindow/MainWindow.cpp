@@ -10,6 +10,9 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuView = new wxMenu;
 	menuHelp = new wxMenu;
 
+	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT, _("Open PhoediX Project"));
+	menuFile->Append(MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT, _("Save PhoediX Project"));
+	menuFile->AppendSeparator();
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_FILE, _("Open Image"));
 	menuFile->AppendSeparator();
 	menuFile->Append(MainWindow::MenuBar::ID_EXIT, _("Exit"));
@@ -44,6 +47,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
 	editListInfo.Right();
 	editListInfo.Caption("Edit List");
+	editListInfo.Name("EditList");
 	editListInfo.CloseButton(true);
 	editListInfo.PinButton(true);
 	editListInfo.DestroyOnClose(false);
@@ -57,18 +61,20 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	imageInfo.CloseButton(true);
 	imageInfo.PinButton(true);
 	imageInfo.DestroyOnClose(false);
+	imageInfo.Name("ImageDisplay");
 
 	auiManager->AddPane(imagePanel, imageInfo);
 	auiManager->Update();
 	
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadProject, this, MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSaveProject, this, MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowImage, this, MainWindow::MenuBar::ID_SHOW_IMAGE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowEditList, this, MainWindow::MenuBar::ID_SHOW_EDIT_LIST);
 	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
-
-
+	
 	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor);
 	imgPanelThread->Run();
 
@@ -85,7 +91,43 @@ void MainWindow::SetSizeProperties(){
 	this->Maximize(true);
 }
 
-void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)){
+void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
+
+	wxFileDialog saveFileDialog(this, _("Save PhoediX Project"), "", "", "PhoediX Project Files (*.phx)|*.phx", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+	if (saveFileDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	editList->AddEditsToProcessor();
+	
+	session.GetEditList()->SetSessionEditList(processor->GetEditVector());
+	session.SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
+	session.SaveSessionToFile(saveFileDialog.GetPath());
+}
+void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
+
+	wxFileDialog openFileDialog(this, _("Open PhoediX Project"), "", "", "PhoediX Project Files (*.phx)|*.phx", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (openFileDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	session.LoadSessionFromFile(openFileDialog.GetPath());
+
+	// Set the new image
+	delete processor->GetOriginalImage();
+	ImageHandler::LoadImageFromFile(session.GetImageFilePath(), processor->GetImage());
+	processor->SetOriginalImage(processor->GetImage());
+	processor->SetUpdated(true);
+
+	// Populate the panel with the edits
+	editList->AddEditWindows(session.GetEditList()->GetSessionEditList());
+
+	// Load perspective after edits are loaded
+	wxString perspect = session.GetPerspective();
+	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session.GetPerspective(), true);
+}
+
+void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 
 	wxFileDialog openFileDialog(this, _("Open Image"), "", "", "Photos (*.jpeg,*.jpg*.png,*.bmp,*.tiff)|*.jpeg;*.jpg;*.png;*.bmp;*.tiff", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
@@ -96,6 +138,8 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)){
 	ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
 	processor->SetOriginalImage(processor->GetImage());
 	processor->SetUpdated(true);
+
+	session.SetImageFilePath(openFileDialog.GetPath());
 }
 
 

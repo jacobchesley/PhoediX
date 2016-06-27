@@ -22,6 +22,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	wxAuiPaneInfo editSelectionInfo = wxAuiPaneInfo();
 	editSelectionInfo.Float();
 	editSelectionInfo.Caption("Edit Selection");
+	editSelectionInfo.Name("EditSelection");
 	editSelectionInfo.CloseButton(true);
 	editSelectionInfo.PinButton(true);
 	editSelectionInfo.DestroyOnClose(false);
@@ -68,6 +69,21 @@ void EditListPanel::ReprocessImageEvt(wxCommandEvent& WXUNUSED(event)) {
 	this->ReprocessImage();
 }
 
+void EditListPanel::AddEditsToProcessor() {
+
+	// Delete the current list of internally stored edits in the processor
+	proc->DeleteEdits();
+
+	// Create a vector of Edit list Items that are displayed on the panel
+	wxVector<EditListItem*> editList = scroller->GetEditList();
+	for (size_t i = 0; i < editList.size(); i++) {
+
+		// Add each edit from the edit window, to the processor
+		if (editList.at(i)->GetEditWindow() != NULL) {
+			editList.at(i)->GetEditWindow()->AddEditToProcessor();
+		}
+	}
+}
 void EditListPanel::ReprocessImage() {
 
 	// Delete the current list of internally stored edits in the processor
@@ -92,37 +108,60 @@ void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
+
 void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 	// Get the edit ID to add to the panel
 	int editID = addEvt.GetInt();
 
+	// Create new edit window and add it to panel
 	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(editID, this, proc);
+	this->AddEditWindowToPanel(newEditWindow, editID);
+
+	// Reprocess the image with the new edit added
+	this->ReprocessImage();
+}
+
+void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> edits) {
+
+	scroller->DeleteAllEdits();
+
+	for (size_t i = 0; i < edits.size(); i++) {
+		if (edits.at(i) != NULL) {
+			EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(edits.at(i), this, proc);
+			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(edits.at(i)));
+		}
+	}
+}
+
+void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID) {
 
 	// If a new edit window was created
-	if (newEditWindow != NULL) {
+	AvailableEdits available;
 
+	if (window != NULL) {
+
+		int id = scroller->GetNextID();
+		wxString idStr;
+		idStr << id;
 		// Create the info to style the AUI Pane
 		wxAuiPaneInfo editWindowInfo = wxAuiPaneInfo();
 		editWindowInfo.DestroyOnClose(false);
 		editWindowInfo.CloseButton(true);
 		editWindowInfo.PinButton(true);
-		editWindowInfo.Caption(newEditWindow->GetName());
+		editWindowInfo.Caption(window->GetName());
 		editWindowInfo.Float();
 		editWindowInfo.Show();
-		editWindowInfo.BestSize(newEditWindow->GetClientSize());
+		editWindowInfo.BestSize(window->GetClientSize());
+		editWindowInfo.Name(window->GetName() + idStr);
 
 		// Add new edit window to AUI manager
-		PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(newEditWindow, editWindowInfo);
+		PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(window, editWindowInfo);
 		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+		
+		// Add a new Edit List Item to the Edit List scroll panel
+		scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window));
 	}
-
-	// Add a new Edit List Item to the Edit List scroll panel
-	AvailableEdits available;
-	scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), newEditWindow));
-
-	// Reprocess the image with the new edit added
-	this->ReprocessImage();
 }
 
 void EditListPanel::MoveEditUp(wxCommandEvent& upEvt) {
@@ -251,6 +290,27 @@ void EditListPanel::EditListScroll::DeleteEdit(size_t index) {
 	editList.erase(editList.begin() + index);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
+	this->RedrawEdits();
+}
+
+void EditListPanel::EditListScroll::DeleteAllEdits() {
+
+	// Remove all edit items from the sizer, but do not destroy them
+	this->GetSizer()->Clear();
+
+	// Remove all edit windows from list
+	for (size_t i = 0; i < editList.size(); i++){
+
+		// Remove the edit window from AUI Manager if it exists
+		if (editList.at(i)->GetEditWindow() != NULL) {
+			PhoedixAUIManager::GetPhoedixAUIManager()->DetachPane(editList.at(i)->GetEditWindow());
+		}
+
+		//Destroy and erase the one edit item we no longer want
+		editList.at(i)->DestroyItem();
+		editList.erase(editList.begin() + i);
+		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+	}
 	this->RedrawEdits();
 }
 

@@ -18,6 +18,7 @@
 #include "GUI\EditList\EditListPanel\EditListPanel.h"
 #include "GUI\AUI Manager\AUIManager.h"
 #include "GUI\Colors\Colors.h"
+#include "Session\Session.h"
 #include "Debugging\MemoryLeakCheck.h"
 
 /**
@@ -32,7 +33,8 @@ public:
 	MainWindow();
 
 private:
-
+	void ShowLoadProject(wxCommandEvent& WXUNUSED(event));
+	void ShowSaveProject(wxCommandEvent& WXUNUSED(event));
 	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
 	void ShowImage(wxCommandEvent& WXUNUSED(event));
 	void ShowEditList(wxCommandEvent& WXUNUSED(event));
@@ -57,7 +59,11 @@ private:
 	ZoomImagePanel * imagePanel;
 	EditListPanel * editList;
 
+	PhoediXSession session;
+
 	enum MenuBar {
+		ID_SHOW_LOAD_PROJECT,
+		ID_SHOW_SAVE_PROJECT,
 		ID_SHOW_LOAD_FILE,
 		ID_EXIT,
 		ID_SHOW_IMAGE,
