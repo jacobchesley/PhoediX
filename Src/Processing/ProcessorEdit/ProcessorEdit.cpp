@@ -151,7 +151,7 @@ void ProcessorEdit::SetEditType(int editType) {
 void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 
 	if (inTag == "ADJUST_CONTRAST") { edit = EditType::ADJUST_CONTRAST; tag = inTag; }
-	else if (inTag == "CHANNEL_TRANSFORMT") { edit = EditType::CHANNEL_TRANSFORM; tag = inTag; }
+	else if (inTag == "CHANNEL_TRANSFORM") { edit = EditType::CHANNEL_TRANSFORM; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_AVG") { edit = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { edit = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_EYE") { edit = EditType::CONVERT_GREYSCALE_EYE; tag = inTag; }
