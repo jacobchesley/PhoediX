@@ -12,9 +12,12 @@ public:
 	ChannelTransformWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void AddEditToProcessor();
 	void Process(wxCommandEvent& WXUNUSED(event));
+	void SetParamsAndFlags(ProcessorEdit * edit);
+	void OnSlide(wxCommandEvent& WXUNUSED(event));
 
 private:
 
+	bool justSetPreset;
 	class ChannelTransformPreset;
 
 	void PopulateIntialPresets();

@@ -125,12 +125,13 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 
 	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
+	justSetPreset = false;
 	proc = processor;
 	parWindow = parent;
 
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
+	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
 
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ChannelTransformWindow::PresetChange, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ChannelTransformWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
@@ -149,9 +150,11 @@ void ChannelTransformWindow::PopulateIntialPresets() {
 
 	ChannelTransformPreset defaultPreset = ChannelTransformPreset("Default", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 	ChannelTransformPreset sepiaPreset = ChannelTransformPreset("Sepia", 0.393, 0.769, 0.189, 0.349, 0.686, 0.168, 0.272, 0.534, 0.131);
+	ChannelTransformPreset customPreset = ChannelTransformPreset("Custom", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
 	presetList.push_back(defaultPreset);
 	presetList.push_back(sepiaPreset);
+	presetList.push_back(customPreset);
 
 	this->CreateComboPresetList();
 }
@@ -176,6 +179,11 @@ ChannelTransformWindow::ChannelTransformPreset ChannelTransformWindow::GetChanne
 
 void ChannelTransformWindow::SetValuesFromPreset(ChannelTransformWindow::ChannelTransformPreset preset) {
 
+	// Do not modify custom preset
+	if (presetBox->GetSelection() == presetList.size() - 1) {
+		return;
+	}
+
 	redRedSlider->SetValue(preset.GetRedRedScale());
 	redGreenSlider->SetValue(preset.GetRedGreenScale());
 	redBlueSlider->SetValue(preset.GetRedBlueScale());
@@ -191,7 +199,20 @@ void ChannelTransformWindow::PresetChange(wxCommandEvent& WXUNUSED(event)) {
 	
 	wxString selectedName = presetBox->GetValue();
 	ChannelTransformWindow::ChannelTransformPreset selectedPreset = this->GetChannelTransformPresetByName(selectedName);
+	justSetPreset = true;
 	this->SetValuesFromPreset(selectedPreset);
+}
+
+void ChannelTransformWindow::OnSlide(wxCommandEvent& WXUNUSED(event)) {
+
+	// Do not reset the preset selection if it was just selected
+	if (justSetPreset) {
+		justSetPreset = false;
+		return;
+	}
+
+	// Set preset selection to custom
+	presetBox->SetSelection(presetList.size() - 1);
 }
 
 void ChannelTransformWindow::Process(wxCommandEvent& WXUNUSED(event)) {
@@ -214,7 +235,31 @@ void ChannelTransformWindow::AddEditToProcessor() {
 	transformEdit->AddParam(blueGreenSlider->GetValue());
 	transformEdit->AddParam(blueBlueSlider->GetValue());
 
+	// Add preset number
+	transformEdit->AddFlag(presetBox->GetSelection());
+
 	proc->AddEdit(transformEdit);
+}
+
+void ChannelTransformWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+
+	justSetPreset = true;
+	// Choose preset based on edit loaded
+	if (edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_TRANSFORM) {
+		presetBox->SetSelection(edit->GetFlag(0));
+	}
+	// Populate sliders based on edit loaded
+	if (edit->GetParamsSize() == 9 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_TRANSFORM) {
+		redRedSlider->SetValue(edit->GetParam(0));
+		redGreenSlider->SetValue(edit->GetParam(1));
+		redBlueSlider->SetValue(edit->GetParam(2));
+		greenRedSlider->SetValue(edit->GetParam(3));
+		greenGreenSlider->SetValue(edit->GetParam(4));
+		greenBlueSlider->SetValue(edit->GetParam(5));
+		blueRedSlider->SetValue(edit->GetParam(6));
+		blueGreenSlider->SetValue(edit->GetParam(7));
+		blueBlueSlider->SetValue(edit->GetParam(8));
+	}
 }
 
 ChannelTransformWindow::ChannelTransformPreset::ChannelTransformPreset(wxString name, double redRedScale, double redGreenScale, double redBlueScale,
