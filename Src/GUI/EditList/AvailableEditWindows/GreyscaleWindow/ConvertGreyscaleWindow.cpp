@@ -68,12 +68,16 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
 	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnCombo, this);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
+
+	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
+	wxPostEvent(this, comboEvt);
 }
 
 void ConvertGreyscaleWindow::Process(wxCommandEvent& WXUNUSED(event)) {
@@ -82,17 +86,40 @@ void ConvertGreyscaleWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 	wxPostEvent(parWindow, evt);
 }
 
+void ConvertGreyscaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
+
+	if (greyscaleMethod->GetSelection() == 2) {
+		redBrightLabel->Show();
+		redBrightSlider->Show();
+		greenBrightLabel->Show();
+		greenBrightSlider->Show();
+		blueBrightLabel->Show();
+		blueBrightSlider->Show();
+	}
+
+	else {
+		redBrightLabel->Hide();
+		redBrightSlider->Hide();
+		greenBrightLabel->Hide();
+		greenBrightSlider->Hide();
+		blueBrightLabel->Hide();
+		blueBrightSlider->Hide();
+	}
+}
+
 void ConvertGreyscaleWindow::AddEditToProcessor() {
 	
 	int greyscaleSelection = greyscaleMethod->GetSelection();
 
 	if (greyscaleSelection == 0) {
 		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE);
+		greyEdit->AddFlag(greyscaleSelection);
 		proc->AddEdit(greyEdit);
 	}
 
 	else if (greyscaleSelection == 1) {
 		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG);
+		greyEdit->AddFlag(greyscaleSelection);
 		proc->AddEdit(greyEdit);
 	}
 
@@ -101,6 +128,27 @@ void ConvertGreyscaleWindow::AddEditToProcessor() {
 		greyEdit->AddParam(redBrightSlider->GetValue());
 		greyEdit->AddParam(greenBrightSlider->GetValue());
 		greyEdit->AddParam(blueBrightSlider->GetValue());
+
+		greyEdit->AddFlag(greyscaleSelection);
 		proc->AddEdit(greyEdit);
+	}
+}
+
+void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+	
+	// Choose method based on edit loaded
+	if (edit->GetFlagsSize() == 1 && (
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE || 
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM)) {
+
+		greyscaleMethod->SetSelection(edit->GetFlag(0));
+	}
+
+	// Populate sliders based on edit loaded
+	if (edit->GetParamsSize() == 3 && edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM){
+		redBrightSlider->SetValue(edit->GetParam(0));
+		greenBrightSlider->SetValue(edit->GetParam(1));
+		blueBrightSlider->SetValue(edit->GetParam(2));
 	}
 }
