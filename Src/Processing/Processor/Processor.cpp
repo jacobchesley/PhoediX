@@ -2714,7 +2714,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 			// Perform an edit on the data through the processor
 			double angle = curEdit->GetParam(0);
-			int cropFlag = curEdit->GetFlag(0);
+			int cropFlag = curEdit->GetFlag(2);
 			procParent->RotateCustom(angle, cropFlag);
 			procParent->SetUpdated(true);
 		}
@@ -2727,7 +2727,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 			// Perform an edit on the data through the processor
 			double angle = curEdit->GetParam(0);
-			int cropFlag = curEdit->GetFlag(0);
+			int cropFlag = curEdit->GetFlag(2);
 			procParent->RotateCustomBilinear(angle, cropFlag);
 			procParent->SetUpdated(true);
 		}
@@ -2740,7 +2740,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 			// Perform an edit on the data through the processor
 			double angle = curEdit->GetParam(0);
-			int cropFlag = curEdit->GetFlag(0);
+			int cropFlag = curEdit->GetFlag(2);
 			procParent->RotateCustomBicubic(angle, cropFlag);
 			procParent->SetUpdated(true);
 		}
