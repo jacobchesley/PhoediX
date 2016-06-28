@@ -89,3 +89,14 @@ void ContrastWindow::AddEditToProcessor() {
 
 	proc->AddEdit(contrastEdit);
 }
+
+void ContrastWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+	
+	// Populate sliders based on edit loaded
+	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST) {
+		allContrastSlider->SetValue(edit->GetParam(0));
+		redContrastSlider->SetValue(edit->GetParam(1));
+		greenContrastSlider->SetValue(edit->GetParam(2));
+		blueContrastSlider->SetValue(edit->GetParam(3));
+	}
+}

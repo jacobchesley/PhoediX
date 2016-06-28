@@ -12,6 +12,7 @@ class ContrastWindow : public EditWindow {
 		ContrastWindow(wxWindow * parent, wxString editName, Processor * processor);
 		void AddEditToProcessor();
 		void Process(wxCommandEvent& WXUNUSED(event));
+		void SetParamsAndFlags(ProcessorEdit * edit);
 
 	private:
 
