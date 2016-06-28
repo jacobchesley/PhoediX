@@ -58,7 +58,7 @@ void RGBCurvesWindow::AddEditToProcessor() {
 	int * greenCurve8 = new int[numSteps8];
 	int * blueCurve8 = new int[numSteps8];
 
-	for (size_t i = 0; i < numSteps8; i++) {
+	for (int i = 0; i < numSteps8; i++) {
 		brightCurve8[i] = brightVector8[i];
 		redCurve8[i] = redVector8[i];
 		greenCurve8[i] =greenVector8[i];
@@ -76,7 +76,7 @@ void RGBCurvesWindow::AddEditToProcessor() {
 	int * greenCurve16 = new int[numSteps16];
 	int * blueCurve16 = new int[numSteps16];
 
-	for (size_t i = 0; i < numSteps8; i++) {
+	for (int i = 0; i < numSteps8; i++) {
 		brightCurve16[i] = brightVector16[i];
 		redCurve16[i] = redVector16[i];
 		greenCurve16[i] = greenVector16[i];

@@ -70,7 +70,7 @@ void LABCurvesWindow::AddEditToProcessor() {
 	int * aCurve16 = new int[numSteps16];
 	int * bCurve16 = new int[numSteps16];
 
-	for (size_t i = 0; i < numSteps16; i++) {
+	for (int i = 0; i < numSteps16; i++) {
 		lCurve16[i] = lVector16[i];
 		aCurve16[i] = aVector16[i];
 		bCurve16[i] = bVector16[i];

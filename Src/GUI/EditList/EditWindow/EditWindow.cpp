@@ -16,4 +16,4 @@ void EditWindow::SetName(wxString editName) {
 
 void EditWindow::AddEditToProcessor() {}
 
-void EditWindow::SetParamsAndFlags(ProcessorEdit * edit) {}
+void EditWindow::SetParamsAndFlags(ProcessorEdit * WXUNUSED(edit)) {}

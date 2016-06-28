@@ -122,14 +122,14 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 	this->ReprocessImage();
 }
 
-void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> edits) {
+void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 
 	scroller->DeleteAllEdits();
 
 	for (size_t i = 0; i < edits.size(); i++) {
-		if (edits.at(i) != NULL) {
-			EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(edits.at(i), this, proc);
-			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(edits.at(i)));
+		if (inEdits.at(i) != NULL) {
+			EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
+			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)));
 		}
 	}
 }

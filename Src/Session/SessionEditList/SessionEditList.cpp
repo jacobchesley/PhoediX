@@ -159,8 +159,6 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 
 	wxXmlNode * editListNode = new wxXmlNode(phoedixProjectNode, wxXML_ELEMENT_NODE, "EditList");
 
-	int size = editList.size();
-	int test = 0;
 	wxString editIndexStr;
 	// Go through each edit one by one.  Each of these will invoke at least 1 child thread for the edit itself
 	for (size_t editIndex = 0; editIndex < editList.size(); editIndex++) {
@@ -185,7 +183,7 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 		wxXmlNode * paramsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Parameters");
 		wxString paramIdx;
 		wxString paramStr;
-		for (size_t paramIndex = 0; paramIndex < curEdit->GetParamsSize(); paramIndex++) {
+		for (int paramIndex = 0; paramIndex < curEdit->GetParamsSize(); paramIndex++) {
 
 			paramIdx = "";
 			paramStr = "";
@@ -200,7 +198,7 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 		wxXmlNode * flagsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Flags");
 		wxString flagIdx;
 		wxString flagStr;
-		for (size_t flagIndex = 0; flagIndex < curEdit->GetFlagsSize(); flagIndex++) {
+		for (int flagIndex = 0; flagIndex < curEdit->GetFlagsSize(); flagIndex++) {
 
 			flagIdx = "";
 			flagStr = "";

@@ -180,7 +180,7 @@ ChannelTransformWindow::ChannelTransformPreset ChannelTransformWindow::GetChanne
 void ChannelTransformWindow::SetValuesFromPreset(ChannelTransformWindow::ChannelTransformPreset preset) {
 
 	// Do not modify custom preset
-	if (presetBox->GetSelection() == presetList.size() - 1) {
+	if (presetBox->GetSelection() == (int)(presetList.size() - 1)) {
 		return;
 	}
 

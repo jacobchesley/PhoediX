@@ -139,8 +139,6 @@ EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow *
 
 int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 
-	EditWindow * newEditWindow = NULL;
-
 	// Create new edit window based on type of edit
 	switch (edit->GetEditType()) {
 
