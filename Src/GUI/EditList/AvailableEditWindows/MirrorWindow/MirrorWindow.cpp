@@ -65,15 +65,35 @@ void MirrorWindow::AddEditToProcessor() {
 
 	int mirrorSelection = mirrorMethod->GetSelection();
 
-	if (mirrorSelection == 0) {}
+	if (mirrorSelection == 0) {
+		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_NONE);
+		mirrorEdit->AddFlag(mirrorSelection);
+		proc->AddEdit(mirrorEdit);
+	}
 
 	else if (mirrorSelection == 1) {
 		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_HORIZONTAL);
+		mirrorEdit->AddFlag(mirrorSelection);
 		proc->AddEdit(mirrorEdit);
 	}
 
 	else if (mirrorSelection == 2) {
 		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_VERTICAL);
+		mirrorEdit->AddFlag(mirrorSelection);
 		proc->AddEdit(mirrorEdit);
 	}
+}
+
+void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+
+	// Choose method based on edit loaded
+	if (edit->GetFlagsSize() == 1 && 
+		(edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
+		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_VERTICAL ||
+		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE)) {
+
+		mirrorMethod->SetSelection(edit->GetFlag(0));
+	}
+
+	
 }
