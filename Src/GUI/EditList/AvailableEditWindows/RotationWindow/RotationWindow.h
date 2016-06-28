@@ -12,6 +12,7 @@ class RotationWindow : public EditWindow {
 public:
 	RotationWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void AddEditToProcessor();
+	void SetParamsAndFlags(ProcessorEdit * edit);
 	void Process(wxCommandEvent& WXUNUSED(event));
 
 private:
