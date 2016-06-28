@@ -102,6 +102,10 @@ void ProcessorEdit::SetEditType(int editType) {
 			tag = "LAB_CURVES";
 			break;
 
+		case EditType::MIRROR_NONE:
+			tag = "MIRROR_NONE";
+			break;
+
 		case EditType::MIRROR_HORIZONTAL:
 			tag = "MIRROR_HORIZONTAL";
 			break;
@@ -112,6 +116,10 @@ void ProcessorEdit::SetEditType(int editType) {
 
 		case EditType::RGB_CURVES:
 			tag = "RGB_CURVES";
+			break;
+	
+		case EditType::ROTATE_NONE:
+			tag = "ROTATE_NONE";
 			break;
 
 		case EditType::ROTATE_180:
@@ -156,15 +164,17 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { edit = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_EYE") { edit = EditType::CONVERT_GREYSCALE_EYE; tag = inTag; }
 	else if (inTag == "LAB_CURVES") { edit = EditType::LAB_CURVES; tag = inTag; }
+	else if (inTag == "MIRROR_NONE") { edit = EditType::MIRROR_NONE; tag = inTag; }
 	else if (inTag == "MIRROR_HORIZONTAL") { edit = EditType::MIRROR_HORIZONTAL; tag = inTag; }
 	else if (inTag == "MIRROR_VERTICAL") { edit = EditType::MIRROR_VERTICAL; tag = inTag; }
 	else if (inTag == "RGB_CURVES") { edit = EditType::RGB_CURVES; tag = inTag; }
+	else if (inTag == "ROTATE_NONE") { edit = EditType::ROTATE_NONE; tag = inTag; }
 	else if (inTag == "ROTATE_180") { edit = EditType::ROTATE_180; tag = inTag; }
 	else if (inTag == "ROTATE_270_CW") { edit = EditType::ROTATE_270_CW; tag = inTag; }
 	else if (inTag == "ROTATE_90_CW") { edit = EditType::ROTATE_90_CW; tag = inTag; }
 	else if (inTag == "ROTATE_CUSTOM_BICUBIC") { edit = EditType::ROTATE_CUSTOM_BICUBIC; tag = inTag; }
 	else if (inTag == "ROTATE_CUSTOM_BILINEAR") { edit = EditType::ROTATE_CUSTOM_BILINEAR; tag = inTag; }
-	else if (inTag == "ROTATE_CUSTOM_NEAREEST") { edit = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_NEAREST") { edit = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
 	else if (inTag == "SCALE_BRIGHTNESS") { edit = EditType::SCALE_BRIGHTNESS; tag = inTag; }
 	else if (inTag == "SHIFT_BRIGHTNESS") { edit = EditType::SHIFT_BRIGHTNESS; tag = inTag; }
 }

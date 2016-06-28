@@ -78,6 +78,10 @@ EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow *
 			newEditWindow = new ConvertGreyscaleWindow(parent, "Convert to Greyscale", processor);
 			break;
 
+		case ProcessorEdit::EditType::ROTATE_NONE:
+			newEditWindow = new RotationWindow(parent, "Rotate", processor);
+			break;
+
 		case ProcessorEdit::EditType::ROTATE_90_CW:
 			newEditWindow = new RotationWindow(parent, "Rotate", processor);
 			break;
@@ -104,6 +108,9 @@ EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow *
 
 		case ProcessorEdit::EditType::CHANNEL_TRANSFORM:
 			newEditWindow = new ChannelTransformWindow(parent, "Channel Transform", processor);
+			break;
+		case ProcessorEdit::EditType::MIRROR_NONE:
+			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
 			break;
 
 		case ProcessorEdit::EditType::MIRROR_HORIZONTAL:
@@ -155,6 +162,9 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 	case ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE:
 		return AvailableEditIDS::EDIT_ID_GREYSCALE;
 
+	case ProcessorEdit::EditType::ROTATE_NONE:
+		return AvailableEditIDS::EDIT_ID_ROTATE;
+
 	case ProcessorEdit::EditType::ROTATE_90_CW:
 		return AvailableEditIDS::EDIT_ID_ROTATE;
 
@@ -176,6 +186,9 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 	case ProcessorEdit::EditType::CHANNEL_TRANSFORM:
 		return AvailableEditIDS::EDIT_ID_CHANNEL_TRANSFORM;
 
+	case ProcessorEdit::EditType::MIRROR_NONE:
+		return AvailableEditIDS::EDIT_ID_MIRROR;
+
 	case ProcessorEdit::EditType::MIRROR_HORIZONTAL:
 		return AvailableEditIDS::EDIT_ID_MIRROR;
 
@@ -188,4 +201,6 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 	case ProcessorEdit::EditType::LAB_CURVES:
 		return AvailableEditIDS::EDIT_ID_LAB_CURVES;
 	}
+
+	return -1;
 }
