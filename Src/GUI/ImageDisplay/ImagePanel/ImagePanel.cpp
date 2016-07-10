@@ -32,11 +32,6 @@ void ImagePanel::Render(wxDC & dc) {
 	int newWidth = this->GetSize().GetWidth();
 	int newHeight = this->GetSize().GetHeight();
 
-	OutputDebugStringA("Draw Width - ");
-	OutputDebugStringA(std::to_string(newWidth).c_str());
-	OutputDebugStringA("Draw Height - ");
-	OutputDebugStringA(std::to_string(newHeight).c_str());
-
 	if (oldHeight != newHeight || oldWidth != newWidth) {
 
 		if (keepAspect) {
