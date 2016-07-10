@@ -29,8 +29,19 @@ public:
 private:
 
 	wxBoxSizer * mainSizer;
+	wxBoxSizer * controlSizer;
 	DoubleSlider * zoomSlider;
+	wxButton * fullImageView;
+	wxButton * viewImage100;
+
 	void OnZoom(wxCommandEvent& slideEvent);
+	void OnFitImage(wxCommandEvent& WXUNUSED(event));
+	void OnZoom100(wxCommandEvent& WXUNUSED(event));
+
+	enum Buttons {
+		ZOOM_100,
+		ZOOM_FIT
+	};
 
 	class ImageScroll : public wxScrolledWindow {
 	public:
@@ -39,8 +50,12 @@ private:
 		void Redraw();
 		void SetZoom(double zoomFactor);
 		void ChangeImage(Image * newImage);
-		
+		void FitImage();
+		double GetZoom();
+
 	private:
+		void OnDragStart(wxMouseEvent & evt);
+		void OnDragContinue(wxMouseEvent & evt);
 		void OnPaint(wxPaintEvent & evt);
 		void Render(wxDC& dc);
 
@@ -54,6 +69,11 @@ private:
 
 		int lastWidth;
 		int lastHeight;
+
+		int dragStartX;
+		int dragStartY;
+		int scrollStartX;
+		int scrollStartY;
 	};
 
 	ImageScroll * scroller;
