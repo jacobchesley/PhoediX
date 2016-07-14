@@ -19,6 +19,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	menuView->Append(MainWindow::MenuBar::ID_SHOW_IMAGE, _("Show Image"));
 	menuView->Append(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit list"));
+	menuView->Append(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS, _("Show Histograms"));
 
 	// Append menus to menu bar
 	menuBar->Append(menuFile, _("&File"));
@@ -64,6 +65,17 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	imageInfo.Name("ImageDisplay");
 
 	auiManager->AddPane(imagePanel, imageInfo);
+
+	histogramDisplay = new HistogramDisplay(this, processor);
+	wxAuiPaneInfo histogramPaneInfo = wxAuiPaneInfo();
+	histogramPaneInfo.Left();
+	histogramPaneInfo.Caption("Histogram");
+	histogramPaneInfo.Name("Histogram");
+	histogramPaneInfo.CloseButton(true);
+	histogramPaneInfo.PinButton(true);
+	histogramPaneInfo.DestroyOnClose(false);
+	histogramPaneInfo.BestSize(histogramDisplay->GetClientSize());
+	auiManager->AddPane(histogramDisplay, histogramPaneInfo);
 	auiManager->Update();
 	
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadProject, this, MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT);
@@ -72,10 +84,11 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowImage, this, MainWindow::MenuBar::ID_SHOW_IMAGE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowEditList, this, MainWindow::MenuBar::ID_SHOW_EDIT_LIST);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowHistograms, this, MainWindow::MenuBar::ID_SHOW_HISTOGRAMS);
 	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
 	
-	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor);
+	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor, histogramDisplay);
 	imgPanelThread->Run();
 
 	ImageHandler::LoadImageFromwxImage(new wxImage(0,0), processor->GetImage());
@@ -101,6 +114,10 @@ void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 	editList->AddEditsToProcessor();
 	
 	session.GetEditList()->SetSessionEditList(processor->GetEditVector());
+	session.SetHistogramDisplaySelect(histogramDisplay->GetHistogramDisplay());
+	session.SetImageZoomLevel(imagePanel->GetZoom());
+	session.SetImageScrollX(imagePanel->GetDragX());
+	session.SetImageScrollY(imagePanel->GetDragY());
 	session.SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
 	session.SaveSessionToFile(saveFileDialog.GetPath());
 }
@@ -117,7 +134,16 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 	delete processor->GetOriginalImage();
 	ImageHandler::LoadImageFromFile(session.GetImageFilePath(), processor->GetImage());
 	processor->SetOriginalImage(processor->GetImage());
+	
+	processor->Lock();
+	imagePanel->ChangeImage(processor->GetImage());
+	imagePanel->Redraw();
+	processor->Unlock();
 	processor->SetUpdated(true);
+
+	histogramDisplay->SetHistogramDisplay(session.GetHistogramDisplaySelect());
+	imagePanel->SetZoom(session.GetImageZoomLevel());
+	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
 
 	// Populate the panel with the edits
 	editList->AddEditWindows(session.GetEditList()->GetSessionEditList());
@@ -153,6 +179,11 @@ void MainWindow::ShowEditList(wxCommandEvent& WXUNUSED(event)) {
 	auiManager->Update();
 }
 
+void MainWindow::ShowHistograms(wxCommandEvent& WXUNUSED(event)) {
+	auiManager->GetPane(histogramDisplay).Show();
+	auiManager->Update();
+}
+
 void MainWindow::SetStatusbarText(wxString text) {
 	if (statusBarText != NULL) {
 		statusBarText->Destroy();
@@ -176,8 +207,9 @@ void MainWindow::OnClose(wxCloseEvent& closeEvent) {
 	delete processor;
 }
 
-MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor) : wxThread(wxTHREAD_DETACHED) {
+MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor, HistogramDisplay * histogramDisplay) : wxThread(wxTHREAD_DETACHED) {
 	imgPanel = imagePanel;
+	histogramDisp = histogramDisplay;
 	proc = processor;
 	continueWatch = true;
 }
@@ -191,6 +223,7 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 			imgPanel->Redraw();
 			proc->Unlock();
 			proc->SetUpdated(false);
+			histogramDisp->UpdateHistograms();
 		}
 		this->Sleep(100);
 	}

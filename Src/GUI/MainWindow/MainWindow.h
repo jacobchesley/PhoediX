@@ -18,6 +18,7 @@
 #include "GUI\EditList\EditListPanel\EditListPanel.h"
 #include "GUI\AUI Manager\AUIManager.h"
 #include "GUI\Colors\Colors.h"
+#include "GUI\HistogramDisplay\HistogramDisplay.h"
 #include "Session\Session.h"
 #include "Debugging\MemoryLeakCheck.h"
 
@@ -38,6 +39,7 @@ private:
 	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
 	void ShowImage(wxCommandEvent& WXUNUSED(event));
 	void ShowEditList(wxCommandEvent& WXUNUSED(event));
+	void ShowHistograms(wxCommandEvent& WXUNUSED(event));
 
 	void SetSizeProperties();
 
@@ -58,6 +60,7 @@ private:
 
 	ZoomImagePanel * imagePanel;
 	EditListPanel * editList;
+	HistogramDisplay * histogramDisplay;
 
 	PhoediXSession session;
 
@@ -67,13 +70,14 @@ private:
 		ID_SHOW_LOAD_FILE,
 		ID_EXIT,
 		ID_SHOW_IMAGE,
-		ID_SHOW_EDIT_LIST
+		ID_SHOW_EDIT_LIST,
+		ID_SHOW_HISTOGRAMS
 	};
 
 	class ImagePanelUpdateThread : public wxThread {
 
 		public:
-			ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor);
+			ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor, HistogramDisplay * histogramDisplay);
 			void StopWatching();
 
 		protected:
@@ -82,6 +86,7 @@ private:
 		private:
 			bool continueWatch;
 			ZoomImagePanel * imgPanel;
+			HistogramDisplay * histogramDisp;
 			Processor * proc;
 	};
 
