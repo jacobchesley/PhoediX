@@ -112,6 +112,12 @@
     <Filter Include="Session\Session Edit List">
       <UniqueIdentifier>{5f817431-a4c7-4d0e-aee5-33dfe3372bff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Hisogram Display">
+      <UniqueIdentifier>{647e9c21-ce4a-4d95-99a7-0aa0ac35e74a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Image Display\wxImagePanel">
+      <UniqueIdentifier>{370976d4-2de4-4812-b16f-91b66db2fc65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -206,6 +212,12 @@
     </ClCompile>
     <ClCompile Include="..\Src\Session\Session.cpp">
       <Filter>Session</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.cpp">
+      <Filter>GUI\Hisogram Display</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.cpp">
+      <Filter>GUI\Image Display\wxImagePanel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -313,6 +325,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Session\SessionEditList\SessionEditList.h">
       <Filter>Session\Session Edit List</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.h">
+      <Filter>GUI\Hisogram Display</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.h">
+      <Filter>GUI\Image Display\wxImagePanel</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -55,8 +55,10 @@
     <ClCompile Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditSelection\EditSelection.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditWindow\EditWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.cpp" />
     <ClCompile Include="..\Src\GUI\Icons\Icons.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp" />
+    <ClCompile Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
     <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp" />
@@ -89,11 +91,13 @@
     <ClInclude Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditSelection\EditSelection.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditWindow\EditWindow.h" />
+    <ClInclude Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.h" />
     <ClInclude Include="..\Src\GUI\Icons\delete_button.h" />
     <ClInclude Include="..\Src\GUI\Icons\down_button.h" />
     <ClInclude Include="..\Src\GUI\Icons\Icons.h" />
     <ClInclude Include="..\Src\GUI\Icons\up_button.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.h" />
+    <ClInclude Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
     <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h" />
