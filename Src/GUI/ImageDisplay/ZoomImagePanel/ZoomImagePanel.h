@@ -25,6 +25,12 @@ public:
 	ZoomImagePanel(wxWindow * parent, Image * img);
 	void Redraw();
 	void ChangeImage(Image * newImage);
+	void SetZoom(float zoom);
+	float GetZoom();
+
+	int GetDragX();
+	int GetDragY();
+	void SetDrag(int x, int y);
 
 private:
 

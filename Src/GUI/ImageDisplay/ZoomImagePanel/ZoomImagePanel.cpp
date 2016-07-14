@@ -100,6 +100,33 @@ void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
 	zoomSlider->SetValue(scroller->GetZoom()*100.0);
 }
 
+void ZoomImagePanel::SetZoom(float zoom) {
+	scroller->SetZoom(zoom / 100.0);
+	zoomSlider->SetValue(zoom);
+}
+
+float ZoomImagePanel::GetZoom() {
+	return scroller->GetZoom() * 100.0f;
+}
+
+int ZoomImagePanel::GetDragX() {
+	int x = 0;
+	int y = 0;
+	scroller->GetViewStart(&x, &y);
+	return x;
+}
+
+int ZoomImagePanel::GetDragY() {
+	int x = 0;
+	int y = 0;
+	scroller->GetViewStart(&x, &y);
+	return y;
+}
+
+void ZoomImagePanel::SetDrag(int x, int y) {
+	scroller->Scroll(x, y);
+}
+
 void ZoomImagePanel::Redraw() {
 	scroller->Redraw();
 }
