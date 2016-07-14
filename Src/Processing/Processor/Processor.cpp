@@ -141,6 +141,7 @@ void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outp
 		outputHistogramRed[i] = 0;
 		outputHistogramGreen[i] = 0;
 		outputHistogramBlue[i] = 0;
+		outputHistogramGrey[i] = 0;
 	}
 
 	int grey = 0;
@@ -151,8 +152,7 @@ void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outp
 		outputHistogramGreen[greenData8[i]] += 1;
 		outputHistogramBlue[blueData8[i]] += 1;
 
-		// Compute grey scale level
-		grey = (int)((redData8[i] * 0.2126) + (greenData8[i] * 0.7152) + (blueData8[i] * 0.0722));
+		grey = (0.2126 * (redData8[i])) + (0.7152 * (greenData8[i])) + (0.0722 * (blueData8[i]));
 		grey = grey > 255 ? 255 : grey;
 		grey = grey < 0 ? 0 : grey;
 		outputHistogramGrey[grey] += 1;
