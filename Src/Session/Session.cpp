@@ -2,6 +2,9 @@
 
 PhoediXSession::PhoediXSession(){
 	editList = new PhoediXSessionEditList();
+	imgZoom = 1.0f;
+	imgScrollX = 0;
+	imgScrollY = 0;
 }
 
 void PhoediXSession::LoadSessionFromFile(wxString filePath) {
@@ -21,6 +24,30 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 		if (sessionInfo->GetName() == "ImagePath") {
 			// Get first child (the actual content)
 			imgFile = sessionInfo->GetChildren()[0].GetContent();
+		}
+
+		// Get Histogram display selection
+		if (sessionInfo->GetName() == "HistogramDisplay") {
+			// Get first child (the actual content)
+			histogramDisplaySelect = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+		}
+
+		// Get Image Display Zoom
+		if (sessionInfo->GetName() == "DisplayZoom") {
+			// Get first child (the actual content)
+			imgZoom = wxAtof(sessionInfo->GetChildren()[0].GetContent());
+		}
+
+		// Get Image Display scroll x
+		if (sessionInfo->GetName() == "DisplayOffsetX") {
+			// Get first child (the actual content)
+			imgScrollX = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+		}
+
+		// Get Image Display scroll y
+		if (sessionInfo->GetName() == "DisplayOffsetY") {
+			// Get first child (the actual content)
+			imgScrollY = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
 		}
 
 		// Get Perspective node
@@ -47,6 +74,22 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	// Write the image file path to XML Doc
 	wxXmlNode * imagePath = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ImagePath");
 	imagePath->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", imgFile));
+
+	// Write hisotgram display selection to XML Doc
+	wxXmlNode * histSelect = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "HistogramDisplay");
+	histSelect->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), histogramDisplaySelect)));
+
+	// Write display image zoom level to XML Doc
+	wxXmlNode * zoom = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "DisplayZoom");
+	zoom->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%f"), imgZoom)));
+
+	// Write dislay image scroll x
+	wxXmlNode * scrollX = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "DisplayOffsetX");
+	scrollX->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), imgScrollX)));
+
+	// Write display image scroll y
+	wxXmlNode * scrollY = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "DisplayOffsetY");
+	scrollY->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), imgScrollY)));
 
 	// Write the perspective for AUI to XML Doc
 	wxXmlNode * perspective = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "Perspective");
@@ -76,4 +119,36 @@ wxString PhoediXSession::GetPerspective() {
 
 void PhoediXSession::SetPerspective(wxString newPerspective) {
 	auiPerspective = newPerspective;
+}
+
+int PhoediXSession::GetHistogramDisplaySelect() {
+	return histogramDisplaySelect;
+}
+
+void PhoediXSession::SetHistogramDisplaySelect(int selection) {
+	histogramDisplaySelect = selection;
+}
+
+float PhoediXSession::GetImageZoomLevel() {
+	return imgZoom;
+}
+
+void PhoediXSession::SetImageZoomLevel(float zoom) {
+	imgZoom = zoom;
+}
+
+int PhoediXSession::GetImageScrollX() {
+	return imgScrollX;
+}
+
+void PhoediXSession::SetImageScrollX(int x) {
+	imgScrollX = x;
+}
+
+int PhoediXSession::GetImageScrollY() {
+	return imgScrollY;
+}
+
+void PhoediXSession::SetImageScrollY(int y) {
+	imgScrollY = y;
 }

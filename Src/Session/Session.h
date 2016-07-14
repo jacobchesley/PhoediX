@@ -27,7 +27,16 @@ public:
 	PhoediXSessionEditList *GetEditList();
 
 	float GetImageZoomLevel();
-	void SetImageZoomLevel();
+	void SetImageZoomLevel(float zoom);
+
+	int GetImageScrollX();
+	void SetImageScrollX(int x);
+
+	int GetImageScrollY();
+	void SetImageScrollY(int y);
+
+	int GetHistogramDisplaySelect();
+	void SetHistogramDisplaySelect(int selection);
 
 	wxString GetPerspective();
 	void SetPerspective(wxString newPerspective);
@@ -37,6 +46,9 @@ private:
 	wxString imgFile;
 	PhoediXSessionEditList *editList;
 	float imgZoom;
+	int imgScrollX;
+	int imgScrollY;
 	wxString auiPerspective;
+	int histogramDisplaySelect;
 };
 #endif
