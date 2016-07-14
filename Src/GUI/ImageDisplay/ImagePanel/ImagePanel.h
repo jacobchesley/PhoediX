@@ -12,17 +12,17 @@
 #include "wx\dc.h"
 #include "wx\dcbuffer.h"
 
-#include "Processing\Processor\Processor.h"
 #include "Processing\ImageHandler\ImageHandler.h"
 #include "Debugging\MemoryLeakCheck.h"
 
 class ImagePanel : public wxPanel {
 public:
-	ImagePanel(wxWindow * parent);
-	ImagePanel(wxWindow * parent, Image * image);
+	ImagePanel(wxWindow * parent, bool keepAspect = true);
+	ImagePanel(wxWindow * parent, Image * image, bool keepAspect = true);
+	void ChangeImage(Image * newImage);
 	void Redraw();
 	void SetZoom(double zoomFactor);
-	void ResizeImgOnResize(bool doResize);
+	void SetKeepAspect(bool doKeepAspect);
 
 private:
 	void OnPaint(wxPaintEvent & evt);

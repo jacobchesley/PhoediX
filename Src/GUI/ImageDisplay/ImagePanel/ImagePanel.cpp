@@ -1,9 +1,9 @@
 #include "ImagePanel.h"
 
-ImagePanel::ImagePanel(wxWindow * parent) : wxPanel(parent) {
+ImagePanel::ImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(parent) {
 
 	zoom = 1.0;
-	keepAspect = true;
+	keepAspect = doKeepAspect;
 	resize = false;
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImagePanel::OnPaint, this);
@@ -12,11 +12,11 @@ ImagePanel::ImagePanel(wxWindow * parent) : wxPanel(parent) {
 	this->SetDoubleBuffered(true);
 }
 
-ImagePanel::ImagePanel(wxWindow * parent, Image * image) : wxPanel(parent) {
+ImagePanel::ImagePanel(wxWindow * parent, Image * image, bool doKeepAspect) : wxPanel(parent) {
 
 	img = image;
 	zoom = 1.0;
-	keepAspect = true;
+	keepAspect = doKeepAspect;
 	resize = false;
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImagePanel::OnPaint, this);
@@ -25,6 +25,13 @@ ImagePanel::ImagePanel(wxWindow * parent, Image * image) : wxPanel(parent) {
 	this->SetDoubleBuffered(true);
 }
 
+void ImagePanel::SetKeepAspect(bool doKeepAspect) {
+	keepAspect = doKeepAspect;
+}
+
+void ImagePanel::ChangeImage(Image * newImage) {
+	img = newImage;
+}
 
 void ImagePanel::Render(wxDC & dc) {
 
