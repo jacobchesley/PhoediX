@@ -34,15 +34,15 @@ public:
 
 private:
 
+	void OnZoom(wxCommandEvent& slideEvent);
+	void OnFitImage(wxCommandEvent& WXUNUSED(event));
+	void OnZoom100(wxCommandEvent& WXUNUSED(event));
+
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * controlSizer;
 	DoubleSlider * zoomSlider;
 	wxButton * fullImageView;
 	wxButton * viewImage100;
-
-	void OnZoom(wxCommandEvent& slideEvent);
-	void OnFitImage(wxCommandEvent& WXUNUSED(event));
-	void OnZoom100(wxCommandEvent& WXUNUSED(event));
 
 	enum Buttons {
 		ZOOM_100,
@@ -58,8 +58,12 @@ private:
 		void ChangeImage(Image * newImage);
 		void FitImage();
 		double GetZoom();
+		void DisreguardScroll();
+		void ReguardScroll();
 
 	private:
+
+		bool disreguardScroll;
 		void OnDragStart(wxMouseEvent & evt);
 		void OnDragContinue(wxMouseEvent & evt);
 		void OnPaint(wxPaintEvent & evt);

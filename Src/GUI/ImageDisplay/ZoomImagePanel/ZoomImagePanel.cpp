@@ -124,7 +124,10 @@ int ZoomImagePanel::GetDragY() {
 }
 
 void ZoomImagePanel::SetDrag(int x, int y) {
+
+	scroller->DisreguardScroll();
 	scroller->Scroll(x, y);
+	scroller->ReguardScroll();
 }
 
 void ZoomImagePanel::Redraw() {
@@ -137,6 +140,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxScrolledWindow(parent) {
 	
+	disreguardScroll = false;
 	this->ChangeImage(image);
 	zoom = 1.0;
 	keepAspect = true;
@@ -220,12 +224,14 @@ void ZoomImagePanel::ImageScroll::OnDragContinue(wxMouseEvent& evt) {
 		int scrollScaleY = 1;
 		this->GetScrollPixelsPerUnit(&scrollScaleX, &scrollScaleY);
 
-		// Convert pixels to scroll units and add to start position
-		int newScrollPosX = (dx / scrollScaleX) + scrollStartX;
-		int newScrollPosY = (dy / scrollScaleY) + scrollStartY;
+		// Convert pixels to scroll units and add to start position.  Negate dx and dy to scroll in direction of mouse drag
+		int newScrollPosX = (-dx / scrollScaleX) + scrollStartX;
+		int newScrollPosY = (-dy / scrollScaleY) + scrollStartY;
 
 		// Scroll to new calculated position
-		this->Scroll(newScrollPosX, newScrollPosY);
+		if(!disreguardScroll){
+			this->Scroll(newScrollPosX, newScrollPosY);
+		}
 	}
 }
 
@@ -263,4 +269,14 @@ void ZoomImagePanel::ImageScroll::FitImage() {
 	else {
 		this->SetZoom(zoomHeight);
 	}
+}
+
+void ZoomImagePanel::ImageScroll::DisreguardScroll(){
+	this->Unbind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
+	disreguardScroll = true;
+}
+
+void ZoomImagePanel::ImageScroll::ReguardScroll(){
+	this->Bind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
+	disreguardScroll = false;
 }
