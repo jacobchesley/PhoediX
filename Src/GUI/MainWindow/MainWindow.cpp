@@ -143,14 +143,17 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 
 	histogramDisplay->SetHistogramDisplay(session.GetHistogramDisplaySelect());
 	imagePanel->SetZoom(session.GetImageZoomLevel());
-	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
 
 	// Populate the panel with the edits
-	editList->AddEditWindows(session.GetEditList()->GetSessionEditList());
+	wxVector<ProcessorEdit*> editLayers = session.GetEditList()->GetSessionEditList();
+	editList->AddEditWindows(editLayers);
 
 	// Load perspective after edits are loaded
 	wxString perspect = session.GetPerspective();
 	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session.GetPerspective(), true);
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+
+	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
 }
 
 void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
@@ -221,9 +224,9 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 			proc->Lock();
 			imgPanel->ChangeImage(proc->GetImage());
 			imgPanel->Redraw();
+			histogramDisp->UpdateHistograms();
 			proc->Unlock();
 			proc->SetUpdated(false);
-			histogramDisp->UpdateHistograms();
 		}
 		this->Sleep(100);
 	}
