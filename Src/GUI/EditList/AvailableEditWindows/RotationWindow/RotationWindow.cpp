@@ -116,6 +116,8 @@ void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 		rotationCropLabel->Hide();
 		customRotationCrop->Hide();
 	}
+	this->Refresh();
+	this->Update();
 }
 
 void RotationWindow::AddEditToProcessor() {
