@@ -126,7 +126,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 
 	scroller->DeleteAllEdits();
 
-	for (size_t i = 0; i < edits.size(); i++) {
+	for (size_t i = 0; i < inEdits.size(); i++) {
 		if (inEdits.at(i) != NULL) {
 			EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
 			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)));
