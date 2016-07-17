@@ -89,3 +89,14 @@ void ScaleBrightnessWindow::AddEditToProcessor() {
 
 	proc->AddEdit(BrightEdit);
 }
+
+void ScaleBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){
+
+	// Populate sliders based on edit loaded
+	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::SHIFT_BRIGHTNESS) {
+		allBrightSlider->SetValue(edit->GetParam(0));
+		redBrightSlider->SetValue(edit->GetParam(1));
+		greenBrightSlider->SetValue(edit->GetParam(2));
+		blueBrightSlider->SetValue(edit->GetParam(3));
+	}
+}
