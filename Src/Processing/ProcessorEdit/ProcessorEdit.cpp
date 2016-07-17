@@ -27,6 +27,7 @@ void ProcessorEdit::ClearIntArray() {
 		delete[] intArrays[i];
 	}
 	intArrays.clear();
+	intArraySizes.clear();
 }
 
 int ProcessorEdit::GetParamsSize() {
