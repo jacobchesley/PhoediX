@@ -9,6 +9,8 @@
 #include "wx/wx.h"
 #endif
 
+#include "wx\thread.h"
+
 #include "Processing\ProcessorEdit\ProcessorEdit.h"
 #include "wx\event.h"
 
@@ -26,12 +28,44 @@ class EditWindow : public wxScrolledWindow{
 		void SetName(wxString editName);
 
 		virtual void SetParamsAndFlags(ProcessorEdit * edit);
+		void OnUpdate(wxCommandEvent& WXUNUSED(event));
+		void StartWatchdog();
+		void StopWatchdog();
+
+		void SetDisabled(bool disable);
+		bool GetDisabled();
 
 		enum {
 			ID_PROCESS_EDITS
 		};
+
+	protected:
+		void SetUpdated(bool update);
+		bool GetUpdated();
+		bool isDisabled;
+		
 	private:
+		bool updated;
 		wxString editNme;
+
+		class WatchForUpdateThread : public wxThread {
+
+		public:
+			WatchForUpdateThread(EditWindow * windowPar, int sleeptime);
+			void Stop();
+
+		protected:
+			virtual ExitCode Entry();
+
+		private:
+			bool contin;
+			EditWindow * window;
+			int slp;
+	};
+
+	WatchForUpdateThread * watchdog;
+	WatchForUpdateThread * watchdogRealtime;
+		
 };
 
 #endif
