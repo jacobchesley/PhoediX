@@ -42,6 +42,10 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 		case AvailableEditIDS::EDIT_ID_LAB_CURVES:
 			newEditWindow = new LABCurvesWindow(parent, "LAB Curves", processor);
 			break;
+
+		case AvailableEditIDS::EDIT_ID_RAW:
+			newEditWindow = new RawWindow(parent, "Raw Processor", processor);
+			break;
 	}
 
 	return newEditWindow;
@@ -128,6 +132,10 @@ EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow *
 		case ProcessorEdit::EditType::LAB_CURVES:
 			newEditWindow = new LABCurvesWindow(parent, "LAB Curves", processor);
 			break;
+
+		case ProcessorEdit::EditType::RAW:
+			newEditWindow = new RawWindow(parent, "Raw Processor", processor);
+			break;
 	}
 
 	// Set loaded parameters
@@ -198,6 +206,9 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 
 	case ProcessorEdit::EditType::LAB_CURVES:
 		return AvailableEditIDS::EDIT_ID_LAB_CURVES;
+
+	case ProcessorEdit::EditType::RAW:
+		return AvailableEditIDS::EDIT_ID_RAW;
 	}
 
 	return -1;

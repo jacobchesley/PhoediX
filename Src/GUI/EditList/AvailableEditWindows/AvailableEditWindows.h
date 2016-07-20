@@ -16,6 +16,7 @@
 #include "GreyscaleWindow\ConvertGreyscaleWindow.h"
 #include "LABCurvesWindow\LABCurvesWindow.h"
 #include "MirrorWindow\MirrorWindow.h"
+#include "RawWindow\RawWindow.h"
 #include "RGBCurvesWindow\RGBCurvesWindow.h"
 #include "RotationWindow\RotationWindow.h"
 #include "ScaleBrightnessWindow\ScaleBrightnessWindow.h"
