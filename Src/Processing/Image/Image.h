@@ -19,6 +19,7 @@ public:
 
 	void SetDataFrom8(uint8_t * inData, int inWidth, int inHeight);
 	void SetDataFrom16(uint16_t * inData, int inWidth, int inHeight);
+	void SetDataFrom16(uint8_t * inData, int inWidth, int inHeight);
 
 	int GetWidth();
 	int GetHeight();

@@ -1,5 +1,20 @@
 #include "ImageHandler.h"
 
+
+
+wxString ImageHandler::allFileDialogList = "All Files (*.*)|*.*";
+wxString ImageHandler::jpegFileDialogList = "JPEG (*.JPG;*.JPEG)|*.JPG;*.JPEG";
+wxString ImageHandler::pngFileDialogList = "PNG (*.PNG)|*.PNG";
+wxString ImageHandler::bmpFileDialogList = "BMP (*.BMP)|*.BMP";
+wxString ImageHandler::tiffFileDialogList = "TIFF (*.TIF;*.TIFF)|*.TIF;*.TIFF";
+
+wxString ImageHandler::imageOpenDialogList = 
+	ImageHandler::allFileDialogList + "|" +
+	ImageHandler::jpegFileDialogList + "|" + 
+	ImageHandler::pngFileDialogList + "|" + 
+	ImageHandler::bmpFileDialogList + "|" + 
+	ImageHandler::tiffFileDialogList + "|";
+
 void ImageHandler::LoadImageFromFile(wxString fileName, Image * image) {
 
 	wxImage fileImage(fileName);
@@ -56,4 +71,42 @@ void ImageHandler::CopyImageData16(Image * image, uint16_t * outArray) {
 
 		index += 1;
 	}
+}
+
+void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, Image * outImage){
+
+	// Bitmap in RGB values from rawImage
+	if(rawImage->type == LIBRAW_IMAGE_BITMAP){
+	
+		ushort width = rawImage->width;
+		ushort height = rawImage->height;
+		unsigned int size = rawImage->data_size;
+
+		// 8 bit image
+		if(rawImage->bits == 8){
+			outImage->SetDataFrom8(rawImage->data, width, height);
+		}
+
+		// 16 bit image
+		else if(rawImage->bits == 16){
+			outImage->SetDataFrom16((uint8_t*)rawImage->data, width, height);
+		}
+	}
+}
+
+bool ImageHandler::CheckRaw(wxString fileName){
+
+	// Attempt to open file in LibRaw raw processor and get the error code returned
+	LibRaw tempRawProc;
+	int result = tempRawProc.open_file(fileName.wc_str());
+
+	// Return true / false based on error code
+	if(result == LIBRAW_SUCCESS){ return true; }
+	else{ return false; }
+}
+
+bool ImageHandler::CheckImage(wxString fileName){
+
+	wxImage fileImage(fileName);
+	return fileImage.IsOk();
 }
