@@ -14,6 +14,7 @@
 #include "up_button.h"
 #include "down_button.h"
 #include "delete_button.h"
+#include "disable_button.h"
 
 class Icons {
 public:
@@ -22,5 +23,6 @@ public:
 	wxImage UpButton;
 	wxImage DownButton;
 	wxImage DeleteButton;
+	wxImage DisableButton;
 };
 #endif
