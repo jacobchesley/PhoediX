@@ -11,6 +11,7 @@
 
 #include "wx\aui\aui.h"
 #include "wx\thread.h"
+#include "wx\timer.h"
 
 #include "Processing\Processor\Processor.h"
 #include "Processing\ImageHandler\ImageHandler.h"
@@ -33,6 +34,7 @@ public:
 	*/
 	MainWindow();
 
+
 private:
 	void ShowLoadProject(wxCommandEvent& WXUNUSED(event));
 	void ShowSaveProject(wxCommandEvent& WXUNUSED(event));
@@ -40,6 +42,7 @@ private:
 	void ShowImage(wxCommandEvent& WXUNUSED(event));
 	void ShowEditList(wxCommandEvent& WXUNUSED(event));
 	void ShowHistograms(wxCommandEvent& WXUNUSED(event));
+	void OnReprocessTimer(wxTimerEvent& WXUNUSED(event));
 
 	void SetSizeProperties();
 
@@ -55,11 +58,11 @@ private:
 	wxMenu * menuView;
 	wxMenu * menuHelp;
 	wxStaticText * statusBarText;
+	EditListPanel * editList;
 
 	Processor * processor;
 
 	ZoomImagePanel * imagePanel;
-	EditListPanel * editList;
 	HistogramDisplay * histogramDisplay;
 
 	PhoediXSession session;
@@ -91,5 +94,6 @@ private:
 	};
 
 	ImagePanelUpdateThread * imgPanelThread;
+
 };		
 #endif

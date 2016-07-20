@@ -87,7 +87,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowHistograms, this, MainWindow::MenuBar::ID_SHOW_HISTOGRAMS);
 	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
-	
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::OnReprocessTimer, this);
+
 	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor, histogramDisplay);
 	imgPanelThread->Run();
 
@@ -154,21 +155,52 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
 	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
+
+	wxTimer *reprocessCountdown = new wxTimer(this);
+	reprocessCountdown->Start(500, true);
 }
 
 void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 
-	wxFileDialog openFileDialog(this, _("Open Image"), "", "", "Photos (*.jpeg,*.jpg*.png,*.bmp,*.tiff)|*.jpeg;*.jpg;*.png;*.bmp;*.tiff", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	wxFileDialog openFileDialog(this, _("Open Image"), "", "", ImageHandler::imageOpenDialogList, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
 		return;
 	}
 
-	delete processor->GetOriginalImage();
-	ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
-	processor->SetOriginalImage(processor->GetImage());
-	processor->SetUpdated(true);
+	// Handle Raw Image
+	if(ImageHandler::CheckRaw(openFileDialog.GetPath())){
+		editList->AddRawWindow();
+		processor->rawPrcoessor.open_file(openFileDialog.GetPath().wc_str());
+		processor->rawPrcoessor.unpack();
+		processor->ProcessRaw();
+		delete processor->GetOriginalImage();
 
-	session.SetImageFilePath(openFileDialog.GetPath());
+	}
+
+	// Handle JPEG, PNG, BMP and TIFF images
+	else{
+
+		// Verify image is okay
+		if(ImageHandler::CheckImage(openFileDialog.GetPath())){
+
+			// Change image in processor to new image
+			delete processor->GetOriginalImage();
+			ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
+			processor->SetOriginalImage(processor->GetImage());
+			processor->SetUpdated(true);
+
+			// Write image path to current session
+			session.SetImageFilePath(openFileDialog.GetPath());
+		}
+		else{
+			wxMessageDialog imageErrorDialog(this, "Error opening image: " + openFileDialog.GetPath(), "Error Opening Image", wxICON_ERROR);
+			imageErrorDialog.ShowModal();
+		}
+	}
+}
+
+void MainWindow::OnReprocessTimer(wxTimerEvent& WXUNUSED(event)){
+	editList->ReprocessImage();
 }
 
 
