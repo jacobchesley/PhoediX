@@ -81,13 +81,16 @@ void ScaleBrightnessWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 void ScaleBrightnessWindow::AddEditToProcessor() {
 
-	ProcessorEdit * BrightEdit = new ProcessorEdit(ProcessorEdit::EditType::SCALE_BRIGHTNESS);
-	BrightEdit->AddParam(allBrightSlider->GetValue());
-	BrightEdit->AddParam(redBrightSlider->GetValue());
-	BrightEdit->AddParam(greenBrightSlider->GetValue());
-	BrightEdit->AddParam(blueBrightSlider->GetValue());
+	ProcessorEdit * brightEdit = new ProcessorEdit(ProcessorEdit::EditType::SCALE_BRIGHTNESS);
+	brightEdit->AddParam(allBrightSlider->GetValue());
+	brightEdit->AddParam(redBrightSlider->GetValue());
+	brightEdit->AddParam(greenBrightSlider->GetValue());
+	brightEdit->AddParam(blueBrightSlider->GetValue());
 
-	proc->AddEdit(BrightEdit);
+	// Set enabled / disabled
+	brightEdit->SetDisabled(isDisabled);
+
+	proc->AddEdit(brightEdit);
 }
 
 void ScaleBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){

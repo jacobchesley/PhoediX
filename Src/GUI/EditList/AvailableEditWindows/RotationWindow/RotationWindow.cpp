@@ -165,6 +165,10 @@ void RotationWindow::AddEditToProcessor() {
 			rotateEdit->AddFlag(rotationSelection);
 			rotateEdit->AddFlag(0);
 			rotateEdit->AddFlag(crop);
+
+			// Set enabled / disabled
+			rotateEdit->SetDisabled(isDisabled);
+
 			proc->AddEdit(rotateEdit);
 		}
 		else if (customRotationInterpolation->GetSelection() == 1) {
@@ -173,6 +177,10 @@ void RotationWindow::AddEditToProcessor() {
 			rotateEdit->AddFlag(rotationSelection);
 			rotateEdit->AddFlag(1);
 			rotateEdit->AddFlag(crop);
+
+			// Set enabled / disabled
+			rotateEdit->SetDisabled(isDisabled);
+
 			proc->AddEdit(rotateEdit);
 		}
 		else if (customRotationInterpolation->GetSelection() == 2) {
@@ -181,6 +189,10 @@ void RotationWindow::AddEditToProcessor() {
 			rotateEdit->AddFlag(rotationSelection);
 			rotateEdit->AddFlag(2);
 			rotateEdit->AddFlag(crop);
+
+			// Set enabled / disabled
+			rotateEdit->SetDisabled(isDisabled);
+
 			proc->AddEdit(rotateEdit);
 		}
 	}
@@ -214,4 +226,5 @@ void RotationWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 		customRotationSlider->SetValue(edit->GetParam(0));
 	}
+
 }

@@ -94,5 +94,8 @@ void RGBCurvesWindow::AddEditToProcessor() {
 	rgbCurveEdit->AddIntArray(greenCurve16, numSteps16);
 	rgbCurveEdit->AddIntArray(blueCurve16, numSteps16);
 
+	// Set enabled / disabled
+	rgbCurveEdit->SetDisabled(isDisabled);
+
 	proc->AddEdit(rgbCurveEdit);
 }

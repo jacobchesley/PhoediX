@@ -61,9 +61,9 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 	proc = processor;
 	parWindow = parent;
 
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ContrastWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ContrastWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ContrastWindow::Process, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ContrastWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
@@ -71,12 +71,15 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
+
+	this->StartWatchdog();
 }
 
 void ContrastWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+	this->SetUpdated(false);
 }
 
 void ContrastWindow::AddEditToProcessor() {
@@ -86,6 +89,9 @@ void ContrastWindow::AddEditToProcessor() {
 	contrastEdit->AddParam(redContrastSlider->GetValue());
 	contrastEdit->AddParam(greenContrastSlider->GetValue());
 	contrastEdit->AddParam(blueContrastSlider->GetValue());
+
+	// Set enabled / disabled
+	contrastEdit->SetDisabled(isDisabled);
 
 	proc->AddEdit(contrastEdit);
 }
@@ -99,4 +105,5 @@ void ContrastWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		greenContrastSlider->SetValue(edit->GetParam(2));
 		blueContrastSlider->SetValue(edit->GetParam(3));
 	}
+
 }

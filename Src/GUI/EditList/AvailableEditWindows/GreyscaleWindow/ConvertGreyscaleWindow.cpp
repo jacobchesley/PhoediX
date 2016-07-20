@@ -27,9 +27,9 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	greyscaleMethod->AppendString("Average RGB Values");
 	greyscaleMethod->AppendString("Custom RGB Scalars");
 	greyscaleMethod->SetSelection(0);
-	redBrightSlider = new DoubleSlider(this, (1.0 / 3.0), 0.0, 5.0, 100000);
-	greenBrightSlider = new DoubleSlider(this, (1.0 / 3.0), 0.0, 5.0, 100000);
-	blueBrightSlider = new DoubleSlider(this, (1.0 / 3.0), 0.0, 5.0, 100000);
+	redBrightSlider = new DoubleSlider(this, (1.0 / 3.0), 0.0, 1.0, 100000);
+	greenBrightSlider = new DoubleSlider(this, (1.0 / 3.0), 0.0, 1.0, 100000);
+	blueBrightSlider = new DoubleSlider(this, (1.0 / 3.0), 0.0, 1.0, 100000);
 
 	redBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	greenBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
@@ -64,9 +64,9 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	proc = processor;
 	parWindow = parent;
 
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnCombo, this);
 
@@ -78,12 +78,15 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
+
+	this->StartWatchdog();
 }
 
 void ConvertGreyscaleWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+	this->SetUpdated(false);
 }
 
 void ConvertGreyscaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
@@ -105,6 +108,7 @@ void ConvertGreyscaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 		blueBrightLabel->Hide();
 		blueBrightSlider->Hide();
 	}
+	this->SetUpdated(true);
 }
 
 void ConvertGreyscaleWindow::AddEditToProcessor() {
@@ -114,12 +118,20 @@ void ConvertGreyscaleWindow::AddEditToProcessor() {
 	if (greyscaleSelection == 0) {
 		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE);
 		greyEdit->AddFlag(greyscaleSelection);
+
+		// Set enabled / disabled
+		greyEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(greyEdit);
 	}
 
 	else if (greyscaleSelection == 1) {
 		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG);
 		greyEdit->AddFlag(greyscaleSelection);
+
+		// Set enabled / disabled
+		greyEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(greyEdit);
 	}
 
@@ -128,6 +140,9 @@ void ConvertGreyscaleWindow::AddEditToProcessor() {
 		greyEdit->AddParam(redBrightSlider->GetValue());
 		greyEdit->AddParam(greenBrightSlider->GetValue());
 		greyEdit->AddParam(blueBrightSlider->GetValue());
+
+		// Set enabled / disabled
+		greyEdit->SetDisabled(isDisabled);
 
 		greyEdit->AddFlag(greyscaleSelection);
 		proc->AddEdit(greyEdit);
@@ -151,4 +166,5 @@ void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		greenBrightSlider->SetValue(edit->GetParam(1));
 		blueBrightSlider->SetValue(edit->GetParam(2));
 	}
+	
 }

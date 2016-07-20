@@ -68,18 +68,30 @@ void MirrorWindow::AddEditToProcessor() {
 	if (mirrorSelection == 0) {
 		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_NONE);
 		mirrorEdit->AddFlag(mirrorSelection);
+
+		// Set enabled / disabled
+		mirrorEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(mirrorEdit);
 	}
 
 	else if (mirrorSelection == 1) {
 		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_HORIZONTAL);
 		mirrorEdit->AddFlag(mirrorSelection);
+
+		// Set enabled / disabled
+		mirrorEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(mirrorEdit);
 	}
 
 	else if (mirrorSelection == 2) {
 		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_VERTICAL);
 		mirrorEdit->AddFlag(mirrorSelection);
+
+		// Set enabled / disabled
+		mirrorEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(mirrorEdit);
 	}
 }
@@ -94,6 +106,4 @@ void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 		mirrorMethod->SetSelection(edit->GetFlag(0));
 	}
-
-	
 }

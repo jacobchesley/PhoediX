@@ -60,12 +60,12 @@ void LABCurvesWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void LABCurvesWindow::AddEditToProcessor() {
-
+	
 	int numSteps16 = 65536;
 	std::vector<int> lVector16 = lCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
 	std::vector<int> aVector16 = aCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
 	std::vector<int> bVector16 = bCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-
+	
 	int * lCurve16 = new int[numSteps16];
 	int * aCurve16 = new int[numSteps16];
 	int * bCurve16 = new int[numSteps16];
@@ -89,5 +89,10 @@ void LABCurvesWindow::AddEditToProcessor() {
 	if (colorSpaceSelection->GetSelection() == 3) { colorSpace = ColorSpaceENUM::WIDE_GAMUT_RGB; }
 
 	labCurveEdit->AddParam(colorSpace);
+
+	// Set enabled / disabled
+	labCurveEdit->SetDisabled(isDisabled);
+
 	proc->AddEdit(labCurveEdit);
+	
 }
