@@ -27,6 +27,9 @@ public :
 	int GetNumIntArrays();
 	int GetIntArraySize();
 
+	void SetDisabled(bool disable);
+	bool GetDisabled();
+
 	double GetParam(size_t index);
 	int * GetIntArray(size_t index);
 	int GetIntArraySize(size_t index);
@@ -61,7 +64,8 @@ public :
 		MIRROR_VERTICAL,
 		MIRROR_HORIZONTAL,
 		RGB_CURVES,
-		LAB_CURVES
+		LAB_CURVES,
+		RAW
 	};
 	
 private:
@@ -75,6 +79,8 @@ private:
 
 	bool doMultithread;
 	int numThread;
+
+	bool isDisabled;
 
 };
 

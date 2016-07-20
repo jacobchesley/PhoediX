@@ -3,6 +3,7 @@
 ProcessorEdit::ProcessorEdit() {
 	doMultithread = false;
 	numThread = 0;
+	isDisabled = false;
 }
 
 ProcessorEdit::ProcessorEdit(int editType) {
@@ -72,6 +73,14 @@ double ProcessorEdit::GetFlag(size_t index) {
 
 int ProcessorEdit::GetEditType() {
 	return edit;
+}
+
+void ProcessorEdit::SetDisabled(bool disable) {
+	isDisabled = disable;
+}
+
+bool ProcessorEdit::GetDisabled() {
+	return isDisabled;
 }
 
 void ProcessorEdit::SetEditType(int editType) {
