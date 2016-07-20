@@ -12,8 +12,10 @@
 #include "wx\thread.h"
 
 #include "Processing\Image\Image.h"
+#include "Processing\ImageHandler\ImageHandler.h"
 #include "Debugging\MemoryLeakCheck.h"
 #include "Processing\ProcessorEdit\ProcessorEdit.h"
+#include "libraw.h"
 
 enum {
 	ID_PROCESSOR_MESSAGE
@@ -72,6 +74,7 @@ public:
 
 	void SetUpdated(bool updated);
 	bool GetUpdated();
+	bool RawImageGood();
 
 	void Lock();
 	void Unlock();
@@ -80,11 +83,18 @@ public:
 	void Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
 	void Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
 
+	void ProcessRaw();
+	void DeleteRawImage();
+	int GetRawError();
+
 	enum RotationCropping{
 		KEEP_SIZE,
 		FIT,
 		EXPAND
 	};
+
+	LibRaw rawPrcoessor;
+	libraw_processed_image_t * rawImage;
 
 private:
 
@@ -92,6 +102,8 @@ private:
 	Image * originalImg;
 
 	bool didUpdate;
+	bool rawImageGood;
+	int rawErrorCode;
 
 	wxCriticalSection lock;
 	bool locked;
@@ -145,6 +157,18 @@ private:
 		private:
 			Processor * procParent;
 			wxVector<ProcessorEdit*> editVec;
+	};
+
+	class RawProcessThread : public wxThread {
+
+		public:
+			RawProcessThread(Processor * processorPar);
+
+		protected:
+			virtual ExitCode Entry();
+
+		private:
+			Processor * processor;
 	};
 
 };

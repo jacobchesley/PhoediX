@@ -9,12 +9,16 @@ Processor::Processor(wxWindow * parent) {
 	didUpdate = false;
 	locked = false;
 	parWindow = parent;
+	rawImage = NULL;
+	rawImageGood = false;
 }
 
 Processor::~Processor() {
 	delete img;
 	delete originalImg;
 	this->DeleteEdits();
+	rawPrcoessor.dcraw_clear_mem(rawImage);
+	delete rawImage;
 }
 
 Image * Processor::GetImage() {
@@ -68,13 +72,13 @@ void Processor::Disable16Bit() {
 
 void Processor::ProcessEdits() {
 
-	if (this->GetLocked()) { return; }
+	//if (this->GetLocked()) { return; }
 	this->ProcessEdits(editListInternal);
 }
 
 void Processor::ProcessEdit(ProcessorEdit * edit) {
 
-	if (this->GetLocked()) { return; }
+	//if (this->GetLocked()) { return; }
 	ProcessThread * procThread = new ProcessThread(this, edit);
 	procThread->Run();
 
@@ -82,22 +86,44 @@ void Processor::ProcessEdit(ProcessorEdit * edit) {
 
 void Processor::ProcessEdits(wxVector<ProcessorEdit*> editList) {
 
-	if (this->GetLocked()) { return; }
+	//if (this->GetLocked()) { return; }
 	ProcessThread * procThread = new ProcessThread(this, editList);
 	procThread->Run();
-	procThread->SetPriority(75);
+	procThread->SetPriority(85);
+}
+
+void Processor::ProcessRaw(){
+	RawProcessThread * rawProcThread = new RawProcessThread(this);
+	rawProcThread->Run();
+	rawProcThread->SetPriority(85);
+
+}
+
+void Processor::DeleteRawImage(){
+	rawImageGood = false;
+	rawPrcoessor.dcraw_clear_mem(rawImage);
+	delete rawImage;
+	rawImage = NULL;
+}
+
+bool Processor::RawImageGood(){
+	return rawImageGood;
+}
+
+int Processor::GetRawError(){
+	return rawErrorCode;
 }
 
 void Processor::Lock() {
 	{
-		wxCriticalSectionLocker locker(lock);
+		//wxCriticalSectionLocker locker(lock);
 		locked = true;
 	}
 }
 
 void Processor::Unlock() {
 	{
-		wxCriticalSectionLocker locker(lock);
+		//wxCriticalSectionLocker locker(lock);
 		locked = false;
 	}
 }
@@ -2534,7 +2560,7 @@ Processor::ProcessThread::ProcessThread(Processor * processor, wxVector<Processo
 wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 	while (procParent->GetLocked()) {
-		this->Sleep(10);
+		this->Sleep(50);
 	}
 	procParent->Lock();
 	procParent->RevertToOriginalImage();
@@ -2551,6 +2577,11 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 		// Get the type of edit to perform
 		int editToComplete = curEdit->GetEditType();
+
+		// Skip disabled edits
+		if (curEdit->GetDisabled()) {
+			continue;
+		}
 
 		wxString curEditStr;
 		curEditStr << (editIndex + 1);
@@ -2817,5 +2848,49 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 	procParent->SendMessageToParent("");
 	procParent->Unlock();
+	return (wxThread::ExitCode)0;
+}
+
+Processor::RawProcessThread::RawProcessThread(Processor * processorPar) : wxThread(wxTHREAD_DETACHED) {
+	processor = processorPar;
+}
+
+wxThread::ExitCode Processor::RawProcessThread::Entry() {
+
+	// process the raw image
+	processor->SendMessageToParent("RAW Image Processing");
+	processor->rawErrorCode = processor->rawPrcoessor.dcraw_process();
+	processor->SendMessageToParent("RAW Image Done Processing");
+	// Exit method before creating raw image from bad data
+	if(processor->rawErrorCode != LIBRAW_SUCCESS){
+
+		wxString errorName;
+		errorName << processor->rawErrorCode;
+
+		processor->SendMessageToParent("RAW Image processing failed: " + errorName);
+		return (wxThread::ExitCode)0;
+	}
+
+	// Create the raw image
+	processor->SendMessageToParent("Creating RAW Image for display");
+	processor->rawImage = processor->rawPrcoessor.dcraw_make_mem_image(&processor->rawErrorCode);
+
+	// Set rawImageGood on processor if success
+	if(processor->rawErrorCode == LIBRAW_SUCCESS){
+
+		processor->SendMessageToParent("Updating Display");
+		processor->rawImageGood = true;
+
+		processor->Lock();
+		//delete processor->GetOriginalImage();
+		ImageHandler::CopyImageFromRaw(processor->rawImage, processor->GetImage());
+		processor->SetOriginalImage(processor->GetImage());
+		processor->SetUpdated(true);
+		processor->Unlock();
+	}
+	else{
+		
+	}
+
 	return (wxThread::ExitCode)0;
 }
