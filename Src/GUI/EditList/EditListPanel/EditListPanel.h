@@ -9,6 +9,8 @@
 #include "wx/wx.h"
 #endif
 
+#include "wx\thread.h"
+
 #include "GUI\EditList\AvailableEdits\AvailableEdits.h"
 #include "GUI\EditList\AvailableEditWindows\AvailableEditWindows.h"
 #include "GUI\EditList\EditListItem\EditListItem.h"
@@ -24,8 +26,11 @@ public:
 	EditListPanel(wxWindow * parent, Processor * processor);
 	wxVector<Edit> edits;
 
+	void AddRawWindow();
+	void RemoveRawWindow();
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
+	void ReprocessImage();
 
 private:
 
@@ -34,14 +39,14 @@ private:
 	void OnAddEdit(wxCommandEvent& WXUNUSED(event));
 
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
-	void ReprocessImage();
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
 	void AddEditWindowToPanel(EditWindow * window, int editID);
 	void MoveEditUp(wxCommandEvent& upEvt);
 	void MoveEditDown(wxCommandEvent& downEvt);
 	void DeleteEdit(wxCommandEvent& deleteEvt);
-
+	void DisableEdit(wxCommandEvent& WXUNUSED(event));
+	
 	wxStaticText * titleText;
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * bottomButtonsSizer;
@@ -64,6 +69,8 @@ private:
 		void MoveEditUp(size_t index);
 		void MoveEditDown(size_t index);
 		int GetNextID();
+		void SetNumTopEdits(size_t numTop);
+		size_t GetNumTopEdits();
 
 		wxVector<EditListItem*> GetEditList();
 
@@ -73,9 +80,9 @@ private:
 		void RedrawEdits();
 		wxBoxSizer * sizer;
 		wxVector<EditListItem*> editList;
+		size_t topEdits;
 	};
 	
 	EditListScroll * scroller;
-
 };
 #endif

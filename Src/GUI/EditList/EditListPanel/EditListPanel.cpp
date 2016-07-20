@@ -44,6 +44,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	this->Bind(EDIT_UP_EVENT, (wxObjectEventFunction)&EditListPanel::MoveEditUp, this, ID_EDIT_UP);
 	this->Bind(EDIT_DOWN_EVENT, (wxObjectEventFunction)&EditListPanel::MoveEditDown, this, ID_EDIT_DOWN);
 	this->Bind(EDIT_DELETE_EVENT, (wxObjectEventFunction)&EditListPanel::DeleteEdit, this, ID_EDIT_DELETE);
+	this->Bind(EDIT_DISABLE_EVENT, (wxObjectEventFunction)&EditListPanel::DisableEdit, this, ID_EDIT_DISABLE);
 	this->Bind(EDIT_ADD_EVENT, (wxObjectEventFunction)&EditListPanel::AddEditToPanel, this, ID_EDIT_ADD);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageEvt, this, ID_REPROCESS_IMAGE);
 
@@ -80,25 +81,20 @@ void EditListPanel::AddEditsToProcessor() {
 
 		// Add each edit from the edit window, to the processor
 		if (editList.at(i)->GetEditWindow() != NULL) {
+
+			editList.at(i)->GetEditWindow()->SetDisabled(editList.at(i)->GetDisabled());
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
 		}
 	}
 }
 void EditListPanel::ReprocessImage() {
-
+	
 	// Delete the current list of internally stored edits in the processor
 	proc->DeleteEdits();
-
-	// Create a vector of Edit list Items that are displayed on the panel
-	wxVector<EditListItem*> editList = scroller->GetEditList();
-	for (size_t i = 0; i < editList.size(); i++) {
-
-		// Add each edit from the edit window, to the processor
-		if (editList.at(i)->GetEditWindow() != NULL) {
-			editList.at(i)->GetEditWindow()->AddEditToProcessor();
-		}
-	}
-
+	
+	// Add all edits to processor
+	this->AddEditsToProcessor();
+	
 	// Process the edits
 	proc->ProcessEdits();
 }
@@ -132,6 +128,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)));
 		}
 	}
+
 }
 
 void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID) {
@@ -160,7 +157,13 @@ void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID) {
 		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 		
 		// Add a new Edit List Item to the Edit List scroll panel
-		scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window));
+		// Add special panel that will disable buttons if it is raw.  Keep raw panel at top
+		if(editID == AvailableEditIDS::EDIT_ID_RAW){
+			scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, true));
+		}
+		else{
+			scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, false));
+		}
 	}
 }
 
@@ -188,6 +191,32 @@ void EditListPanel::DeleteEdit(wxCommandEvent& deleteEvt) {
 	this->ReprocessImage();
 }
 
+void EditListPanel::DisableEdit(wxCommandEvent& WXUNUSED(event)) {
+	this->ReprocessImage();
+}
+
+void EditListPanel::AddRawWindow(){
+
+	// Get number of edits already in list
+	size_t numEdits = scroller->GetNextID();
+
+	// Add new raw processor edit panel to list
+	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc);
+	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW);
+
+	//Move raw processor edit to top
+	int rawEditIdx = numEdits;
+	for(int i = 0; i < numEdits; i++){
+		scroller->MoveEditUp(rawEditIdx);
+		rawEditIdx -= 1;
+	}
+
+	// Mark raw processor top edits as permenant.  Cannot move any edits above this one.
+	scroller->SetNumTopEdits(1);
+
+}
+
+
 EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	parWindow = parent;
@@ -195,6 +224,15 @@ EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWin
 	this->SetSizer(sizer);
 	this->FitInside();
 	this->SetScrollRate(5, 5);
+	topEdits = 0;
+}
+
+void EditListPanel::EditListScroll::SetNumTopEdits(size_t numTop){
+	topEdits = numTop;
+}
+
+size_t EditListPanel::EditListScroll::GetNumTopEdits(){
+	return topEdits;
 }
 
 void EditListPanel::EditListScroll::AddEdit(EditListItem * edit) {
@@ -228,7 +266,7 @@ void EditListPanel::EditListScroll::AddEdit(EditListItem * edit) {
 void EditListPanel::EditListScroll::MoveEditUp(size_t index) {
 
 	// We cant move an item further up if it is at the top
-	if (index <= 0) {
+	if (index <= topEdits) {
 		return;
 	}
 
