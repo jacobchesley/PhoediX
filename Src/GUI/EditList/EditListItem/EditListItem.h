@@ -18,17 +18,18 @@
 enum {
 	ID_EDIT_UP,
 	ID_EDIT_DOWN,
-	ID_EDIT_DELETE
+	ID_EDIT_DELETE,
+	ID_EDIT_DISABLE
 };
 
 wxDECLARE_EVENT(EDIT_UP_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_DOWN_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_DELETE_EVENT, wxCommandEvent);
-
+wxDECLARE_EVENT(EDIT_DISABLE_EVENT, wxCommandEvent);
 
 class EditListItem : public wxPanel {
 public:
-	EditListItem(wxWindow * parent, wxString title = wxEmptyString, int Sequence = 0, EditWindow * editWindow = NULL);
+	EditListItem(wxWindow * parent, wxString title = wxEmptyString, int Sequence = 0, EditWindow * editWindow = NULL, bool disableButtons = false);
 	~EditListItem();
 
 	EditWindow* GetEditWindow();
@@ -41,18 +42,22 @@ public:
 	void SetSequence(size_t Sequence);
 	int GetSequence();
 
+	bool GetDisabled();
+
 private:
 
 	void OnUp(wxCommandEvent& WXUNUSED(event));
 	void OnDown(wxCommandEvent& WXUNUSED(event));
 	void OnDelete(wxCommandEvent& WXUNUSED(event));
 	void OnOpenEdit(wxCommandEvent& WXUNUSED(event));
-	
+	void OnDisable(wxCommandEvent& WXUNUSED(event));
+
 	wxWindow * parWindow;
 	wxBoxSizer * sizer;
 	wxBoxSizer * textSizer;
 	wxBoxSizer * upDownButtonSizer;
 
+	wxButton * disableButton;
 	wxButton * titleText;
 	wxButton * upButton;
 	wxButton * downButton;
@@ -61,12 +66,14 @@ private:
 	EditWindow * editWin;
 
 	size_t seq;
+	bool isDisabled;
 
 	enum Buttons{
 		OPEN_EDIT_BUTTON,
 		UP_BUTTON,
 		DOWN_BUTTON,
-		DELETE_BUTTON
+		DELETE_BUTTON,
+		DISABLE_BUTTON
 	};
 };
 #endif
