@@ -118,6 +118,9 @@
     <Filter Include="GUI\Image Display\wxImagePanel">
       <UniqueIdentifier>{370976d4-2de4-4812-b16f-91b66db2fc65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Raw">
+      <UniqueIdentifier>{8de73d20-78a0-4a56-a5bb-10d10712ccde}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.cpp">
       <Filter>GUI\Image Display\wxImagePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GUI\EditList\AvailableEditWindows\RawWindow\RawWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Raw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +337,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.h">
       <Filter>GUI\Image Display\wxImagePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GUI\EditList\AvailableEditWindows\RawWindow\RawWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GUI\Icons\disable_button.h">
+      <Filter>GUI\Icons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
