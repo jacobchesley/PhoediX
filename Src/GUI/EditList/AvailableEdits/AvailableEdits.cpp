@@ -38,6 +38,10 @@ wxVector<Edit> AvailableEdits::GetAvailableEdits() {
 
 wxString AvailableEdits::GetNameFromID(int id) {
 
+	if(id == AvailableEditIDS::EDIT_ID_RAW){
+		return "Raw Processor";
+	}
+
 	for (size_t i = 0; i < editVector.size(); i++) {
 		if (editVector.at(i).GetID() == id) {
 			return editVector.at(i).GetName();
