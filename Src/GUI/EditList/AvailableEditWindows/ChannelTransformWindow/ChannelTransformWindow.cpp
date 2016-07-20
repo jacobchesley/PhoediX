@@ -144,6 +144,8 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 
 	this->PopulateIntialPresets();
 	presetBox->SetValue(presetList.at(0).GetName());
+
+	this->StartWatchdog();
 }
 
 void ChannelTransformWindow::PopulateIntialPresets() {
@@ -193,6 +195,8 @@ void ChannelTransformWindow::SetValuesFromPreset(ChannelTransformWindow::Channel
 	blueRedSlider->SetValue(preset.GetBlueRedScale());
 	blueGreenSlider->SetValue(preset.GetBlueGreenScale());
 	blueBlueSlider->SetValue(preset.GetBlueBlueScale());
+
+	this->SetUpdated(true);
 }
 
 void ChannelTransformWindow::PresetChange(wxCommandEvent& WXUNUSED(event)) {
@@ -201,6 +205,7 @@ void ChannelTransformWindow::PresetChange(wxCommandEvent& WXUNUSED(event)) {
 	ChannelTransformWindow::ChannelTransformPreset selectedPreset = this->GetChannelTransformPresetByName(selectedName);
 	justSetPreset = true;
 	this->SetValuesFromPreset(selectedPreset);
+	this->SetUpdated(true);
 }
 
 void ChannelTransformWindow::OnSlide(wxCommandEvent& WXUNUSED(event)) {
@@ -213,12 +218,14 @@ void ChannelTransformWindow::OnSlide(wxCommandEvent& WXUNUSED(event)) {
 
 	// Set preset selection to custom
 	presetBox->SetSelection(presetList.size() - 1);
+	this->SetUpdated(true);
 }
 
 void ChannelTransformWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+	this->SetUpdated(false);
 }
 
 void ChannelTransformWindow::AddEditToProcessor() {
@@ -234,6 +241,9 @@ void ChannelTransformWindow::AddEditToProcessor() {
 	transformEdit->AddParam(blueRedSlider->GetValue());
 	transformEdit->AddParam(blueGreenSlider->GetValue());
 	transformEdit->AddParam(blueBlueSlider->GetValue());
+
+	// Set enabled / disabled
+	transformEdit->SetDisabled(isDisabled);
 
 	// Add preset number
 	transformEdit->AddFlag(presetBox->GetSelection());
@@ -260,6 +270,7 @@ void ChannelTransformWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		blueGreenSlider->SetValue(edit->GetParam(7));
 		blueBlueSlider->SetValue(edit->GetParam(8));
 	}
+	this->SetUpdated(true);
 }
 
 ChannelTransformWindow::ChannelTransformPreset::ChannelTransformPreset(wxString name, double redRedScale, double redGreenScale, double redBlueScale,
