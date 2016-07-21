@@ -9,6 +9,8 @@
 #endif
 
 #include "wx/xml/xml.h"
+#include "wx/numformatter.h"
+#include "wx/tokenzr.h"
 
 #include "Processing\ProcessorEdit\ProcessorEdit.h"
 

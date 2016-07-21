@@ -1,5 +1,7 @@
 #include "SessionEditList.h"
 
+#define EDIT_PRECISSION 6
+
 PhoediXSessionEditList::PhoediXSessionEditList() {
 
 }
@@ -56,6 +58,12 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 			// Get edit name and set edit type
 			if (editNodeChildren->GetName() == "EditIndex") {
 				editIdx = wxAtoi(editNodeChildren->GetChildren()[0].GetContent());
+			}
+
+			// Get enable / disable 
+			if (editNodeChildren->GetName() == "Disabled") {
+				int dis = wxAtoi(editNodeChildren->GetChildren()[0].GetContent());
+				if(dis > 0){ newEdit->SetDisabled(true); }
 			}
 
 			// Get all parameters for the edit
@@ -140,12 +148,64 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 					editNodeFlags = editNodeFlags->GetNext();
 				}
 
-				// Add parameters to new edit
+				// Add flags to new edit
 				for (size_t i = 0; i < numFlags; i++) {
 					newEdit->AddFlag(flags.at(i));
 				}
 			}
 			
+			// Get all double arrays for the edit
+			if (editNodeChildren->GetName() == "DoubleArrays") {
+
+				wxXmlNode * editNodeDoubleArrays = editNodeChildren->GetChildren();
+				wxVector<double*> doubleArrays;
+				wxVector<int> doubleArraySizes;
+
+				// Count number of double arrays
+				size_t numDoubleArrays = 0;
+				while (editNodeDoubleArrays) {
+					numDoubleArrays += 1;
+					editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
+				}
+
+				// Resize the double arrays vector to account for all arrays
+				doubleArrays.resize(numDoubleArrays);
+				doubleArraySizes.resize(numDoubleArrays);
+
+				// Get all double arrays and place in correct order
+				editNodeDoubleArrays = editNodeChildren->GetChildren();
+				wxString editDoubleArrayNumStr;
+				size_t arrayIdx = 0;
+				int doubleArray = 0;
+				while (editNodeDoubleArrays) {
+
+					// Get array number
+					editDoubleArrayNumStr = editNodeDoubleArrays->GetName();
+					editDoubleArrayNumStr = editDoubleArrayNumStr.SubString(11, editDoubleArrayNumStr.length());
+					arrayIdx = wxAtoi(editDoubleArrayNumStr);
+
+					// Count number of elements in array
+					wxString arrayStr = editNodeDoubleArrays->GetChildren()[0].GetContent();
+					wxStringTokenizer arrayTokens(arrayStr, ",");
+					size_t numElements = arrayTokens.CountTokens();
+
+					// Create and populate double array
+					double * newDoubleArray = new double[numElements];
+					doubleArraySizes[arrayIdx] = numElements;
+					for (int i = 0; i < numElements; i++) {
+						arrayTokens.GetNextToken().ToDouble(&newDoubleArray[i]);
+					}
+
+					// Set double array element in vector
+					doubleArrays[arrayIdx] = newDoubleArray;
+				}
+
+				// Add double arrays to new edit
+				for (size_t i = 0; i < numDoubleArrays; i++) {
+					newEdit->AddDoubleArray(doubleArrays[i], doubleArraySizes[i]);
+				}
+			}
+
 			editNodeChildren = editNodeChildren->GetNext();
 		}
 
@@ -179,6 +239,14 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 		wxXmlNode * nameNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "EditName");
 		nameNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", curEdit->GetEditTag()));
 
+		// Add enable / disable flag
+		wxXmlNode * disableNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Disabled");
+		int dis = 0;
+		if(curEdit->GetDisabled()) { dis = 1; }
+		wxString disString;
+		disString << dis;
+		disableNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", disString));
+
 		// Add parameters to edit node
 		wxXmlNode * paramsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Parameters");
 		wxString paramIdx;
@@ -188,7 +256,7 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 			paramIdx = "";
 			paramStr = "";
 			paramIdx << paramIndex;
-			paramStr << curEdit->GetParam(paramIndex);
+			paramStr = wxNumberFormatter::ToString(curEdit->GetParam(paramIndex), EDIT_PRECISSION, wxNumberFormatter::Style_None);
 
 			wxXmlNode * paramNode = new wxXmlNode(paramsNode, wxXML_ELEMENT_NODE, "Param" + paramIdx);
 			paramNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", paramStr));
@@ -207,6 +275,30 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 
 			wxXmlNode * flagNode = new wxXmlNode(flagsNode, wxXML_ELEMENT_NODE, "Flag" + flagIdx);
 			flagNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", flagStr));
+		}
+
+		// Add double array to edit node
+		wxXmlNode * doubleArrayNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "DoubleArrays");
+		wxString doubleIdx;
+		wxString doubleStrTemp;
+		wxString doubleStr;
+		for (int doubleIndex = 0; doubleIndex < curEdit->GetNumDoubleArrays(); doubleIndex++) {
+
+			doubleIdx = "";
+			doubleStr = "";
+			doubleIdx << doubleIndex;
+
+			for (int doubleNum = 0; doubleNum < curEdit->GetDoubleArraySize(doubleIndex); doubleNum++) {
+				doubleStrTemp = "";
+				doubleStrTemp = wxNumberFormatter::ToString(curEdit->GetDoubleArray(doubleIndex)[doubleNum], EDIT_PRECISSION, wxNumberFormatter::Style_None);
+				doubleStr += doubleStrTemp + ",";
+			}
+			
+			// remove trailing comma
+			doubleStr = doubleStr.substr(0, doubleStr.size() - 1);
+
+			wxXmlNode * doubleNode = new wxXmlNode(doubleArrayNode, wxXML_ELEMENT_NODE, "DoubleArray" + doubleIdx);
+			doubleNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", doubleStr));
 		}
 	}
 }
