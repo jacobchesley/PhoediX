@@ -112,7 +112,7 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 	// Create new edit window and add it to panel
 	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(editID, this, proc);
-	this->AddEditWindowToPanel(newEditWindow, editID);
+	this->AddEditWindowToPanel(newEditWindow, editID, false);
 
 	// Reprocess the image with the new edit added
 	this->ReprocessImage();
@@ -125,13 +125,14 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	for (size_t i = 0; i < inEdits.size(); i++) {
 		if (inEdits.at(i) != NULL) {
 			EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
-			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)));
+			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled());
+			newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
 		}
 	}
 
 }
 
-void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID) {
+void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool disable) {
 
 	// If a new edit window was created
 	AvailableEdits available;
@@ -159,10 +160,14 @@ void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID) {
 		// Add a new Edit List Item to the Edit List scroll panel
 		// Add special panel that will disable buttons if it is raw.  Keep raw panel at top
 		if(editID == AvailableEditIDS::EDIT_ID_RAW){
-			scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, true));
+
+			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, true);
+			scroller->AddEdit(newEditListItem);
 		}
 		else{
-			scroller->AddEdit(new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, false));
+			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, false);
+			newEditListItem->SetDisabled(disable);
+			scroller->AddEdit(newEditListItem);
 		}
 	}
 }
@@ -202,7 +207,7 @@ void EditListPanel::AddRawWindow(){
 
 	// Add new raw processor edit panel to list
 	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc);
-	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW);
+	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false);
 
 	//Move raw processor edit to top
 	int rawEditIdx = numEdits;

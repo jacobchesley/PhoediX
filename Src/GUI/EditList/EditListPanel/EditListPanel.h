@@ -41,7 +41,7 @@ private:
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
-	void AddEditWindowToPanel(EditWindow * window, int editID);
+	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable);
 	void MoveEditUp(wxCommandEvent& upEvt);
 	void MoveEditDown(wxCommandEvent& downEvt);
 	void DeleteEdit(wxCommandEvent& deleteEvt);
