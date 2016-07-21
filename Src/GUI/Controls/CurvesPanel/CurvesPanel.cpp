@@ -6,7 +6,7 @@ CurvePanel::CurvePanel(wxWindow * Parent, int Channel, int x, int y, int width, 
 	curvePaddingSize = 7;
 	channelColor = Channel;
 
-	// Create a spline with 300 points between each control point
+	// Create a spline with 1000  points between each control point
 	displayCurve = new Spline(1000, true);
 
 	wxSize curSize = this->GetClientSize();
@@ -413,6 +413,14 @@ std::vector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 
 	delete splineCurve;
 	return colorCurveMap;
+}
+
+std::vector<Point> CurvePanel::GetControlPoints(){
+	return displayCurve->GetControlPoints();
+}
+
+void CurvePanel::SetControlPoints(std::vector<Point> newPoints) {
+
 }
 
 void CurvePanel::DestroySpline() {

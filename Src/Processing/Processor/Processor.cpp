@@ -49,6 +49,7 @@ void Processor::DeleteEdits() {
 	// Delete all edits in the internal vector
 	for (size_t i = 0; i < editListInternal.size(); i++) {
 		editListInternal.at(i)->ClearIntArray();
+		editListInternal.at(i)->ClearDoubleArray();
 		delete editListInternal.at(i);
 	}
 
@@ -1114,6 +1115,10 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 
 void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 
+	if(angleDegrees == 0.0){
+		return;
+	}
+
 	double useNearestNeighborDistance = 0.0001;
 
 	angleDegrees *= -1.0;
@@ -1462,6 +1467,10 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 }
 
 void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
+
+	if(angleDegrees == 0.0){
+		return;
+	}
 
 	double useNearestNeighborDistance = 0.0001;
 

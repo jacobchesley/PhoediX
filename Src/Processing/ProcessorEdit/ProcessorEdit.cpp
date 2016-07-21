@@ -4,10 +4,14 @@ ProcessorEdit::ProcessorEdit() {
 	doMultithread = false;
 	numThread = 0;
 	isDisabled = false;
+	this->SetEditType(EditType::UNDEFINED);
 }
 
 ProcessorEdit::ProcessorEdit(int editType) {
 	this->SetEditType(editType);
+	doMultithread = false;
+	numThread = 0;
+	isDisabled = false;
 }
 
 void ProcessorEdit::AddParam(double param) {
@@ -19,6 +23,11 @@ void ProcessorEdit::AddIntArray(int * newArray, int arraySize) {
 	intArraySizes.push_back(arraySize);
 }
 
+void ProcessorEdit::AddDoubleArray(double * newArray, int arraySize) {
+	doubleArrays.push_back(newArray);
+	doubleArraySizes.push_back(arraySize);
+}
+
 void ProcessorEdit::ClearParams() {
 	params.clear();
 }
@@ -27,28 +36,49 @@ void ProcessorEdit::ClearIntArray() {
 	for (size_t i = 0; i < intArrays.size(); i++) {
 		delete[] intArrays[i];
 	}
+	
 	intArrays.clear();
 	intArraySizes.clear();
+}
+
+void ProcessorEdit::ClearDoubleArray() {
+	for (size_t i = 0; i < doubleArrays.size(); i++) {
+		delete[] doubleArrays[i];
+	}
+	
+	doubleArrays.clear();
+	doubleArraySizes.clear();
 }
 
 int ProcessorEdit::GetParamsSize() {
 	return params.size();
 }
 
-int ProcessorEdit::GetIntArraySize() {
-	return intArrays.size();
+int ProcessorEdit::GetNumDoubleArrays() {
+	return doubleArrays.size();
 }
 
 double ProcessorEdit::GetParam(size_t index) {
+	if(index > params.size()){ return 0.0f; }
 	return params.at(index);
 }
 
 int * ProcessorEdit::GetIntArray(size_t index) {
+	if(index > intArrays.size()){ return NULL; }
 	return intArrays.at(index);
+}
+
+double * ProcessorEdit::GetDoubleArray(size_t index) {
+	if(index > doubleArrays.size()){ return NULL; }
+	return doubleArrays.at(index);
 }
 
 int ProcessorEdit::GetIntArraySize(size_t index) {
 	return intArraySizes.at(index);
+}
+
+int ProcessorEdit::GetDoubleArraySize(size_t index) {
+	return doubleArraySizes.at(index);
 }
 
 int ProcessorEdit::GetNumIntArrays() {
@@ -67,7 +97,8 @@ int ProcessorEdit::GetFlagsSize() {
 	return flags.size();
 }
 
-double ProcessorEdit::GetFlag(size_t index) {
+int ProcessorEdit::GetFlag(size_t index) {
+	if(index > flags.size()){ return 0; }
 	return flags.at(index);
 }
 

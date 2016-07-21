@@ -44,8 +44,9 @@ public:
 	void DestroySpline();
 	bool CheckForChanges();
 	std::vector<int> GetColorCurveMap(int numSteps, float scale);
-
 	std::vector<Point> ClipCurve(std::vector<Point> points);
+	std::vector<Point> GetControlPoints();
+	void SetControlPoints(std::vector<Point> newPoints);
 };
 
 #endif
