@@ -19,25 +19,30 @@ public :
 	ProcessorEdit(int editType);
 
 	void AddParam(double param);
+	void AddFlag(int flag);
 	void AddIntArray(int * addArray, int arraySize);
+	void AddDoubleArray(double * addArray, int arraySize);
+
 	void ClearParams();
+	void ClearFlags();
 	void ClearIntArray();
+	void ClearDoubleArray();
 
 	int GetParamsSize();
+	int GetFlagsSize();
 	int GetNumIntArrays();
-	int GetIntArraySize();
+	int GetNumDoubleArrays();
+	
+	double GetParam(size_t index);
+	int GetFlag(size_t index);
+	int * GetIntArray(size_t index);
+	int GetIntArraySize(size_t index);
+	double * GetDoubleArray(size_t index);
+	int GetDoubleArraySize(size_t index);
 
 	void SetDisabled(bool disable);
 	bool GetDisabled();
 
-	double GetParam(size_t index);
-	int * GetIntArray(size_t index);
-	int GetIntArraySize(size_t index);
-
-	void AddFlag(int flag);
-	void ClearFlags();
-	int GetFlagsSize();
-	double GetFlag(size_t index);
 
 	int GetEditType();
 	void SetEditType(int editType);
@@ -46,6 +51,7 @@ public :
 	wxString GetEditTag();
 
 	enum EditType {
+		UNDEFINED,
 		SHIFT_BRIGHTNESS,
 		SCALE_BRIGHTNESS,
 		ADJUST_CONTRAST,
@@ -76,6 +82,9 @@ private:
 
 	wxVector<int*> intArrays;
 	wxVector<int> intArraySizes;
+
+	wxVector<double*> doubleArrays;
+	wxVector<int> doubleArraySizes;
 
 	bool doMultithread;
 	int numThread;
