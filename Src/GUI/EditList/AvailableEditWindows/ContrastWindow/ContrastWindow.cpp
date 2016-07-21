@@ -63,7 +63,6 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 
 	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
-	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ContrastWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
