@@ -13,8 +13,8 @@ wxString ImageHandler::imageOpenDialogList =
 	ImageHandler::jpegFileDialogList + "|" + 
 	ImageHandler::pngFileDialogList + "|" + 
 	ImageHandler::bmpFileDialogList + "|" + 
-	ImageHandler::tiffFileDialogList + "|";
-
+	ImageHandler::tiffFileDialogList;
+	
 void ImageHandler::LoadImageFromFile(wxString fileName, Image * image) {
 
 	wxImage fileImage(fileName);
