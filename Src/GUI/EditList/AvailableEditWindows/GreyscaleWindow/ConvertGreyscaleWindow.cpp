@@ -66,7 +66,6 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 
 	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
-	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnCombo, this);
 
@@ -167,4 +166,5 @@ void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		blueBrightSlider->SetValue(edit->GetParam(2));
 	}
 	
+	this->SetUpdated(true);
 }

@@ -61,9 +61,8 @@ ShiftBrightnessWindow::ShiftBrightnessWindow(wxWindow * parent, wxString editNam
 	proc = processor;
 	parWindow = parent;
 
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ShiftBrightnessWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ShiftBrightnessWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
@@ -71,12 +70,15 @@ ShiftBrightnessWindow::ShiftBrightnessWindow(wxWindow * parent, wxString editNam
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
+
+	this->StartWatchdog();
 }
 
 void ShiftBrightnessWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+	this->SetUpdated(false);
 }
 
 void ShiftBrightnessWindow::AddEditToProcessor() {
@@ -101,5 +103,5 @@ void ShiftBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){
 		greenBrightSlider->SetValue(edit->GetParam(2));
 		blueBrightSlider->SetValue(edit->GetParam(3));
 	}
-
+	this->SetUpdated(true);
 }

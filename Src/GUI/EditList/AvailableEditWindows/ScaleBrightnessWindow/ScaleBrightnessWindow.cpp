@@ -61,9 +61,8 @@ ScaleBrightnessWindow::ScaleBrightnessWindow(wxWindow * parent, wxString editNam
 	proc = processor;
 	parWindow = parent;
 
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ScaleBrightnessWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ScaleBrightnessWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ScaleBrightnessWindow::Process, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ScaleBrightnessWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ScaleBrightnessWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ScaleBrightnessWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
@@ -71,12 +70,14 @@ ScaleBrightnessWindow::ScaleBrightnessWindow(wxWindow * parent, wxString editNam
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
+	this->StartWatchdog();
 }
 
 void ScaleBrightnessWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+	this->SetUpdated(false);
 }
 
 void ScaleBrightnessWindow::AddEditToProcessor() {
@@ -102,4 +103,5 @@ void ScaleBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){
 		greenBrightSlider->SetValue(edit->GetParam(2));
 		blueBrightSlider->SetValue(edit->GetParam(3));
 	}
+	this->SetUpdated(true);
 }

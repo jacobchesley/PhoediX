@@ -76,9 +76,8 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	proc = processor;
 	parWindow = parent;
 
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&RotationWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&RotationWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RotationWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RotationWindow::OnCombo, this);
 
@@ -90,12 +89,15 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
+
+	this->StartWatchdog();
 }
 
 void RotationWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(parWindow, evt);
+	this->SetUpdated(false);
 }
 
 void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
@@ -118,6 +120,7 @@ void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 	}
 	this->Refresh();
 	this->Update();
+	this->SetUpdated(true);
 }
 
 void RotationWindow::AddEditToProcessor() {
@@ -128,24 +131,40 @@ void RotationWindow::AddEditToProcessor() {
 	
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_NONE);
 		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(rotateEdit);
 	}
 
 	else if (rotationSelection == 1) {
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_90_CW);
 		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(rotateEdit);
 	}
 
 	else if (rotationSelection == 2) {
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_180);
 		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(rotateEdit);
 	}
 
 	else if (rotationSelection == 3) {
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_270_CW);
 		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
 		proc->AddEdit(rotateEdit);
 	}
 
@@ -226,5 +245,5 @@ void RotationWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 		customRotationSlider->SetValue(edit->GetParam(0));
 	}
-
+	this->SetUpdated(true);
 }
