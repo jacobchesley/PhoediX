@@ -131,7 +131,6 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 
 	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
-	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
 
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ChannelTransformWindow::PresetChange, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ChannelTransformWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
