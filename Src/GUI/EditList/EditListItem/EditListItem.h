@@ -42,6 +42,7 @@ public:
 	void SetSequence(size_t Sequence);
 	int GetSequence();
 
+	void SetDisabled(bool disable);
 	bool GetDisabled();
 
 private:

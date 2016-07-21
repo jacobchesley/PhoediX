@@ -102,6 +102,18 @@ bool EditListItem::GetDisabled() {
 	return isDisabled;
 }
 
+void EditListItem::SetDisabled(bool disabled){
+
+	if (disabled) {
+		titleText->SetForegroundColour(Colors::TextGrey);
+		isDisabled = true;
+	}
+	else {
+		titleText->SetForegroundColour(Colors::TextWhite);
+		isDisabled = false;
+	}
+}
+
 void EditListItem::OnOpenEdit(wxCommandEvent& WXUNUSED(event)) {
 	if (editWin != NULL) {
 		PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editWin).Show();
@@ -130,12 +142,10 @@ void EditListItem::OnDelete(wxCommandEvent& WXUNUSED(event)) {
 void EditListItem::OnDisable(wxCommandEvent& WXUNUSED(event)) {
 
 	if (isDisabled) {
-		titleText->SetForegroundColour(Colors::TextWhite);
-		isDisabled = false;
+		this->SetDisabled(false);
 	}
 	else {
-		titleText->SetForegroundColour(Colors::TextGrey);
-		isDisabled = true;
+		this->SetDisabled(true);
 	}
 
 	wxCommandEvent evt(EDIT_DISABLE_EVENT, ID_EDIT_DISABLE);
