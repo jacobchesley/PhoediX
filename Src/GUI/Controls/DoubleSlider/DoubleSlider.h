@@ -19,6 +19,7 @@ public:
 	void HideMinMax();
 	void ShowVal();
 	void HideVal();
+	void SetId(wxWindowID id);
 
 	void SetBackgroundColour(wxColor newColor);
 	void SetForegroundColour(wxColor newColor);
@@ -41,7 +42,6 @@ public:
 private:
 
 	void OnSlide(wxCommandEvent& slideEvt);
-	void OnText(wxCommandEvent& textEvt);
 	void OnTextEnter(wxCommandEvent& textEvt);
 	void ResizeValueText();
 

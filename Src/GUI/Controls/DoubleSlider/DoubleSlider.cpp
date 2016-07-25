@@ -29,7 +29,6 @@ DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, dou
 
 	this->Bind(wxEVT_SLIDER, (wxObjectEventFunction)&DoubleSlider::OnSlide, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&DoubleSlider::OnTextEnter, this);
-	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&DoubleSlider::OnText, this);
 
 	this->SetValue(initVal);
 
@@ -194,24 +193,6 @@ void DoubleSlider::OnSlide(wxCommandEvent& slideEvt) {
 	slideEvt.Skip();
 }
 
-void DoubleSlider::OnText(wxCommandEvent& textEvt) {
-
-	if (firedFromSetValue) { return; }
-
-	// Get the current value text
-	wxString strVal = valText->GetValue();
-	double val;
-	strVal.ToDouble(&val);
-
-	// Position the slider based on the new text
-	this->SetValue(val);
-
-	// Fit the value text control with the text
-	this->ResizeValueText();
-
-	textEvt.Skip();
-}
-
 void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
 
 	// Get the current value text
@@ -253,15 +234,14 @@ void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
 void DoubleSlider::ResizeValueText() {
 
 	// Get the width of the text of the value text, so we can size it correctly
-	wxClientDC valDc(valText);
 	wxString valStr = valText->GetValue();
 	wxCoord textWidth = 0;
 	wxCoord textHeight = 0;
-	valDc.GetTextExtent(valStr, &textWidth, &textHeight);
+	valText->GetTextExtent(valStr, &textWidth, &textHeight);
 
 	// Resize the value text with the current text size
 	valText->SetMinSize(wxSize(textWidth + 10, textHeight));
-	valText->Layout();
+	valText->Refresh();
 }
 
 void DoubleSlider::ShowMinMax() {
@@ -318,4 +298,8 @@ void DoubleSlider::SetValue(double newVal) {
 
 	// Fit the value text control with the text
 	this->ResizeValueText();
+}
+
+void DoubleSlider::SetId(wxWindowID id) {
+	slide->SetId(id);
 }
