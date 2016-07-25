@@ -1,15 +1,14 @@
 #include "curvespanel.h"
 
-CurvePanel::CurvePanel(wxWindow * Parent, int Channel, int x, int y, int width, int height)
-	:wxPanel(Parent, -1, wxPoint(x, y), wxSize(width, height)) {
+CurvePanel::CurvePanel(wxWindow * Parent, int Channel)
+	:wxPanel(Parent) {
 
+	this->SetMinSize(wxSize(50, 50));
 	curvePaddingSize = 7;
 	channelColor = Channel;
 
 	// Create a spline with 1000  points between each control point
 	displayCurve = new Spline(1000, true);
-
-	wxSize curSize = this->GetClientSize();
 
 	// add the left and right control points
 	displayCurve->AddPoint(0.0, 1.0);
@@ -193,10 +192,8 @@ void CurvePanel::RightClick(wxMouseEvent& evt) {
 	evt.Skip(false);
 }
 
-void CurvePanel::OnSize(wxSizeEvent& evt) {
-
+void CurvePanel::OnSize(wxSizeEvent& WXUNUSED(evt)) {
 	PaintNow();
-	evt.Skip();
 }
 
 void CurvePanel::PaintEvent(wxPaintEvent& evt) {
@@ -376,8 +373,8 @@ std::vector<Point> CurvePanel::ClipCurve(std::vector<Point> Points) {
 std::vector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 
 
-	splineCurve = new Spline(numSteps * 3, true);
 	std::vector<Point> controlPoints = displayCurve->GetControlPoints();
+	splineCurve = new Spline(numSteps * 2, true);
 
 	for (int i = 0; i < (int)controlPoints.size(); i++) {
 		splineCurve->AddPoint(controlPoints[i].x, controlPoints[i].y);
@@ -420,7 +417,15 @@ std::vector<Point> CurvePanel::GetControlPoints(){
 }
 
 void CurvePanel::SetControlPoints(std::vector<Point> newPoints) {
+	delete displayCurve;
+	displayCurve = NULL;
+	displayCurve = new Spline(1000, true);
 
+	for(size_t i = 0; i < newPoints.size(); i++){
+		displayCurve->AddPoint(newPoints[i].id, newPoints[i].x, newPoints[i].y);
+	}
+
+	this->PaintNow();
 }
 
 void CurvePanel::DestroySpline() {

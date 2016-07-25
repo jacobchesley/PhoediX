@@ -33,12 +33,12 @@ public:
 	Spline * splineCurve;
 	Spline * displayCurve;
 
-	CurvePanel(wxWindow * Parent, int Channel, int x, int y, int width, int height);
+	CurvePanel(wxWindow * Parent, int Channel);
 	~CurvePanel();
 	void RightClick(wxMouseEvent& evt);
 	void LeftClick(wxMouseEvent& evt);
 	void PaintEvent(wxPaintEvent& evt);
-	void OnSize(wxSizeEvent& evt);
+	void OnSize(wxSizeEvent& WXUNUSED(evt));
 	void Render(wxDC& dc);
 	void PaintNow();
 	void DestroySpline();
