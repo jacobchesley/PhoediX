@@ -70,11 +70,19 @@ public:
 
 	void SetOriginalImage(Image * newOriginalImage);
 	Image* GetOriginalImage();
-	void RevertToOriginalImage();
+	void RevertToOriginalImage(bool skipUpdate = false);
 
 	void SetUpdated(bool updated);
 	bool GetUpdated();
 	bool RawImageGood();
+
+	void LockRaw();
+	void UnlockRaw();
+	bool GetLockedRaw();
+
+	wxString GetRawFilePath();
+	void SetRawFilePath(wxString path);
+	void UnpackAndProcessRaw();
 
 	void Lock();
 	void Unlock();
@@ -87,6 +95,9 @@ public:
 	void DeleteRawImage();
 	int GetRawError();
 
+	void SetDoFitImage(bool fit);
+	bool GetDoFitImage();
+
 	enum RotationCropping{
 		KEEP_SIZE,
 		FIT,
@@ -96,17 +107,25 @@ public:
 	LibRaw rawPrcoessor;
 	libraw_processed_image_t * rawImage;
 
+protected:
+	bool forceStop;
 private:
+
+	bool rawImageGood;
+	int rawErrorCode;
+	wxString rawFilePath;
 
 	Image * img;
 	Image * originalImg;
 
 	bool didUpdate;
-	bool rawImageGood;
-	int rawErrorCode;
+	bool doFitImage;
 
-	wxCriticalSection lock;
+	wxCriticalSection lockCritical;
+	wxCriticalSection lockRawCritical;
 	bool locked;
+	bool lockedRaw;
+
 	static double pi;
 
 	wxWindow * parWindow;
@@ -144,12 +163,13 @@ private:
 	void SendMessageToParent(wxString message);
 
 	wxVector<ProcessorEdit*> editListInternal;
-
+	
 	class ProcessThread : public wxThread {
 
 		public:
 			ProcessThread(Processor * processor, ProcessorEdit * edit);
 			ProcessThread(Processor * processor, wxVector<ProcessorEdit*> edits);
+			void Terminate();
 
 		protected:
 			virtual ExitCode Entry();
@@ -157,19 +177,23 @@ private:
 		private:
 			Processor * procParent;
 			wxVector<ProcessorEdit*> editVec;
+			bool terminated;
 	};
 
 	class RawProcessThread : public wxThread {
 
 		public:
-			RawProcessThread(Processor * processorPar);
+			RawProcessThread(Processor * processorPar, bool unpackAndProcess = false);
 
 		protected:
 			virtual ExitCode Entry();
 
 		private:
 			Processor * processor;
+			bool unpackProcess;
 	};
+
+	ProcessThread* processThread;
 
 };
 

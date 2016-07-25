@@ -6,11 +6,16 @@ double Processor::pi = 3.141592653589793238463;
 
 Processor::Processor(wxWindow * parent) {
 	img = new Image();
+	originalImg = NULL;
 	didUpdate = false;
 	locked = false;
 	parWindow = parent;
 	rawImage = NULL;
 	rawImageGood = false;
+	doFitImage = false;
+	processThread = NULL;
+	forceStop = false;
+	lockedRaw = false;
 }
 
 Processor::~Processor() {
@@ -33,11 +38,14 @@ Image* Processor::GetOriginalImage() {
 	return originalImg;
 }
 
-void  Processor::RevertToOriginalImage() {
+void  Processor::RevertToOriginalImage(bool skipUpdate) {
 
 	delete img;
+	img = NULL;
 	img = new Image(*originalImg);
-	didUpdate = true;
+	if(!skipUpdate){
+		didUpdate = true;
+	}
 }
 
 void Processor::AddEdit(ProcessorEdit * edit) {
@@ -87,23 +95,45 @@ void Processor::ProcessEdit(ProcessorEdit * edit) {
 
 void Processor::ProcessEdits(wxVector<ProcessorEdit*> editList) {
 
-	//if (this->GetLocked()) { return; }
-	ProcessThread * procThread = new ProcessThread(this, editList);
-	procThread->Run();
-	procThread->SetPriority(85);
+	this->forceStop = true;
+	this->didUpdate = false;
+	processThread = new ProcessThread(this, editList);
+	this->forceStop = false;
+	processThread->Run();
+	processThread->SetPriority(95);
+
+	if(editList.size() < 1){ 
+		this->didUpdate = true;
+	}
+
 }
 
 void Processor::ProcessRaw(){
+	if (this->GetLockedRaw()) {
+		return;
+	}
+	this->forceStop = true;
 	RawProcessThread * rawProcThread = new RawProcessThread(this);
 	rawProcThread->Run();
-	rawProcThread->SetPriority(85);
+	rawProcThread->SetPriority(95);
+	this->forceStop = false;
+}
 
+void Processor::UnpackAndProcessRaw() {
+	if (this->GetLockedRaw()) {
+		return;
+	}
+	this->forceStop = true;
+	RawProcessThread * rawProcThread = new RawProcessThread(this, true);
+	rawProcThread->Run();
+	rawProcThread->SetPriority(95);
+	this->forceStop = false;
 }
 
 void Processor::DeleteRawImage(){
 	rawImageGood = false;
 	rawPrcoessor.dcraw_clear_mem(rawImage);
-	delete rawImage;
+	//delete rawImage;
 	rawImage = NULL;
 }
 
@@ -116,24 +146,43 @@ int Processor::GetRawError(){
 }
 
 void Processor::Lock() {
-	{
-		//wxCriticalSectionLocker locker(lock);
-		locked = true;
-	}
+
+	lockCritical.Enter();
+	locked = true;
+	
 }
 
 void Processor::Unlock() {
-	{
-		//wxCriticalSectionLocker locker(lock);
-		locked = false;
-	}
+	locked = false;
+	lockCritical.Leave();
 }
 
 bool Processor::GetLocked() {
-	{
-		wxCriticalSectionLocker locker(lock);
-		return locked;
-	}
+	return locked;
+}
+
+void Processor::LockRaw() {
+
+	lockRawCritical.Enter();
+	lockedRaw = true;
+}
+
+void Processor::UnlockRaw() {
+
+	lockedRaw = false;
+	lockRawCritical.Leave();
+}
+
+bool Processor::GetLockedRaw() {
+	return lockedRaw;
+}
+
+void Processor::SetRawFilePath(wxString path) {
+	rawFilePath = path;
+}
+
+wxString Processor::GetRawFilePath() {
+	return rawFilePath;
 }
 
 void Processor::SetUpdated(bool updated) {
@@ -142,6 +191,14 @@ void Processor::SetUpdated(bool updated) {
 
 bool Processor::GetUpdated() {
 	return didUpdate;
+}
+
+void Processor::SetDoFitImage(bool fit) {
+	doFitImage = fit;
+}
+
+bool Processor::GetDoFitImage() {
+	return doFitImage;
 }
 
 void Processor::SendMessageToParent(wxString message) {
@@ -175,6 +232,9 @@ void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outp
 
 	// Compute the histogram for red, green, blue and grey
 	for (int i = 0; i < dataSize; i++) {
+
+		if (forceStop) { return; }
+
 		outputHistogramRed[redData8[i]] += 1;
 		outputHistogramGreen[greenData8[i]] += 1;
 		outputHistogramBlue[blueData8[i]] += 1;
@@ -206,6 +266,8 @@ void Processor::Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * out
 
 	// Compute the histogram for red, green, blue and grey
 	for (int i = 0; i < dataSize; i++) {
+
+		if (forceStop) { return; }
 		outputHistogramRed[redData16[i]] += 1;
 		outputHistogramGreen[greenData16[i]] += 1;
 		outputHistogramBlue[blueData16[i]] += 1;
@@ -246,6 +308,7 @@ void Processor::ShiftBrightness(double all, double red, double green, double blu
 
 	for (int i = dataStart; i < dataEnd; i++) {
 
+		if(forceStop) { return; }
 		// Get red, green and blue temporary pixels
 		tempRed = redData8[i];
 		tempGreen = greenData8[i];
@@ -286,6 +349,8 @@ void Processor::ShiftBrightness(double all, double red, double green, double blu
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Get red, green and blue temporary pixels
 			tempRed = redData16[i];
@@ -335,6 +400,8 @@ void Processor::ScaleBrightness(double all, double red, double green, double blu
 
 	for (int i = dataStart; i < dataEnd; i++) {
 
+		if(forceStop) { return; }
+
 		// Get red, green and blue temporary pixels
 		tempRed = redData8[i];
 		tempGreen = greenData8[i];
@@ -369,6 +436,8 @@ void Processor::ScaleBrightness(double all, double red, double green, double blu
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Get red, green and blue temporary pixels
 			tempRed = redData16[i];
@@ -418,6 +487,8 @@ void Processor::AdjustContrast(double allContrast, double redContrast, double gr
 
 	for (int i = dataStart; i < dataEnd; i++) {
 
+		if(forceStop) { return; }
+
 		// Perform whole contrast on red, green and blue
 		tempRed = (allContrast * (redData8[i] - 128)) + 128;
 		tempGreen = (allContrast * (greenData8[i] - 128)) + 128;
@@ -452,6 +523,8 @@ void Processor::AdjustContrast(double allContrast, double redContrast, double gr
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Perform whole contrast on red, green and blue
 			tempRed = (allContrast * (redData16[i] - 32768)) + 32768;
@@ -499,6 +572,8 @@ void Processor::ConvertGreyscale(double redScale, double greenScale, double blue
 
 	for (int i = dataStart; i < dataEnd; i++) {
 
+		if(forceStop) { return; }
+
 		// Perform greyscale conversion
 		tempGrey = (redScale * (redData8[i])) + (greenScale * (greenData8[i])) + (blueScale * (blueData8[i]));
 
@@ -521,6 +596,8 @@ void Processor::ConvertGreyscale(double redScale, double greenScale, double blue
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Perform greyscale conversion
 			tempGrey = (redScale * (redData16[i])) + (greenScale * (greenData16[i])) + (blueScale * (blueData16[i]));
@@ -560,6 +637,8 @@ void Processor::ChannelScale(double redRedScale, double redGreenScale, double re
 
 	for (int i = dataStart; i < dataEnd; i++) {
 
+		if(forceStop) { return; }
+
 		// Perform transform
 		tempRed = (redRedScale * (redData8[i])) + (redGreenScale * (greenData8[i])) + (redBlueScale * (blueData8[i]));
 		tempGreen = (greenRedScale * (redData8[i])) + (greenGreenScale * (greenData8[i])) + (greenBlueScale * (blueData8[i]));
@@ -589,6 +668,8 @@ void Processor::ChannelScale(double redRedScale, double redGreenScale, double re
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Perform transform
 			tempRed = (redRedScale * (redData16[i])) + (redGreenScale * (greenData16[i])) + (redBlueScale * (blueData16[i]));
@@ -629,6 +710,8 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 	int32_t tempBlue;
 
 	for (int i = 0; i < dataSize; i++) {
+
+		if(forceStop) { return; }
 
 		// Apply red curve and bright curve to red channel
 		tempRed = redCurve8[redData8[i]];
@@ -673,6 +756,8 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 
 		for (int i = 0; i < dataSize; i++) {
 
+			if(forceStop) { return; }
+
 			// Apply red curve and bright curve to red channel
 			tempRed = redCurve16[redData16[i]];
 			tempRed = (tempRed > 65535) ? 65535: tempRed;
@@ -711,6 +796,13 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int colorSpace){
 
 	int numSteps = 65535;
+	int * lCurve16Copy = new int[numSteps];
+	int * aCurve16Copy = new int[numSteps];
+	int * bCurve16Copy = new int[numSteps];
+	memcpy(lCurve16Copy, lCurve16, numSteps * sizeof(int));
+	memcpy(aCurve16Copy, aCurve16, numSteps * sizeof(int));
+	memcpy(bCurve16Copy, bCurve16, numSteps * sizeof(int));
+
 	int width = img->GetWidth();
 	int height = img->GetHeight();
 	int dataSize = width * height;
@@ -738,6 +830,8 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 
 	for (int i = 0; i < dataSize; i++) {
 
+		if(forceStop) { return; }
+
 		// Convert RGB to LAB color space
 		rgb.R = (float)redData8[i] / 256.0;
 		rgb.G = (float)greenData8[i] / 256.0;
@@ -751,9 +845,10 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 		bScale = ((lab.B + 128.0f)/256.0f) * numSteps;
 
 		// Apply LAB Curve
-		newL = lCurve16[lScale];
-		newA = aCurve16[aScale];
-		newB = bCurve16[bScale];
+		//if(lCurve16 == NULL || aCurve16 == NULL || bCurve16 == NULL){ return; }
+		newL = lCurve16Copy[lScale];
+		newA = aCurve16Copy[aScale];
+		newB = bCurve16Copy[bScale];
 
 		// Scale LAB back
 		lab.L = (float)(newL / (float)numSteps);
@@ -798,6 +893,8 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Convert RGB to LAB color space
 			rgb.R = (float)redData16[i] / 65535.0;
@@ -875,6 +972,8 @@ void Processor::Rotate90CW() {
 
 	for (int i = 0; i < dataSize; i++) {
 
+		if(forceStop) { return; }
+
 		// Get x and y coordinates from current index of data
 		x = i % width;
 		y = i / width;
@@ -898,6 +997,8 @@ void Processor::Rotate90CW() {
 		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Get x and y coordinates from current index of data
 			x = i % width;
@@ -934,6 +1035,8 @@ void Processor::Rotate180() {
 
 	for (int i = 0; i < dataSize; i++) {
 
+		if(forceStop) { return; }
+
 		redData8[i] = redData8Dup[dataSize - i - 1];
 		greenData8[i] = greenData8Dup[dataSize - i - 1];
 		blueData8[i] = blueData8Dup[dataSize - i - 1];
@@ -952,6 +1055,8 @@ void Processor::Rotate180() {
 		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			redData16[i] = redData16Dup[dataSize - i - 1];
 			greenData16[i] = greenData16Dup[dataSize - i - 1];
@@ -1018,6 +1123,8 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 	int newI = 0;
 	for (int i = 0; i < newDataSize; i++) {
 
+		if(forceStop) { return; }
+
 		// Get x and y coordinates from current index of data
 		x = i % newWidth;
 		y = i / newWidth;
@@ -1074,6 +1181,8 @@ void Processor::RotateCustom(double angleDegrees, int crop) {
 		}
 
 		for (int i = 0; i < newDataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Get x and y coordinates from current index of data
 			x = i % newWidth;
@@ -1201,6 +1310,8 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 	double weightSum = 1.0;
 
 	for (int i = 0; i < newDataSize; i++) {
+
+		if(forceStop) { return; }
 
 		// Get x and y coordinates from current index of data
 		x = i % newWidth;
@@ -1337,6 +1448,8 @@ void Processor::RotateCustomBilinear(double angleDegrees, int crop) {
 		uint16_t * blueData16Dup = rotatedImage->Get16BitDataBlue();
 
 		for (int i = 0; i < newDataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Get x and y coordinates from current index of data
 			x = i % newWidth;
@@ -1549,6 +1662,8 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 	double weightSum = 1.0;
 
 	for (int i = 0; i < newDataSize; i++) {
+
+		if(forceStop) { return; }
 
 		// Get x and y coordinates from current index of data
 		x = i % newWidth;
@@ -1828,6 +1943,8 @@ void Processor::RotateCustomBicubic(double angleDegrees, int crop) {
 		uint16_t * blueData16Dup = rotatedImage->Get16BitDataBlue();
 
 		for (int i = 0; i < newDataSize; i++) {
+
+			if(forceStop) { return; }
 
 			// Get x and y coordinates from current index of data
 			x = i % newWidth;
@@ -2252,6 +2369,8 @@ void Processor::MirrorHorizontal() {
 	int newI = 0;
 	for (int i = 0; i < dataSize; i++) {
 
+		if(forceStop) { return; }
+
 		x = i % width;
 		y = i / width;
 		newI = (y * width) + (width - x);
@@ -2280,6 +2399,8 @@ void Processor::MirrorHorizontal() {
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			x = i % width;
 			y = i / width;
@@ -2326,6 +2447,8 @@ void Processor::MirrorVertical() {
 	int newI = 0;
 	for (int i = 0; i < dataSize; i++) {
 
+		if(forceStop) { return; }
+
 		x = i % width;
 		y = i / width;
 		newI = (width *(height - y)) + x;
@@ -2354,6 +2477,8 @@ void Processor::MirrorVertical() {
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
 		for (int i = 0; i < dataSize; i++) {
+
+			if(forceStop) { return; }
 
 			x = i % width;
 			y = i / width;
@@ -2559,20 +2684,31 @@ void Processor::LABtoXYZ(LAB * lab, XYZ * xyz) {
 Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
 	editVec.push_back(edit);
+	terminated = false;
 }
 
 Processor::ProcessThread::ProcessThread(Processor * processor, wxVector<ProcessorEdit*> edits) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
 	editVec = edits;
+	terminated = false;
+}
+
+void Processor::ProcessThread::Terminate(){
+	terminated = true;
 }
 
 wxThread::ExitCode Processor::ProcessThread::Entry() {
 
-	while (procParent->GetLocked()) {
-		this->Sleep(50);
+	while (procParent->GetLocked() && !terminated) {
+		this->Sleep(20);
 	}
+
+	while (procParent->GetLockedRaw()) {
+		this->Sleep(20);
+	}
+
 	procParent->Lock();
-	procParent->RevertToOriginalImage();
+	procParent->RevertToOriginalImage(true);
 
 	size_t numEdits = editVec.size();
 	wxString numEditsStr;
@@ -2581,6 +2717,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	// Go through each edit one by one.  Each of these will invoke at least 1 child thread for the edit itself
 	for (size_t editIndex = 0; editIndex < numEdits; editIndex++) {
 
+		// Exit thread if terminated
+
+		if(terminated){ return 0; } 
 		// Get the next edit to take place
 		ProcessorEdit * curEdit = editVec.at(editIndex);
 
@@ -2860,12 +2999,29 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	return (wxThread::ExitCode)0;
 }
 
-Processor::RawProcessThread::RawProcessThread(Processor * processorPar) : wxThread(wxTHREAD_DETACHED) {
+Processor::RawProcessThread::RawProcessThread(Processor * processorPar, bool unpackAndProcess) : wxThread(wxTHREAD_DETACHED) {
 	processor = processorPar;
+	unpackProcess = unpackAndProcess;
 }
 
 wxThread::ExitCode Processor::RawProcessThread::Entry() {
 
+	if (unpackProcess) {
+		while (processor->GetLockedRaw()) {
+			this->Sleep(20);
+		}
+		processor->LockRaw();
+		processor->SendMessageToParent("Unpacking Raw File");
+		processor->rawPrcoessor.unpack();
+		processor->UnlockRaw();
+		processor->ProcessRaw();
+		return 0;
+	}
+
+	if (processor->GetLockedRaw()) {
+		return 0;
+	}
+	processor->LockRaw();
 	// process the raw image
 	processor->SendMessageToParent("RAW Image Processing");
 	processor->rawErrorCode = processor->rawPrcoessor.dcraw_process();
@@ -2877,7 +3033,8 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		errorName << processor->rawErrorCode;
 
 		processor->SendMessageToParent("RAW Image processing failed: " + errorName);
-		return (wxThread::ExitCode)0;
+		processor->UnlockRaw();
+		return 0;
 	}
 
 	// Create the raw image
@@ -2887,19 +3044,26 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	// Set rawImageGood on processor if success
 	if(processor->rawErrorCode == LIBRAW_SUCCESS){
 
+		
 		processor->SendMessageToParent("Updating Display");
 		processor->rawImageGood = true;
-
+		
+		while(processor->GetLocked()){
+			this->Sleep(20);
+		}
 		processor->Lock();
-		//delete processor->GetOriginalImage();
 		ImageHandler::CopyImageFromRaw(processor->rawImage, processor->GetImage());
+		delete processor->GetOriginalImage();
 		processor->SetOriginalImage(processor->GetImage());
 		processor->SetUpdated(true);
 		processor->Unlock();
+		processor->DeleteRawImage();
+		processor->SendMessageToParent("");
+		
 	}
 	else{
 		
 	}
-
+	processor->UnlockRaw();
 	return (wxThread::ExitCode)0;
 }
