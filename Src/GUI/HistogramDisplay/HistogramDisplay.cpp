@@ -276,7 +276,7 @@ void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
 				if (blueHistogram->GetBlue(i, j) > 0) { blueMix = blueHistogram->GetBlue(i, j); }
 				allHistogram->SetRGB(i, j, redMix, greenMix, blueMix);
 
-				if(greyHistogram->GetRed(i, j) > 0 > 0 && greyHistogram->GetGreen(i, j) > 0 && greyHistogram->GetBlue(i, j) > 0){
+				if(greyHistogram->GetRed(i, j) > 0 && greyHistogram->GetGreen(i, j) > 0 && greyHistogram->GetBlue(i, j) > 0){
 					redMix = greyHistogram->GetRed(i, j);
 					greenMix = greyHistogram->GetGreen(i, j);
 					blueMix = greyHistogram->GetBlue(i, j);
