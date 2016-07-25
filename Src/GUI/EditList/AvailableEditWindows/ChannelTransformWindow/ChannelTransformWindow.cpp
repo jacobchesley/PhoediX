@@ -20,7 +20,10 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 	presetLabel = new wxStaticText(this, -1, "Preset");
 	presetLabel->SetForegroundColour(Colors::TextLightGrey);
 
+
 	presetBox = new wxComboBox(this, -1);
+	presetBox->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	presetBox->SetForegroundColour(Colors::TextLightGrey);
 
 	presetSizer->Add(presetLabel);
 	presetSizer->AddSpacer(15);
@@ -110,7 +113,10 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 	blueGridSizer->Add(blueBlueLabel);
 	blueGridSizer->Add(blueBlueSlider);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits");
+	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	processButton->SetForegroundColour(Colors::TextLightGrey);
+	processButton->SetBackgroundColour(Colors::BackGrey);
+	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(20);

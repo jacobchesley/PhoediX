@@ -38,6 +38,7 @@ public:
 	void Process(wxCommandEvent& WXUNUSED(event));
 
 	void AddEditToProcessor();
+	void SetParamsAndFlags(ProcessorEdit * edit);
 };
 
 #endif

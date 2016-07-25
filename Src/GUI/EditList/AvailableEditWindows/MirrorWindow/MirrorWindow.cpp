@@ -23,7 +23,10 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 	mirrorMethod->AppendString("Mirror Vertical");
 	mirrorMethod->SetSelection(0);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits");
+	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	processButton->SetForegroundColour(Colors::TextLightGrey);
+	processButton->SetBackgroundColour(Colors::BackGrey);
+	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	mirrorMethod->SetBackgroundColour(this->GetBackgroundColour());
 	mirrorMethod->SetForegroundColour(Colors::TextLightGrey);

@@ -32,7 +32,10 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 	greenContrastSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	blueContrastSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits");
+	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	processButton->SetForegroundColour(Colors::TextLightGrey);
+	processButton->SetBackgroundColour(Colors::BackGrey);
+	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	allContrastSlider->SetForegroundColour(Colors::TextLightGrey);
 	allContrastSlider->SetBackgroundColour(parent->GetBackgroundColour());

@@ -35,9 +35,12 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	greenBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	blueBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits");
+	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	processButton->SetForegroundColour(Colors::TextLightGrey);
+	processButton->SetBackgroundColour(Colors::BackGrey);
+	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	greyscaleMethod->SetBackgroundColour(this->GetBackgroundColour());
+	greyscaleMethod->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	greyscaleMethod->SetForegroundColour(Colors::TextLightGrey);
 	redBrightSlider->SetForegroundColour(Colors::TextLightGrey);
 	redBrightSlider->SetBackgroundColour(parent->GetBackgroundColour());
