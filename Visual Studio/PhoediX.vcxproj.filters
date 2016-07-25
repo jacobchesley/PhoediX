@@ -121,6 +121,9 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Raw">
       <UniqueIdentifier>{8de73d20-78a0-4a56-a5bb-10d10712ccde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Controls\Collapsible Pane">
+      <UniqueIdentifier>{f3c07118-e513-4793-be0c-5a4b6f8d3a6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -224,6 +227,9 @@
     </ClCompile>
     <ClCompile Include="..\src\GUI\EditList\AvailableEditWindows\RawWindow\RawWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.cpp">
+      <Filter>GUI\Controls\Collapsible Pane</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +349,9 @@
     </ClInclude>
     <ClInclude Include="..\src\GUI\Icons\disable_button.h">
       <Filter>GUI\Icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.h">
+      <Filter>GUI\Controls\Collapsible Pane</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

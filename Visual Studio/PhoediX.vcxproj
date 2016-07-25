@@ -38,6 +38,7 @@
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
     <ClCompile Include="..\Src\GUI\AUI Manager\AUIManager.cpp" />
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
+    <ClCompile Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
     <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h" />
     <ClInclude Include="..\Src\GUI\Colors\Colors.h" />
+    <ClInclude Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.h" />
     <ClInclude Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.h" />
     <ClInclude Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h" />
