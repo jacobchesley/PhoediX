@@ -126,7 +126,7 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 				// Resize the flags vector to account for all parameters
 				flags.resize(numFlags);
 
-				// Get all parameters and place in correct order
+				// Get all flags and place in correct order
 				editNodeFlags = editNodeChildren->GetChildren();
 				wxString editFlagNumStr;
 				size_t flagIdx = 0;
@@ -176,7 +176,6 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 				editNodeDoubleArrays = editNodeChildren->GetChildren();
 				wxString editDoubleArrayNumStr;
 				size_t arrayIdx = 0;
-				int doubleArray = 0;
 				while (editNodeDoubleArrays) {
 
 					// Get array number
@@ -192,12 +191,14 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 					// Create and populate double array
 					double * newDoubleArray = new double[numElements];
 					doubleArraySizes[arrayIdx] = numElements;
-					for (int i = 0; i < numElements; i++) {
+					for (size_t i = 0; i < numElements; i++) {
 						arrayTokens.GetNextToken().ToDouble(&newDoubleArray[i]);
 					}
 
 					// Set double array element in vector
 					doubleArrays[arrayIdx] = newDoubleArray;
+
+					editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
 				}
 
 				// Add double arrays to new edit
