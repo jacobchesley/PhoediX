@@ -56,6 +56,7 @@ private:
 	wxMenuBar * menuBar;
 	wxMenu * menuFile;
 	wxMenu * menuView;
+	wxMenu * menuWindow;
 	wxMenu * menuHelp;
 	wxStaticText * statusBarText;
 	EditListPanel * editList;
@@ -66,6 +67,7 @@ private:
 	HistogramDisplay * histogramDisplay;
 
 	PhoediXSession session;
+
 
 	enum MenuBar {
 		ID_SHOW_LOAD_PROJECT,

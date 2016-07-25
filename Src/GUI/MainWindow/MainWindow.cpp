@@ -8,6 +8,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	menuFile = new wxMenu;
 	menuView = new wxMenu;
+	menuWindow = new wxMenu;
 	menuHelp = new wxMenu;
 
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT, _("Open PhoediX Project"));
@@ -24,6 +25,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	// Append menus to menu bar
 	menuBar->Append(menuFile, _("&File"));
 	menuBar->Append(menuView, _("&View"));
+	menuBar->Append(menuWindow, _("&Window"));
 	menuBar->Append(menuHelp, _("&Help"));
 
 	// Set the menu bar
@@ -36,8 +38,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	statusBarText = NULL;
 	this->GetStatusBar()->SetBackgroundColour(Colors::BackDarkDarkDarkGrey);
 	this->GetStatusBar()->SetForegroundColour(Colors::TextLightGrey);
-	this->SetStatusbarText("test");
-
+	
 	processor = new Processor(this);
 
 	auiManager = new wxAuiManager(this);
@@ -92,9 +93,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor, histogramDisplay);
 	imgPanelThread->Run();
 
-	ImageHandler::LoadImageFromwxImage(new wxImage(0,0), processor->GetImage());
-	processor->SetOriginalImage(processor->GetImage());
-	
+	ImageHandler::LoadImageFromwxImage(new wxImage(0,0), processor->GetImage());	
 }
 
 void MainWindow::SetSizeProperties(){
@@ -169,12 +168,15 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 
 	// Handle Raw Image
 	if(ImageHandler::CheckRaw(openFileDialog.GetPath())){
-		editList->AddRawWindow();
+
+		this->SetStatusbarText("Opening RAW File");
 		processor->rawPrcoessor.open_file(openFileDialog.GetPath().wc_str());
+		this->SetStatusbarText("Unpacking RAW File");
 		processor->rawPrcoessor.unpack();
+		editList->AddRawWindow();
 		processor->ProcessRaw();
 		delete processor->GetOriginalImage();
-
+		processor->SetDoFitImage(true);
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images
@@ -188,9 +190,10 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 			ImageHandler::LoadImageFromFile(openFileDialog.GetPath(), processor->GetImage());
 			processor->SetOriginalImage(processor->GetImage());
 			processor->SetUpdated(true);
-
+			processor->SetDoFitImage(true);
 			// Write image path to current session
 			session.SetImageFilePath(openFileDialog.GetPath());
+			processor->SetDoFitImage(true);
 		}
 		else{
 			wxMessageDialog imageErrorDialog(this, "Error opening image: " + openFileDialog.GetPath(), "Error Opening Image", wxICON_ERROR);
@@ -252,10 +255,16 @@ MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imag
 wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 
 	while (continueWatch) {
-		if (proc->GetUpdated() && !proc->GetLocked()) {
+		if (proc->GetUpdated() && !proc->GetLocked() && !proc->GetLockedRaw()) {
 			proc->Lock();
 			imgPanel->ChangeImage(proc->GetImage());
 			imgPanel->Redraw();
+
+			if(proc->GetDoFitImage()){
+				imgPanel->FitImage();
+			}
+
+			proc->SetDoFitImage(false);
 			histogramDisp->UpdateHistograms();
 			proc->Unlock();
 			proc->SetUpdated(false);
