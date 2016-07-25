@@ -31,6 +31,7 @@ public:
 	int GetDragX();
 	int GetDragY();
 	void SetDrag(int x, int y);
+	void FitImage();
 
 private:
 

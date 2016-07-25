@@ -95,6 +95,10 @@ void ZoomImagePanel::OnZoom100(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
+	this->FitImage();
+}
+
+void ZoomImagePanel::FitImage() {
 	scroller->FitImage();
 	scroller->FitImage();
 	zoomSlider->SetValue(scroller->GetZoom()*100.0);
