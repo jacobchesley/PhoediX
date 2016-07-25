@@ -47,8 +47,10 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	this->Bind(EDIT_DISABLE_EVENT, (wxObjectEventFunction)&EditListPanel::DisableEdit, this, ID_EDIT_DISABLE);
 	this->Bind(EDIT_ADD_EVENT, (wxObjectEventFunction)&EditListPanel::AddEditToPanel, this, ID_EDIT_ADD);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageEvt, this, ID_REPROCESS_IMAGE);
-
+	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageRawEvt, this, ID_REPROCESS_IMAGE_RAW);
+	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
 	proc = processor;
+	hasRaw = false;
 
 	this->InitializeEdits();
 }
@@ -70,6 +72,14 @@ void EditListPanel::ReprocessImageEvt(wxCommandEvent& WXUNUSED(event)) {
 	this->ReprocessImage();
 }
 
+void EditListPanel::ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
+	this->ReprocessImageRaw();
+}
+
+void EditListPanel::ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
+	this->ReprocessUnpackImageRaw();
+}
+
 void EditListPanel::AddEditsToProcessor() {
 
 	// Delete the current list of internally stored edits in the processor
@@ -87,6 +97,7 @@ void EditListPanel::AddEditsToProcessor() {
 		}
 	}
 }
+
 void EditListPanel::ReprocessImage() {
 	
 	// Delete the current list of internally stored edits in the processor
@@ -94,9 +105,27 @@ void EditListPanel::ReprocessImage() {
 	
 	// Add all edits to processor
 	this->AddEditsToProcessor();
-	
+
 	// Process the edits
 	proc->ProcessEdits();
+}
+
+void EditListPanel::ReprocessImageRaw() {
+	// Process Raw if needed
+	if (hasRaw) {
+		proc->ProcessRaw();
+	}	
+
+	this->ReprocessImage();
+}
+
+void EditListPanel::ReprocessUnpackImageRaw() {
+	// Process Raw if needed
+	if (hasRaw) {
+		proc->UnpackAndProcessRaw();
+	}
+
+	this->ReprocessImage();
 }
 
 void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
@@ -211,13 +240,14 @@ void EditListPanel::AddRawWindow(){
 
 	//Move raw processor edit to top
 	int rawEditIdx = numEdits;
-	for(int i = 0; i < numEdits; i++){
+	for(size_t i = 0; i < numEdits; i++){
 		scroller->MoveEditUp(rawEditIdx);
 		rawEditIdx -= 1;
 	}
 
 	// Mark raw processor top edits as permenant.  Cannot move any edits above this one.
 	scroller->SetNumTopEdits(1);
+	hasRaw = true;
 
 }
 

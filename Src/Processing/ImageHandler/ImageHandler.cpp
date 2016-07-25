@@ -80,7 +80,6 @@ void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, Image *
 	
 		ushort width = rawImage->width;
 		ushort height = rawImage->height;
-		unsigned int size = rawImage->data_size;
 
 		// 8 bit image
 		if(rawImage->bits == 8){

@@ -1,6 +1,8 @@
 #include "EditWindow.h"
 
 wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 
 EditWindow::EditWindow(wxWindow * parent, wxString editName) : wxScrolledWindow(parent) {
 	editNme = editName;
@@ -43,7 +45,7 @@ void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 
 
 void EditWindow::StartWatchdog(){
-	watchdog = new WatchForUpdateThread(this, 250);
+	watchdog = new WatchForUpdateThread(this, 100);
 	watchdog->Run();
 	watchdog->SetPriority(2);
 }

@@ -15,10 +15,14 @@
 #include "wx\event.h"
 
 enum {
-	ID_REPROCESS_IMAGE
+	ID_REPROCESS_IMAGE,
+	ID_REPROCESS_IMAGE_RAW,
+	ID_REPROCESS_UNPACK_IMAGE_RAW
 };
 
 wxDECLARE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 
 class EditWindow : public wxScrolledWindow{
 	public:

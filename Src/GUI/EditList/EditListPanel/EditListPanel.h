@@ -31,6 +31,8 @@ public:
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
 	void ReprocessImage();
+	void ReprocessImageRaw();
+	void ReprocessUnpackImageRaw();
 
 private:
 
@@ -39,6 +41,8 @@ private:
 	void OnAddEdit(wxCommandEvent& WXUNUSED(event));
 
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
+	void ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event));
+	void ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event));
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
 	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable);
@@ -55,6 +59,7 @@ private:
 	EditSelection * editSelection;
 
 	Processor * proc;
+	bool hasRaw;
 
 	enum Buttons {
 		ADD_EDIT_BUTTON = 100

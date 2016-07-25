@@ -24,6 +24,7 @@ public:
 	void SetZoom(double zoomFactor);
 	void SetKeepAspect(bool doKeepAspect);
 
+
 private:
 	void OnPaint(wxPaintEvent & evt);
 	void OnSize(wxSizeEvent& event);
