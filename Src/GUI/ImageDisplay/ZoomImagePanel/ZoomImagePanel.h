@@ -11,6 +11,7 @@
 
 #include "wx\dc.h"
 #include "wx\dcbuffer.h"
+#include "wx\rawbmp.h"
 
 #include "GUI\Colors\Colors.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"

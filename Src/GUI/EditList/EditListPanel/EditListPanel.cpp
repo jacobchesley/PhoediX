@@ -46,6 +46,8 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	this->Bind(EDIT_DELETE_EVENT, (wxObjectEventFunction)&EditListPanel::DeleteEdit, this, ID_EDIT_DELETE);
 	this->Bind(EDIT_DISABLE_EVENT, (wxObjectEventFunction)&EditListPanel::DisableEdit, this, ID_EDIT_DISABLE);
 	this->Bind(EDIT_ADD_EVENT, (wxObjectEventFunction)&EditListPanel::AddEditToPanel, this, ID_EDIT_ADD);
+	this->Bind(EDIT_COPY_EVENT, (wxObjectEventFunction)&EditListPanel::CopyEdit, this, ID_EDIT_COPY);
+	this->Bind(EDIT_PASTE_EVENT, (wxObjectEventFunction)&EditListPanel::PasteEdit, this, ID_EDIT_PASTE);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageEvt, this, ID_REPROCESS_IMAGE);
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageRawEvt, this, ID_REPROCESS_IMAGE_RAW);
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
@@ -113,6 +115,15 @@ void EditListPanel::ReprocessImage() {
 void EditListPanel::ReprocessImageRaw() {
 	// Process Raw if needed
 	if (hasRaw) {
+
+		// If there are edits, tell raw processor to not set processor to updated 
+		// (still need to perform edits after raw processing).
+		if(scroller->GetEditList().size() > 0){
+			proc->SetHasEdits(true);
+		}
+		else{
+			proc->SetHasEdits(false);
+		}
 		proc->ProcessRaw();
 	}	
 
@@ -141,7 +152,7 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 	// Create new edit window and add it to panel
 	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(editID, this, proc);
-	this->AddEditWindowToPanel(newEditWindow, editID, false);
+	this->AddEditWindowToPanel(newEditWindow, editID, false, true);
 
 	// Reprocess the image with the new edit added
 	this->ReprocessImage();
@@ -149,19 +160,38 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 
+	this->RemoveRawWindow();
 	scroller->DeleteAllEdits();
-
+	
 	for (size_t i = 0; i < inEdits.size(); i++) {
 		if (inEdits.at(i) != NULL) {
-			EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
-			this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled());
-			newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
+
+			// Add a raw window properly
+			if(inEdits.at(i)->GetEditType() == ProcessorEdit::EditType::RAW){
+				this->AddRawWindow(inEdits.at(i));
+			}
+
+			// Add the correct type of window, and set parameter for window based on edit
+			else{
+				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
+				this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled(), false);
+
+				if (newEditWindow != NULL) {
+					newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
+					newEditWindow->SetParamsAndFlags(inEdits.at(i));
+				}
+			}
 		}
 	}
 
+	for(size_t i = 0; i < scroller->GetEditList().size(); i++){
+		scroller->GetEditList().at(i)->GetEditWindow()->Activate();
+	}
+	
+	this->ReprocessImageRaw();
 }
 
-void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool disable) {
+void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActivate) {
 
 	// If a new edit window was created
 	AvailableEdits available;
@@ -192,11 +222,13 @@ void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool d
 
 			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, true);
 			scroller->AddEdit(newEditListItem);
+			if(autoActivate){ newEditListItem->GetEditWindow()->Activate(); }
 		}
 		else{
 			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, false);
 			newEditListItem->SetDisabled(disable);
 			scroller->AddEdit(newEditListItem);
+			if(autoActivate){ newEditListItem->GetEditWindow()->Activate(); }
 		}
 	}
 }
@@ -225,6 +257,36 @@ void EditListPanel::DeleteEdit(wxCommandEvent& deleteEvt) {
 	this->ReprocessImage();
 }
 
+void EditListPanel::CopyEdit(wxCommandEvent& copyEvt) {
+
+	// Get edit number that is requesting to be copied
+	int editNum = copyEvt.GetInt();
+
+	// Cant copy edit that does not exist in list
+	if(editNum > scroller->GetEditList().size() - 1 || editNum < 0){
+		return;
+	}
+
+	// Grab the params and flags of the edit and store it in the clipboard of the processor
+	ProcessorEdit * editToCopy = scroller->GetEditList()[editNum]->GetEditWindow()->GetParamsAndFlags();
+	proc->StoreEditForCopyPaste(editToCopy);
+}
+
+void EditListPanel::PasteEdit(wxCommandEvent& pasteEvt) {
+
+	// Get edit number that is requesting to be pasted
+	int editNum = pasteEvt.GetInt();
+
+	// Cant paste edit that does not exist in list
+	if(editNum > scroller->GetEditList().size() - 1 || editNum < 0){
+		return;
+	}
+
+	// Grab the params and flags of the edit in the processor and paste in to the edit window
+	ProcessorEdit * copiedEdit = proc->GetEditForCopyPaste();
+	scroller->GetEditList()[editNum]->GetEditWindow()->SetParamsAndFlags(copiedEdit);
+}
+
 void EditListPanel::DisableEdit(wxCommandEvent& WXUNUSED(event)) {
 	this->ReprocessImage();
 }
@@ -236,7 +298,7 @@ void EditListPanel::AddRawWindow(){
 
 	// Add new raw processor edit panel to list
 	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc);
-	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false);
+	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false, true);
 
 	//Move raw processor edit to top
 	int rawEditIdx = numEdits;
@@ -249,6 +311,36 @@ void EditListPanel::AddRawWindow(){
 	scroller->SetNumTopEdits(1);
 	hasRaw = true;
 
+}
+
+void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
+
+	// Get number of edits already in list
+	size_t numEdits = scroller->GetNextID();
+
+	// Add new raw processor edit panel to list
+	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc);
+	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false, true);
+	newEditWindow->SetParamsAndFlags(editForParams);
+
+	//Move raw processor edit to top
+	int rawEditIdx = numEdits;
+	for(size_t i = 0; i < numEdits; i++){
+		scroller->MoveEditUp(rawEditIdx);
+		rawEditIdx -= 1;
+	}
+
+	// Mark raw processor top edits as permenant.  Cannot move any edits above this one.
+	scroller->SetNumTopEdits(1);
+	hasRaw = true;
+
+}
+
+void EditListPanel::RemoveRawWindow() {
+	if (scroller->GetNumTopEdits() == 1) {
+		scroller->DeleteEdit(0);
+		scroller->SetNumTopEdits(0);
+	}
 }
 
 
@@ -381,9 +473,10 @@ void EditListPanel::EditListScroll::DeleteAllEdits() {
 
 		//Destroy and erase the one edit item we no longer want
 		editList.at(i)->DestroyItem();
-		editList.erase(editList.begin() + i);
 		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 	}
+
+	editList.clear();
 	this->RedrawEdits();
 }
 

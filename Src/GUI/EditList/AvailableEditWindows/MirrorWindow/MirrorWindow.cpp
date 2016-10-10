@@ -1,6 +1,6 @@
 #include "MirrorWindow.h"
 
-MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -58,13 +58,21 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 	wxPostEvent(this, comboEvt);
 }
 
-void MirrorWindow::Process(wxCommandEvent& WXUNUSED(event)) {
+void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
-	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
-	wxPostEvent(parWindow, evt);
+	if(edit == NULL){ return; }
+
+	// Choose method based on edit loaded
+	if (edit->GetFlagsSize() == 1 && 
+		(edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
+		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_VERTICAL ||
+		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE)) {
+
+		mirrorMethod->SetSelection(edit->GetFlag(0));
+	}
 }
 
-void MirrorWindow::AddEditToProcessor() {
+ProcessorEdit * MirrorWindow::GetParamsAndFlags(){
 
 	int mirrorSelection = mirrorMethod->GetSelection();
 
@@ -75,7 +83,7 @@ void MirrorWindow::AddEditToProcessor() {
 		// Set enabled / disabled
 		mirrorEdit->SetDisabled(isDisabled);
 
-		proc->AddEdit(mirrorEdit);
+		return mirrorEdit;
 	}
 
 	else if (mirrorSelection == 1) {
@@ -85,7 +93,7 @@ void MirrorWindow::AddEditToProcessor() {
 		// Set enabled / disabled
 		mirrorEdit->SetDisabled(isDisabled);
 
-		proc->AddEdit(mirrorEdit);
+		return mirrorEdit;
 	}
 
 	else if (mirrorSelection == 2) {
@@ -95,18 +103,23 @@ void MirrorWindow::AddEditToProcessor() {
 		// Set enabled / disabled
 		mirrorEdit->SetDisabled(isDisabled);
 
-		proc->AddEdit(mirrorEdit);
+		return mirrorEdit;
 	}
+
+	return NULL;
 }
 
-void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+bool MirrorWindow::CheckCopiedParamsAndFlags(){
 
-	// Choose method based on edit loaded
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+	if(edit == NULL){ return false; }
+
 	if (edit->GetFlagsSize() == 1 && 
 		(edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
 		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_VERTICAL ||
 		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE)) {
-
-		mirrorMethod->SetSelection(edit->GetFlag(0));
+		return true;
+		
 	}
+	return false;
 }

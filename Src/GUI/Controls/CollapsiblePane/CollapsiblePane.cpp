@@ -17,15 +17,30 @@ CollapsiblePane::CollapsiblePane(wxWindow * parent, wxString name) : wxPanel(par
 	collapseButton->GetTextExtent(name, &textWidth, &textHeight);
 	collapseButton->SetMinSize(wxSize(textWidth, textHeight));
 
-	this->GetSizer()->Add(collapseButton);
+	this->GetSizer()->Add(collapseButton, 0, wxALIGN_LEFT);
 	this->GetSizer()->AddSpacer(8);
-	this->GetSizer()->Add(indentAndWindowSizer);
+	this->GetSizer()->Add(indentAndWindowSizer, 1, wxEXPAND);
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CollapsiblePane::OnCollapse, this, CollapsiblePane::Button::COLLAPSE);
 	attachedWindow = NULL;
+
+	isDisplayed = parent->IsShown();
 }
 
 void CollapsiblePane::OnCollapse(wxCommandEvent& WXUNUSED(event)) {
+
+	// Hide window if it is already displayed
+	if (isDisplayed) {
+		this->Collapse();
+	}
+
+	// Show window if it is hidden
+	else {
+		this->Open();
+	}
+}
+
+void CollapsiblePane::Collapse() {
 
 	// Hide window if it is already displayed
 	if (isDisplayed) {
@@ -34,9 +49,17 @@ void CollapsiblePane::OnCollapse(wxCommandEvent& WXUNUSED(event)) {
 			attachedWindow->Hide();
 		}
 	}
+	this->Layout();
+	this->Fit();
+
+	parentWindow->Layout();
+	parentWindow->FitInside();
+}
+
+void CollapsiblePane::Open() {
 
 	// Show window if it is hidden
-	else {
+	if(!isDisplayed){
 		isDisplayed = true;
 		if (attachedWindow != NULL) {
 			attachedWindow->Show();
@@ -71,6 +94,7 @@ void CollapsiblePane::SetTextFont(wxFont font) {
 
 void CollapsiblePane::AttachWindow(wxWindow * attach) {
 	indentAndWindowSizer->AddSpacer(20);
-	indentAndWindowSizer->Add(attach);
+	indentAndWindowSizer->Add(attach, 1, wxEXPAND);
 	attachedWindow = attach;
+	
 }

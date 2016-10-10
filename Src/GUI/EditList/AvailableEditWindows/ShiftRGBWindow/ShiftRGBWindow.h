@@ -1,5 +1,5 @@
-#ifndef SCALE_BRIGHTNESS_WINDOW_H
-#define SCALE_BRIGHTNESS_WINDOW_H
+#ifndef SHIFT_RGB_WINDOW_H
+#define SHIFT_RGB_WINDOW_H
 
 #include "GUI\EditList\EditWindow\EditWindow.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"
@@ -7,12 +7,13 @@
 #include "Processing\Processor\Processor.h"
 #include "Debugging\MemoryLeakCheck.h"
 
-class ScaleBrightnessWindow : public EditWindow {
+class ShiftRGBWindow : public EditWindow {
 public:
-	ScaleBrightnessWindow(wxWindow * parent, wxString editName, Processor * processor);
+	ShiftRGBWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void AddEditToProcessor();
 	void SetParamsAndFlags(ProcessorEdit * edit);
-	void Process(wxCommandEvent& WXUNUSED(event));
+	ProcessorEdit * GetParamsAndFlags();
+	bool CheckCopiedParamsAndFlags();
 
 private:
 
@@ -38,4 +39,4 @@ private:
 	Processor * proc;
 
 };
-#endif
+#endif#pragma once

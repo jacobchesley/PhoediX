@@ -16,13 +16,15 @@
 #include "Debugging\MemoryLeakCheck.h"
 #include "Processing\ProcessorEdit\ProcessorEdit.h"
 #include "libraw.h"
+#include <omp.h>
 
 enum {
-	ID_PROCESSOR_MESSAGE
+	ID_PROCESSOR_MESSAGE,
+	ID_PROCESSOR_NUM
 };
 
 wxDECLARE_EVENT(PROCESSOR_MESSAGE_EVENT, wxCommandEvent);
-
+wxDECLARE_EVENT(PROCESSOR_NUM_EVENT, wxCommandEvent);
 
 enum ColorSpaceENUM {
 	ADOBE_RGB,
@@ -56,6 +58,7 @@ public:
 	~Processor();
 
 	Image * GetImage();
+	Image * GetTempImage();
 	
 	void ProcessEdits(wxVector<ProcessorEdit*> editList);
 	void ProcessEdit(ProcessorEdit * edit);
@@ -64,6 +67,11 @@ public:
 	void ProcessEdits();
 	void DeleteEdits();
 	wxVector<ProcessorEdit*> GetEditVector();
+
+	void StoreEditForCopyPaste(ProcessorEdit * edit);
+	ProcessorEdit * GetEditForCopyPaste();
+	void StoreEditLayerForCopyPaste(wxVector<ProcessorEdit*>);
+	wxVector<ProcessorEdit*> GetEditLayerForCopyPaste();
 
 	void Enable16Bit();
 	void Disable16Bit();
@@ -80,8 +88,18 @@ public:
 	void UnlockRaw();
 	bool GetLockedRaw();
 
-	wxString GetRawFilePath();
-	void SetRawFilePath(wxString path);
+	void SetMultithread(bool doMultithread);
+	bool GetMultithread();
+
+	void SetNumThreads(int numThreads);
+	int GetNumThreads();
+
+	wxString GetFilePath();
+	void SetFilePath(wxString path);
+
+	wxString GetFileName();
+	void SetFileName(wxString path);
+
 	void UnpackAndProcessRaw();
 
 	void Lock();
@@ -97,6 +115,15 @@ public:
 
 	void SetDoFitImage(bool fit);
 	bool GetDoFitImage();
+	
+	void KillCurrentProcessing();
+
+	int GetLastNumEdits();
+
+	void SetHasEdits(bool doesHaveEdits);
+	bool GetHasEdits();
+
+	inline double FastTanH(double x);
 
 	enum RotationCropping{
 		KEEP_SIZE,
@@ -104,19 +131,36 @@ public:
 		EXPAND
 	};
 
+	enum BrightnessPreservation{
+		SHADOWS,
+		HIGHLIGHTS,
+		SHADOWS_AND_HIGHLIGHTS
+	};
+
 	LibRaw rawPrcoessor;
 	libraw_processed_image_t * rawImage;
 
 protected:
 	bool forceStop;
+
 private:
+
+	wxCriticalSection lockStopCritical;
+
+	wxCriticalSection processingCritical;
+	bool isProcessing;
+
+	int numEdits;
+	int numStartedThreads;
 
 	bool rawImageGood;
 	int rawErrorCode;
-	wxString rawFilePath;
+	wxString filePath;
+	wxString fileName;
 
 	Image * img;
 	Image * originalImg;
+	Image * tempImage;
 
 	bool didUpdate;
 	bool doFitImage;
@@ -125,35 +169,60 @@ private:
 	wxCriticalSection lockRawCritical;
 	bool locked;
 	bool lockedRaw;
+	bool hasEdits;
+
+	bool multiThread;
+	int numThreadsToUse;
+
+	ProcessorEdit * copiedEdit;
+	wxVector<ProcessorEdit*> copiedEditLayer;
 
 	static double pi;
 
 	wxWindow * parWindow;
 
-	void ShiftBrightness(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
-	void ScaleBrightness(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
-	void AdjustContrast(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
+	void ShiftRGB(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
+	void AdjustHSL(double hShift, double sScale, double lScale, int dataStart = -1, int dataEnd = -1);
+	void AdjustBrightness(double brightAdjust, double detailsPreserve, double toneSetting, int tonePreservation, int dataStart = -1, int dataEnd = -1);
+	void AdjustContrast(double allContrast, double redContrast, double greenContrast, double blueContrast, 
+		double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
+	void AdjustContrastCurve(double allContrast, double redContrast, double greenContrast, double blueContrast, 
+		double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
 	void ConvertGreyscale(double redScale, double greenScale, double blueScale, int dataStart = -1, int dataEnd = -1);
 	void ChannelScale(double redRedScale, double redGreenScale, double redBlueScale,
 		double greenRedScale, double greenGreenScale, double greenBlueScale,
 		double blueRedScale, double blueGreenScale, double blueBlueScale, 
 		int dataStart = -1, int dataEnd = -1);
-	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
-		int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16);
-	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int colorSpace);
 
-	void Rotate90CW();
-	void Rotate180();
-	void RotateCustom(double angleDegrees, int crop = RotationCropping::KEEP_SIZE);
-	void RotateCustomBilinear(double angleDegrees, int crop = RotationCropping::KEEP_SIZE);
-	void RotateCustomBicubic(double angleDegrees, int crop = RotationCropping::KEEP_SIZE);
+	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
+		int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16, int dataStart = -1, int dataEnd = -1);
+	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int colorSpace, int dataStart = -1, int dataEnd = -1);
+	void HSLCurves(int * hChannel16, int * sChannel16, int * lChannel16, int dataStart = -1, int dataEnd = -1);
+
+	void SetupRotation(int editID, double angleDegrees, int crop);
+	void CleanupRotation(int editID);
+	void Rotate90CW(int dataStart = -1, int dataEnd = -1);
+	void Rotate180(int dataStart = -1, int dataEnd = -1);
+	void RotateCustom(double angleDegrees, int dataStart = -1, int dataEnd = -1);
+	void RotateCustomBilinear(double angleDegrees, int dataStart = -1, int dataEnd = -1);
+	void RotateCustomBicubic(double angleDegrees, int dataStart = -1, int dataEnd = -1);
 	int GetExpandedRotationWidth(double angleDegrees, int originalWidth, int originalHeight);
 	int GetExpandedRotationHeight(double angleDegrees, int originalWidth, int originalHeight);
 	int GetFittedRotationWidth(double angleDegrees, int originalWidth, int originalHeight);
 	int GetFittedRotationHeight(double angleDegrees, int originalWidth, int originalHeight);
 
-	void MirrorHorizontal();
-	void MirrorVertical();
+	void SetupScale(int newWidth, int newHeight);
+	void CleanupScale();
+	void ScaleNearest(int dataStart = -1, int dataEnd = -1);
+	void ScaleBilinear(int dataStart = -1, int dataEnd = -1);
+	void ScaleBicubic(int dataStart = -1, int dataEnd = -1);
+
+	void SetupCrop(int newWidth, int newHeight);
+	void CleanupCrop();
+	void Crop(int startPointX, int startPointY, int dataStart = -1, int dataEnd = -1);
+
+	void MirrorHorizontal(int dataStart = -1, int dataEnd = -1);
+	void MirrorVertical(int dataStart = -1, int dataEnd = -1);
 
 	void RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace = sRGB);
 	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace = sRGB);
@@ -161,6 +230,7 @@ private:
 	void LABtoXYZ(LAB * lab, XYZ * xyz);
 
 	void SendMessageToParent(wxString message);
+	void SendProcessorEditNumToParent(int num);
 
 	wxVector<ProcessorEdit*> editListInternal;
 	

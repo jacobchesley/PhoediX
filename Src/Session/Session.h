@@ -12,11 +12,13 @@
 #include "wx/xml/xml.h"
 
 #include "SessionEditList\SessionEditList.h"
+#include "wx\datetime.h"
 
 class PhoediXSession{
 
 public:
 	PhoediXSession();
+	void Destroy();
 
 	void LoadSessionFromFile(wxString filePath);
 	void SaveSessionToFile(wxString filePath);
@@ -41,6 +43,12 @@ public:
 	wxString GetPerspective();
 	void SetPerspective(wxString newPerspective);
 
+	void GenerateID();
+	int GetID();
+
+	void SetName(wxString newName);
+	wxString GetName();
+
 private:
 
 	wxString imgFile;
@@ -50,5 +58,8 @@ private:
 	int imgScrollY;
 	wxString auiPerspective;
 	int histogramDisplaySelect;
+	int id;
+
+	wxString name;
 };
 #endif

@@ -16,11 +16,12 @@
 class WXImagePanel : public wxPanel {
 public:
 	WXImagePanel(wxWindow * parent, bool keepAspect = true);
-	WXImagePanel(wxWindow * parent, wxImage * image, bool keepAspect = true);
+	WXImagePanel(wxWindow * parent, wxImage * image, bool keepAspect = true, bool staticImg = false);
 	void ChangeImage(wxImage * newImage);
 	void Redraw();
 	void SetZoom(double zoomFactor);
 	void SetKeepAspect(bool doKeepAspect);
+	void SetResize(bool doResize);
 
 private:
 	void OnPaint(wxPaintEvent & evt);
@@ -35,7 +36,8 @@ private:
 	double zoom;
 	bool keepAspect;
 	bool resize;
-
+	bool staticImage;
 };
+
 
 #endif

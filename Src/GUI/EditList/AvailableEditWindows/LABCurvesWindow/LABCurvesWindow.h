@@ -35,10 +35,11 @@ public:
 	Processor * proc;
 
 	LABCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
-	void Process(wxCommandEvent& WXUNUSED(event));
 
 	void AddEditToProcessor();
 	void SetParamsAndFlags(ProcessorEdit * edit);
+	ProcessorEdit * GetParamsAndFlags();
+	bool CheckCopiedParamsAndFlags();
 };
 
 #endif

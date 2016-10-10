@@ -1,6 +1,6 @@
-#include "ShiftBrightnessWindow.h"
+#include "ShiftRGBWindow.h"
 
-ShiftBrightnessWindow::ShiftBrightnessWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -13,10 +13,10 @@ ShiftBrightnessWindow::ShiftBrightnessWindow(wxWindow * parent, wxString editNam
 	editLabel->SetForegroundColour(Colors::TextWhite);
 	editLabel->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
-	allBrightLabel = new wxStaticText(this, -1, "All Brightness");
-	redBrightLabel = new wxStaticText(this, -1, "Red Brightness");
-	greenBrightLabel = new wxStaticText(this, -1, "Green Brightness");
-	blueBrightLabel = new wxStaticText(this, -1, "Blue Brightness");
+	allBrightLabel = new wxStaticText(this, -1, "All Channels");
+	redBrightLabel = new wxStaticText(this, -1, "Red ");
+	greenBrightLabel = new wxStaticText(this, -1, "Green");
+	blueBrightLabel = new wxStaticText(this, -1, "Blue");
 	allBrightLabel->SetForegroundColour(Colors::TextLightGrey);
 	redBrightLabel->SetForegroundColour(Colors::TextLightGrey);
 	greenBrightLabel->SetForegroundColour(Colors::TextLightGrey);
@@ -64,9 +64,9 @@ ShiftBrightnessWindow::ShiftBrightnessWindow(wxWindow * parent, wxString editNam
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ShiftBrightnessWindow::OnUpdate, this);
-	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ShiftBrightnessWindow::OnUpdate, this);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ShiftBrightnessWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ShiftRGBWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBTRACK, (wxObjectEventFunction)&ShiftRGBWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ShiftRGBWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
@@ -77,34 +77,38 @@ ShiftBrightnessWindow::ShiftBrightnessWindow(wxWindow * parent, wxString editNam
 	this->StartWatchdog();
 }
 
-void ShiftBrightnessWindow::Process(wxCommandEvent& WXUNUSED(event)) {
+void ShiftRGBWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
-	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
-	wxPostEvent(parWindow, evt);
-	this->SetUpdated(false);
-}
-
-void ShiftBrightnessWindow::AddEditToProcessor() {
-
-	ProcessorEdit * brightEdit = new ProcessorEdit(ProcessorEdit::EditType::SHIFT_BRIGHTNESS);
-	brightEdit->AddParam(allBrightSlider->GetValue());
-	brightEdit->AddParam(redBrightSlider->GetValue());
-	brightEdit->AddParam(greenBrightSlider->GetValue());
-	brightEdit->AddParam(blueBrightSlider->GetValue());
-
-	brightEdit->SetDisabled(isDisabled);
-
-	proc->AddEdit(brightEdit);
-}
-
-void ShiftBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){
-
+	if(edit == NULL){ return; }
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::SHIFT_BRIGHTNESS) {
+	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::SHIFT_RGB) {
 		allBrightSlider->SetValue(edit->GetParam(0));
 		redBrightSlider->SetValue(edit->GetParam(1));
 		greenBrightSlider->SetValue(edit->GetParam(2));
 		blueBrightSlider->SetValue(edit->GetParam(3));
 	}
-	this->SetUpdated(true);
+}
+
+ProcessorEdit * ShiftRGBWindow::GetParamsAndFlags(){
+
+	ProcessorEdit * shiftRgbEdit = new ProcessorEdit(ProcessorEdit::EditType::SHIFT_RGB);
+	shiftRgbEdit->AddParam(allBrightSlider->GetValue());
+	shiftRgbEdit->AddParam(redBrightSlider->GetValue());
+	shiftRgbEdit->AddParam(greenBrightSlider->GetValue());
+	shiftRgbEdit->AddParam(blueBrightSlider->GetValue());
+
+	shiftRgbEdit->SetDisabled(isDisabled);
+
+	return shiftRgbEdit;
+}
+
+bool ShiftRGBWindow::CheckCopiedParamsAndFlags(){
+
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+	if(edit == NULL){ return false; }
+
+	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::SHIFT_RGB) {
+		return true;
+	}
+	return false;
 }

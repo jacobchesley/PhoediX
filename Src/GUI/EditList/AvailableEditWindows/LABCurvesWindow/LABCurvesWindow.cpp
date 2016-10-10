@@ -1,6 +1,6 @@
 #include "LABCurvesWindow.h"
 
-LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	parWindow = parent;
 	this->SetBackgroundColour(parent->GetBackgroundColour());
@@ -53,14 +53,91 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LABCurvesWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 }
 
-void LABCurvesWindow::Process(wxCommandEvent& WXUNUSED(event)) {
+void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
-	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
-	wxPostEvent(parWindow, evt);
+	if(edit == NULL){ return; }
+
+	std::vector<Point> lControlPoints;
+	std::vector<Point> aControlPoints;
+	std::vector<Point> bControlPoints;
+
+	// Must have 3 double arrays (l, a, and b curves)
+	if(edit->GetNumDoubleArrays() != 3){ return; }
+
+	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
+	int doubleArrSize = 0;
+	for(int i = 0; i < 3; i++){
+		doubleArrSize = edit->GetDoubleArraySize(i);
+		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
+			return;
+		}
+	}
+
+	// Verify all point values are between 0 and 1
+	doubleArrSize = 0;
+	for(int i = 0; i < 3; i++){
+
+		// Get size of current array and array
+		doubleArrSize = edit->GetDoubleArraySize(i);
+		double * arr = edit->GetDoubleArray(i);
+
+		// Check each element in array to verify it is between 0 and 1
+		for(int j = 0; j < doubleArrSize; j++){
+			if(arr[j] < 0.0 || arr[j] > 1.0){
+				return;
+			}
+		}
+	}
+
+	// Set l control points
+	double * lArray = edit->GetDoubleArray(0);
+	int curID = 0;
+	for(int i = 0; i < edit->GetDoubleArraySize(0); i+=2){
+
+		Point lPoint;
+		lPoint.x = lArray[i];
+		lPoint.y = lArray[i + 1];
+		lPoint.id = curID;
+		lControlPoints.push_back(lPoint);
+		curID += 1;
+	}
+
+	// Set a control points
+	double * aArray = edit->GetDoubleArray(1);
+	curID = 0;
+	for(int i = 0; i < edit->GetDoubleArraySize(1); i+=2){
+
+		Point aPoint;
+		aPoint.x = aArray[i];
+		aPoint.y = aArray[i + 1];
+		aPoint.id = curID;
+		aControlPoints.push_back(aPoint);
+
+		curID += 1;
+	}
+
+	// Set b control points
+	double * bArray = edit->GetDoubleArray(2);
+	curID = 0;
+	for(int i = 0; i < edit->GetDoubleArraySize(2); i+=2){
+
+		Point bPoint;
+		bPoint.x = bArray[i];
+		bPoint.y = bArray[i + 1];
+		bPoint.id = curID;
+		bControlPoints.push_back(bPoint);
+
+		curID += 1;
+	}
+
+	// Set curves
+	lCurve->SetControlPoints(lControlPoints);
+	aCurve->SetControlPoints(aControlPoints);
+	bCurve->SetControlPoints(bControlPoints);
 }
 
-void LABCurvesWindow::AddEditToProcessor() {
-	
+ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
+
 	std::vector<Point> lControlPoints = lCurve->GetControlPoints();
 	std::vector<Point> aControlPoints = aCurve->GetControlPoints();
 	std::vector<Point> bControlPoints = bCurve->GetControlPoints();
@@ -137,87 +214,29 @@ void LABCurvesWindow::AddEditToProcessor() {
 	// Set enabled / disabled
 	labCurveEdit->SetDisabled(isDisabled);
 
-	proc->AddEdit(labCurveEdit);
-	
+	return labCurveEdit;
 }
 
-void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
+bool LABCurvesWindow::CheckCopiedParamsAndFlags(){
 
-	std::vector<Point> lControlPoints;
-	std::vector<Point> aControlPoints;
-	std::vector<Point> bControlPoints;
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+	if(edit == NULL){ return false; }
 
-	// Must have 4 double arrays (bright, red, green, and blue curves)
-	if(edit->GetNumDoubleArrays() != 3){ return; }
+	if(edit->GetEditType() != ProcessorEdit::EditType::LAB_CURVES){ return false; }
+
+	// Need 3 double arrars (L, A and B)
+	if(edit->GetNumDoubleArrays() != 3){
+		return false;
+	}
 
 	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
 	int doubleArrSize = 0;
 	for(int i = 0; i < 3; i++){
 		doubleArrSize = edit->GetDoubleArraySize(i);
 		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return;
+			return false;
 		}
 	}
 
-	// Verify all point values are between 0 and 1
-	doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
-
-		// Get size of current array and array
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		double * arr = edit->GetDoubleArray(i);
-
-		// Check each element in array to verify it is between 0 and 1
-		for(int j = 0; j < doubleArrSize; j++){
-			if(arr[j] < 0.0 || arr[j] > 1.0){
-				return;
-			}
-		}
-	}
-
-	// Set l control points
-	double * lArray = edit->GetDoubleArray(0);
-	int curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(0); i+=2){
-
-		Point lPoint;
-		lPoint.x = lArray[i];
-		lPoint.y = lArray[i + 1];
-		lPoint.id = curID;
-		lControlPoints.push_back(lPoint);
-		curID += 1;
-	}
-
-	// Set a control points
-	double * aArray = edit->GetDoubleArray(1);
-	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(1); i+=2){
-
-		Point aPoint;
-		aPoint.x = aArray[i];
-		aPoint.y = aArray[i + 1];
-		aPoint.id = curID;
-		aControlPoints.push_back(aPoint);
-
-		curID += 1;
-	}
-
-	// Set b control points
-	double * bArray = edit->GetDoubleArray(2);
-	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(2); i+=2){
-
-		Point bPoint;
-		bPoint.x = bArray[i];
-		bPoint.y = bArray[i + 1];
-		bPoint.id = curID;
-		bControlPoints.push_back(bPoint);
-
-		curID += 1;
-	}
-
-	// Set curves
-	lCurve->SetControlPoints(lControlPoints);
-	aCurve->SetControlPoints(aControlPoints);
-	bCurve->SetControlPoints(bControlPoints);
+	return true;
 }

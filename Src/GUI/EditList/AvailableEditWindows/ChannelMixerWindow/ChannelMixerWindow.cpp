@@ -1,6 +1,6 @@
-#include "ChannelTransformWindow.h"
+#include "ChannelMixerWindow.h"
 
-ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -119,15 +119,15 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	mainSizer->Add(editLabel);
-	mainSizer->AddSpacer(20);
+	mainSizer->AddSpacer(25);
 	mainSizer->Add(presetSizer);
-	mainSizer->AddSpacer(25);
+	mainSizer->AddSpacer(35);
 	mainSizer->Add(redGridSizer);
-	mainSizer->AddSpacer(25);
+	mainSizer->AddSpacer(35);
 	mainSizer->Add(greenGridSizer);
-	mainSizer->AddSpacer(25);
+	mainSizer->AddSpacer(35);
 	mainSizer->Add(blueGridSizer);
-	mainSizer->AddSpacer(25);
+	mainSizer->AddSpacer(35);
 
 	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
@@ -135,11 +135,11 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
-	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ChannelTransformWindow::OnSlide, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ChannelMixerWindow::OnSlide, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ChannelMixerWindow::OnSlide, this);
 
-	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ChannelTransformWindow::PresetChange, this);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ChannelTransformWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ChannelMixerWindow::PresetChange, this);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ChannelMixerWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
@@ -153,11 +153,11 @@ ChannelTransformWindow::ChannelTransformWindow(wxWindow * parent, wxString editN
 	this->StartWatchdog();
 }
 
-void ChannelTransformWindow::PopulateIntialPresets() {
+void ChannelMixerWindow::PopulateIntialPresets() {
 
-	ChannelTransformPreset defaultPreset = ChannelTransformPreset("Default", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-	ChannelTransformPreset sepiaPreset = ChannelTransformPreset("Sepia", 0.393, 0.769, 0.189, 0.349, 0.686, 0.168, 0.272, 0.534, 0.131);
-	ChannelTransformPreset customPreset = ChannelTransformPreset("Custom", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+	ChannelMixerPreset defaultPreset = ChannelMixerPreset("Default", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+	ChannelMixerPreset sepiaPreset = ChannelMixerPreset("Sepia", 0.393, 0.769, 0.189, 0.349, 0.686, 0.168, 0.272, 0.534, 0.131);
+	ChannelMixerPreset customPreset = ChannelMixerPreset("Custom", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
 	presetList.push_back(defaultPreset);
 	presetList.push_back(sepiaPreset);
@@ -166,14 +166,14 @@ void ChannelTransformWindow::PopulateIntialPresets() {
 	this->CreateComboPresetList();
 }
 
-void ChannelTransformWindow::CreateComboPresetList() {
+void ChannelMixerWindow::CreateComboPresetList() {
 
 	for(size_t i = 0; i < presetList.size(); i++){
 		presetBox->AppendString(presetList.at(i).GetName());
 	}
 }
 
-ChannelTransformWindow::ChannelTransformPreset ChannelTransformWindow::GetChannelTransformPresetByName(wxString name){
+ChannelMixerWindow::ChannelMixerPreset ChannelMixerWindow::GetChannelMixerPresetByName(wxString name){
 
 	for (size_t i = 0; i < presetList.size(); i++) {
 		if (name == presetList.at(i).GetName()) {
@@ -184,7 +184,7 @@ ChannelTransformWindow::ChannelTransformPreset ChannelTransformWindow::GetChanne
 	return presetList.at(0);
 }
 
-void ChannelTransformWindow::SetValuesFromPreset(ChannelTransformWindow::ChannelTransformPreset preset) {
+void ChannelMixerWindow::SetValuesFromPreset(ChannelMixerWindow::ChannelMixerPreset preset) {
 
 	// Do not modify custom preset
 	if (presetBox->GetSelection() == (int)(presetList.size() - 1)) {
@@ -204,16 +204,16 @@ void ChannelTransformWindow::SetValuesFromPreset(ChannelTransformWindow::Channel
 	this->SetUpdated(true);
 }
 
-void ChannelTransformWindow::PresetChange(wxCommandEvent& WXUNUSED(event)) {
+void ChannelMixerWindow::PresetChange(wxCommandEvent& WXUNUSED(event)) {
 	
 	wxString selectedName = presetBox->GetValue();
-	ChannelTransformWindow::ChannelTransformPreset selectedPreset = this->GetChannelTransformPresetByName(selectedName);
+	ChannelMixerWindow::ChannelMixerPreset selectedPreset = this->GetChannelMixerPresetByName(selectedName);
 	justSetPreset = true;
 	this->SetValuesFromPreset(selectedPreset);
 	this->SetUpdated(true);
 }
 
-void ChannelTransformWindow::OnSlide(wxCommandEvent& WXUNUSED(event)) {
+void ChannelMixerWindow::OnSlide(wxCommandEvent& WXUNUSED(event)) {
 
 	// Do not reset the preset selection if it was just selected
 	if (justSetPreset) {
@@ -226,45 +226,17 @@ void ChannelTransformWindow::OnSlide(wxCommandEvent& WXUNUSED(event)) {
 	this->SetUpdated(true);
 }
 
-void ChannelTransformWindow::Process(wxCommandEvent& WXUNUSED(event)) {
+void ChannelMixerWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
-	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
-	wxPostEvent(parWindow, evt);
-	this->SetUpdated(false);
-}
-
-void ChannelTransformWindow::AddEditToProcessor() {
-
-	ProcessorEdit * transformEdit = new ProcessorEdit(ProcessorEdit::EditType::CHANNEL_TRANSFORM);
-
-	transformEdit->AddParam(redRedSlider->GetValue());
-	transformEdit->AddParam(redGreenSlider->GetValue());
-	transformEdit->AddParam(redBlueSlider->GetValue());
-	transformEdit->AddParam(greenRedSlider->GetValue());
-	transformEdit->AddParam(greenGreenSlider->GetValue());
-	transformEdit->AddParam(greenBlueSlider->GetValue());
-	transformEdit->AddParam(blueRedSlider->GetValue());
-	transformEdit->AddParam(blueGreenSlider->GetValue());
-	transformEdit->AddParam(blueBlueSlider->GetValue());
-
-	// Set enabled / disabled
-	transformEdit->SetDisabled(isDisabled);
-
-	// Add preset number
-	transformEdit->AddFlag(presetBox->GetSelection());
-
-	proc->AddEdit(transformEdit);
-}
-
-void ChannelTransformWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+	if(edit == NULL){ return;}
 
 	justSetPreset = true;
 	// Choose preset based on edit loaded
-	if (edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_TRANSFORM) {
+	if (edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_MIXER) {
 		presetBox->SetSelection(edit->GetFlag(0));
 	}
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 9 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_TRANSFORM) {
+	if (edit->GetParamsSize() == 9 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_MIXER) {
 		redRedSlider->SetValue(edit->GetParam(0));
 		redGreenSlider->SetValue(edit->GetParam(1));
 		redBlueSlider->SetValue(edit->GetParam(2));
@@ -275,10 +247,48 @@ void ChannelTransformWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		blueGreenSlider->SetValue(edit->GetParam(7));
 		blueBlueSlider->SetValue(edit->GetParam(8));
 	}
-	this->SetUpdated(true);
 }
 
-ChannelTransformWindow::ChannelTransformPreset::ChannelTransformPreset(wxString name, double redRedScale, double redGreenScale, double redBlueScale,
+ProcessorEdit * ChannelMixerWindow::GetParamsAndFlags(){
+
+	ProcessorEdit * mixerEdit = new ProcessorEdit(ProcessorEdit::EditType::CHANNEL_MIXER);
+
+	mixerEdit->AddParam(redRedSlider->GetValue());
+	mixerEdit->AddParam(redGreenSlider->GetValue());
+	mixerEdit->AddParam(redBlueSlider->GetValue());
+	mixerEdit->AddParam(greenRedSlider->GetValue());
+	mixerEdit->AddParam(greenGreenSlider->GetValue());
+	mixerEdit->AddParam(greenBlueSlider->GetValue());
+	mixerEdit->AddParam(blueRedSlider->GetValue());
+	mixerEdit->AddParam(blueGreenSlider->GetValue());
+	mixerEdit->AddParam(blueBlueSlider->GetValue());
+
+	// Set enabled / disabled
+	mixerEdit->SetDisabled(isDisabled);
+
+	// Add preset number
+	mixerEdit->AddFlag(presetBox->GetSelection());
+
+	return mixerEdit;
+}
+
+bool ChannelMixerWindow::CheckCopiedParamsAndFlags(){
+
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+	if(edit == NULL){ return false;}
+
+	if (edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_MIXER) {
+		return true;
+	}
+
+	if (edit->GetParamsSize() == 9 && edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_MIXER) {
+		return true;
+	}
+
+	return false;
+}
+
+ChannelMixerWindow::ChannelMixerPreset::ChannelMixerPreset(wxString name, double redRedScale, double redGreenScale, double redBlueScale,
 	double greenRedScale, double greenGreenScale, double greenBlueScale,
 	double blueRedScale, double blueGreenScale, double blueBlueScale) {
 
@@ -294,82 +304,82 @@ ChannelTransformWindow::ChannelTransformPreset::ChannelTransformPreset(wxString 
 	blueBlue = blueBlueScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetName(wxString name) {
+void ChannelMixerWindow::ChannelMixerPreset::SetName(wxString name) {
 	presetName = name;
 }
 
-wxString ChannelTransformWindow::ChannelTransformPreset::GetName() {
+wxString ChannelMixerWindow::ChannelMixerPreset::GetName() {
 	return presetName;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetRedRedScale(double newRedRedScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetRedRedScale(double newRedRedScale) {
 	redRed = newRedRedScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetRedGreenScale(double newRedGreenScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetRedGreenScale(double newRedGreenScale) {
 	redGreen = newRedGreenScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetRedBlueScale(double newRedBlueScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetRedBlueScale(double newRedBlueScale) {
 	redBlue = newRedBlueScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetGreenRedScale(double newGreenRedScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetGreenRedScale(double newGreenRedScale) {
 	greenRed= newGreenRedScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetGreenGreenScale(double newGreenGreenScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetGreenGreenScale(double newGreenGreenScale) {
 	greenGreen = newGreenGreenScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetGreenBlueScale(double newGreenBlueScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetGreenBlueScale(double newGreenBlueScale) {
 	greenBlue = newGreenBlueScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetBlueRedScale(double newBlueRedScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetBlueRedScale(double newBlueRedScale) {
 	blueRed = newBlueRedScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetBlueGreenScale(double newBlueGreenScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetBlueGreenScale(double newBlueGreenScale) {
 	blueGreen = newBlueGreenScale;
 }
 
-void ChannelTransformWindow::ChannelTransformPreset::SetBlueBlueScale(double newBlueBlueScale) {
+void ChannelMixerWindow::ChannelMixerPreset::SetBlueBlueScale(double newBlueBlueScale) {
 	blueBlue = newBlueBlueScale;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetRedRedScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetRedRedScale() {
 	return redRed;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetRedGreenScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetRedGreenScale() {
 	return redGreen;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetRedBlueScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetRedBlueScale() {
 	return redBlue;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetGreenRedScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetGreenRedScale() {
 	return greenRed;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetGreenGreenScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetGreenGreenScale() {
 	return greenGreen;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetGreenBlueScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetGreenBlueScale() {
 	return greenBlue;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetBlueRedScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetBlueRedScale() {
 	return blueRed;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetBlueGreenScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetBlueGreenScale() {
 	return blueGreen;
 }
 
-double ChannelTransformWindow::ChannelTransformPreset::GetBlueBlueScale() {
+double ChannelMixerWindow::ChannelMixerPreset::GetBlueBlueScale() {
 	return blueBlue;
 }

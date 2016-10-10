@@ -12,6 +12,7 @@
 #include "wx\thread.h"
 
 #include "Processing\ProcessorEdit\ProcessorEdit.h"
+#include "Processing\Processor\Processor.h"
 #include "wx\event.h"
 
 enum {
@@ -26,18 +27,27 @@ wxDECLARE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 
 class EditWindow : public wxScrolledWindow{
 	public:
-		EditWindow(wxWindow * parent, wxString editName);
-		virtual void AddEditToProcessor();
+		EditWindow(wxWindow * parent, wxString editName, Processor * processor);
+
+		void DoProcess();
+		void Process(wxCommandEvent& WXUNUSED(event));
+		void AddEditToProcessor();
 		wxString GetName();
 		void SetName(wxString editName);
 
 		virtual void SetParamsAndFlags(ProcessorEdit * edit);
+		virtual ProcessorEdit * GetParamsAndFlags();
+		virtual bool CheckCopiedParamsAndFlags();
+
 		void OnUpdate(wxCommandEvent& WXUNUSED(event));
 		void StartWatchdog();
 		void StopWatchdog();
 
 		void SetDisabled(bool disable);
 		bool GetDisabled();
+
+		void Activate();
+		void Deactivate();
 
 		enum {
 			ID_PROCESS_EDITS
@@ -49,8 +59,12 @@ class EditWindow : public wxScrolledWindow{
 		bool isDisabled;
 		
 	private:
+
+		wxWindow * parWindow;
 		bool updated;
 		wxString editNme;
+		bool activated;
+		Processor * proc;
 
 		class WatchForUpdateThread : public wxThread {
 

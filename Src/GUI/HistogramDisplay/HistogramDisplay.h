@@ -25,6 +25,7 @@ public:
 	void UpdateHistograms();
 	void SetHistogramDisplay(int selection);
 	int GetHistogramDisplay();
+	void DestroyHistograms();
 private:
 
 	void OnZoom(wxCommandEvent& WXUNUSED(event));
@@ -58,6 +59,8 @@ private:
 		void ShowAll();
 
 		void RedrawHistograms();
+
+		void DestroyImages();
 	private:
 
 		void GenerateHistograms();

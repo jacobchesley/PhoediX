@@ -9,6 +9,8 @@
 	#include "wx/wx.h"
 #endif
 
+#include "wx\splash.h"
+#include "GUI\Icons\Icons.h"
 #include "GUI\MainWindow\MainWindow.h"
 #include "Debugging\MemoryLeakCheck.h"
 

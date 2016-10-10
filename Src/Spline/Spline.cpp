@@ -274,7 +274,7 @@ std::vector<Point> Spline::GetCurve(double Tension, int SplineType, int limit) {
 
 	if (limit > 0) {
 		std::vector <Point> retPoints;
-		int inc = OutPoints.size() / limit;
+		int inc = (int)OutPoints.size() / limit;
 
 		for (std::vector<Point>::size_type i = 0; i < OutPoints.size(); i += inc) {
 			retPoints.push_back(OutPoints[i]);
@@ -291,18 +291,20 @@ bool Spline::GetXCanOverlap() {
 
 	return Prev_x_overlap;
 }
+
 bool Spline::SetXCanOverlap(bool PreventXOverlap) {
 
 	Prev_x_overlap = PreventXOverlap;
 	return Prev_x_overlap;
 
 }
-int Spline::GetNumControlPoints() {
+
+size_t Spline::GetNumControlPoints() {
 
 	return ControlPoints.size();
 }
 
-int Spline::GetNumCurvePoints() {
+size_t Spline::GetNumCurvePoints() {
 
 	return OutPoints.size();
 }

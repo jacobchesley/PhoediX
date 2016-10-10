@@ -13,4 +13,10 @@ Icons::Icons() {
 
 	wxMemoryInputStream disableButtonInStream(disable_button_png, disable_button_png_size);
 	DisableButton = wxImage(disableButtonInStream);
+
+	wxMemoryInputStream splashStream(PhoediX_Splash_Screen_png, PhoediX_Splash_Screen_png_size);
+	SplashBackground = wxImage(splashStream);
+
+	wxMemoryInputStream pxStream(px_png, px_png_size);
+	pxIcon = wxImage(pxStream);
 }

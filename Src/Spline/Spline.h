@@ -37,11 +37,10 @@ public:
 	int PointExists(double x, double y, double PlusMinXY);
 
 	std::vector<Point> GetControlPoints();
-	Point GetLastModifiedControlPoint();
 	std::vector<Point> GetCurve(double Tension, int SplineType = CATMULL_ROM_SPLINE, int limit = -1);
 
-	int GetNumControlPoints();
-	int GetNumCurvePoints();
+	size_t GetNumControlPoints();
+	size_t GetNumCurvePoints();
 
 	bool GetXCanOverlap();
 	bool SetXCanOverlap(bool PreventXOverlap);

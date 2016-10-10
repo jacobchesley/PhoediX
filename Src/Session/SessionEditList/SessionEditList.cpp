@@ -6,11 +6,18 @@ PhoediXSessionEditList::PhoediXSessionEditList() {
 
 }
 
+PhoediXSessionEditList::~PhoediXSessionEditList() {
+	for (size_t i = 0; i < editList.size(); i++) {
+		delete editList[i];
+	}
+	editList.clear();
+}
+
 void PhoediXSessionEditList::SetSessionEditList(wxVector<ProcessorEdit*> newEditList) {
 
 	editList.clear();
 	for (size_t i = 0; i < newEditList.size(); i++) {
-		editList.push_back(newEditList.at(i));
+		editList.push_back(new ProcessorEdit(*newEditList.at(i)));
 	}
 }
 
@@ -23,6 +30,9 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 	// Delete all edits in the internal vector
 	for (size_t i = 0; i < editList.size(); i++) {
 		editList.at(i)->ClearIntArray();
+		editList.at(i)->ClearDoubleArray();
+		editList.at(i)->ClearFlags();
+		editList.at(i)->ClearParams();
 		delete editList.at(i);
 	}
 

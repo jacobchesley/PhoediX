@@ -1,10 +1,17 @@
 #include "Session.h"
+#include <random>
 
 PhoediXSession::PhoediXSession(){
 	editList = new PhoediXSessionEditList();
 	imgZoom = 1.0f;
 	imgScrollX = 0;
 	imgScrollY = 0;
+	id = -1;
+	name = "";
+}
+
+void PhoediXSession::Destroy(){
+	delete editList;
 }
 
 void PhoediXSession::LoadSessionFromFile(wxString filePath) {
@@ -23,37 +30,49 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 		// Get ImagePath node
 		if (sessionInfo->GetName() == "ImagePath") {
 			// Get first child (the actual content)
-			imgFile = sessionInfo->GetChildren()[0].GetContent();
+			if(sessionInfo->GetChildren() != NULL){
+				imgFile = sessionInfo->GetChildren()[0].GetContent();
+			}
 		}
 
 		// Get Histogram display selection
 		if (sessionInfo->GetName() == "HistogramDisplay") {
 			// Get first child (the actual content)
-			histogramDisplaySelect = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			if(sessionInfo->GetChildren() != NULL){
+				histogramDisplaySelect = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
 		}
 
 		// Get Image Display Zoom
 		if (sessionInfo->GetName() == "DisplayZoom") {
 			// Get first child (the actual content)
-			imgZoom = wxAtof(sessionInfo->GetChildren()[0].GetContent());
+			if(sessionInfo->GetChildren() != NULL){
+				imgZoom = wxAtof(sessionInfo->GetChildren()[0].GetContent());
+			}
 		}
 
 		// Get Image Display scroll x
 		if (sessionInfo->GetName() == "DisplayOffsetX") {
 			// Get first child (the actual content)
-			imgScrollX = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			if(sessionInfo->GetChildren() != NULL){
+				imgScrollX = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
 		}
 
 		// Get Image Display scroll y
 		if (sessionInfo->GetName() == "DisplayOffsetY") {
 			// Get first child (the actual content)
-			imgScrollY = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			if(sessionInfo->GetChildren() != NULL){
+				imgScrollY = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
 		}
 
 		// Get Perspective node
 		if (sessionInfo->GetName() == "Perspective") {
 			// Get first child (the actual content)
-			auiPerspective = sessionInfo->GetChildren()[0].GetContent();
+			if(sessionInfo->GetChildren() != NULL){
+				auiPerspective = sessionInfo->GetChildren()[0].GetContent();
+			}
 		}
 
 		// Get and load edit list into session
@@ -151,4 +170,21 @@ int PhoediXSession::GetImageScrollY() {
 
 void PhoediXSession::SetImageScrollY(int y) {
 	imgScrollY = y;
+}
+
+void PhoediXSession::GenerateID() {
+
+	id = rand() % 20000 + 500;
+}
+
+int PhoediXSession::GetID() {
+	return id;
+}
+
+void PhoediXSession::SetName(wxString newName) {
+	name = newName;
+}
+
+wxString PhoediXSession::GetName() {
+	return name;
 }

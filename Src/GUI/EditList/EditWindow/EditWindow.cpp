@@ -4,15 +4,46 @@ wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 
-EditWindow::EditWindow(wxWindow * parent, wxString editName) : wxScrolledWindow(parent) {
+EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * processor) : wxScrolledWindow(parent) {
 	editNme = editName;
 	watchdog = NULL;
 	watchdogRealtime = NULL;
 	isDisabled = false;
+	parWindow = parent;
+	activated = false;
+	proc = processor;
+
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+}
+
+void EditWindow::DoProcess() {
+
+	if (activated) {
+		wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
+		wxPostEvent(parWindow, evt);
+		this->SetUpdated(false);
+	}
+}
+
+void EditWindow::Process(wxCommandEvent& WXUNUSED(event)) {
+
+	if(activated){
+		wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
+		wxPostEvent(parWindow, evt);
+		this->SetUpdated(false);
+	}
 }
 
 wxString EditWindow::GetName() {
 	return editNme;
+}
+
+void EditWindow::Activate(){
+	activated = true;
+}
+
+void EditWindow::Deactivate(){
+	activated = false;
 }
 
 void EditWindow::SetName(wxString editName) {
@@ -35,9 +66,25 @@ bool EditWindow::GetDisabled() {
 	return isDisabled;
 }
 
-void EditWindow::AddEditToProcessor() {}
+void EditWindow::AddEditToProcessor() {
 
-void EditWindow::SetParamsAndFlags(ProcessorEdit * WXUNUSED(edit)) {}
+	ProcessorEdit * edit = this->GetParamsAndFlags();
+	if(edit != NULL){
+		proc->AddEdit(edit);
+	}
+}
+
+void EditWindow::SetParamsAndFlags(ProcessorEdit * WXUNUSED(edit)) {
+
+}
+
+ProcessorEdit * EditWindow::GetParamsAndFlags() {
+	return NULL;
+}
+
+bool EditWindow::CheckCopiedParamsAndFlags(){
+	return false;
+}
 
 void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 	updated = true;
@@ -45,7 +92,7 @@ void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 
 
 void EditWindow::StartWatchdog(){
-	watchdog = new WatchForUpdateThread(this, 100);
+	watchdog = new WatchForUpdateThread(this, 20);
 	watchdog->Run();
 	watchdog->SetPriority(2);
 }

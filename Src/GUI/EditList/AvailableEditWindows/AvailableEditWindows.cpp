@@ -7,12 +7,16 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 	// Create new edit window based on type of edit
 	switch (editID) {
 
-		case AvailableEditIDS::EDIT_ID_SHIFT_BRIGHTNESS:
-			newEditWindow = new ShiftBrightnessWindow(parent, "Shift Brightness", processor);
+		case AvailableEditIDS::EDIT_ID_ADJUST_BRIGHTNESS:
+			newEditWindow = new AdjustBrightnessWindow(parent, "Adjust Brightness", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_SCALE_BRIGHTNESS:
-			newEditWindow = new ScaleBrightnessWindow(parent, "Scale Brightness", processor);
+		case AvailableEditIDS::EDIT_ID_SHIFT_RGB:
+			newEditWindow = new ShiftRGBWindow(parent, "Shift RGB", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_ADJUST_HSL:
+			newEditWindow = new AdjustHSLWindow(parent, "Scale HSL", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_CONTRAST:
@@ -27,8 +31,8 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			newEditWindow = new RotationWindow(parent, "Rotate", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_CHANNEL_TRANSFORM:
-			newEditWindow = new ChannelTransformWindow(parent, "Channel Transform", processor);
+		case AvailableEditIDS::EDIT_ID_CHANNEL_MIXER:
+			newEditWindow = new ChannelMixerWindow(parent, "Channel Mixer", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_MIRROR:
@@ -43,6 +47,18 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			newEditWindow = new LABCurvesWindow(parent, "LAB Curves", processor);
 			break;
 
+		case AvailableEditIDS::EDIT_ID_HSL_CURVES:
+			newEditWindow = new HSLCurvesWindow(parent, "HSL Curves", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_SCALE:
+			newEditWindow = new ScaleWindow(parent, "Scale Image", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_CROP:
+			newEditWindow = new CropWindow(parent, "Crop Image", processor);
+			break;
+
 		case AvailableEditIDS::EDIT_ID_RAW:
 			newEditWindow = new RawWindow(parent, "Raw Processor", processor);
 			break;
@@ -53,96 +69,8 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 
 EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow * parent, Processor * processor) {
 
-	EditWindow * newEditWindow = NULL;
+	return AvailableEditWindows::GetEditWindow(AvailableEditWindows::GetEditIDFromEdit(edit), parent, processor);
 
-	// Create new edit window based on type of edit
-	switch (edit->GetEditType()) {
-
-		case ProcessorEdit::EditType::SHIFT_BRIGHTNESS:
-			newEditWindow = new ShiftBrightnessWindow(parent, "Shift Brightness", processor);
-			break;
-
-		case ProcessorEdit::EditType::SCALE_BRIGHTNESS:
-			newEditWindow = new ScaleBrightnessWindow(parent, "Scale Brightness", processor);
-			break;
-
-		case ProcessorEdit::EditType::ADJUST_CONTRAST:
-			newEditWindow = new ContrastWindow(parent, "Adjust Contrast", processor);
-			break;
-
-		case ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG:
-			newEditWindow = new ConvertGreyscaleWindow(parent, "Convert to Greyscale", processor);
-			break;
-
-		case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM:
-			newEditWindow = new ConvertGreyscaleWindow(parent, "Convert to Greyscale", processor);
-			break;
-
-		case ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE:
-			newEditWindow = new ConvertGreyscaleWindow(parent, "Convert to Greyscale", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_NONE:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_90_CW:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_180:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_270_CW:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
-			break;
-
-		case ProcessorEdit::EditType::CHANNEL_TRANSFORM:
-			newEditWindow = new ChannelTransformWindow(parent, "Channel Transform", processor);
-			break;
-		case ProcessorEdit::EditType::MIRROR_NONE:
-			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
-			break;
-
-		case ProcessorEdit::EditType::MIRROR_HORIZONTAL:
-			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
-			break;
-
-		case ProcessorEdit::EditType::MIRROR_VERTICAL:
-			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
-			break;
-
-		case ProcessorEdit::EditType::RGB_CURVES:
-			newEditWindow = new RGBCurvesWindow(parent, "RGB Curves", processor);
-			break;
-
-		case ProcessorEdit::EditType::LAB_CURVES:
-			newEditWindow = new LABCurvesWindow(parent, "LAB Curves", processor);
-			break;
-
-		case ProcessorEdit::EditType::RAW:
-			newEditWindow = new RawWindow(parent, "Raw Processor", processor);
-			break;
-	}
-
-	// Set loaded parameters
-	if (newEditWindow != NULL) {
-		newEditWindow->SetParamsAndFlags(edit);
-	}
-	return newEditWindow;
 }
 
 int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
@@ -150,13 +78,19 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 	// Create new edit window based on type of edit
 	switch (edit->GetEditType()) {
 
-	case ProcessorEdit::EditType::SHIFT_BRIGHTNESS:
-		return AvailableEditIDS::EDIT_ID_SHIFT_BRIGHTNESS;
+	case ProcessorEdit::EditType::ADJUST_BRIGHTNESS:
+		return AvailableEditIDS::EDIT_ID_ADJUST_BRIGHTNESS;
 
-	case ProcessorEdit::EditType::SCALE_BRIGHTNESS:
-		return AvailableEditIDS::EDIT_ID_SCALE_BRIGHTNESS;
+	case ProcessorEdit::EditType::SHIFT_RGB:
+		return AvailableEditIDS::EDIT_ID_SHIFT_RGB;
+
+	case ProcessorEdit::EditType::ADJUST_HSL:
+		return AvailableEditIDS::EDIT_ID_ADJUST_HSL;
 
 	case ProcessorEdit::EditType::ADJUST_CONTRAST:
+		return AvailableEditIDS::EDIT_ID_CONTRAST;
+
+	case ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE:
 		return AvailableEditIDS::EDIT_ID_CONTRAST;
 
 	case ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG:
@@ -189,8 +123,8 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 	case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST:
 		return AvailableEditIDS::EDIT_ID_ROTATE;
 
-	case ProcessorEdit::EditType::CHANNEL_TRANSFORM:
-		return AvailableEditIDS::EDIT_ID_CHANNEL_TRANSFORM;
+	case ProcessorEdit::EditType::CHANNEL_MIXER:
+		return AvailableEditIDS::EDIT_ID_CHANNEL_MIXER;
 
 	case ProcessorEdit::EditType::MIRROR_NONE:
 		return AvailableEditIDS::EDIT_ID_MIRROR;
@@ -206,6 +140,21 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 
 	case ProcessorEdit::EditType::LAB_CURVES:
 		return AvailableEditIDS::EDIT_ID_LAB_CURVES;
+
+	case ProcessorEdit::EditType::HSL_CURVES:
+		return AvailableEditIDS::EDIT_ID_HSL_CURVES;
+
+	case ProcessorEdit::EditType::SCALE_BICUBIC:
+		return AvailableEditIDS::EDIT_ID_SCALE;
+
+	case ProcessorEdit::EditType::SCALE_BILINEAR:
+		return AvailableEditIDS::EDIT_ID_SCALE;
+
+	case ProcessorEdit::EditType::SCALE_NEAREST:
+		return AvailableEditIDS::EDIT_ID_SCALE;
+
+	case ProcessorEdit::EditType::CROP:
+		return AvailableEditIDS::EDIT_ID_CROP;
 
 	case ProcessorEdit::EditType::RAW:
 		return AvailableEditIDS::EDIT_ID_RAW;

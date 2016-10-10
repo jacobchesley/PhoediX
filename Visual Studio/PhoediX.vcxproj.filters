@@ -70,12 +70,6 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows">
       <UniqueIdentifier>{fcecefef-6be0-41d3-94a3-eef9fa49714c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Shift Brightness">
-      <UniqueIdentifier>{cb467c56-fbd7-4f53-8323-8666b846504b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Scale Brightness">
-      <UniqueIdentifier>{373d0714-b389-47a1-af21-dec711d6ef8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Contrast">
       <UniqueIdentifier>{15c973d2-3bcb-4b4f-be8a-9b4d0a84a4bd}</UniqueIdentifier>
     </Filter>
@@ -87,9 +81,6 @@
     </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Rotation">
       <UniqueIdentifier>{64fd5cfd-b250-42fc-88f9-e846009bdc97}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform">
-      <UniqueIdentifier>{3e13dec2-a021-47e3-bf9e-6faec7bb1647}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Mirror">
       <UniqueIdentifier>{3e3111cd-5214-44ba-8f86-9556dccceae8}</UniqueIdentifier>
@@ -123,6 +114,48 @@
     </Filter>
     <Filter Include="GUI\Controls\Collapsible Pane">
       <UniqueIdentifier>{f3c07118-e513-4793-be0c-5a4b6f8d3a6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Channel Mixer">
+      <UniqueIdentifier>{3e13dec2-a021-47e3-bf9e-6faec7bb1647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Adjust Brightness">
+      <UniqueIdentifier>{cb467c56-fbd7-4f53-8323-8666b846504b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Adjust HSL">
+      <UniqueIdentifier>{8dc6b330-1550-4cda-b9cf-e8ac49f79d50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB">
+      <UniqueIdentifier>{212613a4-d050-4c78-8bba-a13bfee5ca6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Main Window\Export Window">
+      <UniqueIdentifier>{42574900-a77c-4f00-b945-5c4e112db4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Scale">
+      <UniqueIdentifier>{cd57c266-5eae-44cf-8f66-90f3d5875b75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Crop">
+      <UniqueIdentifier>{ae263040-26e2-4853-aca2-cab85d92c5cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Main Window\Pixel Peep">
+      <UniqueIdentifier>{b6a9d933-49f0-467b-b155-cec9715c641c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves">
+      <UniqueIdentifier>{ee436ec2-11fe-4336-8d0d-917bf6e0f2cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Main Window\Settings Window">
+      <UniqueIdentifier>{7454ac40-37e3-495b-abf3-f5006c8f2931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Main Window\About Window">
+      <UniqueIdentifier>{47200a5c-8425-415f-b807-52d4ccf00ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Selections Window">
+      <UniqueIdentifier>{c85dbce6-6844-4b5d-84b5-fae616d30ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Selections Window\Selections Image">
+      <UniqueIdentifier>{066dffb1-86f7-42b7-a1e7-34eaf66387f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Selections Window\Directory Selection">
+      <UniqueIdentifier>{738ac250-d89e-423e-88ac-499bdbe41c7b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -183,20 +216,11 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleBrightnessWindow\ScaleBrightnessWindow.cpp">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale Brightness</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftBrightnessWindow\ShiftBrightnessWindowcpp.cpp">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift Brightness</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Rotation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.cpp">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Mirror</Filter>
@@ -230,6 +254,48 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.cpp">
       <Filter>GUI\Controls\Collapsible Pane</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelMixerWindow\ChannelMixerWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Mixer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustBrightnessWindow\AdjustBrightnessWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust Brightness</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustHSLWindow\AdjustHSLWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust HSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.cpp">
+      <Filter>GUI\Main Window\Export Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\CropWindow\CropWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Crop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.cpp">
+      <Filter>GUI\Main Window\Pixel Peep</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\HSLCurvesWindow\HSLCurvesWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.cpp">
+      <Filter>GUI\Main Window\Settings Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.cpp">
+      <Filter>GUI\Main Window\About Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp">
+      <Filter>GUI\Selections Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.cpp">
+      <Filter>GUI\Selections Window\Selections Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelection.cpp">
+      <Filter>GUI\Selections Window\Directory Selection</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,20 +368,11 @@
     <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h">
       <Filter>GUI\AUI Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleBrightnessWindow\ScaleBrightnessWindow.h">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale Brightness</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftBrightnessWindow\ShiftBrightnessWindow.h">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift Brightness</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Rotation</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelTransformWindow\ChannelTransformWindow.h">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Transform</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Mirror</Filter>
@@ -352,6 +409,51 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.h">
       <Filter>GUI\Controls\Collapsible Pane</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelMixerWindow\ChannelMixerWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Channel Mixer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustBrightnessWindow\AdjustBrightnessWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust Brightness</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustHSLWindow\AdjustHSLWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust HSL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Icons\Splash.h">
+      <Filter>GUI\Icons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.h">
+      <Filter>GUI\Main Window\Export Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\CropWindow\CropWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Crop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.h">
+      <Filter>GUI\Main Window\Pixel Peep</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\HSLCurvesWindow\HSLCurvesWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.h">
+      <Filter>GUI\Main Window\Settings Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.h">
+      <Filter>GUI\Main Window\About Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryWindow.h">
+      <Filter>GUI\Selections Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.h">
+      <Filter>GUI\Selections Window\Selections Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.h">
+      <Filter>GUI\Selections Window\Directory Selection</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

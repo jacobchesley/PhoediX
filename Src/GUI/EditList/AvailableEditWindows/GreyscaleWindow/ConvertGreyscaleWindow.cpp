@@ -1,6 +1,6 @@
 #include "ConvertGreyscaleWindow.h"
 
-ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -84,13 +84,6 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	this->StartWatchdog();
 }
 
-void ConvertGreyscaleWindow::Process(wxCommandEvent& WXUNUSED(event)) {
-
-	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
-	wxPostEvent(parWindow, evt);
-	this->SetUpdated(false);
-}
-
 void ConvertGreyscaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 
 	if (greyscaleMethod->GetSelection() == 2) {
@@ -113,8 +106,33 @@ void ConvertGreyscaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 	this->SetUpdated(true);
 }
 
-void ConvertGreyscaleWindow::AddEditToProcessor() {
+void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	
+	if(edit == NULL){ return; }
+
+	// Choose method based on edit loaded
+	if (edit->GetFlagsSize() == 1 && (
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE || 
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM)) {
+
+		greyscaleMethod->SetSelection(edit->GetFlag(0));
+
+		// Fire combo box event to show / hide sliders
+		wxCommandEvent comboEvt(wxEVT_COMBOBOX);
+		wxPostEvent(this, comboEvt);
+	}
+
+	// Populate sliders based on edit loaded
+	if (edit->GetParamsSize() == 3 && edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM){
+		redBrightSlider->SetValue(edit->GetParam(0));
+		greenBrightSlider->SetValue(edit->GetParam(1));
+		blueBrightSlider->SetValue(edit->GetParam(2));
+	}
+}
+
+ProcessorEdit * ConvertGreyscaleWindow::GetParamsAndFlags(){
+
 	int greyscaleSelection = greyscaleMethod->GetSelection();
 
 	if (greyscaleSelection == 0) {
@@ -124,7 +142,7 @@ void ConvertGreyscaleWindow::AddEditToProcessor() {
 		// Set enabled / disabled
 		greyEdit->SetDisabled(isDisabled);
 
-		proc->AddEdit(greyEdit);
+		return greyEdit;
 	}
 
 	else if (greyscaleSelection == 1) {
@@ -134,7 +152,7 @@ void ConvertGreyscaleWindow::AddEditToProcessor() {
 		// Set enabled / disabled
 		greyEdit->SetDisabled(isDisabled);
 
-		proc->AddEdit(greyEdit);
+		return greyEdit;
 	}
 
 	else if (greyscaleSelection == 2) {
@@ -147,27 +165,31 @@ void ConvertGreyscaleWindow::AddEditToProcessor() {
 		greyEdit->SetDisabled(isDisabled);
 
 		greyEdit->AddFlag(greyscaleSelection);
-		proc->AddEdit(greyEdit);
+		return greyEdit;
 	}
+
+	return NULL;
 }
 
-void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
-	
-	// Choose method based on edit loaded
+bool ConvertGreyscaleWindow::CheckCopiedParamsAndFlags(){
+
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+	if(edit == NULL){ return false; }
+
 	if (edit->GetFlagsSize() == 1 && (
 		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||
 		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE || 
 		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM)) {
 
-		greyscaleMethod->SetSelection(edit->GetFlag(0));
+		if(edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM && edit->GetParamsSize() == 3){
+			return true;
+		}
+		else if(edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
-
-	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 3 && edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM){
-		redBrightSlider->SetValue(edit->GetParam(0));
-		greenBrightSlider->SetValue(edit->GetParam(1));
-		blueBrightSlider->SetValue(edit->GetParam(2));
-	}
-	
-	this->SetUpdated(true);
+	return false;
 }

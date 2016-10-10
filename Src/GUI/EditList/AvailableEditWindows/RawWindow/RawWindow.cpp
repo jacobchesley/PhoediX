@@ -1,6 +1,6 @@
 #include "RawWindow.h"
 
-RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	parWindow = parent;
 	proc = processor;
@@ -141,14 +141,6 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	exposurePanel->GetSizer()->Add(highlightLabel);
 	exposurePanel->GetSizer()->Add(highlightControl);
 
-	// Black Level
-	blackLevelLabel = new wxStaticText(exposurePanel, -1, "Black Level");
-	blackLevelLabel->SetForegroundColour(Colors::TextLightGrey);
-	blackLevelControl = new DoubleSlider(exposurePanel, (double)defaultBlack, 0.0, (double)defaultSat, defaultSat, 0);
-	this->FormatSlider(blackLevelControl);
-	exposurePanel->GetSizer()->Add(blackLevelLabel);
-	exposurePanel->GetSizer()->Add(blackLevelControl);
-
 	// Saturation Level
 	satLevelLabel = new wxStaticText(exposurePanel, -1, "Saturation Level");
 	satLevelLabel->SetForegroundColour(Colors::TextLightGrey);
@@ -265,28 +257,6 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	colorPanel->GetSizer()->Add(blueMultiplierLabel);
 	colorPanel->GetSizer()->Add(blueMultiplierControl);
 
-	// Color channel black levels
-	redBlackLabel = new wxStaticText(colorPanel, -1, "Red Channel Black Level");
-	redBlackLabel->SetForegroundColour(Colors::TextLightGrey);
-	redBlackControl = new DoubleSlider(colorPanel, (double)0.0, 0.0, (double)defaultSat, defaultSat, 0);
-	this->FormatSlider(redBlackControl);
-	colorPanel->GetSizer()->Add(redBlackLabel);
-	colorPanel->GetSizer()->Add(redBlackControl);
-
-	greenBlackLabel = new wxStaticText(colorPanel, -1, "Green Channel Black Level");
-	greenBlackLabel->SetForegroundColour(Colors::TextLightGrey);
-	greenBlackControl = new DoubleSlider(colorPanel, (double)0.0, 0.0, (double)defaultSat, defaultSat, 0);
-	this->FormatSlider(greenBlackControl);
-	colorPanel->GetSizer()->Add(greenBlackLabel);
-	colorPanel->GetSizer()->Add(greenBlackControl);
-
-	blueBlackLabel = new wxStaticText(colorPanel, -1, "Blue Channel Black Level");
-	blueBlackLabel->SetForegroundColour(Colors::TextLightGrey);
-	blueBlackControl = new DoubleSlider(colorPanel, (double)0.0, 0.0, (double)defaultSat, defaultSat, 0);
-	this->FormatSlider(blueBlackControl);
-	colorPanel->GetSizer()->Add(blueBlackLabel);
-	colorPanel->GetSizer()->Add(blueBlackControl);
-
 	// ---------------------------  RAW noise labels and controls --------------------------- 
 	noisePanelCollapse = new CollapsiblePane(this, "Noise Reduction");
 	noiseSizer = new wxFlexGridSizer(2, 15, 5);
@@ -300,7 +270,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	// Wavelet noise reduction
 	waveletNoiseLabel = new wxStaticText(noisePanel, -1, "Wavelet NR Threshold");
 	waveletNoiseLabel->SetForegroundColour(Colors::TextLightGrey);
-	waveletNoiseControl = new DoubleSlider(noisePanel, (double)0, (double)0, (double)defaultSat, (double)defaultSat, 0);
+	waveletNoiseControl = new DoubleSlider(noisePanel, 0.0, 0.0, 1000.0, 1000, 0);
 	this->FormatSlider(waveletNoiseControl);
 	noisePanel->GetSizer()->Add(waveletNoiseLabel);
 	noisePanel->GetSizer()->Add(waveletNoiseControl);
@@ -315,7 +285,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 
 	cfaCleanLLabel = new wxStaticText(noisePanel, -1, "CFA Luminance NR");
 	cfaCleanLLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanLControl = new DoubleSlider(noisePanel, 0.01, 0.005, 0.05, 500000, 5);
+	cfaCleanLControl = new DoubleSlider(noisePanel, 0.01, 0.0, 0.5, 500000, 5);
 	this->FormatSlider(cfaCleanLControl);
 	noisePanel->GetSizer()->Add(cfaCleanLLabel);
 	noisePanel->GetSizer()->Add(cfaCleanLControl);
@@ -324,7 +294,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 
 	cfaCleanCLabel = new wxStaticText(noisePanel, -1, "CFA Color NR");
 	cfaCleanCLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanCControl = new DoubleSlider(noisePanel, 0.01, 0.005, 0.05, 500000, 5);
+	cfaCleanCControl = new DoubleSlider(noisePanel, 0.01, 0.0, 0.5, 500000, 5);
 	this->FormatSlider(cfaCleanCControl);
 	noisePanel->GetSizer()->Add(cfaCleanCLabel);
 	noisePanel->GetSizer()->Add(cfaCleanCControl);
@@ -347,11 +317,37 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	noisePanel->GetSizer()->Add(cfaCleanLineControl);
 	cfaCleanLineLabel->Hide();
 	cfaCleanLineControl->Hide();
+	
+	// ---------------------------  RAW info labels and controls --------------------------- 
+	infoPanelCollapse = new CollapsiblePane(this, "RAW Information");
+	infoPanelCollapse->SetTextBackgroundColour(this->GetBackgroundColour());
+	infoPanelCollapse->SetTextForegroundColour(Colors::TextLightGrey);
+	infoPanelCollapse->SetTextFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
+	infoList = new wxListCtrl(infoPanelCollapse, -1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT);
+	infoList->SetBackgroundColour(this->GetBackgroundColour());
+	infoList->SetForegroundColour(Colors::TextLightGrey);
+
+	infoList->InsertColumn(0, "");
+	infoList->InsertColumn(1, "");
+
+	this->PopulateRawInfo();
+	
+	infoPanelCollapse->AttachWindow(infoList);
+	
+	// Add all collapsable panes to this sizer
 	this->GetSizer()->Add(settingsPanelCollapse, 0, wxGROW | wxALL, 5);
 	this->GetSizer()->Add(exposurePanelCollapse, 0, wxGROW | wxALL, 5);
 	this->GetSizer()->Add(colorPanelCollapse, 0, wxGROW | wxALL, 5);
 	this->GetSizer()->Add(noisePanelCollapse, 0, wxGROW | wxALL, 5);
+	this->GetSizer()->Add(infoPanelCollapse, 1, wxEXPAND | wxALL, 5);
+
+	// Collapse all panes for clean look
+	settingsPanelCollapse->Collapse();
+	exposurePanelCollapse->Collapse();
+	colorPanelCollapse->Collapse();
+	noisePanelCollapse->Collapse();
+	infoPanelCollapse->Collapse();
 
 	this->FitInside();
 	this->SetScrollRate(5, 5);
@@ -362,10 +358,105 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RawWindow::OnCombo, this);
 	this->Bind(wxEVT_CHECKBOX, (wxObjectEventFunction)&RawWindow::OnCheck, this);
 
-
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RawWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RawWindow::ProcessEvt, this, EditWindow::ID_PROCESS_EDITS);
 	
 	this->StartWatchdog();
+}
+
+void RawWindow::PopulateRawInfo(){
+	this->AddRawInfo("File Name", proc->GetFileName());
+	this->AddRawInfo("Date Time", ctime(&proc->rawPrcoessor.imgdata.other.timestamp));
+	this->AddRawInfo("Artist", wxString(proc->rawPrcoessor.imgdata.other.artist));
+	this->AddRawInfo("Description", wxString(proc->rawPrcoessor.imgdata.other.desc));
+	this->AddRawInfo("Shot Order (Image Serial)", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.other.shot_order));
+
+	this->AddRawInfo("", "");
+	// 90 degree rotation clockwise or counter clockwise.  Flip width and height
+	if (proc->rawPrcoessor.imgdata.sizes.flip == 5 || proc->rawPrcoessor.imgdata.sizes.flip == 6) {
+		this->AddRawInfo("Width", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iheight));
+		this->AddRawInfo("Height", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iwidth));
+	}
+	else {
+		this->AddRawInfo("Width", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iwidth));
+		this->AddRawInfo("Height", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iheight));
+	}
+	this->AddRawInfo("", "");
+	this->AddRawInfo("Shutter Speed", this->GetShutterSpeedStr(proc->rawPrcoessor.imgdata.other.shutter) + " sec");
+	this->AddRawInfo("Aperature", "f / " + wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.other.aperture));
+	this->AddRawInfo("ISO", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.other.iso_speed));
+	this->AddRawInfo("Focal Length", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.other.focal_len) + " mm");
+
+	wxString flashFired = "No";
+	if(proc->rawPrcoessor.imgdata.color.flash_used > 0.0){
+		flashFired = "Yes";
+	}
+	this->AddRawInfo("Flash Fired?", flashFired);
+
+	this->AddRawInfo("", "");
+	this->AddRawInfo("Camera Make", wxString(proc->rawPrcoessor.imgdata.idata.make));
+	this->AddRawInfo("Camera Model", wxString(proc->rawPrcoessor.imgdata.idata.model));
+
+
+	this->AddRawInfo("", "");
+	this->AddRawInfo("Lens Make", wxString(proc->rawPrcoessor.imgdata.lens.LensMake), true);
+	this->AddRawInfo("Lens Model", wxString(proc->rawPrcoessor.imgdata.lens.Lens), true);
+
+	if(!this->AddRawInfo("Lens Min Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinFocal), true)){
+		this->AddRawInfo("Lens Min Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.MinFocal), true);
+	}
+
+	if(!this->AddRawInfo("Lens Max Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxFocal), true)){
+		this->AddRawInfo("Lens Max Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.MaxFocal), true);
+	}
+
+	if(!this->AddRawInfo("Lens Max Aperature", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp), true)){}
+
+	if(!this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4MinFocal), true)){
+		this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.MaxAp4MinFocal), true);
+	}
+
+	if(!this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4MaxFocal), true)){
+		this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.MaxAp4MaxFocal), true);
+	}
+
+	if(!this->AddRawInfo("Lens Max Aperature / Cur Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4CurFocal), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp4MinFocal), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp4MaxFocal), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature / Cur Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp4CurFocal), true)){}
+
+}
+
+bool RawWindow::AddRawInfo(wxString tag, wxString value, bool doNotAddZero){
+
+	if(doNotAddZero){
+		if(value == "" || value == "0" || value == "0.0" || value == "0.00" || value == "0.000"){
+			return false;
+		}
+	}
+	long index = infoList->InsertItem(infoList->GetItemCount(), tag);
+	infoList->SetItem(index, 1, value);
+
+	// Size each column to the max size needed to show all the text
+	infoList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	infoList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+
+	return true;
+}
+
+wxString RawWindow::GetShutterSpeedStr(float shutterSpeed){
+
+	if(shutterSpeed > 1.0){
+		return wxString(std::to_string(shutterSpeed));
+	}
+
+	for(int i = 1; i < 16001; i++){
+		if((1.0f / (float)i) == shutterSpeed){
+			return wxString("1/" + std::to_string(i));
+		}
+	}
+
+	return wxString(std::to_string(shutterSpeed));
 }
 
 void RawWindow::OnCheck(wxCommandEvent& checkEvent) {
@@ -411,7 +502,6 @@ void RawWindow::OnCheck(wxCommandEvent& checkEvent) {
 	}
 
 	this->FitInside();
-	this->SetClientSize(this->GetVirtualSize());
 	this->SetUpdated(true);
 }
 
@@ -455,14 +545,39 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 	// White Balance Preset
 	if (checkEvent.GetId() == ID_WHITE_BALANCE_COMBO) {
 
+		redMultiplierLabel->Show();
+		greenMultiplierLabel->Show();
+		blueMultiplierLabel->Show();
+
+		redMultiplierControl->Show();
+		greenMultiplierControl->Show();
+		blueMultiplierControl->Show();
+
 		switch (whiteBalancePresetsControl->GetSelection()) {
 
 			// Camera WB
-			case 0:
+			case 0:{
+
+				double redMult = proc->rawPrcoessor.imgdata.color.cam_mul[0];
+				double greenMult = proc->rawPrcoessor.imgdata.color.cam_mul[1];
+				double blueMult = proc->rawPrcoessor.imgdata.color.cam_mul[2];
+
+				redMultiplierControl->SetValue(redMult / greenMult);
+				greenMultiplierControl->SetValue(1.0);
+				blueMultiplierControl->SetValue(blueMult / greenMult);
 				break;
+			}
 
 			// Auto WB
 			case 1:
+
+				redMultiplierLabel->Hide();
+				greenMultiplierLabel->Hide();
+				blueMultiplierLabel->Hide();
+
+				redMultiplierControl->Hide();
+				greenMultiplierControl->Hide();
+				blueMultiplierControl->Hide();
 				break;
 
 			// Tungsten
@@ -510,7 +625,6 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 	}
 
 	this->FitInside();
-	this->SetClientSize(this->GetVirtualSize());
 	this->SetUpdated(true);
 }
 
@@ -530,17 +644,18 @@ void RawWindow::OnSlide(wxCommandEvent& slideEvt) {
 	}
 	
 	this->FitInside();
-	this->SetClientSize(this->GetVirtualSize());
 	this->SetUpdated(true);
 }
 
+void RawWindow::ProcessEvt(wxCommandEvent& WXUNUSED(event)) {
+	this->Process();
+}
 
-void RawWindow::Process(wxCommandEvent& WXUNUSED(event)) {
-
+void RawWindow::Process() {
+	
 	// Set Params
 	proc->rawPrcoessor.imgdata.params.bright = (float) brightnessControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.highlight = highlightControl->GetSelection();
-	proc->rawPrcoessor.imgdata.params.user_black = (int)blackLevelControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_sat = (int)satLevelControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.auto_bright_thr = (float)autoBrightThrControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.adjust_maximum_thr = (float)maxThrControl->GetValue();
@@ -553,29 +668,31 @@ void RawWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 	proc->rawPrcoessor.imgdata.params.user_mul[1] = greenMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[2] = blueMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[3] = greenMultiplierControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_cblack[0] = (int)redBlackControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_cblack[1] = (int)greenBlackControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_cblack[2] = (int)blueBlackControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_cblack[3] = (int)greenBlackControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.cfa_clean = (int)cfaCleanControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.lclean = (float)cfaCleanLControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.cclean = (float)cfaCleanCControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.threshold = (float)waveletNoiseControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.cfaline = (int)cfaCleanLineEnableControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.linenoise = (float)cfaCleanLineControl->GetValue();
-	
+
+	// White Balance
+
+	// Camera White Balance
 	if(whiteBalancePresetsControl->GetSelection() == 0){
 		proc->rawPrcoessor.imgdata.params.use_camera_wb = 1;
 		proc->rawPrcoessor.imgdata.params.use_auto_wb = 0;
+
 	}
 	else if(whiteBalancePresetsControl->GetSelection() == 1) {
 		proc->rawPrcoessor.imgdata.params.use_camera_wb = 0;
 		proc->rawPrcoessor.imgdata.params.use_auto_wb = 1;
+
 	}
 	else {
 		proc->rawPrcoessor.imgdata.params.use_camera_wb = 0;
 		proc->rawPrcoessor.imgdata.params.use_auto_wb = 0;
 	}
+	
 	// Auto Bright
 	if (!autoBrightControl->GetValue()) { proc->rawPrcoessor.imgdata.params.no_auto_bright = true; }
 	else { proc->rawPrcoessor.imgdata.params.no_auto_bright = false; }
@@ -612,7 +729,7 @@ void RawWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 			proc->rawPrcoessor.imgdata.params.output_color = 0;
 			break;
 	}
-
+	
 	// Choose Image Flip
 	switch (flipControl->GetSelection()) {
 	case 0:
@@ -631,7 +748,7 @@ void RawWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 		proc->rawPrcoessor.imgdata.params.user_flip = 5;
 		break;
 	}
-
+	
 	// Unpack and reprocess if needed
 	if (
 		halfSizeControl->GetValue() != lastHalfSizeVal
@@ -651,15 +768,100 @@ void RawWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 		wxPostEvent(parWindow, evt);
 	}
 	this->SetUpdated(false);
+
 }
 
-
 void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
-	
 
+	if(edit == NULL){ return;}
+
+	if(edit->GetEditType() == ProcessorEdit::EditType::RAW && edit->GetParamsSize() == 26){
+		brightnessControl->SetValue(edit->GetParam(0));
+		highlightControl->SetSelection((int)edit->GetParam(1));
+		satLevelControl->SetValue(edit->GetParam(2));
+		autoBrightThrControl->SetValue(edit->GetParam(3));
+		maxThrControl->SetValue(edit->GetParam(4));
+		gammaLevelControl->SetValue(edit->GetParam(5));
+		gammaSlopeControl->SetValue(edit->GetParam(6));
+		interpolationControl->SetSelection((int)edit->GetParam(7));
+		halfSizeControl->SetValue((bool)edit->GetParam(8));
+		greenMatchingControl->SetValue((bool)edit->GetParam(9));
+		redMultiplierControl->SetValue(edit->GetParam(10));
+		greenMultiplierControl->SetValue(edit->GetParam(11));
+		blueMultiplierControl->SetValue(edit->GetParam(12));
+		cfaCleanControl->SetValue((bool)edit->GetParam(13));
+		cfaCleanLControl->SetValue(edit->GetParam(14));
+		cfaCleanCControl->SetValue(edit->GetParam(15));
+		waveletNoiseControl->SetValue(edit->GetParam(16));
+		cfaCleanLineEnableControl->SetValue(edit->GetParam(17));
+		cfaCleanLineControl->SetValue(edit->GetParam(18));
+	
+		whiteBalancePresetsControl->SetSelection((int)edit->GetParam(19));
+		autoBrightControl->SetValue((bool)edit->GetParam(20));
+		exposureControl->SetValue(edit->GetParam(21));
+		exposurePreserveControl->SetValue(edit->GetParam(22));
+		colorSpaceControl->SetSelection((int)edit->GetParam(23));
+		flipControl->SetSelection((int)edit->GetParam(24));
+		halfSizeControl->SetValue((bool)edit->GetParam(25));
+
+		this->Process();
+	}
+}
+
+ProcessorEdit * RawWindow::GetParamsAndFlags(){
+
+	ProcessorEdit * rawEdit = new ProcessorEdit(ProcessorEdit::EditType::RAW);
+
+	rawEdit->AddParam(brightnessControl->GetValue());
+	rawEdit->AddParam((double) highlightControl->GetSelection());
+	rawEdit->AddParam(satLevelControl->GetValue());
+	rawEdit->AddParam(autoBrightThrControl->GetValue());
+	rawEdit->AddParam(maxThrControl->GetValue());
+
+	rawEdit->AddParam(gammaLevelControl->GetValue());
+	rawEdit->AddParam(gammaSlopeControl->GetValue());
+	rawEdit->AddParam((double)interpolationControl->GetSelection());
+	rawEdit->AddParam((double)halfSizeControl->GetValue());
+	rawEdit->AddParam((double)greenMatchingControl->GetValue());
+	
+	rawEdit->AddParam(redMultiplierControl->GetValue());
+	rawEdit->AddParam(greenMultiplierControl->GetValue());
+	rawEdit->AddParam(blueMultiplierControl->GetValue());
+	rawEdit->AddParam((double)cfaCleanControl->GetValue());
+	rawEdit->AddParam(cfaCleanLControl->GetValue());
+
+	rawEdit->AddParam(cfaCleanCControl->GetValue());
+	rawEdit->AddParam(waveletNoiseControl->GetValue());
+	rawEdit->AddParam((double)cfaCleanLineEnableControl->GetValue());
+	rawEdit->AddParam(cfaCleanLineControl->GetValue());
+	rawEdit->AddParam((double)whiteBalancePresetsControl->GetSelection());
+
+	
+	rawEdit->AddParam(autoBrightControl->GetValue());
+	rawEdit->AddParam(exposureControl->GetValue());
+	rawEdit->AddParam(exposurePreserveControl->GetValue());
+	rawEdit->AddParam((double)colorSpaceControl->GetSelection());
+	rawEdit->AddParam((double)flipControl->GetSelection());
+
+	
+	rawEdit->AddParam((double)halfSizeControl->GetValue());
+
+	return rawEdit;
+}
+
+bool RawWindow::CheckCopiedParamsAndFlags(){
+
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+
+	if(edit == NULL){ return false;}
+	if(edit->GetEditType() == ProcessorEdit::EditType::RAW && edit->GetParamsSize() == 26){
+		return true;
+	}
+	return false;
 }
 
 void RawWindow::FormatSlider(DoubleSlider * slider) {
+
 	slider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	slider->SetForegroundColour(Colors::TextLightGrey);
 	slider->SetBackgroundColour(this->GetBackgroundColour());

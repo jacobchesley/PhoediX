@@ -1,7 +1,7 @@
 #ifndef RGB_CURVE_H
 #define RGB_CURVE_H
 
-#include "wx\choicebk.h"
+#include "wx\notebook.h"
 
 #include "GUI\EditList\EditWindow\EditWindow.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"
@@ -26,7 +26,7 @@ public:
 	CurvePanel* greenCurve;
 	CurvePanel * blueCurve;
 
-	wxChoicebook * curveTabs;
+	wxNotebook * curveTabs;
 	wxBoxSizer * container;
 
 	wxTextCtrl * text;
@@ -34,10 +34,11 @@ public:
 	Processor * proc;
 
 	RGBCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
-	void Process(wxCommandEvent& WXUNUSED(event));
 
 	void AddEditToProcessor();
 	void SetParamsAndFlags(ProcessorEdit * edit);
+	ProcessorEdit * GetParamsAndFlags();
+	bool CheckCopiedParamsAndFlags();
 
 };
 

@@ -18,6 +18,7 @@ class PhoediXSessionEditList {
 
 public:
 	PhoediXSessionEditList();
+	~PhoediXSessionEditList();
 	void SetSessionEditList(wxVector<ProcessorEdit*> newEditList);
 	wxVector<ProcessorEdit*> GetSessionEditList();
 	void LoadSessionEditList(wxXmlNode * editListNode);

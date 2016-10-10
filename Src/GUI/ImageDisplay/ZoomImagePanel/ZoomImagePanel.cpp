@@ -194,13 +194,25 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 	// Verify new image is okay
 	if (newImage->GetWidth() > 0 && newImage->GetHeight() > 0) {
 
-		// Copy image data (8 bit)
-		unsigned char * imageData = (unsigned char *)malloc(sizeof(unsigned char) * newImage->GetWidth() * newImage->GetHeight() * 3);
-		ImageHandler::CopyImageData8(newImage, imageData);
+		int numPixels = newImage->GetWidth() * newImage->GetHeight();
 
-		// Create a new wxImage and wxBitmap from it for rendering
-		wxImage tempImage = wxImage(newImage->GetWidth(), newImage->GetHeight(), imageData);
-		bitmapDraw = wxBitmap(tempImage);
+		// Copy image data (8 bit)
+		unsigned char * imageData = (unsigned char *)malloc(sizeof(unsigned char) * numPixels * 3);
+
+		if(imageData != NULL){
+			ImageHandler::CopyImageData8(newImage, imageData);
+			wxImage tempImage = wxImage(newImage->GetWidth(), newImage->GetHeight(), imageData);
+			if(!tempImage.IsOk()){
+				bitmapDraw = wxBitmap(wxImage(1, 1));
+			}
+			bitmapDraw = wxBitmap(tempImage);
+			if(!bitmapDraw.IsOk()){
+				bitmapDraw = wxBitmap(wxImage(1, 1));
+			}
+		}
+		else{
+			bitmapDraw = wxBitmap(wxImage(1, 1));
+		}
 	}
 }
 

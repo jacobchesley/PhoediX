@@ -15,6 +15,8 @@ public:
 	void SetTextBackgroundColour(wxColour color);
 	void SetTextForegroundColour(wxColour color);
 	void SetTextFont(wxFont font);
+	void Collapse();
+	void Open();
 
 private:
 

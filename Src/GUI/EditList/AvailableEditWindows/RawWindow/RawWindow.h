@@ -1,6 +1,8 @@
 #ifndef RAW_WINDOW_H
 #define RAW_WINDOW_H
 
+#include "wx\listctrl.h"
+
 #include "GUI\Controls\CollapsiblePane\CollapsiblePane.h"
 #include "GUI\EditList\EditWindow\EditWindow.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"
@@ -11,10 +13,18 @@
 class RawWindow : public EditWindow {
 	public:
 		RawWindow(wxWindow * parent, wxString editName, Processor * processor);
-		void Process(wxCommandEvent& WXUNUSED(event));
+		void Process();
+		void ProcessEvt(wxCommandEvent& WXUNUSED(event));
+		void AddEditToProcessor();
 		void SetParamsAndFlags(ProcessorEdit * edit);
+		ProcessorEdit * GetParamsAndFlags();
+		bool CheckCopiedParamsAndFlags();
 
 	private:
+
+		void PopulateRawInfo();
+		bool AddRawInfo(wxString tag, wxString value, bool doNotAddZero = false);
+		wxString GetShutterSpeedStr(float shutterSpeed);
 
 		void FormatSlider(DoubleSlider * slider);
 		void FormatText(wxStaticText * text);
@@ -146,6 +156,13 @@ class RawWindow : public EditWindow {
 
 		wxStaticText * cfaCleanLineLabel;
 		DoubleSlider * cfaCleanLineControl;
+
+		// Info
+		CollapsiblePane * infoPanelCollapse;
+		wxPanel * infoPanel;
+		wxBoxSizer * infoSizer;
+
+		wxListCtrl * infoList;
 
 		enum {
 			ID_AUTO_BRIGHT_CHECK,

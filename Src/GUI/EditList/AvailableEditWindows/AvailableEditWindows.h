@@ -11,16 +11,20 @@
 
 #include "GUI\EditList\EditWindow\EditWindow.h"
 
-#include "ChannelTransformWindow\ChannelTransformWindow.h"
+#include "AdjustBrightnessWindow\AdjustBrightnessWindow.h"
+#include "ChannelMixerWindow\ChannelMixerWindow.h"
 #include "ContrastWindow\ContrastWindow.h"
 #include "GreyscaleWindow\ConvertGreyscaleWindow.h"
 #include "LABCurvesWindow\LABCurvesWindow.h"
+#include "HSLCurvesWindow\HSLCurvesWindow.h"
 #include "MirrorWindow\MirrorWindow.h"
 #include "RawWindow\RawWindow.h"
 #include "RGBCurvesWindow\RGBCurvesWindow.h"
 #include "RotationWindow\RotationWindow.h"
-#include "ScaleBrightnessWindow\ScaleBrightnessWindow.h"
-#include "ShiftBrightnessWindow\ShiftBrightnessWindow.h"
+#include "AdjustHSLWindow\AdjustHSLWindow.h"
+#include "ShiftRGBWindow\ShiftRGBWindow.h"
+#include "ScaleWindow\ScaleWindow.h"
+#include "CropWindow\CropWindow.h"
 
 #include "GUI\EditList\AvailableEdits\AvailableEdits.h"
 #include "Debugging\MemoryLeakCheck.h"

@@ -1,5 +1,5 @@
-#ifndef CHANNEL_TRANSFORM_WINDOW_H
-#define CHANNEL_TRANSFORM_WINDOW_H
+#ifndef CHANNEL_Mixer_WINDOW_H
+#define CHANNEL_Mixer_WINDOW_H
 
 #include "GUI\EditList\EditWindow\EditWindow.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"
@@ -7,23 +7,25 @@
 #include "Processing\Processor\Processor.h"
 #include "Debugging\MemoryLeakCheck.h"
 
-class ChannelTransformWindow : public EditWindow {
+class ChannelMixerWindow : public EditWindow {
 public:
-	ChannelTransformWindow(wxWindow * parent, wxString editName, Processor * processor);
+	ChannelMixerWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void AddEditToProcessor();
-	void Process(wxCommandEvent& WXUNUSED(event));
 	void SetParamsAndFlags(ProcessorEdit * edit);
+	bool CheckCopiedParamsAndFlags();
+	ProcessorEdit * GetParamsAndFlags();
+
 	void OnSlide(wxCommandEvent& WXUNUSED(event));
 
 private:
 
 	bool justSetPreset;
-	class ChannelTransformPreset;
+	class ChannelMixerPreset;
 
 	void PopulateIntialPresets();
 	void CreateComboPresetList();
-	ChannelTransformPreset GetChannelTransformPresetByName(wxString name);
-	void SetValuesFromPreset(ChannelTransformPreset preset);
+	ChannelMixerPreset GetChannelMixerPresetByName(wxString name);
+	void SetValuesFromPreset(ChannelMixerPreset preset);
 	void PresetChange(wxCommandEvent& WXUNUSED(event));
 
 	wxWindow * parWindow;
@@ -68,12 +70,12 @@ private:
 
 	Processor * proc;
 
-	wxVector<ChannelTransformPreset> presetList;
+	wxVector<ChannelMixerPreset> presetList;
 
-	class ChannelTransformPreset {
+	class ChannelMixerPreset {
 
 	public:
-		ChannelTransformPreset(wxString name, double redRedScale, double redGreenScale, double redBlueScale,
+		ChannelMixerPreset(wxString name, double redRedScale, double redGreenScale, double redBlueScale,
 			double greenRedScale, double greenGreenScale, double greenBlueScale,
 			double blueRedScale, double blueGreenScale, double blueBlueScale);
 

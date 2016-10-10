@@ -1,17 +1,69 @@
 #include "ProcessorEdit.h"
 
 ProcessorEdit::ProcessorEdit() {
-	doMultithread = false;
-	numThread = 0;
+
 	isDisabled = false;
 	this->SetEditType(EditType::UNDEFINED);
+	intArrays = wxVector<int*>();
+	doubleArrays = wxVector<double*>();
 }
 
 ProcessorEdit::ProcessorEdit(int editType) {
 	this->SetEditType(editType);
-	doMultithread = false;
-	numThread = 0;
 	isDisabled = false;
+	intArrays = wxVector<int*>();
+	doubleArrays = wxVector<double*>();
+}
+
+
+ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
+	this->SetEditType(edit.GetEditType());
+	isDisabled = edit.GetDisabled();
+
+	// Copy Params
+	for (size_t i = 0; i < edit.GetParamsSize(); i++) {
+		this->AddParam(edit.GetParam(i));
+	}
+
+	// Copy Flags
+	for (size_t i = 0; i < edit.GetFlagsSize(); i++) {
+		this->AddFlag(edit.GetFlag(i));
+	}
+
+	// Copy Int Arrays
+	for(size_t intArrayIdx = 0; intArrayIdx < edit.GetNumIntArrays(); intArrayIdx ++){
+
+
+		// Allocate new int array
+		int intArraySize = edit.GetIntArraySize(intArrayIdx);
+		int * newIntArray = new int[edit.GetIntArraySize(intArrayIdx)];
+
+		// Copy int array
+		for(size_t i = 0; i < intArraySize; i++){
+			newIntArray[i] = edit.GetIntArray(intArrayIdx)[i];
+		}
+
+		// Add new int array
+		this->AddIntArray(newIntArray, intArraySize);
+	}
+
+	// Copy Double Arrays
+	for(size_t doubleArrayIdx = 0; doubleArrayIdx < edit.GetNumIntArrays(); doubleArrayIdx ++){
+
+
+		// Allocate new int array
+		int doubleArraySize = edit.GetDoubleArraySize(doubleArrayIdx);
+		double* newDoubleArray = new double[edit.GetDoubleArraySize(doubleArrayIdx)];
+
+		// Copy int array
+		for(size_t i = 0; i < doubleArraySize; i++){
+			newDoubleArray[i] = edit.GetDoubleArray(doubleArrayIdx)[i];
+		}
+
+		// Add new int array
+		this->AddDoubleArray(newDoubleArray, doubleArraySize);
+	}
+
 }
 
 void ProcessorEdit::AddParam(double param) {
@@ -37,8 +89,8 @@ void ProcessorEdit::ClearIntArray() {
 		delete[] intArrays[i];
 	}
 	
-	intArrays.clear();
-	intArraySizes.clear();
+	intArrays.resize(0);
+	intArraySizes.resize(0);
 }
 
 void ProcessorEdit::ClearDoubleArray() {
@@ -46,8 +98,8 @@ void ProcessorEdit::ClearDoubleArray() {
 		delete[] doubleArrays[i];
 	}
 	
-	doubleArrays.clear();
-	doubleArraySizes.clear();
+	doubleArrays.resize(0);
+	doubleArraySizes.resize(0);
 }
 
 int ProcessorEdit::GetParamsSize() {
@@ -59,17 +111,17 @@ int ProcessorEdit::GetNumDoubleArrays() {
 }
 
 double ProcessorEdit::GetParam(size_t index) {
-	if(index > params.size()){ return 0.0f; }
+	if(index >= params.size()){ return 0.0f; }
 	return params.at(index);
 }
 
 int * ProcessorEdit::GetIntArray(size_t index) {
-	if(index > intArrays.size()){ return NULL; }
+	if(index >= intArrays.size()){ return NULL; }
 	return intArrays.at(index);
 }
 
 double * ProcessorEdit::GetDoubleArray(size_t index) {
-	if(index > doubleArrays.size()){ return NULL; }
+	if(index >= doubleArrays.size()){ return NULL; }
 	return doubleArrays.at(index);
 }
 
@@ -98,7 +150,7 @@ int ProcessorEdit::GetFlagsSize() {
 }
 
 int ProcessorEdit::GetFlag(size_t index) {
-	if(index > flags.size()){ return 0; }
+	if(index >= flags.size()){ return 0; }
 	return flags.at(index);
 }
 
@@ -123,8 +175,12 @@ void ProcessorEdit::SetEditType(int editType) {
 			tag = "ADJUST_CONTRAST";
 			break;
 
-		case EditType::CHANNEL_TRANSFORM:
-			tag = "CHANNEL_TRANSFORM";
+		case EditType::ADJUST_BRIGHTNESS:
+			tag = "ADJUST_BRIGHTNESS";
+			break;
+
+		case EditType::CHANNEL_MIXER:
+			tag = "CHANNEL_MIXER";
 			break;
 
 		case EditType::CONVERT_GREYSCALE_AVG:
@@ -137,6 +193,10 @@ void ProcessorEdit::SetEditType(int editType) {
 
 		case EditType::CONVERT_GREYSCALE_EYE:
 			tag = "CONVERT_GREYSCALE_EYE";
+			break;
+
+		case EditType::HSL_CURVES:
+			tag = "HSL_CURVES";
 			break;
 
 		case EditType::LAB_CURVES:
@@ -187,12 +247,27 @@ void ProcessorEdit::SetEditType(int editType) {
 			tag = "ROTATE_CUSTOM_NEAREST";
 			break;
 
-		case EditType::SCALE_BRIGHTNESS:
-			tag = "SCALE_BRIGHTNESS";
+		case EditType::ADJUST_HSL:
+			tag = "ADJUST_HSL";
 			break;
 
-		case EditType::SHIFT_BRIGHTNESS:
-			tag = "SHIFT_BRIGHTNESS";
+		case EditType::SHIFT_RGB:
+			tag = "SHIFT_RGB";
+			break;
+
+		case EditType::SCALE_NEAREST:
+			tag = "SCALE_NEAREST";
+			break;
+
+		case EditType::SCALE_BILINEAR:
+			tag = "SCALE_BILINEAR";
+			break;
+
+		case EditType::SCALE_BICUBIC:
+			tag = "SCALE_BICUBIC";
+			break;
+		case EditType::RAW:
+			tag = "RAW";
 			break;
 	}
 }
@@ -200,10 +275,11 @@ void ProcessorEdit::SetEditType(int editType) {
 void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 
 	if (inTag == "ADJUST_CONTRAST") { edit = EditType::ADJUST_CONTRAST; tag = inTag; }
-	else if (inTag == "CHANNEL_TRANSFORM") { edit = EditType::CHANNEL_TRANSFORM; tag = inTag; }
+	else if (inTag == "CHANNEL_MIXER") { edit = EditType::CHANNEL_MIXER; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_AVG") { edit = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { edit = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_EYE") { edit = EditType::CONVERT_GREYSCALE_EYE; tag = inTag; }
+	else if (inTag == "HSL_CURVES") { edit = EditType::HSL_CURVES; tag = inTag; }
 	else if (inTag == "LAB_CURVES") { edit = EditType::LAB_CURVES; tag = inTag; }
 	else if (inTag == "MIRROR_NONE") { edit = EditType::MIRROR_NONE; tag = inTag; }
 	else if (inTag == "MIRROR_HORIZONTAL") { edit = EditType::MIRROR_HORIZONTAL; tag = inTag; }
@@ -216,8 +292,13 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "ROTATE_CUSTOM_BICUBIC") { edit = EditType::ROTATE_CUSTOM_BICUBIC; tag = inTag; }
 	else if (inTag == "ROTATE_CUSTOM_BILINEAR") { edit = EditType::ROTATE_CUSTOM_BILINEAR; tag = inTag; }
 	else if (inTag == "ROTATE_CUSTOM_NEAREST") { edit = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
-	else if (inTag == "SCALE_BRIGHTNESS") { edit = EditType::SCALE_BRIGHTNESS; tag = inTag; }
-	else if (inTag == "SHIFT_BRIGHTNESS") { edit = EditType::SHIFT_BRIGHTNESS; tag = inTag; }
+	else if (inTag == "ADJUST_HSL") { edit = EditType::ADJUST_HSL; tag = inTag; }
+	else if (inTag == "SHIFT_RGB") { edit = EditType::SHIFT_RGB; tag = inTag; }
+	else if (inTag == "ADJUST_BRIGHTNESS") { edit = EditType::ADJUST_BRIGHTNESS; tag = inTag; }
+	else if (inTag == "SCALE_NEAREST") { edit = EditType::SCALE_NEAREST; tag = inTag; }
+	else if (inTag == "SCALE_BILINEAR") { edit = EditType::SCALE_BILINEAR; tag = inTag; }
+	else if (inTag == "SCALE_BICUBIC") { edit = EditType::SCALE_BICUBIC; tag = inTag; }
+	else if (inTag == "RAW") { edit = EditType::RAW; tag = inTag; }
 }
 
 wxString ProcessorEdit::GetEditTag() {

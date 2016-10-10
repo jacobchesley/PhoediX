@@ -5,6 +5,7 @@ WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(paren
 	zoom = 1.0;
 	keepAspect = doKeepAspect;
 	resize = false;
+	staticImage = false;
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&WXImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
@@ -12,12 +13,18 @@ WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(paren
 	this->SetDoubleBuffered(true);
 }
 
-WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect) : wxPanel(parent) {
+WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect, bool staticImg) : wxPanel(parent) {
 
 	img = image;
 	zoom = 1.0;
 	keepAspect = doKeepAspect;
+	staticImage = staticImg;
 	resize = false;
+
+	if (staticImage) {
+		bitmapDraw = wxBitmap(*image);
+
+	}
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&WXImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
@@ -31,7 +38,16 @@ void WXImagePanel::SetKeepAspect(bool doKeepAspect) {
 	keepAspect = doKeepAspect;
 }
 
+void WXImagePanel::SetResize(bool doResize) {
+	resize = doResize;
+}
+
 void WXImagePanel::ChangeImage(wxImage * newImage) {
+	if (staticImage) {
+		bitmapDraw = wxBitmap(*newImage);
+		this->SetSize(newImage->GetSize());
+		this->SetMinSize(newImage->GetSize());
+	}
 	img = newImage;
 	this->SetSize(img->GetSize());
 	this->SetMinSize(img->GetSize());
@@ -39,42 +55,47 @@ void WXImagePanel::ChangeImage(wxImage * newImage) {
 
 void WXImagePanel::Render(wxDC & dc) {
 
+	if (staticImage) {
+		dc.Clear();
+		dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
+		return;
+	}
+
+	if(img == NULL){
+		return;
+	}
 	// Get current width and height
 	int newWidth = this->GetSize().GetWidth();
 	int newHeight = this->GetSize().GetHeight();
 
-	//if (oldHeight != newHeight || oldWidth != newWidth) {
 
-		if (keepAspect) {
-			// Get the aspect ratio of the image, and the current panel
-			double imgAspectRatio = (double)img->GetWidth() / (double)img->GetHeight();
-			double thisAspecRatio = (double)newWidth / (double)newHeight;
+	if (keepAspect) {
+		// Get the aspect ratio of the image, and the current panel
+		double imgAspectRatio = (double)img->GetWidth() / (double)img->GetHeight();
+		double thisAspecRatio = (double)newWidth / (double)newHeight;
 
-			// Resize width based on height
-			if (thisAspecRatio > imgAspectRatio) {
-				newWidth = newHeight  * imgAspectRatio;
-			}
-
-			// Resize height based on width
-			else if (thisAspecRatio < imgAspectRatio) {
-				newHeight = newWidth / imgAspectRatio;
-			}
+		// Resize width based on height
+		if (thisAspecRatio > imgAspectRatio) {
+			newWidth = newHeight  * imgAspectRatio;
 		}
 
-
-		// Convert wxImage to wxBitmap, with scaled width and height
-		if (img->IsOk()) {
-			if (resize) {
-				bitmapDraw = wxBitmap(img->Scale(newWidth * zoom, newHeight * zoom, wxIMAGE_QUALITY_HIGH));
-			}
-			else {
-				bitmapDraw = wxBitmap(*img);
-			}
+		// Resize height based on width
+		else if (thisAspecRatio < imgAspectRatio) {
+			newHeight = newWidth / imgAspectRatio;
 		}
+	}
 
-		oldWidth = newWidth;
-		oldHeight = newHeight;
-	//}
+
+	// Convert wxImage to wxBitmap, with scaled width and height
+	if (img->IsOk()) {
+		if (resize) {
+			bitmapDraw = wxBitmap(img->Scale(newWidth * zoom, newHeight * zoom, wxIMAGE_QUALITY_HIGH));
+		}
+		else {
+			bitmapDraw = wxBitmap(*img);
+		}
+	}
+
 
 	dc.Clear();
 	dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
@@ -93,6 +114,10 @@ void WXImagePanel::OnPaint(wxPaintEvent& event) {
 }
 
 void WXImagePanel::OnSize(wxSizeEvent& event) {
+	if (staticImage) {
+		this->SetSize(bitmapDraw.GetWidth(), bitmapDraw.GetHeight());
+		return;
+	}
 	this->SetSize(img->GetWidth(), img->GetHeight());
 	Refresh();
 	event.Skip();

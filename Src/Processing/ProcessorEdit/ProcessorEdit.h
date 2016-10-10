@@ -16,7 +16,10 @@ class ProcessorEdit {
 public :
 	
 	ProcessorEdit();
+	ProcessorEdit(ProcessorEdit &edit);
 	ProcessorEdit(int editType);
+
+
 
 	void AddParam(double param);
 	void AddFlag(int flag);
@@ -52,13 +55,14 @@ public :
 
 	enum EditType {
 		UNDEFINED,
-		SHIFT_BRIGHTNESS,
-		SCALE_BRIGHTNESS,
+		SHIFT_RGB,
+		ADJUST_HSL,
 		ADJUST_CONTRAST,
+		ADJUST_CONTRAST_CURVE,
 		CONVERT_GREYSCALE_AVG,
 		CONVERT_GREYSCALE_EYE,
 		CONVERT_GREYSCALE_CUSTOM,
-		CHANNEL_TRANSFORM,
+		CHANNEL_MIXER,
 		ROTATE_NONE,
 		ROTATE_90_CW,
 		ROTATE_180,
@@ -71,7 +75,13 @@ public :
 		MIRROR_HORIZONTAL,
 		RGB_CURVES,
 		LAB_CURVES,
-		RAW
+		HSL_CURVES,
+		RAW,
+		ADJUST_BRIGHTNESS,
+		SCALE_NEAREST,
+		SCALE_BILINEAR,
+		SCALE_BICUBIC,
+		CROP
 	};
 	
 private:
@@ -85,9 +95,6 @@ private:
 
 	wxVector<double*> doubleArrays;
 	wxVector<int> doubleArraySizes;
-
-	bool doMultithread;
-	int numThread;
 
 	bool isDisabled;
 

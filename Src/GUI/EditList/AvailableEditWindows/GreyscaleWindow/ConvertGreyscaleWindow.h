@@ -12,9 +12,10 @@ class ConvertGreyscaleWindow : public EditWindow {
 public:
 	ConvertGreyscaleWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void AddEditToProcessor();
-	void Process(wxCommandEvent& WXUNUSED(event));
 	void OnCombo(wxCommandEvent& WXUNUSED(event));
 	void SetParamsAndFlags(ProcessorEdit * edit);
+	bool CheckCopiedParamsAndFlags();
+	ProcessorEdit * GetParamsAndFlags();
 
 private:
 

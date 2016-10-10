@@ -1,5 +1,5 @@
-#ifndef SHIFT_BRIGHTNESS_WINDOW_H
-#define SHIFT_BRIGHTNESS_WINDOW_H
+#ifndef ADJUST_HSL_WINDOW_H
+#define ADJUST_HSL_WINDOW_H
 
 #include "GUI\EditList\EditWindow\EditWindow.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"
@@ -7,12 +7,13 @@
 #include "Processing\Processor\Processor.h"
 #include "Debugging\MemoryLeakCheck.h"
 
-class ShiftBrightnessWindow : public EditWindow {
+class AdjustHSLWindow : public EditWindow {
 public:
-	ShiftBrightnessWindow(wxWindow * parent, wxString editName, Processor * processor);
+	AdjustHSLWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void AddEditToProcessor();
 	void SetParamsAndFlags(ProcessorEdit * edit);
-	void Process(wxCommandEvent& WXUNUSED(event));
+	bool CheckCopiedParamsAndFlags();
+	ProcessorEdit * GetParamsAndFlags();
 
 private:
 
@@ -23,19 +24,17 @@ private:
 
 	wxStaticText * editLabel;
 
-	wxStaticText * allBrightLabel;
-	wxStaticText * redBrightLabel;
-	wxStaticText * greenBrightLabel;
-	wxStaticText * blueBrightLabel;
+	wxStaticText * hueShiftLabel;
+	wxStaticText * saturationScaleLabel;
+	wxStaticText * luminaceScaleLabel;
 
-	DoubleSlider * allBrightSlider;
-	DoubleSlider * redBrightSlider;
+	DoubleSlider * hueShiftSlider;
+	DoubleSlider * saturationScaleSlider;
 	DoubleSlider * greenBrightSlider;
-	DoubleSlider * blueBrightSlider;
+	DoubleSlider * luminaceScaleSlider;
 
 	wxButton * processButton;
 
 	Processor * proc;
-
 };
-#endif#pragma once
+#endif

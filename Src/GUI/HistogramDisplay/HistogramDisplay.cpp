@@ -37,6 +37,10 @@ HistogramDisplay::HistogramDisplay(wxWindow * parent, Processor * processor) : w
 	this->SetMinSize(wxSize(100, 100));
 }
 
+void HistogramDisplay::DestroyHistograms(){
+	histograms->DestroyImages();
+}
+
 void HistogramDisplay::SetHistogramDisplay(int selection) {
 	histogramSelector->SetSelection(selection);
 	this->ProcessComboChange();
@@ -114,6 +118,15 @@ HistogramDisplay::HistogramScrolled::HistogramScrolled(wxWindow * parent, Proces
 	this->SetScrollRate(5, 5);
 
 	this->RedrawHistograms();
+}
+
+void HistogramDisplay::HistogramScrolled::DestroyImages(){
+
+	delete redHistogram;
+	delete greenHistogram;
+	delete blueHistogram;
+	delete greyHistogram;
+	delete allHistogram;
 }
 
 void HistogramDisplay::HistogramScrolled::ShowRed() {

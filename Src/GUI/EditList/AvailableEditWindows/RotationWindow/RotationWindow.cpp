@@ -1,6 +1,6 @@
 #include "RotationWindow.h"
 
-RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName) {
+RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -96,13 +96,6 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	this->StartWatchdog();
 }
 
-void RotationWindow::Process(wxCommandEvent& WXUNUSED(event)) {
-
-	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
-	wxPostEvent(parWindow, evt);
-	this->SetUpdated(false);
-}
-
 void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 
 	if(rotationMethod->GetSelection() == 4){
@@ -126,99 +119,6 @@ void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 	this->SetUpdated(true);
 }
 
-void RotationWindow::AddEditToProcessor() {
-	
-	int rotationSelection = rotationMethod->GetSelection();
-
-	if (rotationSelection == 0) {
-	
-		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_NONE);
-		rotateEdit->AddFlag(rotationSelection);
-
-		// Set enabled / disabled
-		rotateEdit->SetDisabled(isDisabled);
-
-		proc->AddEdit(rotateEdit);
-	}
-
-	else if (rotationSelection == 1) {
-		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_90_CW);
-		rotateEdit->AddFlag(rotationSelection);
-
-		// Set enabled / disabled
-		rotateEdit->SetDisabled(isDisabled);
-
-		proc->AddEdit(rotateEdit);
-	}
-
-	else if (rotationSelection == 2) {
-		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_180);
-		rotateEdit->AddFlag(rotationSelection);
-
-		// Set enabled / disabled
-		rotateEdit->SetDisabled(isDisabled);
-
-		proc->AddEdit(rotateEdit);
-	}
-
-	else if (rotationSelection == 3) {
-		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_270_CW);
-		rotateEdit->AddFlag(rotationSelection);
-
-		// Set enabled / disabled
-		rotateEdit->SetDisabled(isDisabled);
-
-		proc->AddEdit(rotateEdit);
-	}
-
-	else if (rotationSelection == 4) {
-
-		int crop = Processor::RotationCropping::KEEP_SIZE;
-
-		if(customRotationCrop->GetSelection() == 1){
-			crop = Processor::RotationCropping::FIT;
-		}
-		if(customRotationCrop->GetSelection() == 2){
-			crop = Processor::RotationCropping::EXPAND;
-		}
-		if (customRotationInterpolation->GetSelection() == 0) {
-			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST);
-			rotateEdit->AddParam(customRotationSlider->GetValue());
-			rotateEdit->AddFlag(rotationSelection);
-			rotateEdit->AddFlag(0);
-			rotateEdit->AddFlag(crop);
-
-			// Set enabled / disabled
-			rotateEdit->SetDisabled(isDisabled);
-
-			proc->AddEdit(rotateEdit);
-		}
-		else if (customRotationInterpolation->GetSelection() == 1) {
-			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR);
-			rotateEdit->AddParam(customRotationSlider->GetValue());
-			rotateEdit->AddFlag(rotationSelection);
-			rotateEdit->AddFlag(1);
-			rotateEdit->AddFlag(crop);
-
-			// Set enabled / disabled
-			rotateEdit->SetDisabled(isDisabled);
-
-			proc->AddEdit(rotateEdit);
-		}
-		else if (customRotationInterpolation->GetSelection() == 2) {
-			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC);
-			rotateEdit->AddParam(customRotationSlider->GetValue());
-			rotateEdit->AddFlag(rotationSelection);
-			rotateEdit->AddFlag(2);
-			rotateEdit->AddFlag(crop);
-
-			// Set enabled / disabled
-			rotateEdit->SetDisabled(isDisabled);
-
-			proc->AddEdit(rotateEdit);
-		}
-	}
-}
 
 void RotationWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
@@ -248,5 +148,126 @@ void RotationWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 		customRotationSlider->SetValue(edit->GetParam(0));
 	}
-	this->SetUpdated(true);
+}
+
+ProcessorEdit * RotationWindow::GetParamsAndFlags(){
+
+	int rotationSelection = rotationMethod->GetSelection();
+
+	if (rotationSelection == 0) {
+	
+		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_NONE);
+		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
+		return rotateEdit;
+	}
+
+	else if (rotationSelection == 1) {
+		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_90_CW);
+		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
+		return rotateEdit;
+	}
+
+	else if (rotationSelection == 2) {
+		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_180);
+		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
+		return rotateEdit;
+	}
+
+	else if (rotationSelection == 3) {
+		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_270_CW);
+		rotateEdit->AddFlag(rotationSelection);
+
+		// Set enabled / disabled
+		rotateEdit->SetDisabled(isDisabled);
+
+		return rotateEdit;
+	}
+
+	else if (rotationSelection == 4) {
+
+		int crop = Processor::RotationCropping::KEEP_SIZE;
+
+		if(customRotationCrop->GetSelection() == 1){
+			crop = Processor::RotationCropping::FIT;
+		}
+		if(customRotationCrop->GetSelection() == 2){
+			crop = Processor::RotationCropping::EXPAND;
+		}
+		if (customRotationInterpolation->GetSelection() == 0) {
+			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST);
+			rotateEdit->AddParam(customRotationSlider->GetValue());
+			rotateEdit->AddFlag(rotationSelection);
+			rotateEdit->AddFlag(0);
+			rotateEdit->AddFlag(crop);
+
+			// Set enabled / disabled
+			rotateEdit->SetDisabled(isDisabled);
+
+			return rotateEdit;
+		}
+		else if (customRotationInterpolation->GetSelection() == 1) {
+			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR);
+			rotateEdit->AddParam(customRotationSlider->GetValue());
+			rotateEdit->AddFlag(rotationSelection);
+			rotateEdit->AddFlag(1);
+			rotateEdit->AddFlag(crop);
+
+			// Set enabled / disabled
+			rotateEdit->SetDisabled(isDisabled);
+
+			return rotateEdit;
+		}
+		else if (customRotationInterpolation->GetSelection() == 2) {
+			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC);
+			rotateEdit->AddParam(customRotationSlider->GetValue());
+			rotateEdit->AddFlag(rotationSelection);
+			rotateEdit->AddFlag(2);
+			rotateEdit->AddFlag(crop);
+
+			// Set enabled / disabled
+			rotateEdit->SetDisabled(isDisabled);
+
+			return rotateEdit;
+		}
+	}
+	return NULL;
+}
+
+bool RotationWindow::CheckCopiedParamsAndFlags(){
+
+	ProcessorEdit * edit = proc->GetEditForCopyPaste();
+	if(edit == NULL){ return false; }
+
+	// Choose method based on edit loaded
+	if (edit->GetFlagsSize() == 1 && (
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE ||
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_90_CW ||
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_180 ||
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW)) {
+
+		return true;
+	}
+
+	// Populate sliders based on edit loaded
+	if (edit->GetFlagsSize() == 3 && edit->GetParamsSize() == 1 && (
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST ||
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC)){
+
+		return true;
+	}
+
+	return false;
 }

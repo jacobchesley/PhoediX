@@ -19,13 +19,17 @@ enum {
 	ID_EDIT_UP,
 	ID_EDIT_DOWN,
 	ID_EDIT_DELETE,
-	ID_EDIT_DISABLE
+	ID_EDIT_DISABLE,
+	ID_EDIT_COPY,
+	ID_EDIT_PASTE
 };
 
 wxDECLARE_EVENT(EDIT_UP_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_DOWN_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_DELETE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_DISABLE_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(EDIT_COPY_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(EDIT_PASTE_EVENT, wxCommandEvent);
 
 class EditListItem : public wxPanel {
 public:
@@ -47,6 +51,8 @@ public:
 
 private:
 
+	void OnRightClick(wxMouseEvent& WXUNUSED(event));
+	void OnPopupMenuClick(wxCommandEvent& inEvt);
 	void OnUp(wxCommandEvent& WXUNUSED(event));
 	void OnDown(wxCommandEvent& WXUNUSED(event));
 	void OnDelete(wxCommandEvent& WXUNUSED(event));
@@ -75,6 +81,12 @@ private:
 		DOWN_BUTTON,
 		DELETE_BUTTON,
 		DISABLE_BUTTON
+	};
+
+	enum PopupMenuActions{
+		COPY_EDIT_PARAMS,
+		PASTE_EDIT_PARAMS
+
 	};
 };
 #endif

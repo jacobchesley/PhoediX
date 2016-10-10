@@ -1,8 +1,18 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+// for compilers that support precompilation, includes "wx/wx.h"
+#include "wx/wxprec.h"
+
+// for all others, include the necessary headers explicitly
+#ifndef WX_PRECOMP
+	#include "wx/wx.h"
+#endif
+
 #include <stdint.h>
 #include "Debugging\MemoryLeakCheck.h"
+#include <math.h>
+ #include <iostream>  
 
 class Image {
 public:
@@ -36,8 +46,10 @@ public:
 	uint16_t * Get16BitDataGreen();
 	uint16_t * Get16BitDataBlue();
 
+	wxString GetErrorStr();
+
 private:
-	
+
 	bool bit16Enabled;
 
 	int width;
@@ -51,6 +63,7 @@ private:
 	uint16_t * imageDataGreen16;
 	uint16_t * imageDataBlue16;
 
+	wxString errorMessage;
 };
 
 #endif

@@ -27,6 +27,7 @@ public:
 	wxVector<Edit> edits;
 
 	void AddRawWindow();
+	void AddRawWindow(ProcessorEdit* editForParams);
 	void RemoveRawWindow();
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
@@ -45,12 +46,15 @@ private:
 	void ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event));
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
-	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable);
+	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActviate);
 	void MoveEditUp(wxCommandEvent& upEvt);
 	void MoveEditDown(wxCommandEvent& downEvt);
 	void DeleteEdit(wxCommandEvent& deleteEvt);
 	void DisableEdit(wxCommandEvent& WXUNUSED(event));
-	
+
+	void CopyEdit(wxCommandEvent& copyEvt);
+	void PasteEdit(wxCommandEvent& pasteEvt);
+
 	wxStaticText * titleText;
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * bottomButtonsSizer;

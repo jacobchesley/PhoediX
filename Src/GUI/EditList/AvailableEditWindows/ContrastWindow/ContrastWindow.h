@@ -10,9 +10,9 @@
 class ContrastWindow : public EditWindow {
 	public:
 		ContrastWindow(wxWindow * parent, wxString editName, Processor * processor);
-		void AddEditToProcessor();
-		void Process(wxCommandEvent& WXUNUSED(event));
 		void SetParamsAndFlags(ProcessorEdit * edit);
+		bool CheckCopiedParamsAndFlags();
+		ProcessorEdit * GetParamsAndFlags();
 
 	private:
 
@@ -24,14 +24,24 @@ class ContrastWindow : public EditWindow {
 		wxStaticText * editLabel;
 
 		wxStaticText * allContrastLabel;
+		wxStaticText * allContrastCenterLabel;
 		wxStaticText * redContrastLabel;
+		wxStaticText * redContrastCenterLabel;
 		wxStaticText * greenContrastLabel;
+		wxStaticText * greenContrastCenterLabel;
 		wxStaticText * blueContrastLabel;
+		wxStaticText * blueContrastCenterLabel;
+		wxStaticText * curveSelectionLabel;
 
 		DoubleSlider * allContrastSlider;
+		DoubleSlider * allContrastCenterSlider;
 		DoubleSlider * redContrastSlider;
+		DoubleSlider * redContrastCenterSlider;
 		DoubleSlider * greenContrastSlider;
+		DoubleSlider * greenContrastCenterSlider;
 		DoubleSlider * blueContrastSlider;
+		DoubleSlider * blueContrastCenterSlider;
+		wxCheckBox * curveSelection;
 
 		wxButton * processButton;
 		Processor * proc;
