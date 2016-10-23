@@ -1,58 +1,38 @@
 #include "ZoomImagePanel.h"
 
 ZoomImagePanel::ZoomImagePanel(wxWindow * parent) : wxPanel(parent) {
+	par = parent;
+	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	scroller = new ImageScroll(this, new wxImage(0,0));
+	this->InitControls();	
+}
 
-	this->SetBackgroundColour(Colors::BackDarkGrey);
-	this->SetDoubleBuffered(true);
-
-	mainSizer = new wxBoxSizer(wxVERTICAL);
-	controlSizer = new wxBoxSizer(wxHORIZONTAL);
-
-	this->SetSizer(mainSizer);
-
-	scroller = new ImageScroll(this, NULL);
-	
-	zoomSlider = new DoubleSlider(this, 100.0, 1.0, 400.0, 100000, 0);
-	zoomSlider->SetForegroundColour(Colors::TextLightGrey);
-	zoomSlider->SetBackgroundColour(parent->GetBackgroundColour());
-	zoomSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
-
-	fullImageView = new wxButton(this, ZoomImagePanel::Buttons::ZOOM_FIT, "Fit Image", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	fullImageView->SetBackgroundColour(Colors::BackDarkGrey);
-	fullImageView->SetForegroundColour(Colors::TextLightGrey);
-
-	viewImage100 = new wxButton(this, ZoomImagePanel::Buttons::ZOOM_100, "100% Zoom", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	viewImage100->SetBackgroundColour(Colors::BackDarkGrey);
-	viewImage100->SetForegroundColour(Colors::TextLightGrey);
-
-	controlSizer->Add(zoomSlider);
-	controlSizer->Add(fullImageView);
-	controlSizer->Add(viewImage100);
-	
-	this->GetSizer()->Add(scroller, 1, wxGROW);
-	this->GetSizer()->Add(controlSizer);
-
-	this->Bind(wxEVT_SLIDER, (wxObjectEventFunction)&ZoomImagePanel::OnZoom, this);
-	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ZoomImagePanel::OnZoom, this);
-	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ZoomImagePanel::OnZoom, this);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnFitImage, this, ZoomImagePanel::Buttons::ZOOM_FIT);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnZoom100, this, ZoomImagePanel::Buttons::ZOOM_100);
+ZoomImagePanel::ZoomImagePanel(wxWindow * parent, wxImage * img) : wxPanel(parent) {
+	par = parent;
+	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	scroller = new ImageScroll(this, img);
+	this->InitControls();	
 }
 
 ZoomImagePanel::ZoomImagePanel(wxWindow * parent, Image * img) : wxPanel(parent) {
 
-	this->SetBackgroundColour(Colors::BackDarkGrey);
+	par = parent;
+	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	scroller = new ImageScroll(this, img);
+	this->InitControls();
+}
+
+void ZoomImagePanel::InitControls(){
+
 	this->SetDoubleBuffered(true);
 
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	controlSizer = new wxBoxSizer(wxHORIZONTAL);
 	this->SetSizer(mainSizer);
-	
-	scroller = new ImageScroll(this, img);
 
 	zoomSlider = new DoubleSlider(this, 100.0, 1.0, 400.0, 100000, 0);
 	zoomSlider->SetForegroundColour(Colors::TextLightGrey);
-	zoomSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	zoomSlider->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	zoomSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
 	fullImageView = new wxButton(this, ZoomImagePanel::Buttons::ZOOM_FIT, "Fit Image", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -84,7 +64,12 @@ void ZoomImagePanel::ChangeImage(Image * newImage) {
 	scroller->ChangeImage(newImage);
 }
 
+void ZoomImagePanel::ChangeImage(wxImage * newImage) {
+	scroller->ChangeImage(newImage);
+}
+
 void ZoomImagePanel::OnZoom(wxCommandEvent& slideEvent) {
+	double val = zoomSlider->GetValue();
 	scroller->SetZoom(zoomSlider->GetValue()/100.0);
 	slideEvent.Skip(false);
 }
@@ -99,7 +84,6 @@ void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void ZoomImagePanel::FitImage() {
-	scroller->FitImage();
 	scroller->FitImage();
 	zoomSlider->SetValue(scroller->GetZoom()*100.0);
 }
@@ -131,7 +115,11 @@ void ZoomImagePanel::SetDrag(int x, int y) {
 
 	scroller->DisreguardScroll();
 	scroller->Scroll(x, y);
-	scroller->ReguardScroll();
+}
+
+void ZoomImagePanel::SetTempSize(int tempWidth, int tempHeight){
+	scroller->SetVirtualSize(tempWidth, tempHeight);
+	int test = 0;
 }
 
 void ZoomImagePanel::Redraw() {
@@ -143,6 +131,24 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 }
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxScrolledWindow(parent) {
+	
+	disreguardScroll = false;
+	this->ChangeImage(image);
+	zoom = 1.0;
+	keepAspect = true;
+	resize = false;
+
+	SetScrollbars(1, 1, image->GetWidth(), image->GetHeight());
+	
+	this->SetBackgroundColour(parent->GetBackgroundColour());
+	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
+	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
+	this->Bind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
+	this->SetDoubleBuffered(true);
+
+}
+
+ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : wxScrolledWindow(parent) {
 	
 	disreguardScroll = false;
 	this->ChangeImage(image);
@@ -216,6 +222,11 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 	}
 }
 
+void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
+
+	bitmapDraw = wxBitmap(*newImage);
+}
+
 void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 
 	// First left click before drag
@@ -228,6 +239,9 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 
 void ZoomImagePanel::ImageScroll::OnDragContinue(wxMouseEvent& evt) {
 	
+	if(disreguardScroll){
+		this->ReguardScroll();
+	}
 	// Verify this is a drag event, with left mouse button down
 	if (evt.Dragging()) {
 
@@ -288,8 +302,8 @@ void ZoomImagePanel::ImageScroll::FitImage() {
 }
 
 void ZoomImagePanel::ImageScroll::DisreguardScroll(){
-	this->Unbind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
 	disreguardScroll = true;
+	this->Unbind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
 }
 
 void ZoomImagePanel::ImageScroll::ReguardScroll(){

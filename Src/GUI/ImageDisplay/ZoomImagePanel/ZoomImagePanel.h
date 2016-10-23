@@ -24,22 +24,28 @@ class ZoomImagePanel : public wxPanel {
 public:
 	ZoomImagePanel(wxWindow * parent);
 	ZoomImagePanel(wxWindow * parent, Image * img);
+	ZoomImagePanel(wxWindow * parent, wxImage * img);
 	void Redraw();
 	void ChangeImage(Image * newImage);
+	void ChangeImage(wxImage * newImage);
 	void SetZoom(float zoom);
 	float GetZoom();
 
 	int GetDragX();
 	int GetDragY();
+	void SetTempSize(int tempWidth, int tempHeight);
+
 	void SetDrag(int x, int y);
 	void FitImage();
 
 private:
 
+	void InitControls();
 	void OnZoom(wxCommandEvent& slideEvent);
 	void OnFitImage(wxCommandEvent& WXUNUSED(event));
 	void OnZoom100(wxCommandEvent& WXUNUSED(event));
 
+	wxWindow * par;
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * controlSizer;
 	DoubleSlider * zoomSlider;
@@ -55,9 +61,11 @@ private:
 	public:
 		ImageScroll(wxWindow * parent);
 		ImageScroll(wxWindow * parent, Image * img);
+		ImageScroll(wxWindow * parent, wxImage * img);
 		void Redraw();
 		void SetZoom(double zoomFactor);
 		void ChangeImage(Image * newImage);
+		void ChangeImage(wxImage * newImage);
 		void FitImage();
 		double GetZoom();
 		void DisreguardScroll();
