@@ -675,6 +675,9 @@ void RawWindow::Process() {
 	proc->rawPrcoessor.imgdata.params.cfaline = (int)cfaCleanLineEnableControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.linenoise = (float)cfaCleanLineControl->GetValue();
 
+	// Get bit depth of processor image, and set output bps to this
+	proc->rawPrcoessor.imgdata.params.output_bps = proc->GetImage()->GetColorDepth();
+
 	// White Balance
 
 	// Camera White Balance
