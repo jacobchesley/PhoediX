@@ -11,30 +11,21 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 	sCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
 	lCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
 	curveTabs->AddPage(hCurve, "H Channel", true);
 	curveTabs->AddPage(sCurve, "S Channel", false);
 	curveTabs->AddPage(lCurve, "L Channel", false);
 
 	container = new wxBoxSizer(wxVERTICAL);
-	buttonContainer = new wxBoxSizer(wxHORIZONTAL);
-
-	buttonContainer->Add(processButton);
-
 	container->Add(curveTabs, 1, wxEXPAND);
-	container->Add(buttonContainer);
 
 	this->SetSizerAndFit(container);
 	container->Layout();
 
 	proc = processor;
 
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&HSLCurvesWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
+	this->StartWatchdog();
 }
 
 void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){

@@ -35,8 +35,6 @@ private:
 	wxComboBox * customRotationCrop;
 	DoubleSlider * customRotationSlider;
 
-	wxButton * processButton;
-
 	Processor * proc;
 
 	void OnCombo(wxCommandEvent& WXUNUSED(event));

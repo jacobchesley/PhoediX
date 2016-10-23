@@ -13,12 +13,17 @@
 
 class LABCurvesWindow :public EditWindow {
 public:
+	LABCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
+
+	void AddEditToProcessor();
+	void SetParamsAndFlags(ProcessorEdit * edit);
+	ProcessorEdit * GetParamsAndFlags();
+	bool CheckCopiedParamsAndFlags();
+
+private:
 
 	wxWindow * parWindow;
-	wxButton * processButton;
 	wxButton * resetCurveButton;
-
-	wxBoxSizer * buttonContainer;
 	
 	wxBoxSizer * colorSpaceSizer;
 	wxStaticText * colorSpaceLabel;
@@ -33,13 +38,6 @@ public:
 	wxTextCtrl * text;
 
 	Processor * proc;
-
-	LABCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
-
-	void AddEditToProcessor();
-	void SetParamsAndFlags(ProcessorEdit * edit);
-	ProcessorEdit * GetParamsAndFlags();
-	bool CheckCopiedParamsAndFlags();
 };
 
 #endif

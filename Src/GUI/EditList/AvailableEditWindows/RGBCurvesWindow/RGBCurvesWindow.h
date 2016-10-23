@@ -13,17 +13,21 @@
 
 class RGBCurvesWindow :public EditWindow {
 public:
+	RGBCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
+
+	void AddEditToProcessor();
+	void SetParamsAndFlags(ProcessorEdit * edit);
+	ProcessorEdit * GetParamsAndFlags();
+	bool CheckCopiedParamsAndFlags();
+
+private:
 
 	wxWindow * parWindow;
-	wxButton * processButton;
 	wxButton * resetCurveButton;
 
-	wxBoxSizer * buttonContainer;
-
 	CurvePanel * brightCurve;
-	wxBoxSizer * brightCurveContainer;
 	CurvePanel * redCurve;
-	CurvePanel* greenCurve;
+	CurvePanel * greenCurve;
 	CurvePanel * blueCurve;
 
 	wxNotebook * curveTabs;
@@ -32,14 +36,6 @@ public:
 	wxTextCtrl * text;
 
 	Processor * proc;
-
-	RGBCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
-
-	void AddEditToProcessor();
-	void SetParamsAndFlags(ProcessorEdit * edit);
-	ProcessorEdit * GetParamsAndFlags();
-	bool CheckCopiedParamsAndFlags();
-
 };
 
 #endif

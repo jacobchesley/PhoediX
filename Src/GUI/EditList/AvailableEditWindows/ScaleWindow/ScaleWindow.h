@@ -43,8 +43,6 @@ private:
 	wxStaticText * heightLabel;
 	wxTextCtrl * heightCtrl;
 
-	wxButton * processButton;
-
 	Processor * proc;
 
 	void OnCombo(wxCommandEvent& WXUNUSED(event));

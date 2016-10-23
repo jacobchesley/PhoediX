@@ -34,8 +34,6 @@ private:
 	DoubleSlider * toneSlider;
 	DoubleSlider * preservationSlider;
 
-	wxButton * processButton;
-
 	Processor * proc;
 };
 #endif

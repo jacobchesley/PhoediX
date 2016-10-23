@@ -66,8 +66,6 @@ private:
 	DoubleSlider * blueGreenSlider;
 	DoubleSlider * blueBlueSlider;
 
-	wxButton * processButton;
-
 	Processor * proc;
 
 	wxVector<ChannelMixerPreset> presetList;

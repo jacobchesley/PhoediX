@@ -26,31 +26,22 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	aCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
 	bCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
 	curveTabs->AddPage(lCurve, "L Channel", true);
 	curveTabs->AddPage(aCurve, "A Channel", false);
 	curveTabs->AddPage(bCurve, "B Channel", false);
 
 	container = new wxBoxSizer(wxVERTICAL);
-	buttonContainer = new wxBoxSizer(wxHORIZONTAL);
-
-	buttonContainer->Add(processButton);
-
 	container->Add(colorSpaceSizer);
 	container->Add(curveTabs, 1, wxEXPAND);
-	container->Add(buttonContainer);
 
 	this->SetSizerAndFit(container);
 	container->Layout();
 
 	proc = processor;
 
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LABCurvesWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
+	this->StartWatchdog();
 }
 
 void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){

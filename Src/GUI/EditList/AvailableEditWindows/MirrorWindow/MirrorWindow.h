@@ -29,7 +29,6 @@ private:
 
 	wxComboBox * mirrorMethod;
 	
-	wxButton * processButton;
 
 	Processor * proc;
 };

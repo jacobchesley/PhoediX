@@ -23,11 +23,6 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 	mirrorMethod->AppendString("Mirror Vertical");
 	mirrorMethod->SetSelection(0);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	mirrorMethod->SetBackgroundColour(this->GetBackgroundColour());
 	mirrorMethod->SetForegroundColour(Colors::TextLightGrey);
 
@@ -37,16 +32,9 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(gridSizer);
-	mainSizer->AddSpacer(15);
-	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
 	proc = processor;
 	parWindow = parent;
-
-	//this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	//this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	//this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&MirrorWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();

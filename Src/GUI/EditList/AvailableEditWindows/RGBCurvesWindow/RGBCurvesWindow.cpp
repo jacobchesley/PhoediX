@@ -12,11 +12,6 @@ RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor
 	greenCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_GREEN);
 	blueCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
 	curveTabs->AddPage(brightCurve, "All Channels", true);
 	curveTabs->AddPage(redCurve, "Red Channel", false);
@@ -24,22 +19,19 @@ RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor
 	curveTabs->AddPage(blueCurve, "Blue Channel", false);
 
 	container = new wxBoxSizer(wxVERTICAL);
-	buttonContainer = new wxBoxSizer(wxHORIZONTAL);
-
-	buttonContainer->Add(processButton);
 
 	container->Add(curveTabs, 1, wxEXPAND);
-	container->Add(buttonContainer);
 
 	this->SetSizerAndFit(container);
 	container->Layout();
 	
 	proc = processor;
 
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RGBCurvesWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&RGBCurvesWindow::OnUpdate, this);
 
 	this->SetSize(350, 350);
-	
+
+	this->StartWatchdog();
 }
 
 void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){

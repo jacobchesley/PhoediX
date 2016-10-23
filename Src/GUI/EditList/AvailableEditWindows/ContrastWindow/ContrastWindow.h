@@ -43,7 +43,6 @@ class ContrastWindow : public EditWindow {
 		DoubleSlider * blueContrastCenterSlider;
 		wxCheckBox * curveSelection;
 
-		wxButton * processButton;
 		Processor * proc;
 };
 #endif

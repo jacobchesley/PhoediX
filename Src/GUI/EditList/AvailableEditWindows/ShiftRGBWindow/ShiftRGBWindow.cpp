@@ -32,11 +32,6 @@ ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor *
 	greenBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	blueBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	allBrightSlider->SetForegroundColour(Colors::TextLightGrey);
 	allBrightSlider->SetBackgroundColour(parent->GetBackgroundColour());
 	redBrightSlider->SetForegroundColour(Colors::TextLightGrey);
@@ -58,8 +53,6 @@ ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor *
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(gridSizer);
-	mainSizer->AddSpacer(15);
-	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
 	proc = processor;
 	parWindow = parent;

@@ -13,12 +13,17 @@
 
 class HSLCurvesWindow :public EditWindow {
 public:
+	HSLCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
+
+	void AddEditToProcessor();
+	void SetParamsAndFlags(ProcessorEdit * edit);
+	ProcessorEdit * GetParamsAndFlags();
+	bool CheckCopiedParamsAndFlags();
+
+private:
 
 	wxWindow * parWindow;
-	wxButton * processButton;
 	wxButton * resetCurveButton;
-
-	wxBoxSizer * buttonContainer;
 	
 	CurvePanel * hCurve;
 	CurvePanel * sCurve;
@@ -30,13 +35,6 @@ public:
 	wxTextCtrl * text;
 
 	Processor * proc;
-
-	HSLCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
-
-	void AddEditToProcessor();
-	void SetParamsAndFlags(ProcessorEdit * edit);
-	ProcessorEdit * GetParamsAndFlags();
-	bool CheckCopiedParamsAndFlags();
 };
 
 #endif

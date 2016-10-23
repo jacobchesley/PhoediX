@@ -113,11 +113,6 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 	blueGridSizer->Add(blueBlueLabel);
 	blueGridSizer->Add(blueBlueSlider);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(25);
 	mainSizer->Add(presetSizer);
@@ -127,9 +122,6 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 	mainSizer->Add(greenGridSizer);
 	mainSizer->AddSpacer(35);
 	mainSizer->Add(blueGridSizer);
-	mainSizer->AddSpacer(35);
-
-	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
 	justSetPreset = false;
 	proc = processor;
@@ -139,7 +131,6 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ChannelMixerWindow::OnSlide, this);
 
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ChannelMixerWindow::PresetChange, this);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ChannelMixerWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();

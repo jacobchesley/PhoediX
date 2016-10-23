@@ -35,11 +35,6 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	greenBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	blueBrightSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
 	greyscaleMethod->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	greyscaleMethod->SetForegroundColour(Colors::TextLightGrey);
 	redBrightSlider->SetForegroundColour(Colors::TextLightGrey);
@@ -62,14 +57,12 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(gridSizer);
 	mainSizer->AddSpacer(15);
-	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
 	proc = processor;
 	parWindow = parent;
 
 	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnUpdate, this);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ConvertGreyscaleWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ConvertGreyscaleWindow::OnCombo, this);
 
 	this->SetSizer(mainSizer);

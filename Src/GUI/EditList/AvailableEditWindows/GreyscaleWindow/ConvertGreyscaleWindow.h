@@ -36,8 +36,6 @@ private:
 	DoubleSlider * greenBrightSlider;
 	DoubleSlider * blueBrightSlider;
 
-	wxButton * processButton;
-
 	Processor * proc;
 
 };

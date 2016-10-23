@@ -9,11 +9,6 @@ ScaleWindow::ScaleWindow(wxWindow * parent, wxString editName, Processor * proce
 	// 2 Columns, 15 pixel vertical gap, 5 pixel horizontal gap
 	gridSizer = new wxFlexGridSizer(2, 15, 5);
 
-	processButton = new wxButton(this, EditWindow::ID_PROCESS_EDITS, "Process Edits", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-	processButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-	processButton->SetBackgroundColour(Colors::BackGrey);
-	processButton->SetForegroundColour(Colors::TextLightGrey);
-
 	editLabel = new wxStaticText(this, -1, editName);
 	editLabel->SetForegroundColour(Colors::TextWhite);
 	editLabel->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
@@ -83,8 +78,6 @@ ScaleWindow::ScaleWindow(wxWindow * parent, wxString editName, Processor * proce
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(gridSizer);
-	mainSizer->AddSpacer(15);
-	mainSizer->Add(processButton, 0, wxALIGN_LEFT);
 
 	proc = processor;
 	parWindow = parent;
