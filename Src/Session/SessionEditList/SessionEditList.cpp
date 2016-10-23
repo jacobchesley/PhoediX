@@ -62,158 +62,172 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 			
 			// Get edit name and set edit type
 			if (editNodeChildren->GetName() == "EditName") {
-				newEdit->SetEditTypeFromTag(editNodeChildren->GetChildren()[0].GetContent());
+				if(editNodeChildren->GetChildren() != NULL){
+					newEdit->SetEditTypeFromTag(editNodeChildren->GetChildren()[0].GetContent());
+				}
 			}
 
 			// Get edit name and set edit type
 			if (editNodeChildren->GetName() == "EditIndex") {
-				editIdx = wxAtoi(editNodeChildren->GetChildren()[0].GetContent());
+				if(editNodeChildren->GetChildren() != NULL){
+					editIdx = wxAtoi(editNodeChildren->GetChildren()[0].GetContent());
+				}
 			}
 
 			// Get enable / disable 
 			if (editNodeChildren->GetName() == "Disabled") {
-				int dis = wxAtoi(editNodeChildren->GetChildren()[0].GetContent());
-				if(dis > 0){ newEdit->SetDisabled(true); }
+				if(editNodeChildren->GetChildren() != NULL){
+					int dis = wxAtoi(editNodeChildren->GetChildren()[0].GetContent());
+					if(dis > 0){ newEdit->SetDisabled(true); }
+				}
 			}
 
 			// Get all parameters for the edit
 			if (editNodeChildren->GetName() == "Parameters") {
 
-				wxXmlNode * editNodeParameters = editNodeChildren->GetChildren();
+				if(editNodeChildren->GetChildren() != NULL){
+					wxXmlNode * editNodeParameters = editNodeChildren->GetChildren();
 
-				// Count number of parameters
-				size_t numParams = 0;
-				wxVector<double> params;
-				while (editNodeParameters) {
-					numParams += 1;
-					editNodeParameters = editNodeParameters->GetNext();
-				}
+					// Count number of parameters
+					size_t numParams = 0;
+					wxVector<double> params;
+					while (editNodeParameters) {
+						numParams += 1;
+						editNodeParameters = editNodeParameters->GetNext();
+					}
 
-				// Resize the parameters vector to account for all parameters
-				params.resize(numParams);
+					// Resize the parameters vector to account for all parameters
+					params.resize(numParams);
 
-				// Get all parameters and place in correct order
-				editNodeParameters = editNodeChildren->GetChildren();
-				wxString editParamNumStr;
-				size_t paramIdx = 0;
-				double param;
-				while (editNodeParameters) {
+					// Get all parameters and place in correct order
+					editNodeParameters = editNodeChildren->GetChildren();
+					wxString editParamNumStr;
+					size_t paramIdx = 0;
+					double param;
+					while (editNodeParameters) {
 
-					// Get param number
-					editParamNumStr = editNodeParameters->GetName();
-					editParamNumStr = editParamNumStr.SubString(5, editParamNumStr.length());
-					paramIdx = wxAtoi(editParamNumStr);
+						// Get param number
+						editParamNumStr = editNodeParameters->GetName();
+						editParamNumStr = editParamNumStr.SubString(5, editParamNumStr.length());
+						paramIdx = wxAtoi(editParamNumStr);
 
-					// Get param value
-					param = wxAtof(editNodeParameters->GetChildren()[0].GetContent());
+						// Get param value
+						param = wxAtof(editNodeParameters->GetChildren()[0].GetContent());
 
-					// Add to param vector
-					params[paramIdx] = param;
+						// Add to param vector
+						params[paramIdx] = param;
 
-					// Get next parameter
-					editNodeParameters = editNodeParameters->GetNext();
-				}
+						// Get next parameter
+						editNodeParameters = editNodeParameters->GetNext();
+					}
 
-				// Add parameters to new edit
-				for (size_t i = 0; i < numParams; i++) {
-					newEdit->AddParam(params.at(i));
+					// Add parameters to new edit
+					for (size_t i = 0; i < numParams; i++) {
+						newEdit->AddParam(params.at(i));
+					}
 				}
 			}
 
 			// Get all flags for the edit
 			if (editNodeChildren->GetName() == "Flags") {
 
-				wxXmlNode * editNodeFlags = editNodeChildren->GetChildren();
+				if(editNodeChildren->GetChildren() != NULL){
+					wxXmlNode * editNodeFlags = editNodeChildren->GetChildren();
 
-				// Count number of flags
-				size_t numFlags = 0;
-				wxVector<double> flags;
-				while (editNodeFlags) {
-					numFlags += 1;
-					editNodeFlags = editNodeFlags->GetNext();
-				}
+					// Count number of flags
+					size_t numFlags = 0;
+					wxVector<double> flags;
+					while (editNodeFlags) {
+						numFlags += 1;
+						editNodeFlags = editNodeFlags->GetNext();
+					}
 
-				// Resize the flags vector to account for all parameters
-				flags.resize(numFlags);
+					// Resize the flags vector to account for all parameters
+					flags.resize(numFlags);
 
-				// Get all flags and place in correct order
-				editNodeFlags = editNodeChildren->GetChildren();
-				wxString editFlagNumStr;
-				size_t flagIdx = 0;
-				int flag;
-				while (editNodeFlags) {
+					// Get all flags and place in correct order
+					editNodeFlags = editNodeChildren->GetChildren();
+					wxString editFlagNumStr;
+					size_t flagIdx = 0;
+					int flag;
+					while (editNodeFlags) {
 
-					// Get flag number
-					editFlagNumStr = editNodeFlags->GetName();
-					editFlagNumStr = editFlagNumStr.SubString(4, editFlagNumStr.length());
-					flagIdx = wxAtoi(editFlagNumStr);
+						// Get flag number
+						editFlagNumStr = editNodeFlags->GetName();
+						editFlagNumStr = editFlagNumStr.SubString(4, editFlagNumStr.length());
+						flagIdx = wxAtoi(editFlagNumStr);
 
-					// Get param value
-					flag = wxAtoi(editNodeFlags->GetChildren()[0].GetContent());
+						// Get param value
+						flag = wxAtoi(editNodeFlags->GetChildren()[0].GetContent());
 
-					// Add to param vector
-					flags[flagIdx] = flag;
+						// Add to param vector
+						flags[flagIdx] = flag;
 
-					// Get next parameter
-					editNodeFlags = editNodeFlags->GetNext();
-				}
+						// Get next parameter
+						editNodeFlags = editNodeFlags->GetNext();
+					}
 
-				// Add flags to new edit
-				for (size_t i = 0; i < numFlags; i++) {
-					newEdit->AddFlag(flags.at(i));
+					// Add flags to new edit
+					for (size_t i = 0; i < numFlags; i++) {
+						newEdit->AddFlag(flags.at(i));
+					}
 				}
 			}
 			
 			// Get all double arrays for the edit
 			if (editNodeChildren->GetName() == "DoubleArrays") {
 
-				wxXmlNode * editNodeDoubleArrays = editNodeChildren->GetChildren();
-				wxVector<double*> doubleArrays;
-				wxVector<int> doubleArraySizes;
+				if(editNodeChildren->GetChildren() != NULL){
+					wxXmlNode * editNodeDoubleArrays = editNodeChildren->GetChildren();
+					wxVector<double*> doubleArrays;
+					wxVector<int> doubleArraySizes;
 
-				// Count number of double arrays
-				size_t numDoubleArrays = 0;
-				while (editNodeDoubleArrays) {
-					numDoubleArrays += 1;
-					editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
-				}
-
-				// Resize the double arrays vector to account for all arrays
-				doubleArrays.resize(numDoubleArrays);
-				doubleArraySizes.resize(numDoubleArrays);
-
-				// Get all double arrays and place in correct order
-				editNodeDoubleArrays = editNodeChildren->GetChildren();
-				wxString editDoubleArrayNumStr;
-				size_t arrayIdx = 0;
-				while (editNodeDoubleArrays) {
-
-					// Get array number
-					editDoubleArrayNumStr = editNodeDoubleArrays->GetName();
-					editDoubleArrayNumStr = editDoubleArrayNumStr.SubString(11, editDoubleArrayNumStr.length());
-					arrayIdx = wxAtoi(editDoubleArrayNumStr);
-
-					// Count number of elements in array
-					wxString arrayStr = editNodeDoubleArrays->GetChildren()[0].GetContent();
-					wxStringTokenizer arrayTokens(arrayStr, ",");
-					size_t numElements = arrayTokens.CountTokens();
-
-					// Create and populate double array
-					double * newDoubleArray = new double[numElements];
-					doubleArraySizes[arrayIdx] = numElements;
-					for (size_t i = 0; i < numElements; i++) {
-						arrayTokens.GetNextToken().ToDouble(&newDoubleArray[i]);
+					// Count number of double arrays
+					size_t numDoubleArrays = 0;
+					while (editNodeDoubleArrays) {
+						numDoubleArrays += 1;
+						editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
 					}
 
-					// Set double array element in vector
-					doubleArrays[arrayIdx] = newDoubleArray;
+					// Resize the double arrays vector to account for all arrays
+					doubleArrays.resize(numDoubleArrays);
+					doubleArraySizes.resize(numDoubleArrays);
 
-					editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
-				}
+					// Get all double arrays and place in correct order
+					editNodeDoubleArrays = editNodeChildren->GetChildren();
+					wxString editDoubleArrayNumStr;
+					size_t arrayIdx = 0;
+					while (editNodeDoubleArrays) {
 
-				// Add double arrays to new edit
-				for (size_t i = 0; i < numDoubleArrays; i++) {
-					newEdit->AddDoubleArray(doubleArrays[i], doubleArraySizes[i]);
+						// Get array number
+						editDoubleArrayNumStr = editNodeDoubleArrays->GetName();
+						editDoubleArrayNumStr = editDoubleArrayNumStr.SubString(11, editDoubleArrayNumStr.length());
+						arrayIdx = wxAtoi(editDoubleArrayNumStr);
+
+						// Count number of elements in array
+						if(!editNodeDoubleArrays->GetContent() != NULL){
+							wxString arrayStr = editNodeDoubleArrays->GetChildren()[0].GetContent();
+							wxStringTokenizer arrayTokens(arrayStr, ",");
+							size_t numElements = arrayTokens.CountTokens();
+
+							// Create and populate double array
+							double * newDoubleArray = new double[numElements];
+							doubleArraySizes[arrayIdx] = numElements;
+							for (size_t i = 0; i < numElements; i++) {
+								arrayTokens.GetNextToken().ToDouble(&newDoubleArray[i]);
+							}
+
+							// Set double array element in vector
+							doubleArrays[arrayIdx] = newDoubleArray;
+
+						}
+						editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
+					}
+
+					// Add double arrays to new edit
+					for (size_t i = 0; i < numDoubleArrays; i++) {
+						newEdit->AddDoubleArray(doubleArrays[i], doubleArraySizes[i]);
+					}
 				}
 			}
 
