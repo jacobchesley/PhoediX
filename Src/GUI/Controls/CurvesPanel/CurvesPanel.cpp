@@ -1,11 +1,14 @@
 #include "curvespanel.h"
 
-CurvePanel::CurvePanel(wxWindow * Parent, int Channel)
-	:wxPanel(Parent) {
+wxDEFINE_EVENT(CURVE_CHANGED_EVENT, wxCommandEvent);
+
+CurvePanel::CurvePanel(wxWindow * parent, int channel) :wxPanel(parent) {
+
+	par = parent;
 
 	this->SetMinSize(wxSize(50, 50));
 	curvePaddingSize = 7;
-	channelColor = Channel;
+	channelColor = channel;
 
 	// Create a spline with 1000  points between each control point
 	displayCurve = new Spline(1000, true);
@@ -80,7 +83,7 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 		dy = y - OldY;
 
 		// if the mouse position has changed since last time...
-		if (dx != 0 || OldY != 0) {
+		if (dx != 0 || dy != 0) {
 
 			// if a valid control point has been selected
 			if (id > -1) {
@@ -121,6 +124,10 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 
 				// draw the new spline
 				PaintNow();
+
+				// Send event to parent to inform curve has changed
+				wxCommandEvent evt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+				wxPostEvent(par, evt);
 			}
 		}
 
@@ -167,6 +174,10 @@ void CurvePanel::RightClick(wxMouseEvent& evt) {
 
 			// remove that point
 			displayCurve->RemovePoint(delID);
+
+			// Send event to parent to inform curve has changed
+			wxCommandEvent evt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+			wxPostEvent(par, evt);
 		}
 	}
 
@@ -181,6 +192,9 @@ void CurvePanel::RightClick(wxMouseEvent& evt) {
 					// Add the point to the spline
 					displayCurve->AddPoint(i + 1, scaledX, scaledY);
 
+					// Send event to parent to inform curve has changed
+					wxCommandEvent evt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+					wxPostEvent(par, evt);
 				}
 			}
 		}

@@ -20,8 +20,24 @@ enum {
 	CURVE_CHANNEL_BLUE
 };
 
+enum{
+	ID_CURVE_CHANGED
+};
+
+wxDECLARE_EVENT(CURVE_CHANGED_EVENT, wxCommandEvent);
+
 class CurvePanel : public wxPanel {
+
 public:
+	CurvePanel(wxWindow * Parent, int Channel);
+	std::vector<int> GetColorCurveMap(int numSteps, float scale);
+	void SetControlPoints(std::vector<Point> newPoints);
+	std::vector<Point> GetControlPoints();
+	~CurvePanel();
+
+private:
+
+	wxWindow * par;
 
 	int curvePaddingSize;
 	int extraLefttX;
@@ -32,9 +48,7 @@ public:
 	std::vector<Point> lastPoints;
 	Spline * splineCurve;
 	Spline * displayCurve;
-
-	CurvePanel(wxWindow * Parent, int Channel);
-	~CurvePanel();
+		
 	void RightClick(wxMouseEvent& evt);
 	void LeftClick(wxMouseEvent& evt);
 	void PaintEvent(wxPaintEvent& evt);
@@ -43,10 +57,8 @@ public:
 	void PaintNow();
 	void DestroySpline();
 	bool CheckForChanges();
-	std::vector<int> GetColorCurveMap(int numSteps, float scale);
 	std::vector<Point> ClipCurve(std::vector<Point> points);
-	std::vector<Point> GetControlPoints();
-	void SetControlPoints(std::vector<Point> newPoints);
+
 };
 
 #endif
