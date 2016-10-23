@@ -1,21 +1,84 @@
 #include "LibraryImage.h"
 
-LibraryImage::LibraryImage(wxWindow * parent, wxImage * image) : wxPanel(parent) {
+LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName, wxString filePath) : wxPanel(parent) {
+	
+	this->SetBackgroundColour(Colors::BackDarkDarkGrey);;
+
+	path = filePath;
+
 	mainLayout = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainLayout);
 
 	subLayout = new wxBoxSizer(wxHORIZONTAL);
 
 	imageDisplay = new WXImagePanel(this, image, true, true);
-	nameDisplay = new wxStaticText(this, -1, "");
+	imageDisplay->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(LibraryImage::OnLeftDoubleClick), NULL, this);
+
+	nameDisplay = new wxStaticText(this, -1, fileName);
 	selectBox = new wxCheckBox(this, -1, "");
 
-	subLayout->Add(nameDisplay);
-	subLayout->Add(selectBox);
-	this->GetSizer()->Add(imageDisplay);
-	this->GetSizer()->Add(subLayout);
-	this->GetSizer()->AddSpacer(50);
+	nameDisplay->SetForegroundColour(Colors::TextLightGrey);
 
+	subLayout->Add(nameDisplay, 1);
+	subLayout->AddStretchSpacer();
+	subLayout->Add(selectBox, 0);
+
+	this->GetSizer()->Add(imageDisplay);
+	this->GetSizer()->Add(subLayout, 0, wxEXPAND);
+	this->GetSizer()->AddSpacer(50);
+	
+	this->GetSizer()->Layout();
+
+	this->Bind(wxEVT_LEFT_DCLICK, (wxMouseEventFunction)&LibraryImage::OnLeftDoubleClick, this);
+}
+
+void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
+	
+	wxImage * displayImage = NULL;
+
+	// We have a raw image we can load in
+	if (ImageHandler::CheckRaw(path)) {
+
+		LibRaw rawProc;
+
+		rawProc.recycle();
+		rawProc.open_file(path.wc_str());
+		rawProc.unpack();
+		rawProc.imgdata.params.half_size = 1;
+		rawProc.imgdata.params.use_camera_wb = 1;
+		rawProc.imgdata.params.use_auto_wb = 0;
+
+		int rawError = LIBRAW_SUCCESS;
+
+		rawProc.dcraw_process();
+		libraw_processed_image_t * rawImg = rawProc.dcraw_make_mem_image(&rawError);
+
+		if (rawError == LIBRAW_SUCCESS) {
+
+			displayImage = new wxImage(rawImg->width, rawImg->height);
+			ImageHandler::CopyImageFromRaw(rawImg, displayImage);
+
+			ZoomImageFrame * displayFrame = new ZoomImageFrame(this, this->GetName(), displayImage);
+			displayFrame->Show();
+		}
+	}
+
+	// We have an image we can load in
+	else if (ImageHandler::CheckImage(path)) {
+		displayImage = new wxImage(path);
+
+		ZoomImageFrame * displayFrame = new ZoomImageFrame(this, this->GetName(), displayImage);
+		displayFrame->Show();
+	}
+
+	//  No vailid image
+	else{
+		return;
+	}
+
+	if(displayImage != NULL){
+		delete displayImage;
+	}
 }
 
 void LibraryImage::ChangeImage(wxImage * newImage) {
@@ -46,3 +109,27 @@ wxString LibraryImage::GetName() {
 bool LibraryImage::GetSelected() {
 	return selectBox->GetValue();
 }
+
+AddLibraryImageEvent::AddLibraryImageEvent(wxEventType eventType, int winid, wxImage * img, wxString fileName, wxString filePath) : wxEvent(winid, eventType){
+	libImage = img;
+	name = fileName;
+	path = filePath;
+}
+
+wxEvent * AddLibraryImageEvent::Clone() const {
+	 return new AddLibraryImageEvent(*this);
+}
+
+wxImage * AddLibraryImageEvent::GetImage() const {
+	return libImage;
+}
+
+wxString AddLibraryImageEvent::GetFileName() const {
+	return name;
+}
+
+wxString AddLibraryImageEvent::GetFilePath() const {
+	return path;
+}
+
+wxDEFINE_EVENT(ADD_LIB_IMAGE_EVENT, AddLibraryImageEvent);

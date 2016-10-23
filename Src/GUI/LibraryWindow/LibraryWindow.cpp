@@ -21,8 +21,17 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	importButton->SetBackgroundColour(Colors::BackGrey);
 	importButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
+	clearButton = new wxButton(this, LibraryWindow::MenuBar::ID_CLEAR, "Clear Library", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	clearButton->SetForegroundColour(Colors::TextLightGrey);
+	clearButton->SetBackgroundColour(Colors::BackGrey);
+	clearButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
 	toolbarLayout->Add(showDirectoriesButton);
+	toolbarLayout->AddSpacer(15);
 	toolbarLayout->Add(importButton);
+	toolbarLayout->AddSpacer(15);
+	toolbarLayout->Add(clearButton);
+
 	this->GetSizer()->Add(toolbarLayout);
 	this->GetSizer()->Add(imagesLayout);
 
@@ -43,8 +52,9 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnShowDirectories, this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnImport, this, LibraryWindow::MenuBar::ID_IMPORT);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnClear, this, LibraryWindow::MenuBar::ID_CLEAR);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&LibraryWindow::OnResize, this);
-	this->Bind(wxEVT_SCROLLWIN_THUMBRELEASE, (wxObjectEventFunction)&LibraryWindow::OnScroll, this);
+	this->Bind(ADD_LIB_IMAGE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnAddImage, this);
 }
 
 void LibraryWindow::OnShowDirectories(wxCommandEvent& WXUNUSED(evt)){
@@ -52,37 +62,54 @@ void LibraryWindow::OnShowDirectories(wxCommandEvent& WXUNUSED(evt)){
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
-void LibraryWindow::OnResize(wxSizeEvent& evt) {
-	this->SetVirtualSize(this->GetSize());
+void LibraryWindow::OnResize(wxSizeEvent& WXUNUSED(evt)) {
 	this->FitInside();
-	this->Layout();
-	imagesLayout->Layout();
-
-	evt.Skip(true);
-}
-
-void LibraryWindow::OnScroll(wxScrollEvent& evt) {
-	this->FitInside();
-	this->Layout();
-	imagesLayout->Layout();
-
-	evt.Skip(false);
 }
 
 void LibraryWindow::OnImport(wxCommandEvent& WXUNUSED(evt)){
 
 	LoadImagesThread * testImgThread = new LoadImagesThread(this);
 	testImgThread->Run();
-
 }
 
-void LibraryWindow::AddLibraryImage(LibraryImage * newLibraryImage) {
-	imagesLayout->Add(newLibraryImage);
-	imagesLayout->AddSpacer(50);
-	libraryImages.push_back(newLibraryImage);
-	this->SetVirtualSize(this->GetBestVirtualSize());
+void LibraryWindow::OnClear(wxCommandEvent& WXUNUSED(evt)){
+
+	imagesLayout->Clear(true);
+	libraryImages.clear();
+	includedImagePaths.clear();
+	this->Layout();
 	this->FitInside();
-	this->GetSizer()->Layout();
+}
+
+void LibraryWindow::OnAddImage(AddLibraryImageEvent & evt){
+
+	// If the image is not currently in the images display
+	if(!this->CheckIfImageInDisplay(evt.GetFilePath())){
+
+		// Add the image to the vector of displayed image paths, then add image to display
+		includedImagePaths.push_back(evt.GetFilePath());
+		this->AddLibraryImage(evt.GetImage(), evt.GetFileName(), evt.GetFilePath());
+	}
+}
+
+bool LibraryWindow::CheckIfImageInDisplay(wxString imagePath){
+	for(size_t i = 0; i < includedImagePaths.size(); i++){
+		if(includedImagePaths.at(i).CmpNoCase(imagePath) == 0){
+			return true;
+		}
+	}
+	return false;
+}
+void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxString filePath) {
+	
+	LibraryImage * newLibImage = new LibraryImage(this, newImage, fileName, filePath);
+	newImage->Destroy();
+	delete newImage;
+	imagesLayout->Add(newLibImage);
+	imagesLayout->AddSpacer(50);
+	libraryImages.push_back(newLibImage);	
+	this->Layout();
+	this->FitInside();
 }
 
 LibraryWindow::LoadImagesThread::LoadImagesThread(LibraryWindow * parent) : wxThread(wxTHREAD_DETACHED){
@@ -163,9 +190,12 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 				else {
 					displayImage->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
 				}
-				LibraryImage * newLibraryImage = new LibraryImage(par, displayImage);
-				delete displayImage;
-				par->AddLibraryImage(newLibraryImage);
+				
+				// Send the image to the parent to be added to the window
+				wxFileName tempFile(fileName);
+
+				AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage, tempFile.GetFullName(), fileName);
+				wxPostEvent(par, libImageEvent);
 
 			}
 		}

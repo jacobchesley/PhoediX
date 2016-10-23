@@ -30,33 +30,36 @@ public:
 	LibraryWindow(wxWindow * parent);
 
 protected:
-	
-		
-	void AddLibraryImage(LibraryImage* newLibImage);
-
+			
+	void AddLibraryImage(wxImage* newImage, wxString fileName, wxString filePath);
 
 private:
 	
 	void OnShowDirectories(wxCommandEvent & WXUNUSED(evt));
 	void OnImport(wxCommandEvent & WXUNUSED(evt));
-	void OnResize(wxSizeEvent & evt);
-	void OnScroll(wxScrollEvent & evt);
+	void OnClear(wxCommandEvent & WXUNUSED(evt));
+	void OnResize(wxSizeEvent & WXUNUSED(evt));
+	void OnAddImage(AddLibraryImageEvent & evt);
+	bool CheckIfImageInDisplay(wxString imagePath);
 
 	wxBoxSizer * mainLayout;
 
 	wxBoxSizer * toolbarLayout;
 	wxButton * showDirectoriesButton;
 	wxButton * importButton;
+	wxButton * clearButton;
 
 	wxWrapSizer * imagesLayout;
 
 	wxVector<LibraryImage*> libraryImages;
+	wxVector<wxString> includedImagePaths;
 
 	DirectorySelections * directorySelections;
 
 	enum MenuBar{
 		ID_SHOW_DIRECTORY_LIST,
-		ID_IMPORT
+		ID_IMPORT,
+		ID_CLEAR
 	};
 
 	class LoadImagesThread : public wxThread {
