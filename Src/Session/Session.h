@@ -37,6 +37,11 @@ public:
 	int GetImageScrollY();
 	void SetImageScrollY(int y);
 
+	void SetImageScrollWidth(int width);
+	int GetImageScrollWidth();
+	void SetImageScrollHeight(int height);
+	int GetImageScrollHeight();
+
 	int GetHistogramDisplaySelect();
 	void SetHistogramDisplaySelect(int selection);
 
@@ -56,6 +61,8 @@ private:
 	float imgZoom;
 	int imgScrollX;
 	int imgScrollY;
+	int imgWidth;
+	int imgHeight;
 	wxString auiPerspective;
 	int histogramDisplaySelect;
 	int id;

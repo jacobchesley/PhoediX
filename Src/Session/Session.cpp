@@ -6,6 +6,8 @@ PhoediXSession::PhoediXSession(){
 	imgZoom = 1.0f;
 	imgScrollX = 0;
 	imgScrollY = 0;
+	imgWidth = 0;
+	imgHeight = 0;
 	id = -1;
 	name = "";
 }
@@ -67,6 +69,22 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 			}
 		}
 
+		// Get Image Display scroll Width
+		if (sessionInfo->GetName() == "ImageWidth") {
+			// Get first child (the actual content)
+			if(sessionInfo->GetChildren() != NULL){
+				imgWidth = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Image Display scroll Height
+		if (sessionInfo->GetName() == "ImageHeight") {
+			// Get first child (the actual content)
+			if(sessionInfo->GetChildren() != NULL){
+				imgHeight = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
 		// Get Perspective node
 		if (sessionInfo->GetName() == "Perspective") {
 			// Get first child (the actual content)
@@ -109,6 +127,14 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	// Write display image scroll y
 	wxXmlNode * scrollY = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "DisplayOffsetY");
 	scrollY->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), imgScrollY)));
+
+	// Write dislay image scroll width
+	wxXmlNode * imageWidth = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ImageWidth");
+	imageWidth->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), imgWidth)));
+
+	// Write display image scroll height
+	wxXmlNode * imageHeight = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ImageHeight");
+	imageHeight->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), imgHeight)));
 
 	// Write the perspective for AUI to XML Doc
 	wxXmlNode * perspective = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "Perspective");
@@ -166,6 +192,22 @@ void PhoediXSession::SetImageScrollX(int x) {
 
 int PhoediXSession::GetImageScrollY() {
 	return imgScrollY;
+}
+
+void PhoediXSession::SetImageScrollWidth(int width) {
+	imgWidth = width;
+}
+
+int PhoediXSession::GetImageScrollWidth() {
+	return imgWidth;
+}
+
+void PhoediXSession::SetImageScrollHeight(int height) {
+	imgHeight = height;
+}
+
+int PhoediXSession::GetImageScrollHeight() {
+	return imgHeight;
 }
 
 void PhoediXSession::SetImageScrollY(int y) {
