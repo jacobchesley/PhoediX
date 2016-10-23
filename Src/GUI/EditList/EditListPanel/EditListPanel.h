@@ -29,6 +29,7 @@ public:
 	void AddRawWindow();
 	void AddRawWindow(ProcessorEdit* editForParams);
 	void RemoveRawWindow();
+	void RemoveAllWindows();
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
 	void ReprocessImage();
@@ -39,6 +40,8 @@ private:
 
 	void InitializeEdits();
 
+	void OnRightClick(wxMouseEvent& WXUNUSED(event));
+	void OnPopupMenuClick(wxCommandEvent& inEvt);
 	void OnAddEdit(wxCommandEvent& WXUNUSED(event));
 
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
@@ -67,6 +70,12 @@ private:
 
 	enum Buttons {
 		ADD_EDIT_BUTTON = 100
+	};
+
+	enum PopupMenuActions{
+		COPY_EDIT_LIST,
+		PASTE_EDIT_LIST
+
 	};
 
 	class EditListScroll : public wxScrolledWindow {

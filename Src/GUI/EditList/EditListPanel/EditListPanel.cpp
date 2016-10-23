@@ -11,6 +11,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	titleText->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
 	scroller = new EditListScroll(this);
+	scroller->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(EditListPanel::OnRightClick), NULL, this);
 
 	Icons icons;
 	addEditButton = new wxButton(this, EditListPanel::Buttons::ADD_EDIT_BUTTON, "Add Edit", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -51,6 +52,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageEvt, this, ID_REPROCESS_IMAGE);
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageRawEvt, this, ID_REPROCESS_IMAGE_RAW);
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListPanel::OnRightClick, this);
 	proc = processor;
 	hasRaw = false;
 
@@ -67,6 +69,38 @@ void EditListPanel::InitializeEdits() {
 		wxString editName = allEdits.at(i).GetName();
 		wxString editDescription = allEdits.at(i).GetDescription();
 		editSelection->AddEditSelection(editName, editDescription);
+	}
+}
+
+void EditListPanel::OnRightClick(wxMouseEvent& WXUNUSED(event)){
+
+	// Display a popup menu of options
+	wxMenu popupMenu;
+	popupMenu.Append(EditListPanel::PopupMenuActions::COPY_EDIT_LIST, "Copy Edit List");
+
+	if(proc->GetEditListForCopyPaste().size() > 0){
+		popupMenu.Append(EditListPanel::PopupMenuActions::PASTE_EDIT_LIST, "Paste Edit List");
+	}
+	popupMenu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(EditListPanel::OnPopupMenuClick), NULL, this);
+	this->PopupMenu(&popupMenu);
+}
+
+void EditListPanel::OnPopupMenuClick(wxCommandEvent& inEvt) {
+
+	int id = inEvt.GetId();
+
+	switch(id){
+
+		// Copy the edit parameters
+		case EditListPanel::PopupMenuActions::COPY_EDIT_LIST:{
+			this->AddEditsToProcessor();
+			proc->StoreEditListForCopyPaste(proc->GetEditVector());
+			break;
+		}
+
+		case EditListPanel::PopupMenuActions::PASTE_EDIT_LIST:{
+			this->AddEditWindows(proc->GetEditListForCopyPaste());
+		}
 	}
 }
 
@@ -113,6 +147,7 @@ void EditListPanel::ReprocessImage() {
 }
 
 void EditListPanel::ReprocessImageRaw() {
+
 	// Process Raw if needed
 	if (hasRaw) {
 
@@ -131,6 +166,7 @@ void EditListPanel::ReprocessImageRaw() {
 }
 
 void EditListPanel::ReprocessUnpackImageRaw() {
+
 	// Process Raw if needed
 	if (hasRaw) {
 		proc->UnpackAndProcessRaw();
@@ -159,9 +195,8 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 }
 
 void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
-
-	this->RemoveRawWindow();
-	scroller->DeleteAllEdits();
+	
+	this->RemoveAllWindows();
 	
 	for (size_t i = 0; i < inEdits.size(); i++) {
 		if (inEdits.at(i) != NULL) {
@@ -189,6 +224,11 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	}
 	
 	this->ReprocessImageRaw();
+}
+
+void EditListPanel::RemoveAllWindows() {
+	this->RemoveRawWindow();
+	scroller->DeleteAllEdits();
 }
 
 void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActivate) {
