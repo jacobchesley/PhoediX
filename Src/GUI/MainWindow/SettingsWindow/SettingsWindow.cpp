@@ -23,8 +23,15 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor) : wxScr
 	colorDepth->SetForegroundColour(Colors::TextLightGrey);
 	colorDepth->Append("8 Bit");
 	colorDepth->Append("16 Bit");
-	colorDepth->SetSelection(1);
-	lastColorDepth = colorDepth->GetSelection();
+
+	if(processor->GetImage()->GetColorDepth() == 8){
+		colorDepth->SetSelection(0);
+		lastColorDepth = colorDepth->GetSelection();
+	}
+	else{
+		colorDepth->SetSelection(1);
+		lastColorDepth = colorDepth->GetSelection();
+	}
 
 	// Number of Threads Setting
 	numThreadsLabel = new wxStaticText(this, -1, "Number of Threads");
@@ -72,18 +79,24 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor) : wxScr
 }
 
 void SettingsWindow::OnApply(wxCommandEvent& WXUNUSED(evt)) {
+	this->ApplySettings();
+}
+
+void SettingsWindow::ApplySettings(){
 
 	if (colorDepth->GetSelection() == 0 && lastColorDepth != colorDepth->GetSelection()) {
 		proc->GetOriginalImage()->Disable16Bit();
 		proc->GetImage()->Disable16Bit();
+		lastColorDepth = colorDepth->GetSelection();
 
 		wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
 		wxPostEvent(parWindow, reloadEvent);
 
 	}
-	else if (colorDepth->GetSelection() == 0 && lastColorDepth != colorDepth->GetSelection()) {
+	else if (colorDepth->GetSelection() == 1 && lastColorDepth != colorDepth->GetSelection()) {
 		proc->GetOriginalImage()->Enable16Bit();
 		proc->GetImage()->Enable16Bit();
+		lastColorDepth = colorDepth->GetSelection();
 
 		wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
 		wxPostEvent(parWindow, reloadEvent);

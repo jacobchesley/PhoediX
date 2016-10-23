@@ -24,7 +24,7 @@ class SettingsWindow : public wxScrolledWindow {
 
 public:
 	SettingsWindow(wxWindow * parent, Processor * processor);
-	
+	void ApplySettings();
 
 private:
 
