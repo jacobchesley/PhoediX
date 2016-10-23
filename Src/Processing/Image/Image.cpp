@@ -476,11 +476,12 @@ void Image::SetDataFrom16(uint8_t * inData, int inWidth, int inHeight) {
 		}
 
 		// Go through each pixel containing red, green and blue, and copy to 16 bit data.  2 bytes per pixel color.
+		// Flip bytes
 		int index = 0;
 		for (int i = 0; i < size * 2; i += 6) {
-			imageDataRed16[index] = inData[i] << 8 |  inData[i+1];
-			imageDataGreen16[index] = inData[i+2] << 8 |  inData[i+3];;
-			imageDataBlue16[index] = inData[i+4] << 8 |  inData[i+5];;
+			imageDataRed16[index] = inData[i + 1] << 8 |  inData[i];
+			imageDataGreen16[index] = inData[i + 3] << 8 |  inData[i + 2];
+			imageDataBlue16[index] = inData[i + 5] << 8 |  inData[i + 4];
 			index += 1;
 		}
 	}
