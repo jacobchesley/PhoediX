@@ -48,9 +48,8 @@ ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 	}
 
 	// Copy Double Arrays
-	for(size_t doubleArrayIdx = 0; doubleArrayIdx < edit.GetNumIntArrays(); doubleArrayIdx ++){
-
-
+	for(size_t doubleArrayIdx = 0; doubleArrayIdx < edit.GetNumDoubleArrays(); doubleArrayIdx ++){
+		
 		// Allocate new int array
 		int doubleArraySize = edit.GetDoubleArraySize(doubleArrayIdx);
 		double* newDoubleArray = new double[edit.GetDoubleArraySize(doubleArrayIdx)];
@@ -126,10 +125,12 @@ double * ProcessorEdit::GetDoubleArray(size_t index) {
 }
 
 int ProcessorEdit::GetIntArraySize(size_t index) {
+	if (index >= intArraySizes.size()) { return 0; }
 	return intArraySizes.at(index);
 }
 
 int ProcessorEdit::GetDoubleArraySize(size_t index) {
+	if(index >= doubleArraySizes.size()) { return 0; }
 	return doubleArraySizes.at(index);
 }
 
