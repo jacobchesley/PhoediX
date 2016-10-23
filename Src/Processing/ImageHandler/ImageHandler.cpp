@@ -201,8 +201,6 @@ void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, Image *
 
 void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, wxImage * outImage) {
 
-	int test = rawImage->type;
-	int test2 = test;
 	// Bitmap in RGB values from rawImage
 	if (rawImage->type == LIBRAW_IMAGE_BITMAP) {
 
@@ -226,6 +224,7 @@ void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, wxImage
 				rgbData[i] = rawImage->data[i] / 256;
 			}
 			outImage->SetData(rgbData);
+			
 		}
 	}
 }
@@ -242,8 +241,13 @@ bool ImageHandler::CheckRaw(wxString fileName){
 
 bool ImageHandler::CheckImage(wxString fileName){
 
-	wxImage fileImage(fileName);
-	return fileImage.IsOk();
+	if(wxImage::CanRead(fileName)){
+		wxImage fileImage(fileName);
+		return fileImage.IsOk();
+	}
+	else{
+		return false;
+	}
 }
 
 int ImageHandler::GetTiffBitDepth(wxString fileName){
@@ -292,7 +296,7 @@ void ImageHandler::Read16BitTiff(wxString fileName, Image * image){
 		uint32 numStrips = TIFFNumberOfStrips(tif);
 		uint32 bufferSize = stripSize * numStrips;
 		uint8_t * buffer = new uint8_t[bufferSize];
-		int bufferIdx = 0;
+		uint32 bufferIdx = 0;
 		
 		uint8_t * stripBuffer = new uint8_t[stripSize];
 
@@ -343,7 +347,7 @@ void ImageHandler::Read16BitTiff(wxString fileName, Image * image){
 		uint32 numStrips = TIFFNumberOfStrips(tif);
 		uint32 bufferSize = stripSize * numStrips;
 		uint8_t * buffer = new uint8_t[bufferSize];
-		int bufferIdx = 0;
+		uint32 bufferIdx = 0;
 		
 		uint8_t * stripBuffer = new uint8_t[stripSize];
 
