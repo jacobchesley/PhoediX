@@ -70,8 +70,8 @@ public:
 
 	void StoreEditForCopyPaste(ProcessorEdit * edit);
 	ProcessorEdit * GetEditForCopyPaste();
-	void StoreEditLayerForCopyPaste(wxVector<ProcessorEdit*>);
-	wxVector<ProcessorEdit*> GetEditLayerForCopyPaste();
+	void StoreEditListForCopyPaste(wxVector<ProcessorEdit*>);
+	wxVector<ProcessorEdit*> GetEditListForCopyPaste();
 
 	void Enable16Bit();
 	void Disable16Bit();
@@ -175,7 +175,7 @@ private:
 	int numThreadsToUse;
 
 	ProcessorEdit * copiedEdit;
-	wxVector<ProcessorEdit*> copiedEditLayer;
+	wxVector<ProcessorEdit*> copiedEditList;
 
 	static double pi;
 

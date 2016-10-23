@@ -150,7 +150,6 @@ void Processor::ProcessEdits(wxVector<ProcessorEdit*> editList) {
 	numEdits = editList.size();
 
 	this->forceStop = true;
-
 	int curTime = 0;
 	int timeout = 50;
 	while(this->GetLocked()){	
@@ -323,6 +322,18 @@ ProcessorEdit * Processor::GetEditForCopyPaste(){
 	return copiedEdit;
 }
 
+void Processor::StoreEditListForCopyPaste(wxVector<ProcessorEdit*> editList){
+	copiedEditList.clear();
+
+	for(size_t i = 0; i < editList.size(); i++){
+		copiedEditList.push_back(new ProcessorEdit(*editList.at(i)));
+	}
+}
+
+wxVector<ProcessorEdit*> Processor::GetEditListForCopyPaste(){
+	return copiedEditList;
+}
+
 void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey) {
 
 	int dataSize = img->GetWidth() * img->GetHeight();
@@ -362,7 +373,7 @@ void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outp
 	}
 	else{
 
-		// Get pointers to 8 bit data
+		// Get pointers to 16 bit data
 		uint16_t * redData16 = img->Get16BitDataRed();
 		uint16_t * greenData16 = img->Get16BitDataGreen();
 		uint16_t * blueData16 = img->Get16BitDataBlue();
@@ -1516,7 +1527,8 @@ void Processor::ChannelScale(double redRedScale, double redGreenScale, double re
 void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
 	int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16,  int dataStart, int dataEnd) {
 
-
+	// Need to copy curves incase thread ends and destroys original curve table while we are still in it
+	// (but exiting soon)
 	int numSteps8 = 256;
 	int * brightCurve8Copy = new int[numSteps8];
 	int * redCurve8Copy = new int[numSteps8];
@@ -1654,6 +1666,8 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 
 void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int colorSpace,  int dataStart, int dataEnd){
 
+	// Need to copy curves incase thread ends and destroys original curve table while we are still in it
+	// (but exiting soon)
 	int numSteps = 65535;
 	int * lCurve16Copy = new int[numSteps];
 	int * aCurve16Copy = new int[numSteps];
@@ -1774,9 +1788,9 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 			bScale = ((lab.B + 128.0f) / 256.0f) * numSteps;
 
 			// Apply LAB Curve
-			newL = lCurve16[lScale];
-			newA = aCurve16[aScale];
-			newB = bCurve16[bScale];
+			newL = lCurve16Copy[lScale];
+			newA = aCurve16Copy[aScale];
+			newB = bCurve16Copy[bScale];
 
 			// Scale LAB back
 			lab.L = (float)(newL / (float)numSteps);
@@ -1820,13 +1834,18 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 
 void Processor::HSLCurves(int * hCurve16, int * sCurve16, int * lCurve16, int dataStart, int dataEnd){
 
+	// Need to copy curves incase thread ends and destroys original curve table while we are still in it
+	// (but exiting soon)
 	int numSteps = 65535;
-	int * hCurve16Copy = new int[numSteps];
-	int * sCurve16Copy = new int[numSteps];
-	int * lCurve16Copy = new int[numSteps];
+	int * hCurve16Copy = new int[numSteps + 1];
+	int * sCurve16Copy = new int[numSteps + 1];
+	int * lCurve16Copy = new int[numSteps + 1];
 	memcpy(hCurve16Copy, hCurve16, numSteps * sizeof(int));
 	memcpy(sCurve16Copy, sCurve16, numSteps * sizeof(int));
 	memcpy(lCurve16Copy, lCurve16, numSteps * sizeof(int));
+	hCurve16Copy[numSteps] = hCurve16[numSteps];
+	sCurve16Copy[numSteps] = sCurve16[numSteps];
+	lCurve16Copy[numSteps] = lCurve16[numSteps];
 
 	// Get number of pixels for the image
 	int dataSize = img->GetWidth() * img->GetHeight();
@@ -1936,9 +1955,9 @@ void Processor::HSLCurves(int * hCurve16, int * sCurve16, int * lCurve16, int da
 			lScale = luminace * numSteps;
 
 			// Apply HSL Curve
-			newH = hCurve16[hScale];
-			newS = sCurve16[sScale];
-			newL = lCurve16[lScale];
+			newH = hCurve16Copy[hScale];
+			newS = sCurve16Copy[sScale];
+			newL = lCurve16Copy[lScale];
 
 			// Scale HSL back
 			hue = (float)(newH / (float)numSteps) * 360.0f;
@@ -2082,9 +2101,9 @@ void Processor::HSLCurves(int * hCurve16, int * sCurve16, int * lCurve16, int da
 			lScale = luminace * numSteps;
 
 			// Apply HSL Curve
-			newH = hCurve16[hScale];
-			newS = sCurve16[sScale];
-			newL = lCurve16[lScale];
+			newH = hCurve16Copy[hScale];
+			newS = sCurve16Copy[sScale];
+			newL = lCurve16Copy[lScale];
 
 			// Scale HSL back
 			hue = (float)(newH / (float)numSteps) * 360.0f;
@@ -6243,6 +6262,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						#pragma omp parallel for 
 						for(int thread = 0; thread < numThreads; thread++){
 
+							if(procParent->forceStop){
+								continue;
+							}
 							// Process current chunk of data
 							if(thread != numThreads - 1){
 								procParent->LABCurves(lCurve16, aCurve16, bCurve16, colorSpace, chunkSize * thread, chunkSize * (thread + 1));
