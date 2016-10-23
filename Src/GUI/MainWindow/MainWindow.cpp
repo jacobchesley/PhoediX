@@ -13,6 +13,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuBar = new wxMenuBar();
 
 	menuFile = new wxMenu();
+	menuCloseProjects = new wxMenu();
 	menuView = new wxMenu();
 	menuTools = new wxMenu();
 	menuWindow = new wxMenu();
@@ -21,6 +22,9 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuFile->Append(MainWindow::MenuBar::ID_NEW_PROJECT, _("New PhoediX Project"));
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT, _("Open PhoediX Project"));
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT, _("Save PhoediX Project"));
+	menuCloseProjects->Append(MainWindow::MenuBar::ID_CLOSE_CURRENT_PROJECT, _("Close Current Project"));
+	menuCloseProjects->Append(MainWindow::MenuBar::ID_CLOSE_ALL_PROJECTS, _("Close All Projects"));
+	menuFile->AppendSubMenu(menuCloseProjects, _("Close Project..."));
 	menuFile->AppendSeparator();
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_FILE, _("Open Image"));
 	menuFile->AppendSeparator();
@@ -34,9 +38,10 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit list"));
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS, _("Show Histograms"));
 
-	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library"));
-	menuTools->AppendSeparator();
+	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS, _("Show Snapshots"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP, _("Show Pixel Peeper"));
+	menuTools->AppendSeparator();
+	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library"));
 
 	// Append menus to menu bar
 	menuBar->Append(menuFile, _("&File"));
@@ -73,8 +78,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	histogramPaneInfo.PinButton(true);
 	histogramPaneInfo.DestroyOnClose(false);
 	histogramPaneInfo.BestSize(histogramDisplay->GetClientSize());
+	histogramPaneInfo.Hide();
 	auiManager->AddPane(histogramDisplay, histogramPaneInfo);
-	auiManager->Update();
 
 	editList = new EditListPanel(this, processor);
 	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
@@ -84,6 +89,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	editListInfo.CloseButton(true);
 	editListInfo.PinButton(true);
 	editListInfo.DestroyOnClose(false);
+	editListInfo.Hide();
 	auiManager->AddPane(editList, editListInfo);
 
 	imagePanel = new ZoomImagePanel(this, processor->GetImage());
@@ -93,9 +99,10 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	imageInfo.Center();
 	imageInfo.CloseButton(true);
 	imageInfo.PinButton(true);
+	imageInfo.MaximizeButton(true);
 	imageInfo.DestroyOnClose(false);
 	imageInfo.Name("ImageDisplay");
-
+	imageInfo.Hide();
 	auiManager->AddPane(imagePanel, imageInfo);
 
 	exportWindow = new ExportWindow(this, processor, editList);
@@ -109,7 +116,6 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	exportPaneInfo.BestSize(exportWindow->GetClientSize());
 	exportPaneInfo.Hide();
 	auiManager->AddPane(exportWindow, exportPaneInfo);
-	auiManager->Update();
 	
 	settingsWindow = new SettingsWindow(this, processor);
 	wxAuiPaneInfo settingsPaneInfo = wxAuiPaneInfo();
@@ -122,24 +128,39 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	settingsPaneInfo.BestSize(settingsWindow->GetClientSize());
 	settingsPaneInfo.Hide();
 	auiManager->AddPane(settingsWindow, settingsPaneInfo);
-	auiManager->Update();
 
 	libraryWindow = new LibraryWindow(this);
 	wxAuiPaneInfo libraryPaneInfo = wxAuiPaneInfo();
-	libraryPaneInfo.Float();
+	libraryPaneInfo.Center();
 	libraryPaneInfo.Caption("Image Library");
 	libraryPaneInfo.Name("Library");
 	libraryPaneInfo.CloseButton(true);
 	libraryPaneInfo.PinButton(true);
+	libraryPaneInfo.MaximizeButton(true);
 	libraryPaneInfo.DestroyOnClose(false);
 	libraryPaneInfo.BestSize(settingsWindow->GetClientSize());
 	libraryPaneInfo.Hide();
 	auiManager->AddPane(libraryWindow, libraryPaneInfo);
+
+	snapshotWindow = new SnapshotWindow(this);
+	wxAuiPaneInfo snapshotPaneInfo = wxAuiPaneInfo();
+	snapshotPaneInfo.Float();
+	snapshotPaneInfo.Caption("Snapshots");
+	snapshotPaneInfo.Name("Snapshots");
+	snapshotPaneInfo.CloseButton(true);
+	snapshotPaneInfo.PinButton(true);
+	snapshotPaneInfo.DestroyOnClose(false);
+	snapshotPaneInfo.BestSize(settingsWindow->GetClientSize());
+	snapshotPaneInfo.Hide();
+	auiManager->AddPane(snapshotWindow, snapshotPaneInfo);
+
 	auiManager->Update();
 
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnNewProject, this, MainWindow::MenuBar::ID_NEW_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadProject, this, MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSaveProject, this, MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::CloseCurrentProject, this, MainWindow::MenuBar::ID_CLOSE_CURRENT_PROJECT);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::CloseAllProjects, this, MainWindow::MenuBar::ID_CLOSE_ALL_PROJECTS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowExport, this, MainWindow::MenuBar::ID_SHOW_EXPORT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSettings, this, MainWindow::MenuBar::ID_SHOW_SETTINGS);
@@ -147,7 +168,9 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowImage, this, MainWindow::MenuBar::ID_SHOW_IMAGE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowEditList, this, MainWindow::MenuBar::ID_SHOW_EDIT_LIST);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowHistograms, this, MainWindow::MenuBar::ID_SHOW_HISTOGRAMS);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLibrary, this, MainWindow::MenuBar::ID_SHOW_LIBRARY);
+
 	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
 	this->Bind(PROCESSOR_NUM_EVENT, (wxObjectEventFunction)&MainWindow::RecieveNumFromProcessor, this, ID_PROCESSOR_NUM);
 	this->Bind(RELOAD_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::ReloadImage, this, ID_RELOAD_IMAGE);
@@ -165,6 +188,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->SetMenuChecks();
 
 	numnUnnamedProjectsOpen = 0;
+
+
 }
 
 void MainWindow::SetSizeProperties(){
@@ -176,18 +201,57 @@ void MainWindow::SetSizeProperties(){
 }
 
 void MainWindow::OnNewProject(wxCommandEvent& WXUNUSED(event)) {
+	this->CreateNewProject();
+}
 
+void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
+
+	// Close current session in UI
+	this->CloseSession(&currentSession);
+
+	// Itterate over all sessions and look for current session
+	for (size_t i = 0; i < allSessions.size(); i++) {
+
+		// Remove current session from all session and break once complete
+		if (currentSession.GetID() == allSessions.at(i).GetID()) {
+			allSessions.erase(allSessions.begin() + i);
+			break;
+		}
+	}
+
+	// Set current session to last opened session (if any sessions are open)
+	if (allSessions.size() > 0) {
+		currentSession = allSessions.at(allSessions.size() - 1);
+		this->OpenSession(currentSession);
+	}
+}
+
+void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
+
+	// Close current session in UI
+	this->CloseSession(&currentSession);
+
+	// Remove all sessions from menu window
+	for (size_t i = 0; i < allSessions.size(); i++) {
+		menuWindow->Delete(allSessions.at(i).GetID());
+	}
+
+	// Clear all sessions
+	allSessions.clear();	
+}
+
+void MainWindow::CreateNewProject(){
 	PhoediXSession newSession;
 	this->SetUniqueID(&newSession);
 	newSession.SetName("Untitled - " + wxString::Format(wxT("%i"), numnUnnamedProjectsOpen + 1));
 	numnUnnamedProjectsOpen += 1;
 
-	this->GetMenuBar()->GetMenu(2)->AppendCheckItem(newSession.GetID(), newSession.GetName());
+	menuWindow->AppendCheckItem(newSession.GetID(), newSession.GetName());
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession.GetID());
-	this->CheckUncheckSession(newSession.GetID());
 
 	allSessions.push_back(newSession);
 	currentSession = newSession;
+	this->OpenSession(currentSession);
 }
 
 void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
@@ -205,20 +269,19 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 void MainWindow::OpenSession(PhoediXSession session) {
 
 	// Set the new image
-	this->OpenImage(session.GetImageFilePath(), "RENAME THIS!");
+	this->OpenImage(session.GetImageFilePath());
+	if(session.GetImageScrollWidth() > 0 && session.GetImageScrollHeight() > 0) {
+		imagePanel->ChangeImage(new wxImage(session.GetImageScrollWidth(), session.GetImageScrollHeight()));
+	}
+
+	imagePanel->SetZoom(session.GetImageZoomLevel());
+	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
 
 	// Check the current session in the window, and uncheck all other sessions
 	this->CheckUncheckSession(session.GetID());
 
-	processor->Lock();
-	imagePanel->ChangeImage(processor->GetImage());
-	imagePanel->Redraw();
-	processor->Unlock();
-	processor->SetUpdated(true);
-
 	histogramDisplay->SetHistogramDisplay(session.GetHistogramDisplaySelect());
-	imagePanel->SetZoom(session.GetImageZoomLevel());
-
+	
 	// Populate the panel with the edits
 	wxVector<ProcessorEdit*> editLayers = session.GetEditList()->GetSessionEditList();
 	editList->AddEditWindows(editLayers);
@@ -228,11 +291,26 @@ void MainWindow::OpenSession(PhoediXSession session) {
 	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session.GetPerspective(), true);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
-	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
-
 	wxTimer reprocessCountdown(this);
 	reprocessCountdown.Start(500, true);
 }
+
+void MainWindow::CloseSession(PhoediXSession * session) {
+
+	imagePanel->SetZoom(100.0f);
+
+	// Check the current session in the window, and uncheck all other sessions
+	menuWindow->Remove(session->GetID());
+
+	// Populate the panel with the edits
+	editList->RemoveAllWindows();
+
+	processor->GetOriginalImage()->Destroy();
+	processor->GetImage()->Destroy();
+	wxTimer reprocessCountdown(this);
+	reprocessCountdown.Start(500, true);
+}
+
 
 void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 
@@ -249,10 +327,10 @@ void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 	currentSession.SetName(saveFileDialog.GetFilename());
 
 	// Change name on menu object
-	int numWindowMenuItems = this->GetMenuBar()->GetMenu(2)->GetMenuItems().size();
+	int numWindowMenuItems = menuWindow->GetMenuItems().size();
 	for(size_t i = 0; i < numWindowMenuItems; i++){
-		if(currentSession.GetID() == this->GetMenuBar()->GetMenu(3)->GetMenuItems()[i]->GetId()){
-			this->GetMenuBar()->GetMenu(3)->GetMenuItems()[i]->SetItemLabel(currentSession.GetName());
+		if(currentSession.GetID() == menuWindow->GetMenuItems()[i]->GetId()){
+			menuWindow->GetMenuItems()[i]->SetItemLabel(currentSession.GetName());
 		}
 	}
 }
@@ -261,11 +339,14 @@ void MainWindow::SaveCurrentSession() {
 
 	// Save all infomation about the current session
 	editList->AddEditsToProcessor();
+	currentSession.SetImageFilePath(processor->GetFilePath());
 	currentSession.GetEditList()->SetSessionEditList(processor->GetEditVector());
 	currentSession.SetHistogramDisplaySelect(histogramDisplay->GetHistogramDisplay());
 	currentSession.SetImageZoomLevel(imagePanel->GetZoom());
 	currentSession.SetImageScrollX(imagePanel->GetDragX());
 	currentSession.SetImageScrollY(imagePanel->GetDragY());
+	currentSession.SetImageScrollWidth(processor->GetImage()->GetWidth());
+	currentSession.SetImageScrollHeight(processor->GetImage()->GetHeight());
 	currentSession.SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
 
 	// Replace existing session in all sessions, with updated session
@@ -295,24 +376,25 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 	this->SetUniqueID(&session);
 
 	// Append the session to the menu bar
-	this->GetMenuBar()->GetMenu(3)->AppendCheckItem(session.GetID(), session.GetName());
+	menuWindow->AppendCheckItem(session.GetID(), session.GetName());
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, session.GetID());
 
 	// Add new session to all session vector, set current session and open
 	allSessions.push_back(session);
 	currentSession = session;
+	sessionQueue.push_back(&currentSession);
 	this->OpenSession(session);
 }
 
 void MainWindow::CheckUncheckSession(int sessionID){
 
-	int numWindowMenuItems = this->GetMenuBar()->GetMenu(2)->GetMenuItems().size();
+	int numWindowMenuItems = menuWindow->GetMenuItems().size();
 	for(size_t i = 0; i < numWindowMenuItems; i++){
-		if(sessionID == this->GetMenuBar()->GetMenu(2)->GetMenuItems()[i]->GetId()){
-			this->GetMenuBar()->GetMenu(2)->GetMenuItems()[i]->Check(true);
+		if(sessionID == menuWindow->GetMenuItems()[i]->GetId()){
+			menuWindow->GetMenuItems()[i]->Check(true);
 		}
 		else{
-			this->GetMenuBar()->GetMenu(2)->GetMenuItems()[i]->Check(false);
+			menuWindow->GetMenuItems()[i]->Check(false);
 		}
 	}
 }
@@ -346,15 +428,14 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 		return;
 	}
 
-	// Handle Raw Image
-	this->OpenImage(openFileDialog.GetPath(), openFileDialog.GetFilename());	
+	this->OpenImage(openFileDialog.GetPath());	
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
-	this->OpenImage(currentSession.GetImageFilePath(), "RENAME THIS");
+	this->OpenImage(currentSession.GetImageFilePath());
 }
 
-void MainWindow::OpenImage(wxString imagePath, wxString imageName){
+void MainWindow::OpenImage(wxString imagePath){
 
 	// Make sure file name is correct and exists
 	wxFileName imageFile(imagePath);
@@ -368,8 +449,8 @@ void MainWindow::OpenImage(wxString imagePath, wxString imageName){
 
 		currentSession.SetImageFilePath(imagePath);
 		processor->SetFilePath(imagePath);
-		processor->SetFileName(imageName);
-		this->SetTitle("PhoediX - " + imageName);
+		processor->SetFileName(imageFile.GetFullName());
+		this->SetTitle("PhoediX - " + imageFile.GetFullName());
 
 		exportWindow->RawImageLoaded(true);
 		this->SetStatusbarText("Opening RAW File");
@@ -378,6 +459,8 @@ void MainWindow::OpenImage(wxString imagePath, wxString imageName){
 		processor->rawPrcoessor.unpack();
 		editList->AddRawWindow();
 		processor->SetDoFitImage(true);
+
+		this->ShowImageRelatedWindows();
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images
@@ -387,21 +470,34 @@ void MainWindow::OpenImage(wxString imagePath, wxString imageName){
 		// Verify image is okay
 		if(ImageHandler::CheckImage(imagePath)){
 
-			processor->GetImage()->Enable16Bit();
 			ImageHandler::LoadImageFromFile(imagePath, processor->GetImage());
 			processor->SetOriginalImage(processor->GetImage());
 			processor->SetUpdated(true);
 			processor->SetDoFitImage(true);
+
 			// Write image path to current session
 			currentSession.SetImageFilePath(imagePath);
 			processor->SetFilePath(imagePath);
-			processor->SetFileName(imageName);
-			this->SetTitle("PhoediX - " + imageName);
+			processor->SetFileName(imageFile.GetFullName());
+			this->SetTitle("PhoediX - " + imageFile.GetFullName());
+
+			this->ShowImageRelatedWindows();
 		}
 		else{
 			wxMessageDialog imageErrorDialog(this, "Error opening image: " + imagePath, "Error Opening Image", wxICON_ERROR);
 			imageErrorDialog.ShowModal();
 		}
+	}
+}
+
+void MainWindow::ShowImageRelatedWindows(){
+
+	if(menuWindow->GetMenuItems().size() < 1){
+		CreateNewProject();
+		auiManager->GetPane(imagePanel).Show();
+		auiManager->GetPane(histogramDisplay).Show();
+		auiManager->GetPane(editList).Show();
+		auiManager->Update();
 	}
 }
 
@@ -459,6 +555,21 @@ void MainWindow::ShowHistograms(wxCommandEvent& evt) {
 	}
 }
 
+void MainWindow::ShowSnapshots(wxCommandEvent& evt) {
+
+	// If library menu item is checked, show the edit list
+	if(evt.IsChecked()){
+		auiManager->GetPane(snapshotWindow).Show();
+		auiManager->Update();
+	}
+
+	// Otherwise, hide the library
+	else{
+		auiManager->GetPane(snapshotWindow).Hide();
+		auiManager->Update();
+	}
+}
+
 void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 
 	// If library menu item is checked, show the edit list
@@ -496,6 +607,15 @@ void MainWindow::SetMenuChecks(){
 	else{
 		menuView->GetMenuItems()[2]->Check(false);
 	}
+
+	if(auiManager->GetPane(libraryWindow).IsShown()){
+		menuTools->GetMenuItems()[0]->Check(true);
+	}
+	else{
+		menuTools->GetMenuItems()[0]->Check(false);
+	}
+
+
 }
 
 void MainWindow::OnPaneClose(wxAuiManagerEvent& evt){
@@ -569,7 +689,7 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 			imgPanel->ChangeImage(proc->GetImage());
 			imgPanel->Redraw();
 			if(proc->GetDoFitImage()){
-				imgPanel->FitImage();
+				//imgPanel->FitImage();
 			}
 
 			exportWin->ProcessingComplete();

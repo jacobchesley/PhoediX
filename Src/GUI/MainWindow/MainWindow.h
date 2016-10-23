@@ -20,6 +20,7 @@
 #include "GUI\MainWindow\SettingsWindow\SettingsWindow.h"
 #include "GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h"
 #include "GUI\EditList\EditListPanel\EditListPanel.h"
+#include "GUI\SnapshotWindow\SnapshotWindow.h"
 #include "GUI\AUI Manager\AUIManager.h"
 #include "GUI\Colors\Colors.h"
 #include "GUI\HistogramDisplay\HistogramDisplay.h"
@@ -44,10 +45,13 @@ private:
 	void OnNewProject(wxCommandEvent& WXUNUSED(event));
 	void ShowLoadProject(wxCommandEvent& WXUNUSED(event));
 	void ShowSaveProject(wxCommandEvent& WXUNUSED(event));
+	void CloseCurrentProject(wxCommandEvent& WXUNUSED(event));
+	void CloseAllProjects(wxCommandEvent& WXUNUSED(event));
 	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
 	void ShowExport(wxCommandEvent& WXUNUSED(event));
 	void ShowImage(wxCommandEvent& WXUNUSED(event));
 	void ShowPixelPeep(wxCommandEvent& WXUNUSED(event));
+	void ShowSnapshots(wxCommandEvent& WXUNUSED(event));
 	void ShowLibrary(wxCommandEvent& WXUNUSED(event));
 	void ShowSettings(wxCommandEvent& WXUNUSED(event));
 	void ShowAbout(wxCommandEvent& WXUNUSED(event));
@@ -55,12 +59,15 @@ private:
 	void ShowHistograms(wxCommandEvent& evt);
 	void OnReprocessTimer(wxTimerEvent& evt);
 
-	void OpenImage(wxString imagePath, wxString imageName);
+	void CreateNewProject();
+	void OpenImage(wxString imagePath);
+	void ShowImageRelatedWindows();
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
 
 	void OnOpenWindow(wxCommandEvent& evt);
 	void OpenSession(PhoediXSession session);
 	void SaveCurrentSession();
+	void CloseSession(PhoediXSession * session);
 	void SetUniqueID(PhoediXSession * session);
 	void CheckUncheckSession(int sessionID);
 
@@ -79,16 +86,19 @@ private:
 
 	wxMenuBar * menuBar;
 	wxMenu * menuFile;
+	wxMenu * menuCloseProjects;
 	wxMenu * menuView;
 	wxMenu * menuTools;
 	wxMenu * menuWindow;
 	wxMenu * menuHelp;
 	wxStaticText * statusBarText;
+
 	EditListPanel * editList;
 	ExportWindow * exportWindow;
 	SettingsWindow * settingsWindow;
 	PixelPeepWindow * pixelPeepWindow;
 	LibraryWindow * libraryWindow;
+	SnapshotWindow * snapshotWindow;
 
 	Processor * processor;
 
@@ -97,6 +107,7 @@ private:
 
 	PhoediXSession currentSession;
 	wxVector<PhoediXSession> allSessions;
+	wxVector<PhoediXSession*> sessionQueue;
 
 	int numnUnnamedProjectsOpen;
 
@@ -112,7 +123,10 @@ private:
 		ID_SHOW_HISTOGRAMS,
 		ID_SHOW_SETTINGS,
 		ID_SHOW_PIXEL_PEEP,
-		ID_SHOW_LIBRARY
+		ID_SHOW_LIBRARY,
+		ID_SHOW_SNAPSHOTS,
+		ID_CLOSE_CURRENT_PROJECT,
+		ID_CLOSE_ALL_PROJECTS
 	};
 
 	class ImagePanelUpdateThread : public wxThread {
