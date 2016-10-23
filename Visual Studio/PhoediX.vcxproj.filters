@@ -157,6 +157,12 @@
     <Filter Include="GUI\Selections Window\Directory Selection">
       <UniqueIdentifier>{738ac250-d89e-423e-88ac-499bdbe41c7b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Image Display\Zoom Image Frame">
+      <UniqueIdentifier>{ca64e03e-a3eb-4a4a-b210-e4dc3c770e46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\SnapshotWindow">
+      <UniqueIdentifier>{510e6b96-fa33-4cae-995a-892d06703105}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -296,6 +302,12 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelection.cpp">
       <Filter>GUI\Selections Window\Directory Selection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.cpp">
+      <Filter>GUI\Image Display\Zoom Image Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.cpp">
+      <Filter>GUI\SnapshotWindow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -454,6 +466,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.h">
       <Filter>GUI\Selections Window\Directory Selection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.h">
+      <Filter>GUI\Image Display\Zoom Image Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.h">
+      <Filter>GUI\SnapshotWindow</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
