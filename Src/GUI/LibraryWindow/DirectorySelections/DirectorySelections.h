@@ -16,7 +16,6 @@
 
 enum {
 	ID_DELETE_EVT
-
 };
 
 wxDECLARE_EVENT(DELETE_DIR_EVENT, wxCommandEvent);

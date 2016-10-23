@@ -80,6 +80,10 @@ DirectorySelections::DirectorySelections(wxWindow * parent) : wxScrolledWindow(p
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&DirectorySelections::OnAddDirectory, this, DirectorySelections::ID_ADD_DIRECTORY);
 	this->Bind(DELETE_DIR_EVENT, (wxObjectEventFunction)&DirectorySelections::OnDeleteDir, this, ID_DELETE_EVT);
 	this->RedrawPanel();
+
+	this->AddDirectoryDisplayItem();
+	this->SetSize(this->GetBestVirtualSize());
+
 }
 
 void DirectorySelections::AddDirectoryDisplayItem() {
