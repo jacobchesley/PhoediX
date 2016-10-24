@@ -21,10 +21,11 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	importButton->SetBackgroundColour(Colors::BackGrey);
 	importButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	clearButton = new wxButton(this, LibraryWindow::MenuBar::ID_CLEAR, "Clear Library", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	clearButton = new wxButton(this, -1, "Clear Library", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	clearButton->SetForegroundColour(Colors::TextLightGrey);
 	clearButton->SetBackgroundColour(Colors::BackGrey);
 	clearButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+	clearButton->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(LibraryWindow::OnHoverClearButton), NULL, this);
 
 	toolbarLayout->Add(showDirectoriesButton);
 	toolbarLayout->AddSpacer(15);
@@ -52,7 +53,6 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnShowDirectories, this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnImport, this, LibraryWindow::MenuBar::ID_IMPORT);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnClear, this, LibraryWindow::MenuBar::ID_CLEAR);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&LibraryWindow::OnResize, this);
 	this->Bind(ADD_LIB_IMAGE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnAddImage, this);
 }
@@ -72,11 +72,113 @@ void LibraryWindow::OnImport(wxCommandEvent& WXUNUSED(evt)){
 	testImgThread->Run();
 }
 
-void LibraryWindow::OnClear(wxCommandEvent& WXUNUSED(evt)){
+void LibraryWindow::OnHoverClearButton(wxMouseEvent& evt) {
+
+	// Display a popup menu of options
+	wxMenu popupMenu;
+	popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_UNSELECTED, "Clear Unselected Images");
+	popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_SELECTED, "Clear Selected Images");
+	popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_ALL, "Clear All Images");
+
+	popupMenu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(LibraryWindow::OnPopupMenuClick), NULL, this);
+	this->PopupMenu(&popupMenu);
+}
+
+void LibraryWindow::OnPopupMenuClick(wxCommandEvent& inEvt) {
+
+	int id = inEvt.GetId();
+
+	switch (id) {
+
+		// Clear unselected
+		case LibraryWindow::MenuBar::ID_CLEAR_UNSELECTED: {
+			this->ClearUnselected();
+			break;
+		}
+
+		// Clear selected
+		case LibraryWindow::MenuBar::ID_CLEAR_SELECTED: {
+			this->ClearSelected();
+			break;
+		}
+
+		// Clear all
+		case LibraryWindow::MenuBar::ID_CLEAR_ALL: {
+			this->ClearAll();
+			break;
+		}
+	}
+}
+
+void LibraryWindow::ClearAll(){
 
 	imagesLayout->Clear(true);
 	libraryImages.clear();
 	includedImagePaths.clear();
+	this->Layout();
+	this->FitInside();
+}
+
+void LibraryWindow::ClearSelected() {
+
+	wxVector<LibraryImage*> libraryImagesTokeep;
+
+	// Iterate over all library images
+	for (size_t i = 0; i < libraryImages.size(); i++) {
+
+		// Detach and destroy all unslected imaged
+		if (libraryImages.at(i)->GetSelected()) {
+			imagesLayout->Detach(libraryImages.at(i));
+			libraryImages.at(i)->Destroy();
+		}
+
+		// Add selected images to vector of library images to keep
+		else {
+			libraryImagesTokeep.push_back(libraryImages.at(i));
+		}
+	}
+	
+	// Clear library image vector
+	libraryImages.clear();
+	includedImagePaths.clear();
+
+	// Add library images to keep
+	for (size_t i = 0; i < libraryImagesTokeep.size(); i++) {
+		libraryImages.push_back(libraryImagesTokeep.at(i));
+	}
+
+	this->Layout();
+	this->FitInside();
+}
+
+void LibraryWindow::ClearUnselected() {
+
+	wxVector<LibraryImage*> libraryImagesTokeep;
+
+	// Iterate over all library images
+	for (size_t i = 0; i < libraryImages.size(); i++) {
+
+		// Detach and destroy all unslected imaged
+		if (!libraryImages.at(i)->GetSelected()) {
+			imagesLayout->Detach(libraryImages.at(i));
+			libraryImages.at(i)->Destroy();
+		}
+
+		// Add selected images to vector of library images to keep
+		else {
+			libraryImagesTokeep.push_back(libraryImages.at(i));
+		}
+	}
+
+	// Clear library image vector
+	libraryImages.clear();
+	includedImagePaths.clear();
+
+	// Add library images to keep
+	for (size_t i = 0; i < libraryImagesTokeep.size(); i++) {
+		libraryImages.push_back(libraryImagesTokeep.at(i));
+	}
+
 	this->Layout();
 	this->FitInside();
 }

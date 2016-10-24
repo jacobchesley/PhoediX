@@ -37,7 +37,11 @@ private:
 	
 	void OnShowDirectories(wxCommandEvent & WXUNUSED(evt));
 	void OnImport(wxCommandEvent & WXUNUSED(evt));
-	void OnClear(wxCommandEvent & WXUNUSED(evt));
+	void OnHoverClearButton(wxMouseEvent & WXUNUSED(evt));
+	void OnPopupMenuClick(wxCommandEvent& inEvt);
+	void ClearAll();
+	void ClearSelected();
+	void ClearUnselected();
 	void OnResize(wxSizeEvent & WXUNUSED(evt));
 	void OnAddImage(AddLibraryImageEvent & evt);
 	bool CheckIfImageInDisplay(wxString imagePath);
@@ -59,7 +63,9 @@ private:
 	enum MenuBar{
 		ID_SHOW_DIRECTORY_LIST,
 		ID_IMPORT,
-		ID_CLEAR
+		ID_CLEAR_ALL,
+		ID_CLEAR_SELECTED,
+		ID_CLEAR_UNSELECTED
 	};
 
 	class LoadImagesThread : public wxThread {
