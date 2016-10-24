@@ -181,15 +181,13 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor, histogramDisplay, exportWindow);
 	imgPanelThread->Run();
 
-	wxImage tempLoadImg(1, 1);
-	ImageHandler::LoadImageFromwxImage(&tempLoadImg, processor->GetImage());
+	emptyImage = new wxImage(1, 1);
+	ImageHandler::LoadImageFromwxImage(emptyImage, processor->GetImage());
 	processor->SetOriginalImage(processor->GetImage());
 
 	this->SetMenuChecks();
 
 	numnUnnamedProjectsOpen = 0;
-
-
 }
 
 void MainWindow::SetSizeProperties(){
@@ -206,14 +204,19 @@ void MainWindow::OnNewProject(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 
+	imagePanel->ChangeImage(emptyImage);
 	// Close current session in UI
-	this->CloseSession(&currentSession);
+	// Close current session in UI
+	if (allSessions.size() > 0) {
+		this->CloseSession(&currentSession);
+	}
 
 	// Itterate over all sessions and look for current session
 	for (size_t i = 0; i < allSessions.size(); i++) {
 
 		// Remove current session from all session and break once complete
 		if (currentSession.GetID() == allSessions.at(i).GetID()) {
+			allSessions.at(i).Destroy();
 			allSessions.erase(allSessions.begin() + i);
 			break;
 		}
@@ -222,19 +225,24 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 	// Set current session to last opened session (if any sessions are open)
 	if (allSessions.size() > 0) {
 		currentSession = allSessions.at(allSessions.size() - 1);
-		this->OpenSession(currentSession);
+		this->OpenSession(&currentSession);
 	}
 }
 
 void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
 	// Close current session in UI
-	this->CloseSession(&currentSession);
+	if (allSessions.size() > 0) {
+		this->CloseSession(&currentSession);
+	}
 
 	// Remove all sessions from menu window
 	for (size_t i = 0; i < allSessions.size(); i++) {
+		allSessions.at(i).Destroy();
 		menuWindow->Delete(allSessions.at(i).GetID());
 	}
+
+	histogramDisplay->DestroyHistograms();
 
 	// Clear all sessions
 	allSessions.clear();	
@@ -246,12 +254,12 @@ void MainWindow::CreateNewProject(){
 	newSession.SetName("Untitled - " + wxString::Format(wxT("%i"), numnUnnamedProjectsOpen + 1));
 	numnUnnamedProjectsOpen += 1;
 
-	menuWindow->AppendCheckItem(newSession.GetID(), newSession.GetName());
+	menuWindow->AppendCheckItem(newSession.GetID(), _(newSession.GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession.GetID());
 
 	allSessions.push_back(newSession);
 	currentSession = newSession;
-	this->OpenSession(currentSession);
+	this->OpenSession(&currentSession);
 }
 
 void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
@@ -259,37 +267,40 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 	for (size_t i = 0; i < allSessions.size(); i++) {
 		if (allSessions[i].GetID() == evt.GetId() && currentSession.GetID() != allSessions[i].GetID()) {
 			this->SaveCurrentSession();
-			this->OpenSession(allSessions[i]);
+			this->OpenSession(&allSessions[i]);
 			currentSession = allSessions[i];
 			return;
 		}
 	}
 }
 
-void MainWindow::OpenSession(PhoediXSession session) {
+void MainWindow::OpenSession(PhoediXSession * session) {
 
 	// Set the new image
-	this->OpenImage(session.GetImageFilePath());
-	if(session.GetImageScrollWidth() > 0 && session.GetImageScrollHeight() > 0) {
-		imagePanel->ChangeImage(new wxImage(session.GetImageScrollWidth(), session.GetImageScrollHeight()));
+	this->OpenImage(session->GetImageFilePath());
+	if(session->GetImageScrollWidth() > 0 && session->GetImageScrollHeight() > 0) {
+		wxImage * tempImage = new wxImage(session->GetImageScrollWidth(), session->GetImageScrollHeight());
+		imagePanel->ChangeImage(tempImage);
+		tempImage->Destroy();
+		delete tempImage;
 	}
 
-	imagePanel->SetZoom(session.GetImageZoomLevel());
-	imagePanel->SetDrag(session.GetImageScrollX(), session.GetImageScrollY());
-
 	// Check the current session in the window, and uncheck all other sessions
-	this->CheckUncheckSession(session.GetID());
+	this->CheckUncheckSession(session->GetID());
 
-	histogramDisplay->SetHistogramDisplay(session.GetHistogramDisplaySelect());
+	histogramDisplay->SetHistogramDisplay(session->GetHistogramDisplaySelect());
 	
 	// Populate the panel with the edits
-	wxVector<ProcessorEdit*> editLayers = session.GetEditList()->GetSessionEditList();
+	wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
 	editList->AddEditWindows(editLayers);
 
 	// Load perspective after edits are loaded
-	wxString perspect = session.GetPerspective();
-	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session.GetPerspective(), true);
+	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session->GetPerspective(), true);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+
+	// Set zoom and drag after window has been positioned
+	imagePanel->SetZoom(session->GetImageZoomLevel());
+	imagePanel->SetDrag(session->GetImageScrollX(), session->GetImageScrollY());
 
 	wxTimer reprocessCountdown(this);
 	reprocessCountdown.Start(500, true);
@@ -298,15 +309,21 @@ void MainWindow::OpenSession(PhoediXSession session) {
 void MainWindow::CloseSession(PhoediXSession * session) {
 
 	imagePanel->SetZoom(100.0f);
+	imagePanel->ChangeImage(emptyImage);
 
 	// Check the current session in the window, and uncheck all other sessions
-	menuWindow->Remove(session->GetID());
+	if (menuWindow->FindItem(session->GetID())) {
+		menuWindow->Remove(session->GetID());
+	}
 
 	// Populate the panel with the edits
 	editList->RemoveAllWindows();
 
 	processor->GetOriginalImage()->Destroy();
 	processor->GetImage()->Destroy();
+
+	session->Destroy();
+
 	wxTimer reprocessCountdown(this);
 	reprocessCountdown.Start(500, true);
 }
@@ -368,6 +385,7 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 
 	// Save the current session
 	this->SaveCurrentSession();
+	this->CloseSession(&currentSession);
 
 	// Load the new session from file
 	PhoediXSession session;
@@ -376,14 +394,13 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 	this->SetUniqueID(&session);
 
 	// Append the session to the menu bar
-	menuWindow->AppendCheckItem(session.GetID(), session.GetName());
+	menuWindow->AppendCheckItem(session.GetID(), _(session.GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, session.GetID());
 
 	// Add new session to all session vector, set current session and open
 	allSessions.push_back(session);
 	currentSession = session;
-	sessionQueue.push_back(&currentSession);
-	this->OpenSession(session);
+	this->OpenSession(&session);
 }
 
 void MainWindow::CheckUncheckSession(int sessionID){
@@ -614,8 +631,6 @@ void MainWindow::SetMenuChecks(){
 	else{
 		menuTools->GetMenuItems()[0]->Check(false);
 	}
-
-
 }
 
 void MainWindow::OnPaneClose(wxAuiManagerEvent& evt){
@@ -645,21 +660,26 @@ void MainWindow::RecieveNumFromProcessor(wxCommandEvent& numEvt) {
 	exportWindow->SetEditNum(numEvt.GetInt());
 }
 
-void MainWindow::OnClose(wxCloseEvent& closeEvent) {
+void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 
 	// Kill current processing and stop watching for new edits
 	processor->KillCurrentProcessing();
 	imgPanelThread->StopWatching();
 
-	// Remove all sessions
-	if(allSessions.size() > 0){
-		for(int i = 0; i < allSessions.size(); i++){
-			allSessions[i].Destroy();
+	int currentSessionID = currentSession.GetID();
+	currentSession.Destroy();
+
+	// Remove all sessions from menu window
+	for (size_t i = 0; i < allSessions.size(); i++) {
+
+		// Destroy session if it is not current session. (Current session already destroyed)
+		if (allSessions.at(i).GetID() != currentSessionID) {
+			allSessions.at(i).Destroy();
 		}
 	}
-	else{
-		currentSession.Destroy();
-	}
+
+	// Clear all sessions
+	allSessions.clear();
 
 	// Delete histogram display resources
 	histogramDisplay->DestroyHistograms();
@@ -668,9 +688,9 @@ void MainWindow::OnClose(wxCloseEvent& closeEvent) {
 	delete auiManager;
 	
 	delete processor;
+	delete emptyImage;
 
 	this->Destroy();
-	closeEvent.Skip();
 }
 
 MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow) : wxThread(wxTHREAD_DETACHED) {

@@ -65,7 +65,7 @@ private:
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
 
 	void OnOpenWindow(wxCommandEvent& evt);
-	void OpenSession(PhoediXSession session);
+	void OpenSession(PhoediXSession * session);
 	void SaveCurrentSession();
 	void CloseSession(PhoediXSession * session);
 	void SetUniqueID(PhoediXSession * session);
@@ -77,7 +77,7 @@ private:
 	void OnPaneClose(wxAuiManagerEvent& evt);
 
 	void SetStatusbarText(wxString text);
-	void OnClose(wxCloseEvent& closeEvent);
+	void OnClose(wxCloseEvent& WXUNUSED(evt));
 
 	void RecieveMessageFromProcessor(wxCommandEvent& messageEvt);
 	void RecieveNumFromProcessor(wxCommandEvent& numEvt);
@@ -103,11 +103,11 @@ private:
 	Processor * processor;
 
 	ZoomImagePanel * imagePanel;
+	wxImage * emptyImage;
 	HistogramDisplay * histogramDisplay;
 
 	PhoediXSession currentSession;
 	wxVector<PhoediXSession> allSessions;
-	wxVector<PhoediXSession*> sessionQueue;
 
 	int numnUnnamedProjectsOpen;
 
