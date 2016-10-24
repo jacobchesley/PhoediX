@@ -19,6 +19,7 @@ public:
 	WXImagePanel(wxWindow * parent, wxImage * image, bool keepAspect = true, bool staticImg = false);
 	void ChangeImage(wxImage * newImage);
 	void Redraw();
+	void StopDrawing();
 	void SetZoom(double zoomFactor);
 	void SetKeepAspect(bool doKeepAspect);
 	void SetResize(bool doResize);
@@ -37,6 +38,7 @@ private:
 	bool keepAspect;
 	bool resize;
 	bool staticImage;
+	bool doDraw;
 };
 
 

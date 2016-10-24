@@ -224,7 +224,12 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 
 void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 
-	bitmapDraw = wxBitmap(*newImage);
+	if (newImage->IsOk()) {
+		bitmapDraw = wxBitmap(*newImage);
+	}
+	else {
+		bitmapDraw = wxBitmap(1, 1);
+	}
 }
 
 void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {

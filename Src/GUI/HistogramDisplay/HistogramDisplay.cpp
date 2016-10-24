@@ -122,6 +122,12 @@ HistogramDisplay::HistogramScrolled::HistogramScrolled(wxWindow * parent, Proces
 
 void HistogramDisplay::HistogramScrolled::DestroyImages(){
 
+	redHistogramPanel->StopDrawing();
+	greenHistogramPanel->StopDrawing();
+	blueHistogramPanel->StopDrawing();
+	greyHistogramPanel->StopDrawing();
+	allHistogramPanel->StopDrawing();
+
 	delete redHistogram;
 	delete greenHistogram;
 	delete blueHistogram;

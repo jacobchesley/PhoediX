@@ -19,6 +19,7 @@ public :
 	ProcessorEdit(ProcessorEdit &edit);
 	ProcessorEdit(int editType);
 
+	~ProcessorEdit();
 
 
 	void AddParam(double param);

@@ -65,6 +65,16 @@ ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 
 }
 
+ProcessorEdit::~ProcessorEdit() {
+	for (size_t i = 0; i < intArrays.size(); i++) {
+		delete[] intArrays.at(i);
+	}
+
+	for (size_t i = 0; i < doubleArrays.size(); i++) {
+		delete[] doubleArrays.at(i);
+	}
+}
+
 void ProcessorEdit::AddParam(double param) {
 	params.push_back(param);
 }

@@ -11,6 +11,7 @@ WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(paren
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
 
 	this->SetDoubleBuffered(true);
+	doDraw = true;
 }
 
 WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect, bool staticImg) : wxPanel(parent) {
@@ -32,6 +33,7 @@ WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect
 	this->SetDoubleBuffered(true);
 	this->SetSize(img->GetSize());
 	this->SetMinSize(img->GetSize());
+	doDraw = true;
 }
 
 void WXImagePanel::SetKeepAspect(bool doKeepAspect) {
@@ -55,6 +57,7 @@ void WXImagePanel::ChangeImage(wxImage * newImage) {
 
 void WXImagePanel::Render(wxDC & dc) {
 
+	if (!doDraw) { return;  }
 	if (staticImage) {
 		dc.Clear();
 		dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
@@ -105,6 +108,10 @@ void WXImagePanel::Redraw() {
 	wxClientDC dc(this);
 	wxBufferedDC dcBuffer(&dc);
 	this->Render(dcBuffer);
+}
+
+void WXImagePanel::StopDrawing() {
+	doDraw = false;
 }
 
 void WXImagePanel::OnPaint(wxPaintEvent& event) {
