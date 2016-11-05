@@ -20,6 +20,8 @@ public:
 	void ShowVal();
 	void HideVal();
 	void SetId(wxWindowID id);
+	void Disable();
+	void Enable();
 
 	void SetBackgroundColour(wxColor newColor);
 	void SetForegroundColour(wxColor newColor);
@@ -43,6 +45,7 @@ private:
 
 	void OnSlide(wxCommandEvent& slideEvt);
 	void OnTextEnter(wxCommandEvent& textEvt);
+	void OnText(wxCommandEvent& textEvt);
 	void ResizeValueText();
 
 	wxBoxSizer * sizer;
@@ -61,6 +64,7 @@ private:
 	int textPrec;
 	int valPos;
 	bool firedFromSetValue;
+	bool isDisabled;
 };
 
 #endif

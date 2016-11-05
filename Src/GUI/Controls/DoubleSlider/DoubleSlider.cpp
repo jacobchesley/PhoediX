@@ -2,6 +2,7 @@
 
 DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, double maxVal, int intervals, int textPrecision) : wxPanel(parent) {
 
+	isDisabled = false;
 	textPrec = textPrecision;
 	wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
 	minText = new wxStaticText(this, -1, wxString::Format(formatString, minVal));
@@ -29,6 +30,7 @@ DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, dou
 
 	this->Bind(wxEVT_SLIDER, (wxObjectEventFunction)&DoubleSlider::OnSlide, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&DoubleSlider::OnTextEnter, this);
+	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&DoubleSlider::OnText, this);
 
 	this->SetValue(initVal);
 
@@ -41,7 +43,6 @@ DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, dou
 
 	// Fit the value text control with the text
 	this->ResizeValueText();
-
 }
 
 void DoubleSlider::SetBackgroundColour(wxColor newColor) {
@@ -178,6 +179,8 @@ void DoubleSlider::SetValuePosition(int newValuePosition) {
 
 void DoubleSlider::OnSlide(wxCommandEvent& slideEvt) {
 
+	if(isDisabled){ return; }
+
 	// Convert current value to the text with specified precision
 	double val = this->GetValue();
 	wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
@@ -194,6 +197,8 @@ void DoubleSlider::OnSlide(wxCommandEvent& slideEvt) {
 }
 
 void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
+
+	if(isDisabled){ return; }
 
 	// Get the current value text
 	wxString strVal = valText->GetValue();
@@ -231,6 +236,14 @@ void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
 	textEvt.Skip();
 }
 
+void DoubleSlider::OnText(wxCommandEvent& WXUNUSED(evt)){
+	if(isDisabled){
+		wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+		wxString valStr = wxString::Format(formatString, this->GetValue());
+		valText->SetValue(valStr);
+		return;
+	}
+}
 void DoubleSlider::ResizeValueText() {
 
 	// Get the width of the text of the value text, so we can size it correctly
@@ -277,6 +290,8 @@ double DoubleSlider::GetValue() {
 
 void DoubleSlider::SetValue(double newVal) {
 
+	if(isDisabled){ return; }
+
 	if (newVal < min) { newVal = min; }
 	if (newVal > max) { newVal = max; }
 
@@ -302,4 +317,14 @@ void DoubleSlider::SetValue(double newVal) {
 
 void DoubleSlider::SetId(wxWindowID id) {
 	slide->SetId(id);
+}
+
+void DoubleSlider::Disable(){
+	slide->Disable();
+	isDisabled = true;
+}
+
+void DoubleSlider::Enable(){
+	slide->Enable();
+	isDisabled = false;
 }
