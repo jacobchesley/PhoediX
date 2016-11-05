@@ -25,6 +25,7 @@
 #include "GUI\Colors\Colors.h"
 #include "GUI\HistogramDisplay\HistogramDisplay.h"
 #include "GUI\LibraryWindow\LibraryWindow.h"
+#include "GUI\MainWindow\AboutWindow\AboutWindow.h";
 #include "Session\Session.h"
 #include "Debugging\MemoryLeakCheck.h"
 
@@ -38,7 +39,6 @@ public:
 		Constructor for the main window.
 	*/
 	MainWindow();
-
 
 private:
 
@@ -99,6 +99,7 @@ private:
 	PixelPeepWindow * pixelPeepWindow;
 	LibraryWindow * libraryWindow;
 	SnapshotWindow * snapshotWindow;
+	AboutWindow * aboutWindow;
 
 	Processor * processor;
 
@@ -126,7 +127,8 @@ private:
 		ID_SHOW_LIBRARY,
 		ID_SHOW_SNAPSHOTS,
 		ID_CLOSE_CURRENT_PROJECT,
-		ID_CLOSE_ALL_PROJECTS
+		ID_CLOSE_ALL_PROJECTS,
+		ID_ABOUT
 	};
 
 	class ImagePanelUpdateThread : public wxThread {

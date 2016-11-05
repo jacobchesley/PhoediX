@@ -43,6 +43,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuTools->AppendSeparator();
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library"));
 
+	menuHelp->Append(MainWindow::MenuBar::ID_ABOUT, _("About PhoediX"));
+
 	// Append menus to menu bar
 	menuBar->Append(menuFile, _("&File"));
 	menuBar->Append(menuView, _("&View"));
@@ -156,6 +158,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	auiManager->Update();
 
+	aboutWindow = new AboutWindow(this);
+
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnNewProject, this, MainWindow::MenuBar::ID_NEW_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadProject, this, MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSaveProject, this, MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT);
@@ -170,6 +174,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowHistograms, this, MainWindow::MenuBar::ID_SHOW_HISTOGRAMS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLibrary, this, MainWindow::MenuBar::ID_SHOW_LIBRARY);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowAbout, this, MainWindow::MenuBar::ID_ABOUT);
 
 	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
 	this->Bind(PROCESSOR_NUM_EVENT, (wxObjectEventFunction)&MainWindow::RecieveNumFromProcessor, this, ID_PROCESSOR_NUM);
@@ -221,11 +226,14 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 			break;
 		}
 	}
-
+	
 	// Set current session to last opened session (if any sessions are open)
 	if (allSessions.size() > 0) {
 		currentSession = allSessions.at(allSessions.size() - 1);
 		this->OpenSession(&currentSession);
+	}
+	else{
+		currentSession = PhoediXSession();
 	}
 }
 
@@ -239,13 +247,20 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 	// Remove all sessions from menu window
 	for (size_t i = 0; i < allSessions.size(); i++) {
 		allSessions.at(i).Destroy();
-		menuWindow->Delete(allSessions.at(i).GetID());
+		if(menuWindow->FindChildItem(allSessions.at(i).GetID())){
+			menuWindow->Delete(allSessions.at(i).GetID());
+		}
 	}
+
+	currentSession.Destroy();
 
 	histogramDisplay->DestroyHistograms();
 
 	// Clear all sessions
 	allSessions.clear();	
+
+	currentSession = PhoediXSession();
+
 }
 
 void MainWindow::CreateNewProject(){
@@ -322,8 +337,6 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 	processor->GetOriginalImage()->Destroy();
 	processor->GetImage()->Destroy();
 
-	session->Destroy();
-
 	wxTimer reprocessCountdown(this);
 	reprocessCountdown.Start(500, true);
 }
@@ -354,6 +367,9 @@ void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::SaveCurrentSession() {
 
+	if(currentSession.GetID() < 0){
+		return;
+	}
 	// Save all infomation about the current session
 	editList->AddEditsToProcessor();
 	currentSession.SetImageFilePath(processor->GetFilePath());
@@ -510,7 +526,6 @@ void MainWindow::OpenImage(wxString imagePath){
 void MainWindow::ShowImageRelatedWindows(){
 
 	if(menuWindow->GetMenuItems().size() < 1){
-		CreateNewProject();
 		auiManager->GetPane(imagePanel).Show();
 		auiManager->GetPane(histogramDisplay).Show();
 		auiManager->GetPane(editList).Show();
@@ -600,6 +615,11 @@ void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 		auiManager->GetPane(libraryWindow).Hide();
 		auiManager->Update();
 	}
+}
+
+void MainWindow::ShowAbout(wxCommandEvent& WXUNUSED(evt)){
+	aboutWindow->CenterOnParent();
+	aboutWindow->Show();
 }
 
 void MainWindow::SetMenuChecks(){
@@ -708,10 +728,7 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 			proc->Lock();
 			imgPanel->ChangeImage(proc->GetImage());
 			imgPanel->Redraw();
-			if(proc->GetDoFitImage()){
-				//imgPanel->FitImage();
-			}
-
+	
 			exportWin->ProcessingComplete();
 			proc->SetDoFitImage(false);
 			histogramDisp->UpdateHistograms();
