@@ -361,6 +361,9 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RawWindow::ProcessEvt, this, EditWindow::ID_PROCESS_EDITS);
 	
 	this->StartWatchdog();
+
+	wxCommandEvent comboEvt(wxEVT_COMBOBOX, ID_WHITE_BALANCE_COMBO);
+	wxPostEvent(this, comboEvt);
 }
 
 void RawWindow::PopulateRawInfo(){
@@ -549,9 +552,14 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 		greenMultiplierLabel->Show();
 		blueMultiplierLabel->Show();
 
+
 		redMultiplierControl->Show();
 		greenMultiplierControl->Show();
 		blueMultiplierControl->Show();
+
+		redMultiplierControl->Enable();
+		greenMultiplierControl->Enable();
+		blueMultiplierControl->Enable();
 
 		switch (whiteBalancePresetsControl->GetSelection()) {
 
@@ -565,6 +573,11 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(redMult / greenMult);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(blueMult / greenMult);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
+
 				break;
 			}
 
@@ -578,6 +591,10 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->Hide();
 				greenMultiplierControl->Hide();
 				blueMultiplierControl->Hide();
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
 				break;
 
 			// Tungsten
@@ -585,6 +602,11 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(1.392498);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(2.375114);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
+
 				break;
 
 			// Flourescent
@@ -592,6 +614,11 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(1.783446);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(1.997113);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
+
 				break;
 
 			// Daylight
@@ -599,6 +626,11 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(2.132483);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(1.480864);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
+
 				break;
 
 			// Shade
@@ -606,6 +638,10 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(2.531894);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(1.223749);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
 				break;
 
 			// Cloudy
@@ -613,6 +649,11 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(2.336605);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(1.334642);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
+
 				break;
 
 			// Flash
@@ -620,6 +661,11 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 				redMultiplierControl->SetValue(2.429833);
 				greenMultiplierControl->SetValue(1.0);
 				blueMultiplierControl->SetValue(1.284593);
+
+				redMultiplierControl->Disable();
+				greenMultiplierControl->Disable();
+				blueMultiplierControl->Disable();
+
 				break;
 		}
 	}
