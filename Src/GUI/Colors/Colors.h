@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef COLORS_H
 #define COLORS_H
 

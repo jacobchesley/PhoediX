@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef PIXEL_PEEP_WINDOW_H
 #define PIXEL_PEEP_WINDOW_H
 

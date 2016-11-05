@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef CROP_WINDOW_H
 #define CROP_WINDOW_H
 

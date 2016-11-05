@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef ADJUST_BRIGHTNESS_WINDOW_H
 #define ADJUST_BRIGHTNESS_WINDOW_H
 

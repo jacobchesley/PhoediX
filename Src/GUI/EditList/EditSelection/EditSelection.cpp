@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "EditSelection.h"
 
 wxDEFINE_EVENT(EDIT_ADD_EVENT, wxCommandEvent);

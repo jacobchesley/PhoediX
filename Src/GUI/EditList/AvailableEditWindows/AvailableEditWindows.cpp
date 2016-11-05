@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "AvailableEditWindows.h"
 
 EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, Processor * processor) {

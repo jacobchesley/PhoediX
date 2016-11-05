@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef SHIFT_RGB_WINDOW_H
 #define SHIFT_RGB_WINDOW_H
 

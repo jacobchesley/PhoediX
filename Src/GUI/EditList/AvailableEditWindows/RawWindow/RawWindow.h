@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef RAW_WINDOW_H
 #define RAW_WINDOW_H
 

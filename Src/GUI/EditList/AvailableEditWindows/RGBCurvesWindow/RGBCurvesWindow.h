@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef RGB_CURVE_H
 #define RGB_CURVE_H
 

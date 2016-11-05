@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef PHOEDIX_SESSION_H
 #define PHOEDIX_SESSION_H
 

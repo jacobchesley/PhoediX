@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef SPLINE_H
 #define SPLINE_H
 

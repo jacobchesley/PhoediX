@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef MIRROR_WINDOW_H
 #define MIRROR_WINDOW_H
 

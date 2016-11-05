@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef ADJUST_HSL_WINDOW_H
 #define ADJUST_HSL_WINDOW_H
 

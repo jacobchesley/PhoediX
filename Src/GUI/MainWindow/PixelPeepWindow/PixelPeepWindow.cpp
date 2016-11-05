@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "PixelPeepWindow.h"
 
 PixelPeepWindow::PixelPeepWindow(wxWindow * parent) : wxScrolledWindow(parent){

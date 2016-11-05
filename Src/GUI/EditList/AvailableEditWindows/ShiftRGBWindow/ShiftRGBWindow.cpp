@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "ShiftRGBWindow.h"
 
 ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

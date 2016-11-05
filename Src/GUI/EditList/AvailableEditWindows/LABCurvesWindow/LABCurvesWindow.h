@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef LAB_CURVE_H
 #define LAB_CURVE_H
 

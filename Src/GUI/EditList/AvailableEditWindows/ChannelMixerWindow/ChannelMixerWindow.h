@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef CHANNEL_Mixer_WINDOW_H
 #define CHANNEL_Mixer_WINDOW_H
 

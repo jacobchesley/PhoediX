@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef LIBRARY_WINDOW_H
 #define LIBRARY_WINDOW_H
 

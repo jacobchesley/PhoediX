@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef EDIT_WINDOW_H
 #define EDIT_WINDOW_H
 

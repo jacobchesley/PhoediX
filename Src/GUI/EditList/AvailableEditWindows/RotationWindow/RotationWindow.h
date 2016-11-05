@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef ROTATION_WINDOW_H
 #define ROTATION_WINDOW_H
 

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "RotationWindow.h"
 
 RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

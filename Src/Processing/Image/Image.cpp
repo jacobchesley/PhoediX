@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "Image.h"
 #include <string.h>
 

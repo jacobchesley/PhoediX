@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "curvespanel.h"
 
 wxDEFINE_EVENT(CURVE_CHANGED_EVENT, wxCommandEvent);

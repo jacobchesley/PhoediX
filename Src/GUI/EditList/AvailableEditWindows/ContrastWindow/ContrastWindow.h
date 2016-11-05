@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef CONTRAST_WINDOW_H
 #define CONTRAST_WINDOW_H
 

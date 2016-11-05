@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "CollapsiblePane.h"
 
 CollapsiblePane::CollapsiblePane(wxWindow * parent, wxString name) : wxPanel(parent) {

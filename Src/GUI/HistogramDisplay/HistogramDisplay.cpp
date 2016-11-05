@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "HistogramDisplay.h"
 
 HistogramDisplay::HistogramDisplay(wxWindow * parent, Processor * processor) : wxPanel(parent) {

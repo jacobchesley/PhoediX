@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "DirectorySelections.h"
 
 wxDEFINE_EVENT(DELETE_DIR_EVENT, wxCommandEvent);

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef IMAGE_PANEL_H
 #define IMAGE_PANEL_H
 

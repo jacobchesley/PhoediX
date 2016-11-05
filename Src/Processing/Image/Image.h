@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef IMAGE_H
 #define IMAGE_H
 

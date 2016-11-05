@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "DoubleSlider.h"
 
 DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, double maxVal, int intervals, int textPrecision) : wxPanel(parent) {

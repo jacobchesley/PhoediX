@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef IMAGE_FILE_LOADER_H
 #define IMAGE_FILE_LOADER_H
 

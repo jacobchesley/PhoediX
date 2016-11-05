@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef EDIT_LIST_PANEL_H
 #define EDIT_LIST_PANEL_H
 

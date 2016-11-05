@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "EditListPanel.h"
 
 EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel(parent) {

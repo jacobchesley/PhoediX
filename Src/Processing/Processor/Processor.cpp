@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "Processor.h"
 
 wxDEFINE_EVENT(PROCESSOR_MESSAGE_EVENT, wxCommandEvent);

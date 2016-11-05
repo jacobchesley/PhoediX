@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "AvailableEdits.h"
 
 Edit::Edit(int editID, wxString editName, wxString editDescription) {

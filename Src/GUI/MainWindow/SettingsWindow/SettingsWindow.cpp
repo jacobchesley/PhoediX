@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "SettingsWindow.h"
 
 wxDEFINE_EVENT(RELOAD_IMAGE_EVENT, wxCommandEvent);

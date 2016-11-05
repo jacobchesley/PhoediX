@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef WXIMAGE_PANEL_H
 #define WXIMAGE_PANEL_H
 

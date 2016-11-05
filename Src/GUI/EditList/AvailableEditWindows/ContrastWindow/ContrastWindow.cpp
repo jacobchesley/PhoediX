@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "ContrastWindow.h"
 
 ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifdef CHECK_MEMORY_LEAK
 	#define CRTDBG_MAP_ALLOC
 	#include <stdlib.h>

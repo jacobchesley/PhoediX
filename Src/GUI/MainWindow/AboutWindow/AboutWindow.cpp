@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "AboutWindow.h"
 #include "App\PhoediX.h"
 #include "libraw.h"

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef ZOOM_IMAGE_FRAME_H
 #define ZOOM_IMAGE_FRAME_H
 

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef SNAPSHOT_WINDOW_H
 #define SNAPSHOT_WINDOW_H
 

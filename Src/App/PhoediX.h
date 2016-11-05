@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef PHOEDIX_H
 #define PHOEDIX_H
 

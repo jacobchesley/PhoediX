@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 

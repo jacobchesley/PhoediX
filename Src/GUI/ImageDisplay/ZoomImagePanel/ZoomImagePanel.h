@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef ZOOM_IMAGE_PANEL_H
 #define ZOOM_IMAGE_PANEL_H
 

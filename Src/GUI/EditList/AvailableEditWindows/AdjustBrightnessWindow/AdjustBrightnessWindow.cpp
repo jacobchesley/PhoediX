@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "AdjustBrightnessWindow.h"
 
 AdjustBrightnessWindow::AdjustBrightnessWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

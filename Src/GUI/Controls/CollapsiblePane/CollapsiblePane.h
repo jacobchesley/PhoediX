@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef COLLAPSIBLE_PANE_H
 #define COLLAPSIBLE_PANE_H
 

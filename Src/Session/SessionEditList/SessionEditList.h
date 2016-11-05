@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef PHOEDIX_SESSION_EDIT_LIST
 #define PHOEDIX_SESSION_EDIT_LIST
 

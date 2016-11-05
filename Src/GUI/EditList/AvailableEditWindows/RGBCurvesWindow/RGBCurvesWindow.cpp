@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "RGBCurvesWindow.h"
 
 RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

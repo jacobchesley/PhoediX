@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "PhoediX.h"
 
 IMPLEMENT_APP(PhoediX)

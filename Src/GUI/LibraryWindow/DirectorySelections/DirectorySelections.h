@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef DIRECTORY_SELECTIONS_H
 #define DIRECTORY_SELECTIONS_H
 

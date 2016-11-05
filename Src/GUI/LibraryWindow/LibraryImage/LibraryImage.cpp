@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "LibraryImage.h"
 
 LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName, wxString filePath) : wxPanel(parent) {

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "EditWindow.h"
 
 wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);

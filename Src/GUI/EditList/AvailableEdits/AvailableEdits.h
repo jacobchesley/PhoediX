@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef AVAILABLE_EDITS_H
 #define AVAILABLE_EDITS_H
 

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "AdjustHSLWindow.h"
 
 AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "RawWindow.h"
 
 RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef AVAILABLE_EDIT_WINDOWS_H
 #define AVAILABLE_EDIT_WINDOWS_H
 

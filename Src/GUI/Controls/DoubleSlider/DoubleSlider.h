@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef DOUBLE_SLIDER_H
 #define DOUBLE_SLIDER_H
 

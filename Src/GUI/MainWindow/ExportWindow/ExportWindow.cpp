@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "ExportWindow.h"
 
 wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_NUM_EVENT, wxCommandEvent);

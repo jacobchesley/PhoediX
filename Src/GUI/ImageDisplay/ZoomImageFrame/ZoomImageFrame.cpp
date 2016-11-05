@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "ZoomImageFrame.h"
 
 ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title) : wxFrame(parent, -1, title){

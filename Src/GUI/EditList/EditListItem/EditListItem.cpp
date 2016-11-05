@@ -1,4 +1,6 @@
-﻿#include "EditListItem.h"
+// Copyright 2016 Jacob Chesley
+
+#include "EditListItem.h"
 
 wxDEFINE_EVENT(EDIT_UP_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EDIT_DOWN_EVENT, wxCommandEvent);

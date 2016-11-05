@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef EXPORT_WINDOW_H
 #define EXPORT_WINDOW_H
 

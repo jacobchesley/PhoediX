@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef CONVERT_GREYSCALE_WINDOW_H
 #define CONVERT_GREYSCALE_WINDOW_H
 

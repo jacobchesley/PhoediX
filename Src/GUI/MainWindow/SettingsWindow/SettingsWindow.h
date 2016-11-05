@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef SETTINGS_WINDOW_H
 #define SETTINGS_WINDOW_H
 

@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef LIBRARY_IMAGE_H
 #define LIBRARY_IMAGE_H
 

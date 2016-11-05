@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "MainWindow.h"
 
 MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDefaultSize){

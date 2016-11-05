@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "wxImagePanel.h"
 
 WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(parent) {

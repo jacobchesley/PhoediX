@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef SCALE_WINDOW_H
 #define SCALE_WINDOW_H
 

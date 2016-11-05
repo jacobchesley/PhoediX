@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef HSL_CURVE_H
 #define HSL_CURVE_H
 

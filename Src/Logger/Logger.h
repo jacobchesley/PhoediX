@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef LOGGER_H
 #define LOGGER_H
 	

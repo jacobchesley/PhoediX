@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "Colors.h"
 
 wxColor Colors::BackBlack = wxColor(0, 0, 0);

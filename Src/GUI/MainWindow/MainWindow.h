@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 

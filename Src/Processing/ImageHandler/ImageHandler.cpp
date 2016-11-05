@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #include "ImageHandler.h"
 
 wxString ImageHandler::allFileDialogList = "All Files (*.*)|*.*";

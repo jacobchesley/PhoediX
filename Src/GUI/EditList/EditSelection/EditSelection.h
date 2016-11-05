@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef EDIT_SELECTION_H
 #define EDIT_SELECTION_H
 

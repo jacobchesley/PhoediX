@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef PHOEDIX_AUI_MANAGER_H
 #define PHOEDIX_AUI_MANAGER_H
 

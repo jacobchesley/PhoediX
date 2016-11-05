@@ -1,3 +1,5 @@
+// Copyright 2016 Jacob Chesley
+
 #ifndef RAW_ERROR_H
 #define RAW_ERROR_H
 
