@@ -1,6 +1,12 @@
 #ifndef PHOEDIX_H
 #define PHOEDIX_H
 
+#define PHOEDIX_VERSION_STRING "0.1.0"
+#define PHOEDIX_BUILD_DATE_STRING __DATE__
+#define PHOEDIX_BUILD_TIME_STRING __TIME__
+#define PHOEDIX_AUTHOR_STRING "Jacob Chesley"
+#define PHOEDIX_WEBSITE_STRING "www.phoedix.com"
+
 // for compilers that support precompilation, includes "wx/wx.h"
 #include "wx/wxprec.h"
 
