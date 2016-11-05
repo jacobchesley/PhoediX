@@ -19,9 +19,9 @@ LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName
 
 	nameDisplay->SetForegroundColour(Colors::TextLightGrey);
 
-	subLayout->Add(nameDisplay, 1);
+	subLayout->Add(nameDisplay);
 	subLayout->AddStretchSpacer();
-	subLayout->Add(selectBox, 0);
+	subLayout->Add(selectBox);
 
 	this->GetSizer()->Add(imageDisplay);
 	this->GetSizer()->Add(subLayout, 0, wxEXPAND);
@@ -61,6 +61,7 @@ void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
 			ZoomImageFrame * displayFrame = new ZoomImageFrame(this, this->GetName(), displayImage);
 			displayFrame->Show();
 		}
+		rawProc.dcraw_clear_mem(rawImg);
 	}
 
 	// We have an image we can load in
