@@ -15,6 +15,7 @@ PhoediXSession::PhoediXSession(){
 void PhoediXSession::Destroy(){
 	delete editList;
 	editList = NULL;
+	id = -1;
 }
 
 void PhoediXSession::LoadSessionFromFile(wxString filePath) {
