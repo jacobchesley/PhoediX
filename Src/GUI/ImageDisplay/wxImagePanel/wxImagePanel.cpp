@@ -60,7 +60,9 @@ void WXImagePanel::Render(wxDC & dc) {
 	if (!doDraw) { return;  }
 	if (staticImage) {
 		dc.Clear();
-		dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
+		if(bitmapDraw.IsOk()){
+			dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
+		}
 		return;
 	}
 
@@ -103,6 +105,7 @@ void WXImagePanel::Render(wxDC & dc) {
 	dc.Clear();
 	dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
 }
+
 
 void WXImagePanel::Redraw() {
 	wxClientDC dc(this);
