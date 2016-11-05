@@ -9,7 +9,7 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	imagesLayout = new wxWrapSizer();
 	this->SetSizer(mainLayout);
 
-	toolbarLayout = new wxBoxSizer(wxHORIZONTAL);
+	toolbarLayout = new wxWrapSizer();
 
 	showDirectoriesButton = new wxButton(this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST, "Import Directories", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	showDirectoriesButton->SetForegroundColour(Colors::TextLightGrey);
@@ -248,7 +248,6 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 			// We have a raw image we can load in
 			if (ImageHandler::CheckRaw(fileName)) {
 
-				rawProc.recycle();
 				rawProc.open_file(fileName.wc_str());
 				rawProc.unpack();
 				rawProc.imgdata.params.half_size = 1;
@@ -265,6 +264,8 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 					displayImage = new wxImage(rawImg->width, rawImg->height);
 					ImageHandler::CopyImageFromRaw(rawImg, displayImage);
 				}
+				rawProc.dcraw_clear_mem(rawImg);
+				rawProc.recycle();
 			}
 
 			// We have an image we can load in
@@ -302,5 +303,6 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 			}
 		}
 	}
+	rawProc.recycle();
 	return 0;
 }

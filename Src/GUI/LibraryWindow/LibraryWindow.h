@@ -48,7 +48,7 @@ private:
 
 	wxBoxSizer * mainLayout;
 
-	wxBoxSizer * toolbarLayout;
+	wxWrapSizer * toolbarLayout;
 	wxButton * showDirectoriesButton;
 	wxButton * importButton;
 	wxButton * clearButton;
