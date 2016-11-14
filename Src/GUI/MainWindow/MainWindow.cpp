@@ -146,7 +146,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	libraryPaneInfo.Hide();
 	auiManager->AddPane(libraryWindow, libraryPaneInfo);
 
-	snapshotWindow = new SnapshotWindow(this);
+	snapshotWindow = new SnapshotWindow(this, editList, processor);
 	wxAuiPaneInfo snapshotPaneInfo = wxAuiPaneInfo();
 	snapshotPaneInfo.Float();
 	snapshotPaneInfo.Caption("Snapshots");
@@ -311,6 +311,10 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
 	editList->AddEditWindows(editLayers);
 
+	// Load snapshots
+	snapshotWindow->DeleteAllSnapshots();
+	snapshotWindow->AddSnapshots(session->GetSnapshots());
+
 	// Load perspective after edits are loaded
 	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session->GetPerspective(), true);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
@@ -383,6 +387,7 @@ void MainWindow::SaveCurrentSession() {
 	currentSession.SetImageScrollWidth(processor->GetImage()->GetWidth());
 	currentSession.SetImageScrollHeight(processor->GetImage()->GetHeight());
 	currentSession.SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
+	currentSession.SetSnapshots(snapshotWindow->GetSnapshots());
 
 	// Replace existing session in all sessions, with updated session
 	for(size_t i = 0; i < allSessions.size(); i++){
@@ -626,6 +631,7 @@ void MainWindow::ShowAbout(wxCommandEvent& WXUNUSED(evt)){
 
 void MainWindow::SetMenuChecks(){
 
+	// 1st element in view is image panel
 	if(auiManager->GetPane(imagePanel).IsShown()){
 		menuView->GetMenuItems()[0]->Check(true);
 	}
@@ -633,6 +639,7 @@ void MainWindow::SetMenuChecks(){
 		menuView->GetMenuItems()[0]->Check(false);
 	}
 
+	// 2nd element in view is edit list
 	if(auiManager->GetPane(editList).IsShown()){
 		menuView->GetMenuItems()[1]->Check(true);
 	}
@@ -640,6 +647,7 @@ void MainWindow::SetMenuChecks(){
 		menuView->GetMenuItems()[1]->Check(false);
 	}
 
+	// 3rd element in view is histograms
 	if(auiManager->GetPane(histogramDisplay).IsShown()){
 		menuView->GetMenuItems()[2]->Check(true);
 	}
@@ -647,11 +655,24 @@ void MainWindow::SetMenuChecks(){
 		menuView->GetMenuItems()[2]->Check(false);
 	}
 
-	if(auiManager->GetPane(libraryWindow).IsShown()){
+	// 1st element in tools is snapshots
+	if(auiManager->GetPane(snapshotWindow).IsShown()){
 		menuTools->GetMenuItems()[0]->Check(true);
 	}
 	else{
 		menuTools->GetMenuItems()[0]->Check(false);
+	}
+
+	// 2nd element in tools is pixel peep
+
+	// 3rd element in tools is separator
+
+	// 4th element in tools is library window
+	if(auiManager->GetPane(libraryWindow).IsShown()){
+		menuTools->GetMenuItems()[3]->Check(true);
+	}
+	else{
+		menuTools->GetMenuItems()[3]->Check(false);
 	}
 }
 
@@ -724,7 +745,7 @@ MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imag
 }
 
 wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
-
+	
 	while (continueWatch) {
 		if (proc->GetUpdated() && !proc->GetLocked() && !proc->GetLockedRaw()) {
 			proc->Lock();
@@ -739,6 +760,7 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 		}
 		this->Sleep(20);
 	}
+	
 	return (wxThread::ExitCode)0;
 }
 
