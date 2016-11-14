@@ -211,9 +211,9 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 			// Add the correct type of window, and set parameter for window based on edit
 			else{
 				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
-				this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled(), false);
-
+				
 				if (newEditWindow != NULL) {
+					this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled(), false);
 					newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
 					newEditWindow->SetParamsAndFlags(inEdits.at(i));
 				}
@@ -225,6 +225,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 		scroller->GetEditList().at(i)->GetEditWindow()->Activate();
 	}
 	
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 	this->ReprocessImageRaw();
 }
 
@@ -256,18 +257,17 @@ void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool d
 
 		// Add new edit window to AUI manager
 		PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(window, editWindowInfo);
-		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
-		
+				
 		// Add a new Edit List Item to the Edit List scroll panel
 		// Add special panel that will disable buttons if it is raw.  Keep raw panel at top
 		if(editID == AvailableEditIDS::EDIT_ID_RAW){
 
-			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, true);
+			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), id, window, true);
 			scroller->AddEdit(newEditListItem);
 			if(autoActivate){ newEditListItem->GetEditWindow()->Activate(); }
 		}
 		else{
-			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), scroller->GetNextID(), window, false);
+			EditListItem * newEditListItem = new EditListItem(scroller, available.GetNameFromID(editID), id, window, false);
 			newEditListItem->SetDisabled(disable);
 			scroller->AddEdit(newEditListItem);
 			if(autoActivate){ newEditListItem->GetEditWindow()->Activate(); }

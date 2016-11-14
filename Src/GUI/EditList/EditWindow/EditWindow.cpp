@@ -15,7 +15,7 @@ EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * process
 	activated = false;
 	proc = processor;
 
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 }
 
 void EditWindow::DoProcess() {
@@ -94,7 +94,7 @@ void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 
 
 void EditWindow::StartWatchdog(){
-	watchdog = new WatchForUpdateThread(this, 20);
+	watchdog = new WatchForUpdateThread(this, 50);
 	watchdog->Run();
 	watchdog->SetPriority(2);
 }
@@ -102,10 +102,6 @@ void EditWindow::StartWatchdog(){
 void EditWindow::StopWatchdog(){
 	if(watchdog != NULL){
 		watchdog->Stop();
-	}
-
-	if(watchdogRealtime != NULL){
-		watchdogRealtime->Stop();
 	}
 }
 
@@ -128,7 +124,7 @@ wxThread::ExitCode EditWindow::WatchForUpdateThread::Entry(){
 			// This will prevent the window from processing several similar edits when the
 			// sliders change quickly during movement.
 			if(!window->GetUpdated()){
-				wxCommandEvent evt(wxEVT_BUTTON, EditWindow::ID_PROCESS_EDITS);
+				wxCommandEvent evt(REPROCESS_IMAGE_EVENT, EditWindow::ID_PROCESS_EDITS);
 				wxPostEvent(window, evt);
 			}
 		}

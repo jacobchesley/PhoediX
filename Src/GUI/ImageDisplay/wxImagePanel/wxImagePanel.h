@@ -33,8 +33,6 @@ private:
 
 	wxImage * img;
 	wxBitmap bitmapDraw;
-	int oldWidth;
-	int oldHeight;
 
 	double zoom;
 	bool keepAspect;
