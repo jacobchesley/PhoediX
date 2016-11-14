@@ -49,7 +49,6 @@ public :
 	void SetDisabled(bool disable);
 	bool GetDisabled();
 
-
 	int GetEditType();
 	void SetEditType(int editType);
 	void SetEditTypeFromTag(wxString inTag);

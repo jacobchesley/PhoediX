@@ -304,10 +304,11 @@ void Processor::SendMessageToParent(wxString message) {
 		evt.SetString(message);
 		wxPostEvent(parWindow, evt);
 	}
+
 }
 
 void Processor::SendProcessorEditNumToParent(int editNum){
-
+	
 	// Send add edit event with edit ID to parent window (the edit panel)
 	if (parWindow != NULL) {
 		wxCommandEvent evt(PROCESSOR_NUM_EVENT, ID_PROCESSOR_NUM);
@@ -5277,9 +5278,14 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 		// Get the next edit to take place
 		ProcessorEdit * curEdit = editVec.at(editIndex);
-
 		// Get the type of edit to perform
 		int editToComplete = curEdit->GetEditType();
+
+		if (curEdit->GetEditTag().IsNull()) {
+			procParent->SendMessageToParent("");
+			procParent->Unlock();
+			return 0;
+		}
 
 		// Skip disabled edits
 		if (curEdit->GetDisabled()) {
@@ -6449,21 +6455,33 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		while(processor->GetLocked()){
 			this->Sleep(20);
 		}
+
+		OutputDebugStringA("Processor Unlocked");
 		processor->Lock();
+		OutputDebugStringA("Processor Locked");
 		ImageHandler::CopyImageFromRaw(processor->rawImage, processor->GetImage());
 		if(processor->GetOriginalImage() != NULL){
+			OutputDebugStringA("Destorying original image...");
 			processor->GetOriginalImage()->Destroy();
+			OutputDebugStringA("Original image destroyed");
 		}
+		OutputDebugStringA("Setting original image...");
 		processor->SetOriginalImage(processor->GetImage());
+		OutputDebugStringA("Original image set");
 
 		// If there are no edits after raw procesing, set updated.  We don't want to show the raw image without
 		// following edits, if those edits exist
 		if(!processor->GetHasEdits()){
+			OutputDebugStringA("Setting updated...");
 			processor->SetUpdated(true);
+			OutputDebugStringA("updated set");
 		}
+		OutputDebugStringA("Unlocking and deleting raw image...");
 		processor->Unlock();
 		processor->DeleteRawImage();
+		OutputDebugStringA("Almost done...");
 		processor->SendMessageToParent("");
+		OutputDebugStringA("Done!");
 		
 	}
 	else{

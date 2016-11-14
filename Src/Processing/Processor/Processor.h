@@ -72,6 +72,7 @@ public:
 
 	void StoreEditForCopyPaste(ProcessorEdit * edit);
 	ProcessorEdit * GetEditForCopyPaste();
+
 	void StoreEditListForCopyPaste(wxVector<ProcessorEdit*>);
 	wxVector<ProcessorEdit*> GetEditListForCopyPaste();
 
