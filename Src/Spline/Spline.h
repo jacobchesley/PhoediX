@@ -3,7 +3,13 @@
 #ifndef SPLINE_H
 #define SPLINE_H
 
-#include <vector>
+// for compilers that support precompilation, includes "wx/wx.h"
+#include "wx/wxprec.h"
+
+// for all others, include the necessary headers explicitly
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
 
 enum {
 	CATMULL_ROM_SPLINE,
@@ -26,7 +32,7 @@ public:
 	double HermiteInterpolate(double y0, double y1, double tangenty0, double tangenty1, double mu);
 	double CalculateTangentCardinalX(Point Left, Point Right, double Tension);
 	double CalculateTangentCardinalY(Point Left, Point Right, double Tension);
-	std::vector <Point> GetHermiteSpline(double Tension, bool NoXOverlap = false);
+	wxVector<Point> GetHermiteSpline(double Tension, bool NoXOverlap = false);
 
 	bool AddPoint(double x, double y);
 	bool AddPoint(int position, double x, double y);
@@ -38,8 +44,8 @@ public:
 
 	int PointExists(double x, double y, double PlusMinXY);
 
-	std::vector<Point> GetControlPoints();
-	std::vector<Point> GetCurve(double Tension, int SplineType = CATMULL_ROM_SPLINE, int limit = -1);
+	wxVector<Point> GetControlPoints();
+	wxVector<Point> GetCurve(double Tension, int SplineType = CATMULL_ROM_SPLINE, int limit = -1);
 
 	size_t GetNumControlPoints();
 	size_t GetNumCurvePoints();
@@ -47,8 +53,8 @@ public:
 	bool GetXCanOverlap();
 	bool SetXCanOverlap(bool PreventXOverlap);
 
-	std::vector <Point> ControlPoints;
-	std::vector <Point> OutPoints;
+	wxVector<Point> ControlPoints;
+	wxVector<Point> OutPoints;
 	int NumControlPoint, Precision, CurrentID;
 	double MinX, MaxX;
 	bool Prev_x_overlap;

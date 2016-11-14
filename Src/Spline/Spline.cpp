@@ -8,6 +8,8 @@ Spline::Spline(int Precision, bool PreventXOverlap) {
 	this->CurrentID = 0;
 	this->NumControlPoint = 0;
 	this->Prev_x_overlap = PreventXOverlap;
+	ControlPoints = wxVector<Point>();
+	OutPoints = wxVector<Point>();
 }
 
 Spline::~Spline() {}
@@ -38,7 +40,7 @@ double Spline::CalculateTangentCardinalY(Point Left, Point Right, double Tension
 	return Tension * (Right.y - Left.y);
 }
 
-std::vector <Point> Spline::GetHermiteSpline(double Tension, bool NoXOverlap) {
+wxVector <Point> Spline::GetHermiteSpline(double Tension, bool NoXOverlap) {
 
 	Point LeftPoint, RightPoint;
 	double LeftTangentY, RightTangentY, LeftTangentX, RightTangentX;
@@ -56,50 +58,50 @@ std::vector <Point> Spline::GetHermiteSpline(double Tension, bool NoXOverlap) {
 
 	for (int i = 0; i < NumControlPoint - 1; i++) {
 
-		LeftPoint = ControlPoints[i];
-		RightPoint = ControlPoints[i + 1];
+		LeftPoint = ControlPoints.at(i);
+		RightPoint = ControlPoints.at(i);
 
 		// 2 Control points, this will be treated as a line
 		if (i == 0 && NumControlPoint == 2) {
 
-			LeftTangentX = ControlPoints[i + 1].x - ControlPoints[i].x;
-			RightTangentX = ControlPoints[i + 1].x - ControlPoints[i].x;
-			LeftTangentY = ControlPoints[i + 1].y - ControlPoints[i].y;
-			RightTangentY = ControlPoints[i + 1].y - ControlPoints[i].y;
+			LeftTangentX = ControlPoints.at(i + 1).x - ControlPoints.at(i).x;
+			RightTangentX = ControlPoints.at(i + 1).x - ControlPoints.at(i).x;
+			LeftTangentY = ControlPoints.at(i + 1).y - ControlPoints.at(i).y;
+			RightTangentY = ControlPoints.at(i + 1).y - ControlPoints.at(i).y;
 		}
 
 		// More than 2 control points, get the tangent for first end
 		if (i == 0 && NumControlPoint != 2) {
 
 			LeftTangentX = 0;
-			RightTangentX = CalculateTangentCardinalX(ControlPoints[i], ControlPoints[i + 2], Tension);
+			RightTangentX = CalculateTangentCardinalX(ControlPoints.at(i), ControlPoints[i + 2], Tension);
 			LeftTangentY = 0;
-			RightTangentY = CalculateTangentCardinalY(ControlPoints[i], ControlPoints[i + 2], Tension);
+			RightTangentY = CalculateTangentCardinalY(ControlPoints.at(i), ControlPoints[i + 2], Tension);
 		}
 
 		// More than 2 control points, get the tangent for first end
 		if (i == NumControlPoint - 2 && NumControlPoint != 2) {
 
-			LeftTangentX = CalculateTangentCardinalX(ControlPoints[i - 1], ControlPoints[i + 1], Tension);
+			LeftTangentX = CalculateTangentCardinalX(ControlPoints.at(i - 1), ControlPoints.at(i + 1), Tension);
 			RightTangentX = 0;
-			LeftTangentY = CalculateTangentCardinalY(ControlPoints[i - 1], ControlPoints[i + 1], Tension);
+			LeftTangentY = CalculateTangentCardinalY(ControlPoints.at(i - 1), ControlPoints.at(i + 1), Tension);
 			RightTangentY = 0;
 		}
 
 		// More than 2 control points, get the tangent for a middle segment
 		if (i > 0 && i < NumControlPoint - 2 && NumControlPoint != 2) {
 
-			LeftTangentX = CalculateTangentCardinalX(ControlPoints[i - 1], ControlPoints[i + 1], Tension);
-			RightTangentX = CalculateTangentCardinalX(ControlPoints[i], ControlPoints[i + 2], Tension);
-			LeftTangentY = CalculateTangentCardinalY(ControlPoints[i - 1], ControlPoints[i + 1], Tension);
-			RightTangentY = CalculateTangentCardinalY(ControlPoints[i], ControlPoints[i + 2], Tension);
+			LeftTangentX = CalculateTangentCardinalX(ControlPoints.at(i - 1), ControlPoints.at(i + 1), Tension);
+			RightTangentX = CalculateTangentCardinalX(ControlPoints.at(i), ControlPoints[i + 2], Tension);
+			LeftTangentY = CalculateTangentCardinalY(ControlPoints.at(i - 1), ControlPoints.at(i + 1), Tension);
+			RightTangentY = CalculateTangentCardinalY(ControlPoints.at(i), ControlPoints[i + 2], Tension);
 		}
 
 		// Generate the curve between control points
 		for (double t = 0; t < 1.0; t += inc) {
 
-			OutPoints[OutInc].x = HermiteInterpolate(ControlPoints[i].x, ControlPoints[i + 1].x, LeftTangentX, RightTangentX, t);
-			OutPoints[OutInc].y = HermiteInterpolate(ControlPoints[i].y, ControlPoints[i + 1].y, LeftTangentY, RightTangentY, t);
+			OutPoints[OutInc].x = HermiteInterpolate(ControlPoints.at(i).x, ControlPoints.at(i + 1).x, LeftTangentX, RightTangentX, t);
+			OutPoints[OutInc].y = HermiteInterpolate(ControlPoints.at(i).y, ControlPoints.at(i + 1).y, LeftTangentY, RightTangentY, t);
 
 			// if this is the very first point on the curve, set the maximum 
 			if (i == 0 && t == 0) { CurMaxX = OutPoints[OutInc].x; }
@@ -117,7 +119,7 @@ std::vector <Point> Spline::GetHermiteSpline(double Tension, bool NoXOverlap) {
 	return OutPoints;
 }
 bool Spline::AddPoint(double x, double y) {
-
+	
 	// Create point
 	Point NewPoint;
 	NewPoint.x = x;
@@ -131,7 +133,7 @@ bool Spline::AddPoint(double x, double y) {
 	NumControlPoint += 1;
 
 	// Resize the output points
-	OutPoints.resize(NumControlPoint + (NumControlPoint - 1) * Precision);
+	OutPoints.resize(NumControlPoint + (NumControlPoint - 1) * (Precision + 1));
 	return true;
 }
 
@@ -156,7 +158,7 @@ bool Spline::AddPoint(int position, double x, double y) {
 	// Re ID everything after the new point
 	for (int i = position + 1; i < NumControlPoint + 1; i++) {
 
-		ControlPoints[i].id = i;
+		ControlPoints.at(i).id = i;
 	}
 
 	CurrentID += 1;
@@ -171,10 +173,10 @@ bool Spline::ModifyPoint(double OriginalX, double OriginalY, double NewX, double
 
 	for (int i = 0; i < NumControlPoint; i++) {
 
-		if (OriginalX == ControlPoints[i].x && OriginalY == ControlPoints[i].y) {
+		if (OriginalX == ControlPoints.at(i).x && OriginalY == ControlPoints.at(i).y) {
 
-			ControlPoints[i].x = NewX;
-			ControlPoints[i].y = NewY;
+			ControlPoints.at(i).x = NewX;
+			ControlPoints.at(i).y = NewY;
 			return true;
 		}
 	}
@@ -185,11 +187,11 @@ bool Spline::ModifyPoint(int ID, double NewX, double NewY) {
 
 	for (int i = 0; i < NumControlPoint; i++) {
 
-		if (ControlPoints[i].id == ID) {
+		if (ControlPoints.at(i).id == ID) {
 
 			LastModifiedPointID = ID;
-			ControlPoints[i].x = NewX;
-			ControlPoints[i].y = NewY;
+			ControlPoints.at(i).x = NewX;
+			ControlPoints.at(i).y = NewY;
 			return true;
 		}
 	}
@@ -201,11 +203,11 @@ int Spline::RemovePoint(double x, double y, double PlusMinXY) {
 	int ID = -1;
 	for (int i = 0; i < NumControlPoint; i++) {
 
-		if (((x - PlusMinXY) <= ControlPoints[i].x) && ((x + PlusMinXY) >= ControlPoints[i].x) &&
-			((y - PlusMinXY) <= ControlPoints[i].y) && ((y + PlusMinXY) >= ControlPoints[i].y)) {
+		if (((x - PlusMinXY) <= ControlPoints.at(i).x) && ((x + PlusMinXY) >= ControlPoints.at(i).x) &&
+			((y - PlusMinXY) <= ControlPoints.at(i).y) && ((y + PlusMinXY) >= ControlPoints.at(i).y)) {
 
 			// Remove the point
-			ID = ControlPoints[i].id;
+			ID = ControlPoints.at(i).id;
 			ControlPoints.erase(ControlPoints.begin() + i);
 			NumControlPoint -= 1;
 			CurrentID -= 1;
@@ -233,7 +235,7 @@ bool Spline::RemovePoint(int id) {
 	// Re ID all points
 	for (int i = 0; i < NumControlPoint; i++) {
 
-		ControlPoints[i].id = i;
+		ControlPoints.at(i).id = i;
 	}
 
 	// Resize the output points
@@ -245,23 +247,23 @@ int Spline::PointExists(double x, double y, double PlusMinXY) {
 
 	for (int i = 0; i < NumControlPoint; i++) {
 
-		if (((x - PlusMinXY) <= ControlPoints[i].x) && ((x + PlusMinXY) >= ControlPoints[i].x) &&
-			((y - PlusMinXY) <= ControlPoints[i].y) && ((y + PlusMinXY) >= ControlPoints[i].y)) {
+		if (((x - PlusMinXY) <= ControlPoints.at(i).x) && ((x + PlusMinXY) >= ControlPoints.at(i).x) &&
+			((y - PlusMinXY) <= ControlPoints.at(i).y) && ((y + PlusMinXY) >= ControlPoints.at(i).y)) {
 
-			return ControlPoints[i].id;
+			return ControlPoints.at(i).id;
 		}
 	}
 	return -1;
 }
 
-std::vector<Point> Spline::GetControlPoints() {
+wxVector<Point> Spline::GetControlPoints() {
 
 	return ControlPoints;
 }
 
 
 
-std::vector<Point> Spline::GetCurve(double Tension, int SplineType, int limit) {
+wxVector<Point> Spline::GetCurve(double Tension, int SplineType, int limit) {
 
 
 	switch (SplineType) {
@@ -275,11 +277,11 @@ std::vector<Point> Spline::GetCurve(double Tension, int SplineType, int limit) {
 	}
 
 	if (limit > 0) {
-		std::vector <Point> retPoints;
+		wxVector <Point> retPoints = wxVector<Point>();
 		int inc = (int)OutPoints.size() / limit;
 
-		for (std::vector<Point>::size_type i = 0; i < OutPoints.size(); i += inc) {
-			retPoints.push_back(OutPoints[i]);
+		for (wxVector<Point>::size_type i = 0; i < OutPoints.size(); i += inc) {
+			retPoints.push_back(OutPoints.at(i));
 		}
 
 		return retPoints;
