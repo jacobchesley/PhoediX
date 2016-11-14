@@ -32,9 +32,9 @@ class CurvePanel : public wxPanel {
 
 public:
 	CurvePanel(wxWindow * Parent, int Channel);
-	std::vector<int> GetColorCurveMap(int numSteps, float scale);
-	void SetControlPoints(std::vector<Point> newPoints);
-	std::vector<Point> GetControlPoints();
+	wxVector<int> GetColorCurveMap(int numSteps, float scale);
+	void SetControlPoints(wxVector<Point> newPoints);
+	wxVector<Point> GetControlPoints();
 	~CurvePanel();
 
 private:
@@ -46,8 +46,7 @@ private:
 	int extraLefttY;
 	int channelColor;
 
-	std::vector<int> colorCurveMap;
-	std::vector<Point> lastPoints;
+	wxVector<Point> lastPoints;
 	Spline * splineCurve;
 	Spline * displayCurve;
 		
@@ -59,7 +58,7 @@ private:
 	void PaintNow();
 	void DestroySpline();
 	bool CheckForChanges();
-	std::vector<Point> ClipCurve(std::vector<Point> points);
+	wxVector<Point> ClipCurve(wxVector<Point> points);
 
 };
 

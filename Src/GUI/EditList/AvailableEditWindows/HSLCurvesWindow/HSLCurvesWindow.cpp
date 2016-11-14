@@ -31,14 +31,14 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 }
 
 void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
-
+	
 	if(edit == NULL){ return; }
 
 	if(edit->GetEditType() != ProcessorEdit::EditType::HSL_CURVES){ return; }
 
-	std::vector<Point> hControlPoints;
-	std::vector<Point> sControlPoints;
-	std::vector<Point> lControlPoints;
+	wxVector<Point> hControlPoints;
+	wxVector<Point> sControlPoints;
+	wxVector<Point> lControlPoints;
 
 	// Must have 3 double arrays (h, s, and l curves)
 	if(edit->GetNumDoubleArrays() != 3){ return; }
@@ -113,76 +113,79 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	hCurve->SetControlPoints(hControlPoints);
 	sCurve->SetControlPoints(sControlPoints);
 	lCurve->SetControlPoints(lControlPoints);
+	
 }
 
 ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 
-	std::vector<Point> lControlPoints = hCurve->GetControlPoints();
-	std::vector<Point> aControlPoints = sCurve->GetControlPoints();
-	std::vector<Point> bControlPoints = lCurve->GetControlPoints();
+	wxVector<Point> hControlPoints = hCurve->GetControlPoints();
+	wxVector<Point> sControlPoints = sCurve->GetControlPoints();
+	wxVector<Point> lControlPoints = lCurve->GetControlPoints();
 
 	// Create double array that will store control points
-	double * hPoints = new double[lControlPoints.size() * 2];
-	double * sPoints = new double[aControlPoints.size() * 2];
-	double * lPoints = new double[bControlPoints.size() * 2];
+	double * hPoints = new double[hControlPoints.size() * 2];
+	double * sPoints = new double[sControlPoints.size() * 2];
+	double * lPoints = new double[lControlPoints.size() * 2];
 
 	unsigned int idx = 0;
 
 	// Add h control points to a double array
-	for (size_t p = 0; p < lControlPoints.size(); p ++) {
-		hPoints[idx] = lControlPoints[p].x;
-		hPoints[idx + 1] =lControlPoints[p].y;
+	for (size_t p = 0; p < hControlPoints.size(); p ++) {
+		hPoints[idx] = hControlPoints[p].x;
+		hPoints[idx + 1] = hControlPoints[p].y;
 		idx += 2;
 	}
 	idx = 0;
 
 	// Add s control points to a double array
-	for (size_t p = 0; p < aControlPoints.size(); p++) {
-		sPoints[idx] = aControlPoints[p].x;
-		sPoints[idx + 1] = aControlPoints[p].y;
+	for (size_t p = 0; p < sControlPoints.size(); p++) {
+		sPoints[idx] = sControlPoints[p].x;
+		sPoints[idx + 1] = sControlPoints[p].y;
 		idx += 2;
 	}
 	idx = 0;
 
 	// Add l control points to a double array
-	for (size_t p = 0; p < bControlPoints.size(); p++) {
-		lPoints[idx] = bControlPoints[p].x;
-		lPoints[idx + 1] = bControlPoints[p].y;
+	for (size_t p = 0; p < lControlPoints.size(); p++) {
+		lPoints[idx] = lControlPoints[p].x;
+		lPoints[idx + 1] = lControlPoints[p].y;
 		idx += 2;
 	}
 	idx = 0;
 	
 	ProcessorEdit * HSLCurveEdit = new ProcessorEdit(ProcessorEdit::EditType::HSL_CURVES);
 
+	
 	if (!isDisabled) {
 		int numSteps16 = 65536;
-		std::vector<int> lVector16 = hCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> aVector16 = sCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> bVector16 = lCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-
+		wxVector<int> hVector16 = hCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> sVector16 = sCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> lVector16 = lCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+	
+		int * hCurve16 = new int[numSteps16];
+		int * sCurve16 = new int[numSteps16];
 		int * lCurve16 = new int[numSteps16];
-		int * aCurve16 = new int[numSteps16];
-		int * bCurve16 = new int[numSteps16];
 
 		for (int i = 0; i < numSteps16; i++) {
+			hCurve16[i] = hVector16[i];
+			sCurve16[i] = sVector16[i];
 			lCurve16[i] = lVector16[i];
-			aCurve16[i] = aVector16[i];
-			bCurve16[i] = bVector16[i];
 		}
 
+		HSLCurveEdit->AddIntArray(hCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(sCurve16, numSteps16);
 		HSLCurveEdit->AddIntArray(lCurve16, numSteps16);
-		HSLCurveEdit->AddIntArray(aCurve16, numSteps16);
-		HSLCurveEdit->AddIntArray(bCurve16, numSteps16);
+		
 	}
 
 	// Add control points double arrays to edit
-	HSLCurveEdit->AddDoubleArray(hPoints, lControlPoints.size() * 2);
-	HSLCurveEdit->AddDoubleArray(sPoints, aControlPoints.size() * 2);
-	HSLCurveEdit->AddDoubleArray(lPoints, bControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(hPoints, hControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(sPoints, sControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(lPoints, lControlPoints.size() * 2);
 
 	// Set enabled / disabled
 	HSLCurveEdit->SetDisabled(isDisabled);
-
+	
 	return HSLCurveEdit;
 }
 

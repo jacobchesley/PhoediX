@@ -38,10 +38,10 @@ RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor
 
 void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
-	std::vector<Point> brightControlPoints;
-	std::vector<Point> redControlPoints;
-	std::vector<Point> greenControlPoints;
-	std::vector<Point> blueControlPoints;
+	wxVector<Point> brightControlPoints;
+	wxVector<Point> redControlPoints;
+	wxVector<Point> greenControlPoints;
+	wxVector<Point> blueControlPoints;
 
 	// Must have 4 double arrays (bright, red, green, and blue curves)
 	if(edit->GetNumDoubleArrays() != 4){ return; }
@@ -135,10 +135,10 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 
-	std::vector<Point> brightControlPoints = brightCurve->GetControlPoints();
-	std::vector<Point> redControlPoints = redCurve->GetControlPoints();
-	std::vector<Point> greenControlPoints = greenCurve->GetControlPoints();
-	std::vector<Point> blueControlPoints = blueCurve->GetControlPoints();
+	wxVector<Point> brightControlPoints = brightCurve->GetControlPoints();
+	wxVector<Point> redControlPoints = redCurve->GetControlPoints();
+	wxVector<Point> greenControlPoints = greenCurve->GetControlPoints();
+	wxVector<Point> blueControlPoints = blueCurve->GetControlPoints();
 
 	// Create double array that will store control points
 	double * brightPoints = new double[brightControlPoints.size() * 2];
@@ -186,10 +186,10 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 	// Get 8 bit color map
 	if (!isDisabled) {
 		int numSteps8 = 256;
-		std::vector<int> brightVector8 = brightCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
-		std::vector<int> redVector8 = redCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
-		std::vector<int> greenVector8 = greenCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
-		std::vector<int> blueVector8 = blueCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+		wxVector<int> brightVector8 = brightCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+		wxVector<int> redVector8 = redCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+		wxVector<int> greenVector8 = greenCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+		wxVector<int> blueVector8 = blueCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
 
 		// Create 8 bit int arrays
 		int * brightCurve8 = new int[numSteps8];
@@ -207,10 +207,10 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 
 		// Get 16 bit color map
 		int numSteps16 = 65536;
-		std::vector<int> brightVector16 = brightCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> redVector16 = redCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> greenVector16 = greenCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> blueVector16 = blueCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> brightVector16 = brightCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> redVector16 = redCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> greenVector16 = greenCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> blueVector16 = blueCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
 
 		// Create 16 bit int arrays
 		int * brightCurve16 = new int[numSteps16];

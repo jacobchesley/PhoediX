@@ -162,7 +162,7 @@ void CurvePanel::RightClick(wxMouseEvent& evt) {
 	scaledX = (double)x / (double)curSize.GetWidth();
 	scaledY = (double)y / (double)curSize.GetHeight();
 
-	std::vector<Point> AllControls = displayCurve->GetControlPoints();
+	wxVector<Point> AllControls = displayCurve->GetControlPoints();
 
 	// If shift is pressed during a right click
 	if (keyboard.ShiftDown() == true) {
@@ -290,8 +290,8 @@ void CurvePanel::Render(wxDC& dc) {
 	wxPen GridPen(Colors::BackLightGrey, 2, wxPENSTYLE_SOLID);
 
 	// get the spline and control points
-	std::vector<Point> SplinePoints = displayCurve->GetCurve(0.5, CATMULL_ROM_SPLINE, 300);
-	std::vector<Point> ControlPoints = displayCurve->GetControlPoints();
+	wxVector<Point> SplinePoints = displayCurve->GetCurve(0.5, CATMULL_ROM_SPLINE, 300);
+	wxVector<Point> ControlPoints = displayCurve->GetControlPoints();
 
 	// clip to curve so it does not go off the panel
 	SplinePoints = ClipCurve(SplinePoints);
@@ -367,7 +367,7 @@ void CurvePanel::Render(wxDC& dc) {
 		dc.DrawCircle(wxPoint((int)x1Circle, (int)y1Circle), 4);
 	}
 }
-std::vector<Point> CurvePanel::ClipCurve(std::vector<Point> Points) {
+wxVector<Point> CurvePanel::ClipCurve(wxVector<Point> Points) {
 
 	for (int i = 0; i < (int)Points.size() - 1; i++) {
 
@@ -386,10 +386,10 @@ std::vector<Point> CurvePanel::ClipCurve(std::vector<Point> Points) {
 	}
 	return Points;
 }
-std::vector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
+wxVector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 
 
-	std::vector<Point> controlPoints = displayCurve->GetControlPoints();
+	wxVector<Point> controlPoints = displayCurve->GetControlPoints();
 	splineCurve = new Spline(numSteps * 2, true);
 
 	for (int i = 0; i < (int)controlPoints.size(); i++) {
@@ -397,7 +397,7 @@ std::vector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 		lastPoints.push_back(controlPoints[i]);
 	}
 
-	std::vector<Point> SplinePoints = splineCurve->GetCurve(0.5, CATMULL_ROM_SPLINE);
+	wxVector<Point> SplinePoints = splineCurve->GetCurve(0.5, CATMULL_ROM_SPLINE);
 	for (int i = 0; i < (int)SplinePoints.size(); i++) {
 		SplinePoints[i].x *= scale;
 		SplinePoints[i].y *= scale;
@@ -409,6 +409,7 @@ std::vector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 		}
 	}
 
+	wxVector<int> colorCurveMap = wxVector<int>();
 	colorCurveMap.resize(numSteps);
 
 	int SplinePos = 0;
@@ -428,16 +429,16 @@ std::vector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 	return colorCurveMap;
 }
 
-std::vector<Point> CurvePanel::GetControlPoints(){
+wxVector<Point> CurvePanel::GetControlPoints() {
 	return displayCurve->GetControlPoints();
 }
 
-void CurvePanel::SetControlPoints(std::vector<Point> newPoints) {
+void CurvePanel::SetControlPoints(wxVector<Point> newPoints) {
 	delete displayCurve;
 	displayCurve = NULL;
 	displayCurve = new Spline(1000, true);
 
-	for(size_t i = 0; i < newPoints.size(); i++){
+	for (size_t i = 0; i < newPoints.size(); i++) {
 		displayCurve->AddPoint(newPoints[i].id, newPoints[i].x, newPoints[i].y);
 	}
 

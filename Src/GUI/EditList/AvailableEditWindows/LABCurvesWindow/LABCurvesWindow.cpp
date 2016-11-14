@@ -50,9 +50,9 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 	if(edit == NULL){ return; }
 
-	std::vector<Point> lControlPoints;
-	std::vector<Point> aControlPoints;
-	std::vector<Point> bControlPoints;
+	wxVector<Point> lControlPoints;
+	wxVector<Point> aControlPoints;
+	wxVector<Point> bControlPoints;
 
 	// Must have 3 double arrays (l, a, and b curves)
 	if(edit->GetNumDoubleArrays() != 3){ return; }
@@ -131,9 +131,9 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 
-	std::vector<Point> lControlPoints = lCurve->GetControlPoints();
-	std::vector<Point> aControlPoints = aCurve->GetControlPoints();
-	std::vector<Point> bControlPoints = bCurve->GetControlPoints();
+	wxVector<Point> lControlPoints = lCurve->GetControlPoints();
+	wxVector<Point> aControlPoints = aCurve->GetControlPoints();
+	wxVector<Point> bControlPoints = bCurve->GetControlPoints();
 
 	// Create double array that will store control points
 	double * lPoints = new double[lControlPoints.size() * 2];
@@ -170,9 +170,9 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 
 	if (!isDisabled) {
 		int numSteps16 = 65536;
-		std::vector<int> lVector16 = lCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> aVector16 = aCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		std::vector<int> bVector16 = bCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> lVector16 = lCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> aVector16 = aCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+		wxVector<int> bVector16 = bCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
 
 		int * lCurve16 = new int[numSteps16];
 		int * aCurve16 = new int[numSteps16];
