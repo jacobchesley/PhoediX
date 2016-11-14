@@ -120,6 +120,7 @@
     <ClInclude Include="..\Src\Processing\Image\Image.h" />
     <ClInclude Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.h" />
     <ClInclude Include="..\Src\Processing\Processor\Processor.h" />
+    <ClInclude Include="..\Src\Processing\Snapshot\Snapshot.h" />
     <ClInclude Include="..\Src\Session\Session.h" />
     <ClInclude Include="..\Src\Session\SessionEditList\SessionEditList.h" />
     <ClInclude Include="..\Src\Spline\Spline.h" />
@@ -197,7 +198,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\Build\Release_x64\</OutDir>
     <IntDir>..\Build\Release_x64\tmp</IntDir>
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
     <TargetName>PhoediX</TargetName>
   </PropertyGroup>

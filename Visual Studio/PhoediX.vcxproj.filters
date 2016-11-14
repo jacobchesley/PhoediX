@@ -163,6 +163,9 @@
     <Filter Include="GUI\SnapshotWindow">
       <UniqueIdentifier>{510e6b96-fa33-4cae-995a-892d06703105}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Processing\Snapshot">
+      <UniqueIdentifier>{aee554a6-9f31-463d-ae6e-5d8839acea10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -472,6 +475,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.h">
       <Filter>GUI\SnapshotWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Processing\Snapshot\Snapshot.h">
+      <Filter>Processing\Snapshot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

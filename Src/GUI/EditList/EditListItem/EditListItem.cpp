@@ -1,4 +1,4 @@
-// Copyright 2016 Jacob Chesley
+﻿// Copyright 2016 Jacob Chesley
 
 #include "EditListItem.h"
 

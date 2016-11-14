@@ -206,7 +206,7 @@ void HistogramDisplay::HistogramScrolled::RedrawHistograms() {
 }
 
 void HistogramDisplay::HistogramScrolled::UpdateHistograms() {
-
+	
 	this->GenerateHistograms();
 
 	redHistogramPanel->Redraw();
@@ -214,6 +214,7 @@ void HistogramDisplay::HistogramScrolled::UpdateHistograms() {
 	blueHistogramPanel->Redraw();
 	greyHistogramPanel->Redraw();
 	allHistogramPanel->Redraw();
+	
 }
 
 void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
