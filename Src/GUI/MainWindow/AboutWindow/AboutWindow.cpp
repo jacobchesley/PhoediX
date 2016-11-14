@@ -30,7 +30,7 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	versionTitle->SetForegroundColour(Colors::TextLightGrey);
 	versionValue->SetForegroundColour(Colors::TextLightGrey);
 
-	char * buildDateTime;
+	char * buildDateTime = NULL;
 	if((buildDateTime = (char*)malloc(strlen(PHOEDIX_BUILD_DATE_STRING)+strlen(PHOEDIX_BUILD_TIME_STRING)+1 + 1)) != NULL){
 		buildDateTime[0] = '\0';   // ensures the memory is an empty string
 		strcat(buildDateTime, PHOEDIX_BUILD_DATE_STRING);
@@ -55,6 +55,8 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	websiteValue = new wxStaticText(this, -1, PHOEDIX_WEBSITE_STRING);
 	websiteTitle->SetForegroundColour(Colors::TextLightGrey);
 	websiteValue->SetForegroundColour(Colors::TextLightGrey);
+	websiteValue->SetFont(wxFont(websiteValue->GetFont().GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, true));
+	websiteValue->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(AboutWindow::OnWebsiteClick), NULL, this);
 
 	aboutSizer->Add(versionTitle);
 	aboutSizer->Add(versionValue);
@@ -68,9 +70,9 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	aboutSizer->Add(websiteTitle);
 	aboutSizer->Add(websiteValue);
 
-	aboutLibraries = new wxStaticText(this, -1, "About Libraries");
+	aboutLibraries = new wxStaticText(this, -1, "Libraries Used");
 	aboutLibraries->SetForegroundColour(Colors::TextWhite);
-	aboutLibraries->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	aboutLibraries->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
 	wxWidgetsVersionTitle = new wxStaticText(this, -1, "wxWidgets Version");
 	wxWidgetsVersionValue = new wxStaticText(this, -1, wxVERSION_STRING);
@@ -101,7 +103,7 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	okayButton->SetBackgroundColour(Colors::BackGrey);
 	okayButton->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	mainSizer->Add(aboutPhoediX);
+	mainSizer->Add(aboutPhoediX, 0, wxALIGN_CENTER);
 	mainSizer->AddSpacer(5);
 	mainSizer->Add(aboutSizer);
 	mainSizer->AddSpacer(50);
@@ -116,6 +118,10 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 
 	this->Fit();
 	this->CentreOnParent();
+}
+
+void AboutWindow::OnWebsiteClick(wxMouseEvent& WXUNUSED(evt)){
+	wxLaunchDefaultBrowser(PHOEDIX_WEBSITE_STRING);
 }
 
 void AboutWindow::OnClose(wxCloseEvent& WXUNUSED(evt)){

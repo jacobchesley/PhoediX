@@ -20,11 +20,11 @@ class AboutWindow : public wxFrame {
 
 public:
 	AboutWindow(wxWindow * parent);
-	
 private:
 
 	void OnClose(wxCloseEvent& WXUNUSED(evt));
 	void OnOkay(wxCommandEvent& WXUNUSED(evt));
+	void OnWebsiteClick(wxMouseEvent& WXUNUSED(evt));
 
 	wxBoxSizer * mainSizer;
 	wxFlexGridSizer * aboutSizer;
@@ -56,6 +56,8 @@ private:
 	wxStaticText * libtiffVersionValue;
 
 	wxButton * okayButton;
+
+	char * buildDateTime;
 
 	enum{
 		ID_OKAY
