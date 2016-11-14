@@ -14,6 +14,7 @@
 #include "wx/xml/xml.h"
 
 #include "SessionEditList\SessionEditList.h"
+#include "Processing\Snapshot\Snapshot.h"
 #include "wx\datetime.h"
 
 class PhoediXSession{
@@ -29,6 +30,9 @@ public:
 	void SetImageFilePath(wxString imageFilePath);
 
 	PhoediXSessionEditList *GetEditList();
+
+	wxVector<Snapshot*> GetSnapshots();
+	void SetSnapshots(wxVector<Snapshot*> snapshots);
 
 	float GetImageZoomLevel();
 	void SetImageZoomLevel(float zoom);
@@ -60,6 +64,7 @@ private:
 
 	wxString imgFile;
 	PhoediXSessionEditList *editList;
+	wxVector <Snapshot*>  snapshotsList;
 	float imgZoom;
 	int imgScrollX;
 	int imgScrollY;

@@ -101,6 +101,81 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 		if (sessionInfo->GetName() == "EditList") {
 			editList->LoadSessionEditList(sessionInfo);
 		}
+
+		// Get and load snapshots into session
+		if (sessionInfo->GetName() == "AllSnapshots") {
+			if (sessionInfo->GetChildren() != NULL) {
+
+				wxXmlNode * allSnapshots = sessionInfo->GetChildren();
+
+				snapshotsList.clear();
+
+				// Count number of snapshots
+				size_t numSnapshots = 0;
+				while (allSnapshots) {
+					numSnapshots += 1;
+					allSnapshots = allSnapshots->GetNext();
+				}
+
+				// Resize the parameters vector to account for all parameters
+				snapshotsList.resize(numSnapshots);
+
+				for (size_t i = 0; i < numSnapshots; i++) {
+					snapshotsList.at(i) = new Snapshot();
+				}
+
+				allSnapshots = sessionInfo->GetChildren();
+				// Go through all snapshots
+				while (allSnapshots) {
+
+					wxXmlNode * snapshotElement = allSnapshots->GetChildren();
+					Snapshot * tempSnapshot = new Snapshot();
+
+					// Populate snapshot info
+					while (snapshotElement) {
+
+						// Get Snapshot index
+						if (snapshotElement->GetName() == "SnapshotIndex") {
+							// Get first child (the actual content)
+							if (snapshotElement->GetChildren() != NULL) {
+								tempSnapshot->snapshotIndex = wxAtoi(snapshotElement->GetChildren()[0].GetContent());
+							}
+						}
+
+						// Get Snapshot Name
+						if (snapshotElement->GetName() == "SnapshotName") {
+							// Get first child (the actual content)
+							if (snapshotElement->GetChildren() != NULL) {
+								tempSnapshot->snapshotName = snapshotElement->GetChildren()[0].GetContent();
+							}
+						}
+
+						// Get Snapshot AUI Perspective
+						if (snapshotElement->GetName() == "SnapshotPerspective") {
+							// Get first child (the actual content)
+							if (snapshotElement->GetChildren() != NULL) {
+								tempSnapshot->auiPerspective = snapshotElement->GetChildren()[0].GetContent();
+							}
+						}
+
+						// Get Snapshot Edit List
+						if (snapshotElement->GetName() == "EditList") {
+							PhoediXSessionEditList snapshotEditList = PhoediXSessionEditList();
+							snapshotEditList.LoadSessionEditList(snapshotElement);
+
+							// Copy edit list to snapshot
+							tempSnapshot->editList.clear();
+							for (size_t i = 0; i < snapshotEditList.GetSessionEditList().size(); i++) {
+								tempSnapshot->editList.push_back(new ProcessorEdit(*snapshotEditList.GetSessionEditList().at(i)));
+							}
+						}
+						snapshotElement = snapshotElement->GetNext();
+					}
+					snapshotsList[tempSnapshot->snapshotIndex] = tempSnapshot;
+					allSnapshots = allSnapshots->GetNext();
+				}
+			}
+		}
 		sessionInfo = sessionInfo->GetNext();
 	}
 }
@@ -146,6 +221,30 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 
 	// Write the edit list to XML Doc
 	editList->SaveSessionEditList(sessionInfo);
+
+	// Save snapshotsSnapshotPerspective
+	wxXmlNode * snapshots = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "AllSnapshots");
+	for (size_t i = 0; i < snapshotsList.size(); i++) {
+
+		wxXmlNode * snapshot = new wxXmlNode(snapshots, wxXML_ELEMENT_NODE, "Snapshot");
+
+		// save snapshots index
+		wxXmlNode * snapshotIndex = new wxXmlNode(snapshot, wxXML_ELEMENT_NODE, "SnapshotIndex");
+		snapshotIndex->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), snapshotsList.at(i)->snapshotIndex)));
+
+		// save snapshots name
+		wxXmlNode * snapshotName = new wxXmlNode(snapshot, wxXML_ELEMENT_NODE, "SnapshotName");
+		snapshotName->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", snapshotsList.at(i)->snapshotName));
+
+		// save snapshots aui perspective
+		wxXmlNode * snapshotAui = new wxXmlNode(snapshot, wxXML_ELEMENT_NODE, "SnapshotPerspective");
+		snapshotAui->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", snapshotsList.at(i)->auiPerspective));
+
+		// Save snapshots edit list
+		PhoediXSessionEditList snapshotEditList = PhoediXSessionEditList();
+		snapshotEditList.SetSessionEditList(snapshotsList.at(i)->editList);
+		snapshotEditList.SaveSessionEditList(snapshot);
+	}
 
 	session.Save(filePath);
 }
@@ -233,4 +332,44 @@ void PhoediXSession::SetName(wxString newName) {
 
 wxString PhoediXSession::GetName() {
 	return name;
+}
+
+wxVector<Snapshot*> PhoediXSession::GetSnapshots() {
+	return snapshotsList;
+}
+
+void PhoediXSession::SetSnapshots(wxVector<Snapshot*> snapshots) {
+	
+	// Clear current snapshots
+	for (size_t i = 0; i < snapshotsList.size(); i++) {
+
+		// Delete all processor edits for snapshot
+		for (size_t j = 0; j < snapshotsList.at(i)->editList.size(); j++) {
+			delete snapshotsList.at(i)->editList.at(j);
+		}
+
+		delete snapshotsList.at(i);
+	}
+
+	snapshotsList.clear();
+	
+	for (size_t i = 0; i < snapshots.size(); i++) {
+
+		// Create new snapshot and copy info
+		Snapshot * tempSnapshot = new Snapshot();
+
+		// Copy inedex, name, and perspective
+		tempSnapshot->snapshotIndex = snapshots.at(i)->snapshotIndex;
+		tempSnapshot->snapshotName = snapshots.at(i)->snapshotName;
+		tempSnapshot->auiPerspective = snapshots.at(i)->auiPerspective;
+
+		// Copy edit list
+		tempSnapshot->editList.clear();
+		for (size_t j = 0; j < snapshots.at(i)->editList.size(); j++) {
+			tempSnapshot->editList.push_back(new ProcessorEdit(*snapshots.at(i)->editList.at(j)));
+		}
+
+		// push onto list
+		snapshotsList.push_back(tempSnapshot);
+	}
 }
