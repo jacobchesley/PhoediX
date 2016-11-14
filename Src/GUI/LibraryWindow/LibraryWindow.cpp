@@ -23,6 +23,16 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	importButton->SetBackgroundColour(Colors::BackGrey);
 	importButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
+	copyButton = new wxButton(this, LibraryWindow::MenuBar::ID_COPY_TO, "Copy Selected", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	copyButton->SetForegroundColour(Colors::TextLightGrey);
+	copyButton->SetBackgroundColour(Colors::BackGrey);
+	copyButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
+	moveButton = new wxButton(this, LibraryWindow::MenuBar::ID_MOVE_TO, "Move Selected", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	moveButton->SetForegroundColour(Colors::TextLightGrey);
+	moveButton->SetBackgroundColour(Colors::BackGrey);
+	moveButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
 	clearButton = new wxButton(this, -1, "Clear Library", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	clearButton->SetForegroundColour(Colors::TextLightGrey);
 	clearButton->SetBackgroundColour(Colors::BackGrey);
@@ -32,6 +42,10 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	toolbarLayout->Add(showDirectoriesButton);
 	toolbarLayout->AddSpacer(15);
 	toolbarLayout->Add(importButton);
+	toolbarLayout->AddSpacer(15);
+	toolbarLayout->Add(copyButton);
+	toolbarLayout->AddSpacer(15);
+	toolbarLayout->Add(moveButton);
 	toolbarLayout->AddSpacer(15);
 	toolbarLayout->Add(clearButton);
 
@@ -55,6 +69,8 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnShowDirectories, this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnImport, this, LibraryWindow::MenuBar::ID_IMPORT);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnCopy, this, LibraryWindow::MenuBar::ID_COPY_TO);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnMove, this, LibraryWindow::MenuBar::ID_MOVE_TO);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&LibraryWindow::OnResize, this);
 	this->Bind(ADD_LIB_IMAGE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnAddImage, this);
 }
@@ -72,6 +88,30 @@ void LibraryWindow::OnImport(wxCommandEvent& WXUNUSED(evt)){
 
 	LoadImagesThread * testImgThread = new LoadImagesThread(this);
 	testImgThread->Run();
+}
+
+void LibraryWindow::OnCopy(wxCommandEvent& WXUNUSED(evt)){
+
+	// Browse for directory to look for images
+	wxDirDialog openDirDialog(this, "Copy Images To...");
+	if (openDirDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	CopyImagesThread * copyThread = new CopyImagesThread(this, this->GetSelectedFileNames(), openDirDialog.GetPath(), false);
+	copyThread->Run();
+}
+
+void LibraryWindow::OnMove(wxCommandEvent& WXUNUSED(evt)){
+
+	// Browse for directory to look for images
+	wxDirDialog openDirDialog(this, "Move Images To...");
+	if (openDirDialog.ShowModal() == wxID_CANCEL) {
+		return;
+	}
+
+	CopyImagesThread * moveThread = new CopyImagesThread(this, this->GetSelectedFileNames(), openDirDialog.GetPath(), true);
+	moveThread->Run();
 }
 
 void LibraryWindow::OnHoverClearButton(wxMouseEvent& evt) {
@@ -216,6 +256,19 @@ void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxStr
 	this->FitInside();
 }
 
+wxVector<wxString> LibraryWindow::GetSelectedFileNames() {
+	
+	wxVector<wxString> fileNames;
+
+	for(size_t i = 0; i < libraryImages.size(); i++){
+		if(libraryImages.at(i)->GetSelected()){
+			fileNames.push_back(libraryImages.at(i)->GetPath());
+		}
+	}
+
+	return fileNames;
+}
+
 LibraryWindow::LoadImagesThread::LoadImagesThread(LibraryWindow * parent) : wxThread(wxTHREAD_DETACHED){
 	par = parent;
 }
@@ -307,4 +360,57 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 	}
 	rawProc.recycle();
 	return 0;
+}
+
+LibraryWindow::CopyImagesThread::CopyImagesThread(LibraryWindow * parent, wxVector<wxString> filesToCopy, wxString destination, bool deleteAfterCopy) : wxThread(wxTHREAD_DETACHED){
+	par = parent;
+	toCopy = filesToCopy;
+	doDelete = deleteAfterCopy;
+	destFolder = destination;
+}
+
+wxThread::ExitCode LibraryWindow::CopyImagesThread::Entry(){
+
+	// Dont perform copy or move if destination directory does not exist
+	if(!wxDirExists(destFolder)){ return (wxThread::ExitCode)0; }
+
+	wxString progressTitle = "";
+	if(doDelete){ progressTitle = "Move Files Progress"; }
+	else{ progressTitle = "Copy Files Progress"; }
+
+	wxProgressDialog * progressDialog = new wxProgressDialog(progressTitle, "", toCopy.size());
+	
+	wxString progressMessage = "";
+
+	for(size_t i = 0; i < toCopy.size(); i++){
+		wxString fileToCopy = toCopy.at(i);
+
+		// Verify file exists to copy
+		if(wxFileExists(fileToCopy)){
+
+			// Create file name to create new file string of destination
+			wxFileName fileName(fileToCopy);
+			wxString newFilePath = destFolder + fileName.GetPathSeparator() + fileName.GetFullName();
+
+			// Update progress dialog message with appropriate prefix
+			if(doDelete){ progressMessage = "Moving file " + fileName.GetFullName(); }
+			else{ progressMessage = "Copying file " + fileName.GetFullName(); }
+
+			// Update progress
+			progressDialog->Update(i, progressMessage);
+
+			// Copy (and delete file if it is being moved)
+			if(wxCopyFile(fileToCopy, newFilePath)){
+				if(doDelete){
+					wxRemoveFile(fileToCopy);
+				}
+			}
+		}
+		else{
+			// Update progress dialog with blank message if file does not exist
+			progressDialog->Update(i);
+		}
+	}
+
+	progressDialog->Destroy();
 }

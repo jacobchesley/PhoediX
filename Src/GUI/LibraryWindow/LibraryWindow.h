@@ -14,6 +14,7 @@
 #include "wx\dir.h"
 #include "wx\file.h"
 #include "wx\wrapsizer.h"
+#include "wx\progdlg.h"
 
 #include "GUI\LibraryWindow\DirectorySelections\DirectorySelections.h"
 #include "GUI\Colors\Colors.h"
@@ -41,12 +42,15 @@ private:
 	void OnImport(wxCommandEvent & WXUNUSED(evt));
 	void OnHoverClearButton(wxMouseEvent & WXUNUSED(evt));
 	void OnPopupMenuClick(wxCommandEvent& inEvt);
+	void OnCopy(wxCommandEvent& WXUNUSED(evt));
+	void OnMove(wxCommandEvent& WXUNUSED(evt));
 	void ClearAll();
 	void ClearSelected();
 	void ClearUnselected();
 	void OnResize(wxSizeEvent & WXUNUSED(evt));
 	void OnAddImage(AddLibraryImageEvent & evt);
 	bool CheckIfImageInDisplay(wxString imagePath);
+	wxVector<wxString> GetSelectedFileNames();
 
 	wxBoxSizer * mainLayout;
 
@@ -54,6 +58,8 @@ private:
 	wxButton * showDirectoriesButton;
 	wxButton * importButton;
 	wxButton * clearButton;
+	wxButton * copyButton;
+	wxButton * moveButton;
 
 	wxWrapSizer * imagesLayout;
 
@@ -67,7 +73,22 @@ private:
 		ID_IMPORT,
 		ID_CLEAR_ALL,
 		ID_CLEAR_SELECTED,
-		ID_CLEAR_UNSELECTED
+		ID_CLEAR_UNSELECTED,
+		ID_COPY_TO,
+		ID_MOVE_TO
+	};
+
+	class CopyImagesThread : public wxThread {
+	public:
+		CopyImagesThread(LibraryWindow * parent, wxVector<wxString> filesToCopy, wxString destination, bool deleteAfterCopy);
+	protected:
+
+		virtual ExitCode Entry();
+	private:
+		LibraryWindow * par;
+		wxVector<wxString> toCopy;
+		wxString destFolder;
+		bool doDelete;
 	};
 
 	class LoadImagesThread : public wxThread {
