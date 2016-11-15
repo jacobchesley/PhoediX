@@ -59,6 +59,7 @@
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.cpp" />
     <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.cpp" />
     <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp" />
     <ClCompile Include="..\Src\Processing\Image\Image.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.h" />
+    <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.h" />
     <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.h" />
     <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h" />
     <ClInclude Include="..\Src\Processing\Image\Image.h" />
@@ -197,8 +199,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\Build\Release_x64\</OutDir>
-    <IntDir>..\Build\Release_x64\tmp</IntDir>
-    <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\Build\Release_x64\tmp\</IntDir>
+    <LinkIncremental>No</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
     <TargetName>PhoediX</TargetName>
   </PropertyGroup>

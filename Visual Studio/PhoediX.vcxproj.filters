@@ -166,6 +166,9 @@
     <Filter Include="Processing\Snapshot">
       <UniqueIdentifier>{aee554a6-9f31-463d-ae6e-5d8839acea10}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\SnapshotWindow\Snapshot Rename Dialog">
+      <UniqueIdentifier>{7b417262-2420-4086-9fc6-512bb0d2e1a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -311,6 +314,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.cpp">
       <Filter>GUI\SnapshotWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.cpp">
+      <Filter>GUI\SnapshotWindow\Snapshot Rename Dialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -478,6 +484,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\Processing\Snapshot\Snapshot.h">
       <Filter>Processing\Snapshot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.h">
+      <Filter>GUI\SnapshotWindow\Snapshot Rename Dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
