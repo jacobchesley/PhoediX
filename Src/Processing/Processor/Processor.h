@@ -248,6 +248,7 @@ private:
 			virtual ExitCode Entry();
 
 		private:
+			void DeleteEditVector();
 			Processor * procParent;
 			wxVector<ProcessorEdit*> editVec;
 			bool terminated;

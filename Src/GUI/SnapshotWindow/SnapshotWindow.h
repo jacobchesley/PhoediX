@@ -12,13 +12,15 @@
 #endif
 
 #include "wx/dataview.h"
-#include "wx\wrapsizer.h"
+#include "wx/wrapsizer.h"
 
-#include "Processing\Snapshot\Snapshot.h"
+#include "Processing/Snapshot/Snapshot.h"
+#include "Processing/Snapshot/Snapshot.h"
 #include "GUI/AUI Manager/AUIManager.h"
-#include "GUI\EditList\EditListPanel\EditListPanel.h"
-#include "GUI\Colors\Colors.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/EditList/EditListPanel/EditListPanel.h"
+#include "GUI/SnapshotWindow/SnapshotRenameDialog/SnapshotRenameDialog.h"
+#include "GUI/Colors/Colors.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class SnapshotWindow : public wxScrolledWindow {
 
@@ -31,7 +33,7 @@ public:
 private:
 
 	void OnResize(wxSizeEvent& WXUNUSED(evt));
-
+	void OnRenameSnapshot(wxCommandEvent & WXUNUSED(evt));
 	void OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt));
 	void OnRestoreSnapshot(wxCommandEvent & WXUNUSED(evt));
 	void OnTakeSnapshot(wxCommandEvent & WXUNUSED(evt));
@@ -46,6 +48,7 @@ private:
 	wxWrapSizer * buttonSizer;
 
 	wxButton * removeSnapshot;
+	wxButton * renameSnapshot;
 	wxButton * restoreSnapshot;
 	wxButton * takeSnapshot;
 
@@ -53,6 +56,7 @@ private:
 
 	enum Buttons{
 		ID_REMOVE_SNAPSHOT,
+		ID_RENAME_SNAPSHOT,
 		ID_RESTORE_SNAPSHOT,
 		ID_TAKE_SNAPSHOT
 	};

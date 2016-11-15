@@ -186,7 +186,7 @@ void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 
 	width = inWidth;
 	height = inHeight;
-	int size = width * height * 3;
+	uint64_t size = width * height * 3;
 
 	if(width == 0 || height == 0){
 		if (bit16Enabled) {

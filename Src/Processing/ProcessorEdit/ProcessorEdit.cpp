@@ -291,6 +291,10 @@ void ProcessorEdit::SetEditType(int editType) {
 		case EditType::RAW:
 			tag = "RAW";
 			break;
+
+		case EditType::UNDEFINED:
+			tag = "UNDEFINED";
+			break;
 	}
 }
 
@@ -321,6 +325,7 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "SCALE_BILINEAR") { edit = EditType::SCALE_BILINEAR; tag = inTag; }
 	else if (inTag == "SCALE_BICUBIC") { edit = EditType::SCALE_BICUBIC; tag = inTag; }
 	else if (inTag == "RAW") { edit = EditType::RAW; tag = inTag; }
+	else{ edit = EditType::UNDEFINED; tag = "UNDEFINED"; }
 }
 
 wxString ProcessorEdit::GetEditTag() {

@@ -30,7 +30,7 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	versionTitle->SetForegroundColour(Colors::TextLightGrey);
 	versionValue->SetForegroundColour(Colors::TextLightGrey);
 
-	char * buildDateTime = NULL;
+	buildDateTime = NULL;
 	if((buildDateTime = (char*)malloc(strlen(PHOEDIX_BUILD_DATE_STRING)+strlen(PHOEDIX_BUILD_TIME_STRING)+1 + 1)) != NULL){
 		buildDateTime[0] = '\0';   // ensures the memory is an empty string
 		strcat(buildDateTime, PHOEDIX_BUILD_DATE_STRING);

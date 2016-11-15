@@ -60,6 +60,7 @@ void ZoomImagePanel::InitControls(){
 	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ZoomImagePanel::OnZoom, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnFitImage, this, ZoomImagePanel::Buttons::ZOOM_FIT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnZoom100, this, ZoomImagePanel::Buttons::ZOOM_100);
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&ZoomImagePanel::OnReguardScrollTimer, this);
 }
 
 void ZoomImagePanel::ChangeImage(Image * newImage) {
@@ -71,7 +72,6 @@ void ZoomImagePanel::ChangeImage(wxImage * newImage) {
 }
 
 void ZoomImagePanel::OnZoom(wxCommandEvent& slideEvent) {
-	double val = zoomSlider->GetValue();
 	scroller->SetZoom(zoomSlider->GetValue()/100.0);
 	slideEvent.Skip(false);
 }
@@ -117,11 +117,17 @@ void ZoomImagePanel::SetDrag(int x, int y) {
 
 	scroller->DisreguardScroll();
 	scroller->Scroll(x, y);
+
+	wxTimer * reguardScrollCountdown= new wxTimer(this);
+	reguardScrollCountdown->Start(500, true);
+}
+
+void ZoomImagePanel::OnReguardScrollTimer(wxTimerEvent& WXUNUSED(evt)){
+	scroller->ReguardScroll();
 }
 
 void ZoomImagePanel::SetTempSize(int tempWidth, int tempHeight){
 	scroller->SetVirtualSize(tempWidth, tempHeight);
-	int test = 0;
 }
 
 void ZoomImagePanel::Redraw() {
@@ -198,7 +204,7 @@ void ZoomImagePanel::ImageScroll::Redraw() {
 }
 
 void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
-
+	
 	// Verify new image is okay
 	if (newImage->GetWidth() > 0 && newImage->GetHeight() > 0) {
 

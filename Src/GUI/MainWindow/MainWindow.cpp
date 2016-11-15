@@ -259,10 +259,12 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 	histogramDisplay->DestroyHistograms();
 
 	// Clear all sessions
+	for (size_t i = 0; i < allSessions.size(); i++) {
+		allSessions.at(i).Destroy();
+	}
 	allSessions.clear();	
 
 	currentSession = PhoediXSession();
-
 }
 
 void MainWindow::CreateNewProject(){
@@ -323,8 +325,8 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	imagePanel->SetZoom(session->GetImageZoomLevel());
 	imagePanel->SetDrag(session->GetImageScrollX(), session->GetImageScrollY());
 
-	wxTimer reprocessCountdown(this);
-	reprocessCountdown.Start(500, true);
+	wxTimer * reprocessCountdown = new wxTimer(this);
+	reprocessCountdown->Start(500, true);
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {
@@ -337,14 +339,15 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 		menuWindow->Remove(session->GetID());
 	}
 
-	// Populate the panel with the edits
+	// Remove all edits from panel and snapshots
 	editList->RemoveAllWindows();
+	snapshotWindow->DeleteAllSnapshots();
 
 	processor->GetOriginalImage()->Destroy();
 	processor->GetImage()->Destroy();
 
-	wxTimer reprocessCountdown(this);
-	reprocessCountdown.Start(500, true);
+	wxTimer * reprocessCountdown = new wxTimer(this);
+	reprocessCountdown->Start(500, true);
 }
 
 
@@ -541,7 +544,7 @@ void MainWindow::ShowImageRelatedWindows(){
 }
 
 void MainWindow::OnReprocessTimer(wxTimerEvent& WXUNUSED(event)){
-	editList->ReprocessImage();
+	editList->ReprocessImageRaw();
 }
 
 void MainWindow::ShowSettings(wxCommandEvent& WXUNUSED(evt)) {
@@ -726,6 +729,9 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 
 	// Delete histogram display resources
 	histogramDisplay->DestroyHistograms();
+
+	// Delete all snapshots
+	snapshotWindow->DeleteAllSnapshots();
 
 	auiManager->UnInit();
 	delete auiManager;

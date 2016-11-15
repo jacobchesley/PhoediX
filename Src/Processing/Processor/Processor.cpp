@@ -27,6 +27,8 @@ Processor::Processor(wxWindow * parent) {
 	isProcessing = false;
 	hasEdits = false;
 	copiedEdit = NULL;
+	editListInternal = wxVector<ProcessorEdit*>();
+
 }
 
 Processor::~Processor() {
@@ -176,6 +178,7 @@ void Processor::KillCurrentProcessing(){
 }
 
 void Processor::ProcessRaw(){
+
 	if (this->GetLockedRaw()) {
 		return;
 	}
@@ -1573,7 +1576,15 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if(forceStop) { return; }
+			if (forceStop) {
+				delete[] redCurve8Copy;
+				delete[] greenCurve8Copy;
+				delete[] blueCurve8Copy;
+				delete[] redCurve16Copy;
+				delete[] greenCurve16Copy;
+				delete[] blueCurve16Copy;
+				return;
+			}
 
 			// Apply red curve and bright curve to red channel
 			tempRed = redCurve8Copy[redData8[i]];
@@ -1619,7 +1630,15 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if(forceStop) { return; }
+			if (forceStop) {
+				delete[] redCurve8Copy;
+				delete[] greenCurve8Copy;
+				delete[] blueCurve8Copy;
+				delete[] redCurve16Copy;
+				delete[] greenCurve16Copy;
+				delete[] blueCurve16Copy;
+				return;
+			}
 
 			// Apply red curve and bright curve to red channel
 			tempRed = redCurve16Copy[redData16[i]];
@@ -1712,7 +1731,12 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if(forceStop) { return; }
+			if (forceStop) {
+				delete[] lCurve16Copy;
+				delete[] aCurve16Copy;
+				delete[] bCurve16Copy;
+				return;
+			}
 
 			// Convert RGB to LAB color space
 			rgb.R = (float)redData8[i] / 256.0;
@@ -1776,7 +1800,12 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if(forceStop) { return; }
+			if (forceStop) {
+				delete[] lCurve16Copy;
+				delete[] aCurve16Copy;
+				delete[] bCurve16Copy;
+				return;
+			}
 
 			// Convert RGB to LAB color space
 			rgb.R = (float)redData16[i] / 65535.0;
@@ -1900,7 +1929,12 @@ void Processor::HSLCurves(int * hCurve16, int * sCurve16, int * lCurve16, int da
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if(forceStop) { return; }
+			if(forceStop) { 
+				delete[] hCurve16Copy;
+				delete[] sCurve16Copy;
+				delete[] lCurve16Copy;
+				return; 
+			}
 
 			tempRed = redData8[i];
 			tempGreen = greenData8[i];
@@ -2045,7 +2079,12 @@ void Processor::HSLCurves(int * hCurve16, int * sCurve16, int * lCurve16, int da
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if(forceStop) { return; }
+			if (forceStop) {
+				delete[] hCurve16Copy;
+				delete[] sCurve16Copy;
+				delete[] lCurve16Copy;
+				return;
+			}
 
 			// Get red, green and blue temporary pixels
 			tempRed = redData16[i];
@@ -5230,31 +5269,48 @@ Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * e
 
 Processor::ProcessThread::ProcessThread(Processor * processor, wxVector<ProcessorEdit*> edits) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
-	editVec = edits;
+	
+	// Copy edit vector to threads edit vector
+	for (size_t i = 0; i < edits.size(); i++) {
+		editVec.push_back(new ProcessorEdit(*edits.at(i)));
+	}
+
 	terminated = false;
 }
 
 void Processor::ProcessThread::Terminate(){
 	terminated = true;
+	this->DeleteEditVector();
+}
+
+void Processor::ProcessThread::DeleteEditVector() {
+
+	// Clean up copied edits
+	for (size_t i = 0; i < editVec.size(); i++) {
+		delete editVec.at(i);
+	}
+	editVec.clear();
 }
 
 wxThread::ExitCode Processor::ProcessThread::Entry() {
 
+	// Wait for raw image to process (must process raw before image data)
+	while (procParent->GetLockedRaw()) {
+		this->Sleep(20);
+	}
+
 	// Immediatly return if there is no vaild image
 	if(procParent->GetImage() == NULL){
+		this->DeleteEditVector();
 		return 0;
 	}
 	if(procParent->GetImage()->GetWidth() < 1 || procParent->GetImage()->GetHeight() < 1){
+		this->DeleteEditVector();
 		return 0;
 	}
 
 	// Wait for last thread to finish
 	while (procParent->GetLocked() && !terminated) {
-		this->Sleep(20);
-	}
-
-	// Wait for raw image to process (must process raw before image data)
-	while (procParent->GetLockedRaw()) {
 		this->Sleep(20);
 	}
 
@@ -5271,6 +5327,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	for (size_t editIndex = 0; editIndex < numberOfEdits; editIndex++) {
 
 		if(procParent->forceStop){
+			this->DeleteEditVector();
 			procParent->SendMessageToParent("");
 			procParent->Unlock();
 			return 0;
@@ -5278,14 +5335,12 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 		// Get the next edit to take place
 		ProcessorEdit * curEdit = editVec.at(editIndex);
+		if (curEdit == NULL) {
+			continue;
+		}
 		// Get the type of edit to perform
 		int editToComplete = curEdit->GetEditType();
 
-		if (curEdit->GetEditTag().IsNull()) {
-			procParent->SendMessageToParent("");
-			procParent->Unlock();
-			return 0;
-		}
 
 		// Skip disabled edits
 		if (curEdit->GetDisabled()) {
@@ -5736,6 +5791,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 					if(dataSize < 1){ 
 						procParent->SendMessageToParent("Image rotation failure: " + procParent->GetTempImage()->GetErrorStr());
+						this->DeleteEditVector();
 						return 0;
 					}
 
@@ -5765,6 +5821,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 					if(procParent->GetTempImage()->GetWidth() < 1 || procParent->GetTempImage()->GetHeight() < 1 ){ 
 						procParent->SendMessageToParent("Image rotation failure: " + procParent->GetTempImage()->GetErrorStr());
+						this->DeleteEditVector();
 						return 0;
 					}
 
@@ -6396,6 +6453,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 		procParent->SendProcessorEditNumToParent(editIndex + 1);
 	}
+	
+	this->DeleteEditVector();
 
 	procParent->SendMessageToParent("");
 	procParent->Unlock();
@@ -6456,32 +6515,22 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			this->Sleep(20);
 		}
 
-		OutputDebugStringA("Processor Unlocked");
 		processor->Lock();
-		OutputDebugStringA("Processor Locked");
+
 		ImageHandler::CopyImageFromRaw(processor->rawImage, processor->GetImage());
 		if(processor->GetOriginalImage() != NULL){
-			OutputDebugStringA("Destorying original image...");
 			processor->GetOriginalImage()->Destroy();
-			OutputDebugStringA("Original image destroyed");
 		}
-		OutputDebugStringA("Setting original image...");
 		processor->SetOriginalImage(processor->GetImage());
-		OutputDebugStringA("Original image set");
 
 		// If there are no edits after raw procesing, set updated.  We don't want to show the raw image without
 		// following edits, if those edits exist
 		if(!processor->GetHasEdits()){
-			OutputDebugStringA("Setting updated...");
 			processor->SetUpdated(true);
-			OutputDebugStringA("updated set");
 		}
-		OutputDebugStringA("Unlocking and deleting raw image...");
 		processor->Unlock();
 		processor->DeleteRawImage();
-		OutputDebugStringA("Almost done...");
 		processor->SendMessageToParent("");
-		OutputDebugStringA("Done!");
 		
 	}
 	else{

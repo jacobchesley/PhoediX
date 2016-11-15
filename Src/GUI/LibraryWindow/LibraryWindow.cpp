@@ -114,7 +114,7 @@ void LibraryWindow::OnMove(wxCommandEvent& WXUNUSED(evt)){
 	moveThread->Run();
 }
 
-void LibraryWindow::OnHoverClearButton(wxMouseEvent& evt) {
+void LibraryWindow::OnHoverClearButton(wxMouseEvent& WXUNUSED(evt)) {
 
 	// Display a popup menu of options
 	wxMenu popupMenu;
@@ -413,4 +413,5 @@ wxThread::ExitCode LibraryWindow::CopyImagesThread::Entry(){
 	}
 
 	progressDialog->Destroy();
+	return (wxThread::ExitCode)0;
 }

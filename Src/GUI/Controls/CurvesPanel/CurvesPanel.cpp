@@ -128,8 +128,8 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 				PaintNow();
 
 				// Send event to parent to inform curve has changed
-				wxCommandEvent evt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
-				wxPostEvent(par, evt);
+				wxCommandEvent curveEvt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+				wxPostEvent(par, curveEvt);
 			}
 		}
 
@@ -178,8 +178,8 @@ void CurvePanel::RightClick(wxMouseEvent& evt) {
 			displayCurve->RemovePoint(delID);
 
 			// Send event to parent to inform curve has changed
-			wxCommandEvent evt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
-			wxPostEvent(par, evt);
+			wxCommandEvent curveEvt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+			wxPostEvent(par, curveEvt);
 		}
 	}
 
@@ -195,8 +195,8 @@ void CurvePanel::RightClick(wxMouseEvent& evt) {
 					displayCurve->AddPoint(i + 1, scaledX, scaledY);
 
 					// Send event to parent to inform curve has changed
-					wxCommandEvent evt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
-					wxPostEvent(par, evt);
+					wxCommandEvent curveEvt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+					wxPostEvent(par, curveEvt);
 				}
 			}
 		}

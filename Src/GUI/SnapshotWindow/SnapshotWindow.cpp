@@ -25,6 +25,10 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 	removeSnapshot->SetForegroundColour(Colors::TextLightGrey);
 	removeSnapshot->SetBackgroundColour(Colors::BackGrey);
 
+	renameSnapshot = new wxButton(this, SnapshotWindow::Buttons::ID_RENAME_SNAPSHOT, "Rename", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	renameSnapshot->SetForegroundColour(Colors::TextLightGrey);
+	renameSnapshot->SetBackgroundColour(Colors::BackGrey);
+
 	restoreSnapshot = new wxButton(this, SnapshotWindow::Buttons::ID_RESTORE_SNAPSHOT, "Restore Snapshot", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	restoreSnapshot->SetForegroundColour(Colors::TextLightGrey);
 	restoreSnapshot->SetBackgroundColour(Colors::BackGrey);
@@ -34,6 +38,8 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 	takeSnapshot->SetBackgroundColour(Colors::BackGrey);
 
 	buttonSizer->Add(removeSnapshot);
+	buttonSizer->AddSpacer(10);
+	buttonSizer->Add(renameSnapshot);
 	buttonSizer->AddSpacer(10);
 	buttonSizer->Add(restoreSnapshot);
 	buttonSizer->AddSpacer(10);
@@ -46,6 +52,7 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&SnapshotWindow::OnResize, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SnapshotWindow::OnRemoveSnapshot, this, SnapshotWindow::Buttons::ID_REMOVE_SNAPSHOT);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SnapshotWindow::OnRenameSnapshot, this, SnapshotWindow::Buttons::ID_RENAME_SNAPSHOT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SnapshotWindow::OnRestoreSnapshot, this, SnapshotWindow::Buttons::ID_RESTORE_SNAPSHOT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SnapshotWindow::OnTakeSnapshot, this, SnapshotWindow::Buttons::ID_TAKE_SNAPSHOT);
 }
@@ -86,6 +93,31 @@ void SnapshotWindow::OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt)){
 	// Re index all the snapshots
 	for (size_t i = 0; i < snapshots.size(); i++) {
 		snapshots.at(i)->snapshotIndex = i;
+	}
+}
+
+void SnapshotWindow::OnRenameSnapshot(wxCommandEvent & WXUNUSED(evt)){
+
+	int selectedRow = snapshotList->GetSelectedRow();
+
+	// If selected row is okay and only one selected row
+	if(selectedRow != wxNOT_FOUND && selectedRow < snapshots.size()){
+
+		SnapshotRenameDialog * renameDialog = new SnapshotRenameDialog(this, snapshots.at(selectedRow)->snapshotName);
+
+		if(renameDialog->ShowModal() == wxID_OK){
+
+			// Get unique name of dialogs name value and set snapshot name
+			wxString newName = this->GetUniqueName(renameDialog->GetNewName());
+			snapshots.at(selectedRow)->snapshotName = newName;
+
+			// Delete snapshot from GUI, and insert new name at the selected row
+			snapshotList->DeleteItem(selectedRow);
+			wxVector<wxVariant> snapshotListData;
+			snapshotListData.push_back(newName);
+			snapshotList->InsertItem(selectedRow, snapshotListData);
+		}
+		renameDialog->Destroy();
 	}
 }
 
@@ -156,7 +188,6 @@ void SnapshotWindow::AddSnapshots(wxVector<Snapshot*> snapshotsToLoad) {
 void SnapshotWindow::DeleteAllSnapshots(){
 
 	int numberRemoved = 0;
-	Snapshot * test;
 	for (size_t i = 0; i < snapshots.size(); i++) {
 
 		// Delete all processor edits for snapshot

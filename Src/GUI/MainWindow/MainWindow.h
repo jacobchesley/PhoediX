@@ -26,8 +26,8 @@
 #include "GUI\AUI Manager\AUIManager.h"
 #include "GUI\Colors\Colors.h"
 #include "GUI\HistogramDisplay\HistogramDisplay.h"
-#include "GUI\LibraryWindow\LibraryWindow.h"
-#include "GUI\MainWindow\AboutWindow\AboutWindow.h";
+#include "GUI/MainWindow/AboutWindow/AboutWindow.h"
+#include "GUI/LibraryWindow/LibraryWindow.h"
 #include "Session\Session.h"
 #include "Debugging\MemoryLeakCheck.h"
 

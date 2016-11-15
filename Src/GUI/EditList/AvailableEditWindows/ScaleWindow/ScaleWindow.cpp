@@ -170,7 +170,7 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 			if(edit->GetFlag(0) == 0){
 
 				scaleMethod->SetSelection(0);
-				keepAspect->SetValue((bool)edit->GetFlag(1));
+				if(edit->GetFlag(1) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
 
 				// Fire combo box event to show / hide sliders
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
@@ -203,7 +203,7 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 			if(edit->GetFlag(0) == 0){
 
 				scaleMethod->SetSelection(0);
-				keepAspect->SetValue((bool)edit->GetFlag(1));
+				if(edit->GetFlag(1) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
 
 				// Fire combo box event to show / hide sliders
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
@@ -236,7 +236,7 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 			if(edit->GetFlag(0) == 0){
 
 				scaleMethod->SetSelection(0);
-				keepAspect->SetValue((bool) edit->GetFlag(1));
+				if(edit->GetFlag(1) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
 
 				// Fire combo box event to show / hide sliders
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);

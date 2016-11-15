@@ -46,6 +46,7 @@ private:
 	void OnZoom(wxCommandEvent& slideEvent);
 	void OnFitImage(wxCommandEvent& WXUNUSED(event));
 	void OnZoom100(wxCommandEvent& WXUNUSED(event));
+	void OnReguardScrollTimer(wxTimerEvent & WXUNUSED(evt));
 
 	wxWindow * par;
 	wxBoxSizer * mainSizer;

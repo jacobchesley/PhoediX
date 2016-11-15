@@ -17,6 +17,14 @@ PhoediXSession::PhoediXSession(){
 void PhoediXSession::Destroy(){
 	delete editList;
 	editList = NULL;
+
+	// Delete all snapshot edit lists
+	for (size_t i = 0; i < snapshotsList.size(); i++) {
+		for (size_t j = 0; j < snapshotsList.at(i)->editList.size(); j++) {
+			delete snapshotsList.at(i)->editList.at(j);
+		}
+		delete snapshotsList.at(i);
+	}
 	id = -1;
 }
 
@@ -119,10 +127,6 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 
 				// Resize the parameters vector to account for all parameters
 				snapshotsList.resize(numSnapshots);
-
-				for (size_t i = 0; i < numSnapshots; i++) {
-					snapshotsList.at(i) = new Snapshot();
-				}
 
 				allSnapshots = sessionInfo->GetChildren();
 				// Go through all snapshots

@@ -452,16 +452,16 @@ bool RawWindow::AddRawInfo(wxString tag, wxString value, bool doNotAddZero){
 wxString RawWindow::GetShutterSpeedStr(float shutterSpeed){
 
 	if(shutterSpeed > 1.0){
-		return wxString(std::to_string(shutterSpeed));
+		return wxString::Format(wxT("%f"), shutterSpeed);
 	}
 
 	for(int i = 1; i < 16001; i++){
 		if((1.0f / (float)i) == shutterSpeed){
-			return wxString("1/" + std::to_string(i));
+			return wxString("1/" + wxString::Format(wxT("%i"), i));
 		}
 	}
 
-	return wxString(std::to_string(shutterSpeed));
+	return wxString::Format(wxT("%f"), shutterSpeed);
 }
 
 void RawWindow::OnCheck(wxCommandEvent& checkEvent) {
@@ -835,25 +835,25 @@ void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		gammaLevelControl->SetValue(edit->GetParam(5));
 		gammaSlopeControl->SetValue(edit->GetParam(6));
 		interpolationControl->SetSelection((int)edit->GetParam(7));
-		halfSizeControl->SetValue((bool)edit->GetParam(8));
-		greenMatchingControl->SetValue((bool)edit->GetParam(9));
+		if(edit->GetParam(8) == 1){ halfSizeControl->SetValue(true); } else { halfSizeControl->SetValue(false); }
+		if(edit->GetParam(9) == 1){ greenMatchingControl->SetValue(true); } else { greenMatchingControl->SetValue(false); }
 		redMultiplierControl->SetValue(edit->GetParam(10));
 		greenMultiplierControl->SetValue(edit->GetParam(11));
 		blueMultiplierControl->SetValue(edit->GetParam(12));
-		cfaCleanControl->SetValue((bool)edit->GetParam(13));
+		if(edit->GetParam(13) == 1){ cfaCleanControl->SetValue(true); } else { cfaCleanControl->SetValue(false); }
 		cfaCleanLControl->SetValue(edit->GetParam(14));
 		cfaCleanCControl->SetValue(edit->GetParam(15));
 		waveletNoiseControl->SetValue(edit->GetParam(16));
-		cfaCleanLineEnableControl->SetValue(edit->GetParam(17));
+		if(edit->GetParam(17) == 1){ cfaCleanLineEnableControl->SetValue(true); } else { cfaCleanLineEnableControl->SetValue(false); }
 		cfaCleanLineControl->SetValue(edit->GetParam(18));
 	
 		whiteBalancePresetsControl->SetSelection((int)edit->GetParam(19));
-		autoBrightControl->SetValue((bool)edit->GetParam(20));
+		if(edit->GetParam(20) == 1){ autoBrightControl->SetValue(true); } else { autoBrightControl->SetValue(false); }
 		exposureControl->SetValue(edit->GetParam(21));
 		exposurePreserveControl->SetValue(edit->GetParam(22));
 		colorSpaceControl->SetSelection((int)edit->GetParam(23));
 		flipControl->SetSelection((int)edit->GetParam(24));
-		halfSizeControl->SetValue((bool)edit->GetParam(25));
+		if(edit->GetParam(25) == 1){ halfSizeControl->SetValue(true); } else { halfSizeControl->SetValue(false); }
 
 		this->Process();
 	}

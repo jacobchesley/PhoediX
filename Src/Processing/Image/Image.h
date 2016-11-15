@@ -54,8 +54,8 @@ private:
 
 	bool bit16Enabled;
 
-	int width;
-	int height;
+	uint32_t width;
+	uint32_t height;
 
 	uint8_t * imageDataRed8;
 	uint8_t * imageDataGreen8;
