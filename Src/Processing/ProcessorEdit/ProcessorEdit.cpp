@@ -7,18 +7,26 @@ ProcessorEdit::ProcessorEdit() {
 	isDisabled = false;
 	this->SetEditType(EditType::UNDEFINED);
 	intArrays = wxVector<int*>();
+	intArrays.clear();
 	doubleArrays = wxVector<double*>();
+	doubleArrays.clear();
 	params = wxVector<double>();
+	params.clear();
 	flags = wxVector<int>();
+	flags.clear();
 }
 
 ProcessorEdit::ProcessorEdit(int editType) {
 	this->SetEditType(editType);
 	isDisabled = false;
 	intArrays = wxVector<int*>();
+	intArrays.clear();
 	doubleArrays = wxVector<double*>();
+	doubleArrays.clear();
 	params = wxVector<double>();
+	params.clear();
 	flags = wxVector<int>();
+	flags.clear();
 }
 
 
@@ -27,9 +35,13 @@ ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 	isDisabled = edit.GetDisabled();
 
 	intArrays = wxVector<int*>();
+	intArrays.clear();
 	doubleArrays = wxVector<double*>();
+	doubleArrays.clear();
 	params = wxVector<double>();
+	params.clear();
 	flags = wxVector<int>();
+	flags.clear();
 
 	// Copy Params
 	for (size_t i = 0; i < edit.GetParamsSize(); i++) {
