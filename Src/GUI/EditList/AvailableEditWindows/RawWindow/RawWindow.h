@@ -17,7 +17,6 @@ class RawWindow : public EditWindow {
 		RawWindow(wxWindow * parent, wxString editName, Processor * processor);
 		void Process();
 		void ProcessEvt(wxCommandEvent& WXUNUSED(event));
-		void AddEditToProcessor();
 		void SetParamsAndFlags(ProcessorEdit * edit);
 		ProcessorEdit * GetParamsAndFlags();
 		bool CheckCopiedParamsAndFlags();
@@ -29,7 +28,6 @@ class RawWindow : public EditWindow {
 		wxString GetShutterSpeedStr(float shutterSpeed);
 
 		void FormatSlider(DoubleSlider * slider);
-		void FormatText(wxStaticText * text);
 
 		void OnCheck(wxCommandEvent& checkEvt);
 		void OnCombo(wxCommandEvent& comboEvt);
