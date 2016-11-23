@@ -14,6 +14,7 @@
 #include "wx\aui\aui.h"
 #include "wx\thread.h"
 #include "wx\timer.h"
+#include "wx\msgdlg.h"
 
 #include "Processing\Processor\Processor.h"
 #include "Processing\ImageHandler\ImageHandler.h"
@@ -113,6 +114,8 @@ private:
 	wxVector<PhoediXSession> allSessions;
 
 	int numnUnnamedProjectsOpen;
+
+	wxTimer * reprocessCountdown;
 
 	enum MenuBar {
 		ID_NEW_PROJECT,

@@ -195,6 +195,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->SetMenuChecks();
 
 	numnUnnamedProjectsOpen = 0;
+
+	reprocessCountdown = new wxTimer(this);
 }
 
 void MainWindow::SetSizeProperties(){
@@ -212,7 +214,7 @@ void MainWindow::OnNewProject(wxCommandEvent& WXUNUSED(event)) {
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 
 	imagePanel->ChangeImage(emptyImage);
-	// Close current session in UI
+
 	// Close current session in UI
 	if (allSessions.size() > 0) {
 		this->CloseSession(&currentSession);
@@ -268,6 +270,10 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MainWindow::CreateNewProject(){
+
+	// Save the current session
+	this->SaveCurrentSession();
+
 	PhoediXSession newSession;
 	this->SetUniqueID(&newSession);
 	newSession.SetName("Untitled - " + wxString::Format(wxT("%i"), numnUnnamedProjectsOpen + 1));
@@ -294,6 +300,11 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 }
 
 void MainWindow::OpenSession(PhoediXSession * session) {
+
+	processor->KillRawProcessing();
+	editList->RemoveAllWindows();
+	imagePanel->ChangeImage(emptyImage);
+	histogramDisplay->ZeroOutHistograms();
 
 	// Set the new image
 	this->OpenImage(session->GetImageFilePath());
@@ -325,7 +336,7 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	imagePanel->SetZoom(session->GetImageZoomLevel());
 	imagePanel->SetDrag(session->GetImageScrollX(), session->GetImageScrollY());
 
-	wxTimer * reprocessCountdown = new wxTimer(this);
+	this->SetMenuChecks();
 	reprocessCountdown->Start(500, true);
 }
 
@@ -346,7 +357,6 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 	processor->GetOriginalImage()->Destroy();
 	processor->GetImage()->Destroy();
 
-	wxTimer * reprocessCountdown = new wxTimer(this);
 	reprocessCountdown->Start(500, true);
 }
 
@@ -387,8 +397,10 @@ void MainWindow::SaveCurrentSession() {
 	currentSession.SetImageZoomLevel(imagePanel->GetZoom());
 	currentSession.SetImageScrollX(imagePanel->GetDragX());
 	currentSession.SetImageScrollY(imagePanel->GetDragY());
-	currentSession.SetImageScrollWidth(processor->GetImage()->GetWidth());
-	currentSession.SetImageScrollHeight(processor->GetImage()->GetHeight());
+	if(processor->GetImage() != NULL){
+		currentSession.SetImageScrollWidth(processor->GetImage()->GetWidth());
+		currentSession.SetImageScrollHeight(processor->GetImage()->GetHeight());
+	}
 	currentSession.SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
 	currentSession.SetSnapshots(snapshotWindow->GetSnapshots());
 
@@ -411,7 +423,8 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 
 	// Save the current session
 	this->SaveCurrentSession();
-	this->CloseSession(&currentSession);
+
+	//this->CloseSession(&currentSession);
 
 	// Load the new session from file
 	PhoediXSession session;
@@ -472,6 +485,8 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 	}
 
 	this->OpenImage(openFileDialog.GetPath());	
+	this->ShowImageRelatedWindows();
+	reprocessCountdown->Start(500, true);
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
@@ -494,12 +509,7 @@ void MainWindow::OpenImage(wxString imagePath){
 		processor->SetFilePath(imagePath);
 		processor->SetFileName(imageFile.GetFullName());
 		this->SetTitle("PhoediX - " + imageFile.GetFullName());
-
 		exportWindow->RawImageLoaded(true);
-		this->SetStatusbarText("Opening RAW File");
-		processor->rawPrcoessor.open_file(imagePath.wc_str());
-		this->SetStatusbarText("Unpacking RAW File");
-		processor->rawPrcoessor.unpack();
 		editList->AddRawWindow();
 		processor->SetDoFitImage(true);
 
@@ -712,6 +722,10 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	processor->KillCurrentProcessing();
 	imgPanelThread->StopWatching();
 
+	reprocessCountdown->Stop();
+	delete reprocessCountdown;
+	imagePanel->DestroyTimer();
+
 	int currentSessionID = currentSession.GetID();
 	currentSession.Destroy();
 
@@ -756,10 +770,12 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 		if (proc->GetUpdated() && !proc->GetLocked() && !proc->GetLockedRaw()) {
 			proc->Lock();
 			imgPanel->ChangeImage(proc->GetImage());
+			proc->Unlock();
 			imgPanel->Redraw();
 	
 			exportWin->ProcessingComplete();
 			proc->SetDoFitImage(false);
+			proc->Lock();
 			histogramDisp->UpdateHistograms();
 			proc->Unlock();
 			proc->SetUpdated(false);
