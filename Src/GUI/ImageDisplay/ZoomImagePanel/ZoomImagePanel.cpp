@@ -6,6 +6,7 @@ ZoomImagePanel::ZoomImagePanel(wxWindow * parent) : wxPanel(parent) {
 	par = parent;
 	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	scroller = new ImageScroll(this, new wxImage(0,0));
+	reguardScrollCountdown= new wxTimer(this);
 	this->InitControls();	
 }
 
@@ -13,6 +14,7 @@ ZoomImagePanel::ZoomImagePanel(wxWindow * parent, wxImage * img) : wxPanel(paren
 	par = parent;
 	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	scroller = new ImageScroll(this, img);
+	reguardScrollCountdown= new wxTimer(this);
 	this->InitControls();	
 }
 
@@ -21,6 +23,7 @@ ZoomImagePanel::ZoomImagePanel(wxWindow * parent, Image * img) : wxPanel(parent)
 	par = parent;
 	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	scroller = new ImageScroll(this, img);
+	reguardScrollCountdown= new wxTimer(this);
 	this->InitControls();
 }
 
@@ -61,6 +64,12 @@ void ZoomImagePanel::InitControls(){
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnFitImage, this, ZoomImagePanel::Buttons::ZOOM_FIT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnZoom100, this, ZoomImagePanel::Buttons::ZOOM_100);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&ZoomImagePanel::OnReguardScrollTimer, this);
+}
+
+void ZoomImagePanel::DestroyTimer(){
+
+	reguardScrollCountdown->Stop();
+	delete reguardScrollCountdown;
 }
 
 void ZoomImagePanel::ChangeImage(Image * newImage) {
@@ -118,7 +127,6 @@ void ZoomImagePanel::SetDrag(int x, int y) {
 	scroller->DisreguardScroll();
 	scroller->Scroll(x, y);
 
-	wxTimer * reguardScrollCountdown= new wxTimer(this);
 	reguardScrollCountdown->Start(500, true);
 }
 

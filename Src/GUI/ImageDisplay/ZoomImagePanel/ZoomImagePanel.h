@@ -39,6 +39,7 @@ public:
 
 	void SetDrag(int x, int y);
 	void FitImage();
+	void DestroyTimer();
 
 private:
 
@@ -59,6 +60,8 @@ private:
 		ZOOM_100,
 		ZOOM_FIT
 	};
+
+	wxTimer * reguardScrollCountdown;
 
 	class ImageScroll : public wxScrolledWindow {
 	public:
