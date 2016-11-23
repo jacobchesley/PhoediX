@@ -92,6 +92,9 @@ void HistogramDisplay::UpdateHistograms() {
 	histograms->UpdateHistograms();
 }
 
+void HistogramDisplay::ZeroOutHistograms(){
+	histograms->ZeroDisplay();
+}
 HistogramDisplay::HistogramScrolled::HistogramScrolled(wxWindow * parent, Processor * processor) : wxScrolledWindow(parent) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
@@ -136,7 +139,6 @@ void HistogramDisplay::HistogramScrolled::DestroyImages(){
 	delete greyHistogram;
 	delete allHistogram;
 }
-
 void HistogramDisplay::HistogramScrolled::ShowRed() {
 	showRed = true;
 }
@@ -242,15 +244,8 @@ void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
 		if (greyHistogram8[i] > maxGreyCount) { maxGreyCount = greyHistogram8[i]; }
 	}
 
-	for (int i = 0; i < 256; i++) {
-		for (int j = 0; j < 256; j++) {
-			redHistogram->SetRGB(i, j, 0, 0, 0);
-			greenHistogram->SetRGB(i, j, 0, 0, 0);
-			blueHistogram->SetRGB(i, j, 0, 0, 0);
-			greyHistogram->SetRGB(i, j, 0, 0, 0);
-			allHistogram->SetRGB(i, j, 0, 0, 0);
-		}
-	}
+	this->ZeroDisplay();
+
 	// Normalize histogram data to 0-256 for each element
 	for (int i = 0; i < 256; i++) {
 
@@ -290,8 +285,6 @@ void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
 			unsigned char greenMix = 0;
 			unsigned char blueMix = 0;
 
-
-
 			for (int j = 0; j < 256; j++) {
 				if (redHistogram->GetRed(i, j) > 0) { redMix = redHistogram->GetRed(i,j); }
 				if (greenHistogram->GetGreen(i, j) > 0) { greenMix = greenHistogram->GetGreen(i, j); }
@@ -306,6 +299,18 @@ void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
 				}
 
 			}
+		}
+	}
+}
+
+void HistogramDisplay::HistogramScrolled::ZeroDisplay(){
+	for (int i = 0; i < 256; i++) {
+		for (int j = 0; j < 256; j++) {
+			redHistogram->SetRGB(i, j, 0, 0, 0);
+			greenHistogram->SetRGB(i, j, 0, 0, 0);
+			blueHistogram->SetRGB(i, j, 0, 0, 0);
+			greyHistogram->SetRGB(i, j, 0, 0, 0);
+			allHistogram->SetRGB(i, j, 0, 0, 0);
 		}
 	}
 }
