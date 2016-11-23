@@ -360,7 +360,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RawWindow::OnCombo, this);
 	this->Bind(wxEVT_CHECKBOX, (wxObjectEventFunction)&RawWindow::OnCheck, this);
 
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&RawWindow::ProcessEvt, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&RawWindow::ProcessEvt, this, EditWindow::ID_PROCESS_EDITS);
 	
 	this->StartWatchdog();
 
@@ -724,7 +724,9 @@ void RawWindow::Process() {
 	proc->rawPrcoessor.imgdata.params.linenoise = (float)cfaCleanLineControl->GetValue();
 
 	// Get bit depth of processor image, and set output bps to this
-	proc->rawPrcoessor.imgdata.params.output_bps = proc->GetImage()->GetColorDepth();
+	if(proc->GetImage() != NULL && proc->GetImage()->GetWidth() > 0 && proc->GetImage()->GetHeight() > 0){
+		proc->rawPrcoessor.imgdata.params.output_bps = proc->GetImage()->GetColorDepth();
+	}
 
 	// White Balance
 
