@@ -2,6 +2,8 @@
 
 #include "EditListPanel.h"
 
+wxDEFINE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
+
 EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel(parent) {
 
 	mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -55,9 +57,11 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessImageRawEvt, this, ID_REPROCESS_IMAGE_RAW);
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListPanel::OnRightClick, this);
+	this->Bind(START_EDITS_COMPLETE, (wxObjectEventFunction)&EditListPanel::StartEditsComplete, this, ID_START_EDITS_COMPLETE);
 	proc = processor;
 	hasRaw = false;
-
+	startEdits = NULL;
+	editsStarted = false;
 	this->InitializeEdits();
 }
 
@@ -111,11 +115,15 @@ void EditListPanel::ReprocessImageEvt(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void EditListPanel::ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
-	this->ReprocessImageRaw();
+
+	// Reprocess raw with no unpacking
+	this->ReprocessImageRaw(false);
 }
 
 void EditListPanel::ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
-	this->ReprocessUnpackImageRaw();
+
+	// Reprocess raw with unpack
+	this->ReprocessImageRaw(true);
 }
 
 void EditListPanel::AddEditsToProcessor() {
@@ -138,43 +146,57 @@ void EditListPanel::AddEditsToProcessor() {
 
 void EditListPanel::ReprocessImage() {
 	
+	if (editsStarted) {
+		startEdits->Stop();
+	}
+
 	// Delete the current list of internally stored edits in the processor
 	proc->DeleteEdits();
 	
 	// Add all edits to processor
 	this->AddEditsToProcessor();
 
-	// Process the edits
-	proc->ProcessEdits();
+	proc->KillCurrentProcessing();
+	
+	if (!editsStarted) {
+		// Start edit thread (with raw disabled)
+		startEdits = new StartEditsThread(this, proc, false);
+		startEdits->Run();
+	}
 }
 
-void EditListPanel::ReprocessImageRaw() {
+void EditListPanel::ReprocessImageRaw(bool unpack) {
 
 	// Process Raw if needed
 	if (hasRaw) {
 
+		// Stop current edits taking place
+		if (editsStarted) {
+			startEdits->Stop();
+		}
+
 		// If there are edits, tell raw processor to not set processor to updated 
 		// (still need to perform edits after raw processing).
-		if(scroller->GetEditList().size() > 0){
+		if(scroller->GetEditList().size() > 1){
 			proc->SetHasEdits(true);
 		}
 		else{
 			proc->SetHasEdits(false);
 		}
-		proc->ProcessRaw();
-	}	
 
-	this->ReprocessImage();
+		proc->KillRawProcessing();
+		proc->KillCurrentProcessing();
+
+		if (!editsStarted) {
+			// Start edit thread (with raw enabled)
+			startEdits = new StartEditsThread(this, proc, true, unpack);
+			startEdits->Run();
+		}
+	}	
 }
 
-void EditListPanel::ReprocessUnpackImageRaw() {
-
-	// Process Raw if needed
-	if (hasRaw) {
-		proc->UnpackAndProcessRaw();
-	}
-
-	this->ReprocessImage();
+void EditListPanel::StartEditsComplete() {
+	editsStarted = false;
 }
 
 void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
@@ -226,12 +248,22 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	}
 	
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
-	this->ReprocessImageRaw();
+
+	if(hasRaw){
+		this->ReprocessImageRaw();
+	}
+	else{
+		this->ReprocessImageRaw();
+	}
 }
 
 void EditListPanel::RemoveAllWindows() {
+
+	proc->KillCurrentProcessing();
 	this->RemoveRawWindow();
+	hasRaw = false;
 	scroller->DeleteAllEdits();
+	proc->DeleteEdits();
 }
 
 void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActivate) {
@@ -353,6 +385,8 @@ void EditListPanel::AddRawWindow(){
 	scroller->SetNumTopEdits(1);
 	hasRaw = true;
 
+	// Unpack and reprocess raw
+	this->ReprocessImageRaw(true);
 }
 
 void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
@@ -541,4 +575,84 @@ int EditListPanel::EditListScroll::GetNextID() {
 
 wxVector<EditListItem*> EditListPanel::EditListScroll::GetEditList() {
 	return editList;
+}
+
+EditListPanel::StartEditsThread::StartEditsThread(EditListPanel * parent, Processor * processor, bool processRaw, bool unpack) : wxThread(wxTHREAD_DETACHED) {
+	par = parent;
+	proc = processor;
+	stop = false;
+	raw = processRaw;
+	unpck = unpack;
+}
+
+void EditListPanel::StartEditsThread::Stop() {
+	stop = true;
+}
+
+wxThread::ExitCode EditListPanel::StartEditsThread::Entry() {
+
+	if (raw) {
+		
+		// Unpack and process raw
+		if (unpck) {
+			while (proc->UnpackAndProcessRaw() < 0) {
+
+				// Another edit was made while waiting to prcoess current one.  Stop and let
+				// edit list restart accounting for new edit
+				if (stop) {
+					break;
+				}
+				Sleep(1);
+			}
+		}
+
+		// Just process raw, no unpacking necessary
+		else {
+			while (proc->ProcessRaw() < 0) {
+
+				// Another edit was made while waiting to prcoess current one.  Stop and let
+				// edit list restart accounting for new edit
+				if (stop) {
+					break;
+				}
+				Sleep(1);
+			}
+		}
+		par->StartEditsComplete();
+		wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
+		wxPostEvent(par, evt);
+
+		return 0;
+	}
+
+	// Process a normal non raw image
+	else {
+
+		// Maximum wait for force stop to complete, 0.5 seconds.
+		// After 0.5 seconds, process anyway
+		int count = 0;
+		int maxCount = 500;
+
+		while (proc->ProcessEdits() < 0) {
+
+			// Another edit was made while waiting to prcoess current one.  Stop and let
+			// edit list restart accounting for new edit
+			if (stop) {
+				break;
+			}
+
+			// Timeout.  Set force stop to false and restart prcocessing
+			if (count > maxCount) {
+				proc->ResetForceStop();
+				proc->ProcessEdits();
+				break;
+			}
+			Sleep(1);
+			count += 1;
+		}
+
+		// Let parent know process is complete
+		par->StartEditsComplete();
+		return 0;
+	}
 }

@@ -22,6 +22,12 @@
 #include "Processing\Processor\Processor.h"
 #include "Debugging\MemoryLeakCheck.h"
 
+wxDECLARE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
+
+enum {
+	ID_START_EDITS_COMPLETE
+};
+
 class EditListPanel : public wxPanel {
 public:
 
@@ -35,8 +41,7 @@ public:
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
 	void ReprocessImage();
-	void ReprocessImageRaw();
-	void ReprocessUnpackImageRaw();
+	void ReprocessImageRaw(bool unpack = false);
 
 private:
 
@@ -59,6 +64,8 @@ private:
 
 	void CopyEdit(wxCommandEvent& copyEvt);
 	void PasteEdit(wxCommandEvent& pasteEvt);
+
+	void StartEditsComplete();
 
 	wxStaticText * titleText;
 	wxBoxSizer * mainSizer;
@@ -104,5 +111,24 @@ private:
 	};
 	
 	EditListScroll * scroller;
+
+	class StartEditsThread : public wxThread {
+	public:
+		StartEditsThread(EditListPanel * parent, Processor * processor, bool processRaw, bool unpack = false);
+		void Stop();
+
+	protected:
+		virtual wxThread::ExitCode Entry();
+
+	private:
+		EditListPanel * par;
+		Processor * proc;
+		bool stop;
+		bool raw;
+		bool unpck;
+	};
+
+	StartEditsThread * startEdits;
+	bool editsStarted;
 };
 #endif
