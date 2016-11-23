@@ -169,6 +169,9 @@
     <Filter Include="GUI\SnapshotWindow\Snapshot Rename Dialog">
       <UniqueIdentifier>{7b417262-2420-4086-9fc6-512bb0d2e1a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Processing\Raw Error Codes">
+      <UniqueIdentifier>{52782be7-b7f7-4650-9198-b6354a3d60c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -317,6 +320,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.cpp">
       <Filter>GUI\SnapshotWindow\Snapshot Rename Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Processing\RawErrorCodes\RawError.cpp">
+      <Filter>Processing\Raw Error Codes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -487,6 +493,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.h">
       <Filter>GUI\SnapshotWindow\Snapshot Rename Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Processing\RawErrorCodes\RawError.h">
+      <Filter>Processing\Raw Error Codes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

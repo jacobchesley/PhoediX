@@ -65,6 +65,7 @@
     <ClCompile Include="..\Src\Processing\Image\Image.cpp" />
     <ClCompile Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.cpp" />
     <ClCompile Include="..\Src\Processing\Processor\Processor.cpp" />
+    <ClCompile Include="..\Src\Processing\RawErrorCodes\RawError.cpp" />
     <ClCompile Include="..\Src\Session\Session.cpp" />
     <ClCompile Include="..\Src\Session\SessionEditList\SessionEditList.cpp" />
     <ClCompile Include="..\Src\Spline\Spline.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="..\Src\Processing\Image\Image.h" />
     <ClInclude Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.h" />
     <ClInclude Include="..\Src\Processing\Processor\Processor.h" />
+    <ClInclude Include="..\Src\Processing\RawErrorCodes\RawError.h" />
     <ClInclude Include="..\Src\Processing\Snapshot\Snapshot.h" />
     <ClInclude Include="..\Src\Session\Session.h" />
     <ClInclude Include="..\Src\Session\SessionEditList\SessionEditList.h" />
