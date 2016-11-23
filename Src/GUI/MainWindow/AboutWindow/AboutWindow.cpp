@@ -37,6 +37,7 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 		strcat(buildDateTime, " ");
 		strcat(buildDateTime, PHOEDIX_BUILD_TIME_STRING);
 		buildDateValue = new wxStaticText(this, -1, buildDateTime);
+		free(buildDateTime);
 	} 
 	else {
 		buildDateValue = new wxStaticText(this, -1, PHOEDIX_BUILD_DATE_STRING);
