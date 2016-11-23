@@ -17,6 +17,7 @@
 #include "Processing\ImageHandler\ImageHandler.h"
 #include "Debugging\MemoryLeakCheck.h"
 #include "Processing\ProcessorEdit\ProcessorEdit.h"
+#include "Processing\RawErrorCodes\RawError.h"
 #include "libraw.h"
 #include <omp.h>
 
@@ -66,7 +67,7 @@ public:
 	void ProcessEdit(ProcessorEdit * edit);
 
 	void AddEdit(ProcessorEdit * edit);
-	void ProcessEdits();
+	int ProcessEdits();
 	void DeleteEdits();
 	wxVector<ProcessorEdit*> GetEditVector();
 
@@ -103,8 +104,6 @@ public:
 	wxString GetFileName();
 	void SetFileName(wxString path);
 
-	void UnpackAndProcessRaw();
-
 	void Lock();
 	void Unlock();
 	bool GetLocked();
@@ -112,7 +111,8 @@ public:
 	void Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
 	void Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
 
-	void ProcessRaw();
+	int ProcessRaw();
+	int UnpackAndProcessRaw();
 	void DeleteRawImage();
 	int GetRawError();
 
@@ -120,6 +120,7 @@ public:
 	bool GetDoFitImage();
 	
 	void KillCurrentProcessing();
+	void KillRawProcessing(bool restart = true);
 
 	int GetLastNumEdits();
 
@@ -143,14 +144,21 @@ public:
 	LibRaw rawPrcoessor;
 	libraw_processed_image_t * rawImage;
 
+	void ResetForceStop();
+	
 protected:
+
+	static int RawCallback(void *data, enum LibRaw_progress p, int iteration, int expected);
 	bool forceStop;
+	wxCriticalSection forceStopCritical;
+	static bool forceStopRaw;
+	bool restartRaw;
 
 private:
 
 	wxCriticalSection lockStopCritical;
-
 	wxCriticalSection processingCritical;
+
 	bool isProcessing;
 
 	int numEdits;
@@ -231,6 +239,7 @@ private:
 	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace = sRGB);
 	void XYZtoLAB(XYZ * xyz, LAB * lab);
 	void LABtoXYZ(LAB * lab, XYZ * xyz);
+
 
 	void SendMessageToParent(wxString message);
 	void SendProcessorEditNumToParent(int num);
