@@ -7,7 +7,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	parWindow = parent;
 	proc = processor;
 
-	defaultSat = proc->rawPrcoessor.imgdata.rawdata.color.maximum;
+	defaultSat = proc->rawPrcoessor.imgdata.rawdata.color.maximum > 0 ? proc->rawPrcoessor.imgdata.rawdata.color.maximum : 1;
 	defaultBlack = proc->rawPrcoessor.imgdata.rawdata.color.black;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
