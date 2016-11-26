@@ -313,4 +313,10 @@ void HistogramDisplay::HistogramScrolled::ZeroDisplay(){
 			allHistogram->SetRGB(i, j, 0, 0, 0);
 		}
 	}
+
+	redHistogramPanel->Redraw();
+	greenHistogramPanel->Redraw();
+	blueHistogramPanel->Redraw();
+	greyHistogramPanel->Redraw();
+	allHistogramPanel->Redraw();
 }
