@@ -220,6 +220,7 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	
+	this->Freeze();
 	this->RemoveAllWindows();
 	
 	for (size_t i = 0; i < inEdits.size(); i++) {
@@ -255,6 +256,8 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	else{
 		this->ReprocessImageRaw();
 	}
+
+	this->Thaw();
 }
 
 void EditListPanel::RemoveAllWindows() {
@@ -416,6 +419,7 @@ void EditListPanel::RemoveRawWindow() {
 	if (scroller->GetNumTopEdits() == 1) {
 		scroller->DeleteEdit(0);
 		scroller->SetNumTopEdits(0);
+		hasRaw = false;
 	}
 }
 
