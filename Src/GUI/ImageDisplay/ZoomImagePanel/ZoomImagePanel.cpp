@@ -7,7 +7,7 @@ ZoomImagePanel::ZoomImagePanel(wxWindow * parent) : wxPanel(parent) {
 	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	scroller = new ImageScroll(this, new wxImage(0,0));
 	reguardScrollCountdown= new wxTimer(this);
-	this->InitControls();	
+	this->InitControls();
 }
 
 ZoomImagePanel::ZoomImagePanel(wxWindow * parent, wxImage * img) : wxPanel(parent) {
@@ -64,6 +64,7 @@ void ZoomImagePanel::InitControls(){
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnFitImage, this, ZoomImagePanel::Buttons::ZOOM_FIT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnZoom100, this, ZoomImagePanel::Buttons::ZOOM_100);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&ZoomImagePanel::OnReguardScrollTimer, this);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ZoomImagePanel::OnScrollRightDown, this);
 }
 
 void ZoomImagePanel::DestroyTimer(){
@@ -92,6 +93,11 @@ void ZoomImagePanel::OnZoom100(wxCommandEvent& WXUNUSED(event)) {
 
 void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
 	this->FitImage();
+}
+
+void ZoomImagePanel::OnScrollRightDown(wxMouseEvent& evt) {
+	wxMouseEvent newEvent(evt);
+	wxPostEvent(this->GetParent(), newEvent);
 }
 
 void ZoomImagePanel::FitImage() {
@@ -160,6 +166,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
 	this->SetDoubleBuffered(true);
 
 }
@@ -178,6 +185,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
 	this->SetDoubleBuffered(true);
 }
 
@@ -330,4 +338,17 @@ void ZoomImagePanel::ImageScroll::DisreguardScroll(){
 void ZoomImagePanel::ImageScroll::ReguardScroll(){
 	this->Bind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
 	disreguardScroll = false;
+}
+
+void ZoomImagePanel::ImageScroll::OnRightDown(wxMouseEvent & evt) {
+
+	wxMouseEvent newEvent(evt);
+	wxCoord newX;
+	wxCoord newY;
+
+	this->CalcUnscrolledPosition(evt.GetX(), evt.GetY(), &newX, &newY);
+	newEvent.SetX(newX / zoom);
+	newEvent.SetY(newY / zoom);
+
+	wxPostEvent(this->GetParent(), newEvent);
 }

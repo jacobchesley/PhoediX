@@ -48,6 +48,7 @@ private:
 	void OnFitImage(wxCommandEvent& WXUNUSED(event));
 	void OnZoom100(wxCommandEvent& WXUNUSED(event));
 	void OnReguardScrollTimer(wxTimerEvent & WXUNUSED(evt));
+	void OnScrollRightDown(wxMouseEvent & evt);
 
 	wxWindow * par;
 	wxBoxSizer * mainSizer;
@@ -84,7 +85,7 @@ private:
 		void OnDragContinue(wxMouseEvent & evt);
 		void OnPaint(wxPaintEvent & evt);
 		void Render(wxDC& dc);
-
+		void OnRightDown(wxMouseEvent & evt);
 		wxBitmap bitmapDraw;
 		int oldWidth;
 		int oldHeight;
