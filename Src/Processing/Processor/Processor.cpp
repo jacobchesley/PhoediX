@@ -10,6 +10,10 @@ double Processor::pi = 3.141592653589793238463;
 typedef int (processor_callback)(void *callback_data,enum LibRaw_progress stage, int iteration, int expected);
 
 bool Processor::forceStopRaw = false;
+void * Processor::rawProcessorData = NULL;
+enum LibRaw_progress Processor::rawProcessorProgress;
+int Processor::rawIteration = 0;
+int Processor::rawExpected = 0;
 
 Processor::Processor(wxWindow * parent) {
 	img = new Image();
@@ -33,6 +37,7 @@ Processor::Processor(wxWindow * parent) {
 	hasEdits = false;
 	copiedEdit = NULL;
 	editListInternal = wxVector<ProcessorEdit*>();
+	editListInternal.clear();
 
 	restartRaw = true;
 }
@@ -93,7 +98,8 @@ void Processor::AddEdit(ProcessorEdit * edit) {
 }
 
 void Processor::DeleteEdits() {
-
+	
+	editListCritical.Enter();
 	// Delete all edits in the internal vector
 	for (size_t i = 0; i < editListInternal.size(); i++) {
 		editListInternal.at(i)->ClearIntArray();
@@ -103,6 +109,8 @@ void Processor::DeleteEdits() {
 
 	// Clear the vector
 	editListInternal.clear();
+
+	editListCritical.Leave();
 }
 
 void Processor::SetHasEdits(bool doesHaveEdits){
@@ -131,7 +139,10 @@ int Processor::ProcessEdits() {
 	if(forceStop){
 		return -1;
 	}
+
+	editListCritical.Enter();
 	this->ProcessEdits(editListInternal);
+	editListCritical.Leave();
 	return 0;
 }
 
@@ -154,6 +165,7 @@ void Processor::ProcessEdits(wxVector<ProcessorEdit*> editList) {
 	numEdits = editList.size();
 	this->didUpdate = false;
 
+	// Start processing thread on edit list
 	processThread = new ProcessThread(this, editList);
 	processThread->Run();
 
@@ -169,7 +181,7 @@ void Processor::KillCurrentProcessing(){
 	}
 }
 
-void Processor::KillRawProcessing(bool restart){
+void Processor::KillRawProcessing(){
 
 	if (forceStop) { 
 	}
@@ -244,13 +256,11 @@ bool Processor::GetLocked() {
 }
 
 void Processor::LockRaw() {
-	int test = 0;
 	lockRawCritical.Enter();
 	lockedRaw = true;
 }
 
 void Processor::UnlockRaw() {
-	int test = 0;
 	lockedRaw = false;
 	lockRawCritical.Leave();
 }
@@ -354,7 +364,13 @@ wxVector<ProcessorEdit*> Processor::GetEditListForCopyPaste(){
 	return copiedEditList;
 }
 
-int Processor::RawCallback(void *data,enum LibRaw_progress p,int iteration, int expected){
+int Processor::RawCallback(void * data, enum LibRaw_progress p, int iteration, int expected){
+
+	Processor::rawProcessorData = data;
+	Processor::rawProcessorProgress = p;
+	Processor::rawIteration = iteration;
+	Processor::rawExpected = expected;
+
 	if(forceStopRaw){ 
 		return 1; 
 	}
@@ -5285,6 +5301,8 @@ void Processor::LABtoXYZ(LAB * lab, XYZ * xyz) {
 
 Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
+	editVec = wxVector<ProcessorEdit*>();
+	editVec.clear();
 	editVec.push_back(edit);
 	terminated = false;
 }
@@ -5292,6 +5310,9 @@ Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * e
 Processor::ProcessThread::ProcessThread(Processor * processor, wxVector<ProcessorEdit*> edits) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
 	
+	editVec = wxVector<ProcessorEdit*>();
+	editVec.clear();
+
 	// Copy edit vector to threads edit vector
 	for (size_t i = 0; i < edits.size(); i++) {
 		editVec.push_back(new ProcessorEdit(*edits.at(i)));
@@ -5309,6 +5330,8 @@ void Processor::ProcessThread::DeleteEditVector() {
 
 	// Clean up copied edits
 	for (size_t i = 0; i < editVec.size(); i++) {
+		editVec.at(i)->ClearIntArray();
+		editVec.at(i)->ClearDoubleArray();
 		delete editVec.at(i);
 	}
 	editVec.clear();
@@ -5324,6 +5347,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	}
 
 	if (procParent->GetLocked()) {
+		this->DeleteEditVector();
 		return 0;
 	}
 
@@ -5353,9 +5377,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	}
 
 	// Lock and revert to original image, so we have a clean slate
-	OutputDebugStringA("Locking Processor");
 	procParent->Lock();
-	OutputDebugStringA("Processor locked");
 	procParent->RevertToOriginalImage(true);
 
 	// Get number of edits and set to a string to display in UI
@@ -5365,16 +5387,13 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 	// Go through each edit one by one.  Each of these will invoke at least 1 child thread for the edit itself
 	for (size_t editIndex = 0; editIndex < numberOfEdits; editIndex++) {
-
-		OutputDebugStringA("Processing next edit...");
-
+		
 		if(procParent->forceStop){
 			this->DeleteEditVector();
 			procParent->forceStopCritical.Enter();
 			procParent->forceStop = false;
 			procParent->forceStopCritical.Leave();
 			procParent->SendMessageToParent("");
-			OutputDebugStringA("Force stop called, unlocking processor");
 			procParent->Unlock();
 			return 0;
 		}
@@ -6504,9 +6523,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	this->DeleteEditVector();
 
 	procParent->SendMessageToParent("");
-	OutputDebugStringA("Unlocking processor... [ END OF PROC] ");
 	procParent->Unlock();
-	OutputDebugStringA("Processor unlocked [ END OF PROC]");
 	return (wxThread::ExitCode)0;
 }
 
@@ -6525,9 +6542,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			this->Sleep(20);
 		}
 
-		OutputDebugStringA("Locking RAW processor... [UNPACK PROCESS]");
 		processor->LockRaw();
-		OutputDebugStringA("RAW processor locked [UNPACK PROCESS]");
 
 		processor->SendMessageToParent("Opening Raw File");
 		processor->rawPrcoessor.recycle();
@@ -6535,12 +6550,10 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
 			// Open failed, present error and return
 			if(processor->rawErrorCode != 0){
+
 				wxString errorName = RawError::GetStringFromError(processor->rawErrorCode);
 				processor->SendMessageToParent("RAW Image open failed: " + errorName);
-
-				OutputDebugStringA("Unlocking RAW processor... [UNPACK PROCESS - OPEN FAIL]");
 				processor->UnlockRaw();
-				OutputDebugStringA("RAW processor unlocked [UNPACK PROCESS - OPEN FAIL]");
 				return 0;
 			}
 
@@ -6548,16 +6561,14 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			processor->rawErrorCode = processor->rawPrcoessor.unpack();
 			// Unpack failed, present error and return
 			if(processor->rawErrorCode != 0){
+
 				wxString errorName = RawError::GetStringFromError(processor->rawErrorCode);
 				processor->SendMessageToParent("RAW Image unpack failed: " + errorName);
-				OutputDebugStringA("Unlocking RAW processor... [UNPACK PROCESS -UNPACK FAIL]");
 				processor->UnlockRaw();
-				OutputDebugStringA("RAW processor unlocked [UNPACK PROCESS -UNPACK FAIL]");
 				return 0;
 			}
-		OutputDebugStringA("Unlocking RAW processor...");
+
 		processor->UnlockRaw();
-		OutputDebugStringA("RAW processor unlocked");
 		processor->ProcessRaw();
 		return 0;
 	}
@@ -6565,9 +6576,9 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	if (processor->GetLockedRaw()) {
 		return 0;
 	}
-	OutputDebugStringA("Locking RAW processor... [BEGIN]");
+
 	processor->LockRaw();
-	OutputDebugStringA("RAW processor locked [BEGIN]");
+
 	// process the raw image
 	processor->SendMessageToParent("RAW Image Processing");
 	//processor->rawPrcoessor.set_progress_handler(&Processor::RawCallback, NULL);
@@ -6586,39 +6597,34 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
 			// Open failed, present error and return
 			if(processor->rawErrorCode != 0){
+
 				wxString errorName = RawError::GetStringFromError(processor->rawErrorCode);
 				processor->SendMessageToParent("RAW Image open failed: " + errorName);
-				OutputDebugStringA("Unlocking RAW processor...  [dcraw_process - CANCELED]");
 				processor->UnlockRaw();
-				OutputDebugStringA("RAW processor unlocked [dcraw_process - CANCELED]");
 				return 0;
 			}
 
 			processor->rawErrorCode = processor->rawPrcoessor.unpack();
 			// Unpack failed, present error and return
 			if(processor->rawErrorCode != 0){
+
 				wxString errorName = RawError::GetStringFromError(processor->rawErrorCode);
 				processor->SendMessageToParent("RAW Image unpack failed: " + errorName);
-				OutputDebugStringA("Unlocking RAW processor... [dcraw_process - CANCELED - UNPACK]");
 				processor->UnlockRaw();
-				OutputDebugStringA("RAW processor unlocked [dcraw_process - CANCELED - UNPACK]");
 				return 0;
 			}
 
 			// Set progress handler to processors raw callback
 			if(processor->restartRaw){
-				OutputDebugStringA("Unlocking RAW processor... [dcraw_process - CANCELED - RESTART]");
+
 				processor->UnlockRaw();
-				OutputDebugStringA("RAW processor unlocked [dcraw_process - CANCELED - RESTART]");
 				processor->ProcessRaw();
 				return 0;
 			}
 		}
 		wxString errorName = RawError::GetStringFromError(processor->rawErrorCode);
 		processor->SendMessageToParent("RAW Image processing failed: " + errorName);
-		OutputDebugStringA("Unlocking RAW processor...  [dcraw_process - FAIL]");
 		processor->UnlockRaw();
-		OutputDebugStringA("RAW processor unlocked [dcraw_process - FAIL]");
 		return 0;
 	}
 
@@ -6636,9 +6642,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			this->Sleep(20);
 		}
 
-		OutputDebugStringA("Locking processor (from raw)... [DCRAW MAKE MEM IMAGE SUCCESS]");
 		processor->Lock();
-		OutputDebugStringA("Processor locked (from raw) [DCRAW MAKE MEM IMAGE SUCCESS]");
 
 		ImageHandler::CopyImageFromRaw(processor->rawImage, processor->GetImage());
 		if(processor->GetOriginalImage() != NULL){
@@ -6652,9 +6656,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			processor->SetUpdated(true);
 		}
 
-		OutputDebugStringA("Unlocking processor (from raw)... [DCRAW MAKE MEM IMAGE SUCCESS]");
 		processor->Unlock();
-		OutputDebugStringA("Processor unlocked (from raw) [DCRAW MAKE MEM IMAGE SUCCESS]");
 		processor->ProcessEdits();
 		processor->DeleteRawImage();
 		processor->SendMessageToParent("");
@@ -6663,8 +6665,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	else{
 		
 	}
-	OutputDebugStringA("Unlocking RAW processor... [END OF RAW THREAD]");
+
 	processor->UnlockRaw();
-	OutputDebugStringA("RAW Processor unlocked  [END OF RAW THREAD]");
 	return (wxThread::ExitCode)0;
 }

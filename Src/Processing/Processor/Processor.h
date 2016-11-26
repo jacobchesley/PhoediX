@@ -120,7 +120,7 @@ public:
 	bool GetDoFitImage();
 	
 	void KillCurrentProcessing();
-	void KillRawProcessing(bool restart = true);
+	void KillRawProcessing();
 
 	int GetLastNumEdits();
 
@@ -142,6 +142,11 @@ public:
 	};
 
 	LibRaw rawPrcoessor;
+	static void * rawProcessorData;
+	static enum LibRaw_progress rawProcessorProgress;
+	static int rawIteration;
+	static int rawExpected;
+
 	libraw_processed_image_t * rawImage;
 
 	void ResetForceStop();
@@ -196,17 +201,17 @@ private:
 	void AdjustHSL(double hShift, double sScale, double lScale, int dataStart = -1, int dataEnd = -1);
 	void AdjustBrightness(double brightAdjust, double detailsPreserve, double toneSetting, int tonePreservation, int dataStart = -1, int dataEnd = -1);
 	void AdjustContrast(double allContrast, double redContrast, double greenContrast, double blueContrast, 
-		double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
+	double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
 	void AdjustContrastCurve(double allContrast, double redContrast, double greenContrast, double blueContrast, 
-		double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
+	double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
 	void ConvertGreyscale(double redScale, double greenScale, double blueScale, int dataStart = -1, int dataEnd = -1);
 	void ChannelScale(double redRedScale, double redGreenScale, double redBlueScale,
-		double greenRedScale, double greenGreenScale, double greenBlueScale,
-		double blueRedScale, double blueGreenScale, double blueBlueScale, 
-		int dataStart = -1, int dataEnd = -1);
+	double greenRedScale, double greenGreenScale, double greenBlueScale,
+	double blueRedScale, double blueGreenScale, double blueBlueScale, 
+	int dataStart = -1, int dataEnd = -1);
 
 	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
-		int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16, int dataStart = -1, int dataEnd = -1);
+	int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16, int dataStart = -1, int dataEnd = -1);
 	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int colorSpace, int dataStart = -1, int dataEnd = -1);
 	void HSLCurves(int * hChannel16, int * sChannel16, int * lChannel16, int dataStart = -1, int dataEnd = -1);
 
@@ -245,7 +250,8 @@ private:
 	void SendProcessorEditNumToParent(int num);
 
 	wxVector<ProcessorEdit*> editListInternal;
-	
+	wxCriticalSection editListCritical;
+
 	class ProcessThread : public wxThread {
 
 		public:

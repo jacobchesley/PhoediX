@@ -17,6 +17,7 @@ ProcessorEdit::ProcessorEdit() {
 }
 
 ProcessorEdit::ProcessorEdit(int editType) {
+
 	this->SetEditType(editType);
 	isDisabled = false;
 	intArrays = wxVector<int*>();
@@ -31,7 +32,23 @@ ProcessorEdit::ProcessorEdit(int editType) {
 
 
 ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
+
+	isDisabled = false;
+	intArrays = wxVector<int*>();
+	intArrays.clear();
+	doubleArrays = wxVector<double*>();
+	doubleArrays.clear();
+	params = wxVector<double>();
+	params.clear();
+	flags = wxVector<int>();
+	flags.clear();
+
+	if(edit.GetEditType() < 0 ){
+		this->SetEditType(ProcessorEdit::UNDEFINED);
+		return;
+	}
 	this->SetEditType(edit.GetEditType());
+
 	isDisabled = edit.GetDisabled();
 
 	intArrays = wxVector<int*>();
@@ -189,7 +206,7 @@ int ProcessorEdit::GetFlag(size_t index) {
 }
 
 int ProcessorEdit::GetEditType() {
-	return edit;
+	return editInt;
 }
 
 void ProcessorEdit::SetDisabled(bool disable) {
@@ -201,9 +218,9 @@ bool ProcessorEdit::GetDisabled() {
 }
 
 void ProcessorEdit::SetEditType(int editType) {
-	edit = editType;
+	editInt = editType;
 
-	switch (edit) {
+	switch (editInt) {
 
 		case EditType::ADJUST_CONTRAST:
 			tag = "ADJUST_CONTRAST";
@@ -307,37 +324,42 @@ void ProcessorEdit::SetEditType(int editType) {
 		case EditType::UNDEFINED:
 			tag = "UNDEFINED";
 			break;
+
+		default:
+			editInt = ProcessorEdit::UNDEFINED;
+			tag = "UNDEFINED";
+			break;
 	}
 }
 
 void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 
-	if (inTag == "ADJUST_CONTRAST") { edit = EditType::ADJUST_CONTRAST; tag = inTag; }
-	else if (inTag == "CHANNEL_MIXER") { edit = EditType::CHANNEL_MIXER; tag = inTag; }
-	else if (inTag == "CONVERT_GREYSCALE_AVG") { edit = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
-	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { edit = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
-	else if (inTag == "CONVERT_GREYSCALE_EYE") { edit = EditType::CONVERT_GREYSCALE_EYE; tag = inTag; }
-	else if (inTag == "HSL_CURVES") { edit = EditType::HSL_CURVES; tag = inTag; }
-	else if (inTag == "LAB_CURVES") { edit = EditType::LAB_CURVES; tag = inTag; }
-	else if (inTag == "MIRROR_NONE") { edit = EditType::MIRROR_NONE; tag = inTag; }
-	else if (inTag == "MIRROR_HORIZONTAL") { edit = EditType::MIRROR_HORIZONTAL; tag = inTag; }
-	else if (inTag == "MIRROR_VERTICAL") { edit = EditType::MIRROR_VERTICAL; tag = inTag; }
-	else if (inTag == "RGB_CURVES") { edit = EditType::RGB_CURVES; tag = inTag; }
-	else if (inTag == "ROTATE_NONE") { edit = EditType::ROTATE_NONE; tag = inTag; }
-	else if (inTag == "ROTATE_180") { edit = EditType::ROTATE_180; tag = inTag; }
-	else if (inTag == "ROTATE_270_CW") { edit = EditType::ROTATE_270_CW; tag = inTag; }
-	else if (inTag == "ROTATE_90_CW") { edit = EditType::ROTATE_90_CW; tag = inTag; }
-	else if (inTag == "ROTATE_CUSTOM_BICUBIC") { edit = EditType::ROTATE_CUSTOM_BICUBIC; tag = inTag; }
-	else if (inTag == "ROTATE_CUSTOM_BILINEAR") { edit = EditType::ROTATE_CUSTOM_BILINEAR; tag = inTag; }
-	else if (inTag == "ROTATE_CUSTOM_NEAREST") { edit = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
-	else if (inTag == "ADJUST_HSL") { edit = EditType::ADJUST_HSL; tag = inTag; }
-	else if (inTag == "SHIFT_RGB") { edit = EditType::SHIFT_RGB; tag = inTag; }
-	else if (inTag == "ADJUST_BRIGHTNESS") { edit = EditType::ADJUST_BRIGHTNESS; tag = inTag; }
-	else if (inTag == "SCALE_NEAREST") { edit = EditType::SCALE_NEAREST; tag = inTag; }
-	else if (inTag == "SCALE_BILINEAR") { edit = EditType::SCALE_BILINEAR; tag = inTag; }
-	else if (inTag == "SCALE_BICUBIC") { edit = EditType::SCALE_BICUBIC; tag = inTag; }
-	else if (inTag == "RAW") { edit = EditType::RAW; tag = inTag; }
-	else{ edit = EditType::UNDEFINED; tag = "UNDEFINED"; }
+	if (inTag == "ADJUST_CONTRAST") { editInt = EditType::ADJUST_CONTRAST; tag = inTag; }
+	else if (inTag == "CHANNEL_MIXER") { editInt = EditType::CHANNEL_MIXER; tag = inTag; }
+	else if (inTag == "CONVERT_GREYSCALE_AVG") { editInt = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
+	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { editInt = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
+	else if (inTag == "CONVERT_GREYSCALE_EYE") { editInt = EditType::CONVERT_GREYSCALE_EYE; tag = inTag; }
+	else if (inTag == "HSL_CURVES") { editInt = EditType::HSL_CURVES; tag = inTag; }
+	else if (inTag == "LAB_CURVES") { editInt = EditType::LAB_CURVES; tag = inTag; }
+	else if (inTag == "MIRROR_NONE") { editInt = EditType::MIRROR_NONE; tag = inTag; }
+	else if (inTag == "MIRROR_HORIZONTAL") { editInt = EditType::MIRROR_HORIZONTAL; tag = inTag; }
+	else if (inTag == "MIRROR_VERTICAL") { editInt = EditType::MIRROR_VERTICAL; tag = inTag; }
+	else if (inTag == "RGB_CURVES") { editInt = EditType::RGB_CURVES; tag = inTag; }
+	else if (inTag == "ROTATE_NONE") { editInt = EditType::ROTATE_NONE; tag = inTag; }
+	else if (inTag == "ROTATE_180") { editInt = EditType::ROTATE_180; tag = inTag; }
+	else if (inTag == "ROTATE_270_CW") { editInt = EditType::ROTATE_270_CW; tag = inTag; }
+	else if (inTag == "ROTATE_90_CW") { editInt = EditType::ROTATE_90_CW; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_BICUBIC") { editInt = EditType::ROTATE_CUSTOM_BICUBIC; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_BILINEAR") { editInt = EditType::ROTATE_CUSTOM_BILINEAR; tag = inTag; }
+	else if (inTag == "ROTATE_CUSTOM_NEAREST") { editInt = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
+	else if (inTag == "ADJUST_HSL") { editInt = EditType::ADJUST_HSL; tag = inTag; }
+	else if (inTag == "SHIFT_RGB") { editInt = EditType::SHIFT_RGB; tag = inTag; }
+	else if (inTag == "ADJUST_BRIGHTNESS") { editInt = EditType::ADJUST_BRIGHTNESS; tag = inTag; }
+	else if (inTag == "SCALE_NEAREST") { editInt = EditType::SCALE_NEAREST; tag = inTag; }
+	else if (inTag == "SCALE_BILINEAR") { editInt = EditType::SCALE_BILINEAR; tag = inTag; }
+	else if (inTag == "SCALE_BICUBIC") { editInt = EditType::SCALE_BICUBIC; tag = inTag; }
+	else if (inTag == "RAW") { editInt = EditType::RAW; tag = inTag; }
+	else{ editInt = EditType::UNDEFINED; tag = "UNDEFINED"; }
 }
 
 wxString ProcessorEdit::GetEditTag() {

@@ -56,7 +56,7 @@ public :
 	wxString GetEditTag();
 
 	enum EditType {
-		UNDEFINED,
+		UNDEFINED = 0,
 		SHIFT_RGB,
 		ADJUST_HSL,
 		ADJUST_CONTRAST,
@@ -87,7 +87,7 @@ public :
 	};
 	
 private:
-	int edit;
+	int editInt;
 	wxString tag;
 	wxVector<double> params;
 	wxVector<int> flags;
