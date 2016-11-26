@@ -61,6 +61,7 @@ private:
 	void ShowEditList(wxCommandEvent& evt);
 	void ShowHistograms(wxCommandEvent& evt);
 	void OnReprocessTimer(wxTimerEvent& evt);
+	void OnImagePanelMouse(wxMouseEvent & evt);
 
 	void CreateNewProject();
 	void OpenImage(wxString imagePath);
@@ -139,7 +140,7 @@ private:
 	class ImagePanelUpdateThread : public wxThread {
 
 		public:
-			ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow);
+			ImagePanelUpdateThread(ZoomImagePanel * imagePanel, PixelPeepWindow * pixelPeepWindow, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow);
 			void StopWatching();
 
 		protected:
@@ -151,6 +152,7 @@ private:
 			HistogramDisplay * histogramDisp;
 			Processor * proc;
 			ExportWindow * exportWin;
+			PixelPeepWindow * pixelPeep;
 	};
 
 	ImagePanelUpdateThread * imgPanelThread;

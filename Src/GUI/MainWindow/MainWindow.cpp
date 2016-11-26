@@ -154,9 +154,22 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	snapshotPaneInfo.CloseButton(true);
 	snapshotPaneInfo.PinButton(true);
 	snapshotPaneInfo.DestroyOnClose(false);
-	snapshotPaneInfo.BestSize(settingsWindow->GetClientSize());
+	snapshotPaneInfo.BestSize(snapshotWindow->GetClientSize());
 	snapshotPaneInfo.Hide();
 	auiManager->AddPane(snapshotWindow, snapshotPaneInfo);
+
+	pixelPeepWindow = new PixelPeepWindow(this);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&MainWindow::OnImagePanelMouse, this);
+	wxAuiPaneInfo pixelPeepPaneInfo = wxAuiPaneInfo();
+	pixelPeepPaneInfo.Float();
+	pixelPeepPaneInfo.Caption("Pixel Peep");
+	pixelPeepPaneInfo.Name("Pixel Peep");
+	pixelPeepPaneInfo.CloseButton(true);
+	pixelPeepPaneInfo.PinButton(true);
+	pixelPeepPaneInfo.DestroyOnClose(false);
+	pixelPeepPaneInfo.BestSize(pixelPeepWindow->GetClientSize());
+	pixelPeepPaneInfo.Hide();
+	auiManager->AddPane(pixelPeepWindow, pixelPeepPaneInfo);
 
 	auiManager->Update();
 
@@ -175,6 +188,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowEditList, this, MainWindow::MenuBar::ID_SHOW_EDIT_LIST);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowHistograms, this, MainWindow::MenuBar::ID_SHOW_HISTOGRAMS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowPixelPeep, this, MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLibrary, this, MainWindow::MenuBar::ID_SHOW_LIBRARY);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowAbout, this, MainWindow::MenuBar::ID_ABOUT);
 
@@ -185,7 +199,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_AUI_PANE_CLOSE, (wxObjectEventFunction)&MainWindow::OnPaneClose, this);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::OnReprocessTimer, this);
 
-	imgPanelThread = new ImagePanelUpdateThread(imagePanel, processor, histogramDisplay, exportWindow);
+	imgPanelThread = new ImagePanelUpdateThread(imagePanel, pixelPeepWindow, processor, histogramDisplay, exportWindow);
 	imgPanelThread->Run();
 
 	emptyImage = new wxImage(1, 1);
@@ -197,6 +211,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	numnUnnamedProjectsOpen = 0;
 
 	reprocessCountdown = new wxTimer(this);
+
+	pixelPeepWindow->UpdatePosition(0, 0);
 }
 
 void MainWindow::SetSizeProperties(){
@@ -356,6 +372,9 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 
 	processor->GetOriginalImage()->Destroy();
 	processor->GetImage()->Destroy();
+
+	histogramDisplay->ZeroOutHistograms();
+	pixelPeepWindow->UpdateImage(NULL);
 
 	reprocessCountdown->Start(500, true);
 }
@@ -622,6 +641,21 @@ void MainWindow::ShowSnapshots(wxCommandEvent& evt) {
 	}
 }
 
+void MainWindow::ShowPixelPeep(wxCommandEvent& evt) {
+
+	// If library menu item is checked, show the edit list
+	if (evt.IsChecked()) {
+		auiManager->GetPane(pixelPeepWindow).Show();
+		auiManager->Update();
+	}
+
+	// Otherwise, hide the library
+	else {
+		auiManager->GetPane(pixelPeepWindow).Hide();
+		auiManager->Update();
+	}
+}
+
 void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 
 	// If library menu item is checked, show the edit list
@@ -677,6 +711,12 @@ void MainWindow::SetMenuChecks(){
 	}
 
 	// 2nd element in tools is pixel peep
+	if (auiManager->GetPane(pixelPeepWindow).IsShown()) {
+		menuTools->GetMenuItems()[1]->Check(true);
+	}
+	else {
+		menuTools->GetMenuItems()[1]->Check(false);
+	}
 
 	// 3rd element in tools is separator
 
@@ -692,6 +732,13 @@ void MainWindow::SetMenuChecks(){
 void MainWindow::OnPaneClose(wxAuiManagerEvent& evt){
 	evt.GetPane()->Hide();
 	this->SetMenuChecks();
+}
+
+void MainWindow::OnImagePanelMouse(wxMouseEvent & evt) {
+
+	int x = evt.GetPosition().x;
+	int y = evt.GetPosition().y;
+	pixelPeepWindow->UpdatePosition(x, y);
 }
 
 void MainWindow::ShowExport(wxCommandEvent& WXUNUSED(event)) {
@@ -756,12 +803,13 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	this->Destroy();
 }
 
-MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imagePanel, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow) : wxThread(wxTHREAD_DETACHED) {
+MainWindow::ImagePanelUpdateThread::ImagePanelUpdateThread(ZoomImagePanel * imagePanel, PixelPeepWindow * pixelPeepWindow, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow) : wxThread(wxTHREAD_DETACHED) {
 	imgPanel = imagePanel;
 	histogramDisp = histogramDisplay;
 	proc = processor;
 	exportWin = exportWindow;
 	continueWatch = true;
+	pixelPeep = pixelPeepWindow;
 }
 
 wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
@@ -770,6 +818,7 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 		if (proc->GetUpdated() && !proc->GetLocked() && !proc->GetLockedRaw()) {
 			proc->Lock();
 			imgPanel->ChangeImage(proc->GetImage());
+			pixelPeep->UpdateImage(proc->GetImage());
 			proc->Unlock();
 			imgPanel->Redraw();
 	
