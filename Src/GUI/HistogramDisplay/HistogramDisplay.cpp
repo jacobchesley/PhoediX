@@ -133,11 +133,26 @@ void HistogramDisplay::HistogramScrolled::DestroyImages(){
 	greyHistogramPanel->StopDrawing();
 	allHistogramPanel->StopDrawing();
 
-	delete redHistogram;
-	delete greenHistogram;
-	delete blueHistogram;
-	delete greyHistogram;
-	delete allHistogram;
+	if (redHistogram != NULL) {
+		delete redHistogram;
+		redHistogram = NULL;
+	}
+	if (greenHistogram != NULL) {
+		delete greenHistogram;
+		greenHistogram = NULL;
+	}
+	if (blueHistogram != NULL) {
+		delete blueHistogram;
+		blueHistogram = NULL;
+	}
+	if (greyHistogram != NULL) {
+		delete greyHistogram;
+		greyHistogram = NULL;
+	}
+	if (allHistogram != NULL) {
+		delete allHistogram;
+		allHistogram = NULL;
+	}
 }
 void HistogramDisplay::HistogramScrolled::ShowRed() {
 	showRed = true;
@@ -220,6 +235,11 @@ void HistogramDisplay::HistogramScrolled::UpdateHistograms() {
 }
 
 void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
+
+	if (redHistogram == NULL || greenHistogram == NULL || blueHistogram == NULL ||
+		greyHistogram == NULL || allHistogram == NULL) {
+		return;
+	}
 
 	// 8 bit histogram data
 	uint32_t redHistogram8[256];
@@ -304,6 +324,11 @@ void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
 }
 
 void HistogramDisplay::HistogramScrolled::ZeroDisplay(){
+
+	if (redHistogram == NULL || greenHistogram == NULL || blueHistogram == NULL ||
+		greyHistogram == NULL || allHistogram == NULL) {
+		return;
+	}
 	for (int i = 0; i < 256; i++) {
 		for (int j = 0; j < 256; j++) {
 			redHistogram->SetRGB(i, j, 0, 0, 0);
