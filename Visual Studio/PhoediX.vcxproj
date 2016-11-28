@@ -56,6 +56,7 @@
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryWindow.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.h" />
+    <ClInclude Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.h" />

@@ -172,6 +172,9 @@
     <Filter Include="Processing\Raw Error Codes">
       <UniqueIdentifier>{52782be7-b7f7-4650-9198-b6354a3d60c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Main Window\Import Image Dialog">
+      <UniqueIdentifier>{f3884e67-b828-43fb-b406-9b2991aecfd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -323,6 +326,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\Processing\RawErrorCodes\RawError.cpp">
       <Filter>Processing\Raw Error Codes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.cpp">
+      <Filter>GUI\Main Window\Import Image Dialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -496,6 +502,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\Processing\RawErrorCodes\RawError.h">
       <Filter>Processing\Raw Error Codes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.h">
+      <Filter>GUI\Main Window\Import Image Dialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
