@@ -28,6 +28,7 @@
 #include "GUI\Colors\Colors.h"
 #include "GUI\HistogramDisplay\HistogramDisplay.h"
 #include "GUI/MainWindow/AboutWindow/AboutWindow.h"
+#include "GUI/MainWindow/ImportImageDialog/ImportImageDialog.h"
 #include "GUI/LibraryWindow/LibraryWindow.h"
 #include "Session\Session.h"
 #include "Debugging\MemoryLeakCheck.h"

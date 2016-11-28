@@ -266,13 +266,10 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
 	// Remove all sessions from menu window
 	for (size_t i = 0; i < allSessions.size(); i++) {
-		allSessions.at(i).Destroy();
 		if(menuWindow->FindChildItem(allSessions.at(i).GetID())){
 			menuWindow->Delete(allSessions.at(i).GetID());
 		}
 	}
-
-	currentSession.Destroy();
 
 	histogramDisplay->DestroyHistograms();
 
@@ -503,9 +500,22 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 		return;
 	}
 
-	this->OpenImage(openFileDialog.GetPath());	
-	this->ShowImageRelatedWindows();
-	reprocessCountdown->Start(500, true);
+	// Ask to import to current project, or to new project
+	
+	ImportImageDialog * importDialog = new ImportImageDialog(this);
+	int importReturn = importDialog->ShowModal();
+
+	if (importReturn == ImportImageDialog::ID_IMPORT_CURRENT_PROJECT) {
+		this->OpenImage(openFileDialog.GetPath());
+		this->ShowImageRelatedWindows();
+		reprocessCountdown->Start(500, true);
+	}
+	else if (importReturn == ImportImageDialog::ID_IMPORT_NEW_PROJECT) {
+		this->CreateNewProject();
+		this->OpenImage(openFileDialog.GetPath());
+		this->ShowImageRelatedWindows();
+		reprocessCountdown->Start(500, true);
+	}
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
@@ -560,16 +570,18 @@ void MainWindow::OpenImage(wxString imagePath){
 			imageErrorDialog.ShowModal();
 		}
 	}
+	if (currentSession.GetPerspective().IsEmpty()) {
+		this->ShowImageRelatedWindows();
+	}
 }
 
 void MainWindow::ShowImageRelatedWindows(){
 
-	if(menuWindow->GetMenuItems().size() < 1){
-		auiManager->GetPane(imagePanel).Show();
-		auiManager->GetPane(histogramDisplay).Show();
-		auiManager->GetPane(editList).Show();
-		auiManager->Update();
-	}
+	auiManager->GetPane(imagePanel).Show();
+	imagePanel->FitImage();
+	auiManager->GetPane(histogramDisplay).Show();
+	auiManager->GetPane(editList).Show();
+	auiManager->Update();
 }
 
 void MainWindow::OnReprocessTimer(wxTimerEvent& WXUNUSED(event)){
