@@ -192,7 +192,10 @@ void EditListPanel::ReprocessImageRaw(bool unpack) {
 			startEdits = new StartEditsThread(this, proc, true, unpack);
 			startEdits->Run();
 		}
-	}	
+	}
+	else {
+		this->ReprocessImage();
+	}
 }
 
 void EditListPanel::StartEditsComplete() {
@@ -370,6 +373,10 @@ void EditListPanel::DisableEdit(wxCommandEvent& WXUNUSED(event)) {
 
 void EditListPanel::AddRawWindow(){
 
+	if (!proc->GetLockedRaw()) {
+		proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+		proc->rawPrcoessor.unpack();
+	}
 	// Get number of edits already in list
 	size_t numEdits = scroller->GetNextID();
 
@@ -394,6 +401,10 @@ void EditListPanel::AddRawWindow(){
 
 void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 
+	if (!proc->GetLockedRaw()) {
+		proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+		proc->rawPrcoessor.unpack();
+	}
 	// Get number of edits already in list
 	size_t numEdits = scroller->GetNextID();
 
