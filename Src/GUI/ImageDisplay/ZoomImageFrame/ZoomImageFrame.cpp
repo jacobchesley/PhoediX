@@ -3,6 +3,12 @@
 #include "ZoomImageFrame.h"
 
 ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title) : wxFrame(parent, -1, title){
+
+	Icons icons;
+	wxIcon theIcon;
+	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
+	this->SetIcon(theIcon);
+
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
@@ -15,6 +21,12 @@ ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title) : wxFrame(pare
 }
 
 ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, wxImage * image) : wxFrame(parent, -1, title){
+
+	Icons icons;
+	wxIcon theIcon;
+	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
+	this->SetIcon(theIcon);
+
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
@@ -27,6 +39,12 @@ ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, wxImage * imag
 }
 
 ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, Image * image) : wxFrame(parent, -1, title){
+
+	Icons icons;
+	wxIcon theIcon;
+	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
+	this->SetIcon(theIcon);
+
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);

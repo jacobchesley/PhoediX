@@ -11,6 +11,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI\Icons\Icons.h"
 #include "GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h"
 
 class ZoomImageFrame : public wxFrame {
