@@ -49,6 +49,7 @@ private:
 	void OnNewProject(wxCommandEvent& WXUNUSED(event));
 	void ShowLoadProject(wxCommandEvent& WXUNUSED(event));
 	void ShowSaveProject(wxCommandEvent& WXUNUSED(event));
+	void QuickSaveProject(wxCommandEvent& WXUNUSED(event));
 	void CloseCurrentProject(wxCommandEvent& WXUNUSED(event));
 	void CloseAllProjects(wxCommandEvent& WXUNUSED(event));
 	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
@@ -75,6 +76,7 @@ private:
 	void CloseSession(PhoediXSession * session);
 	void SetUniqueID(PhoediXSession * session);
 	void CheckUncheckSession(int sessionID);
+	void EnableDisableMenuItemsNoProject(bool enable);
 
 	void SetSizeProperties();
 
@@ -123,6 +125,7 @@ private:
 		ID_NEW_PROJECT,
 		ID_SHOW_LOAD_PROJECT,
 		ID_SHOW_SAVE_PROJECT,
+		ID_QUICK_SAVE_PROJECT,
 		ID_SHOW_LOAD_FILE,
 		ID_SHOW_EXPORT,
 		ID_EXIT,
