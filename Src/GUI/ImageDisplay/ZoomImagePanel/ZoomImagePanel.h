@@ -101,6 +101,8 @@ private:
 		int dragStartY;
 		int scrollStartX;
 		int scrollStartY;
+
+		bool currentlyDrawing;
 	};
 
 	ImageScroll * scroller;

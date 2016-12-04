@@ -150,10 +150,16 @@ void ZoomImagePanel::Redraw() {
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
+	currentlyDrawing = false;
+	disreguardScroll = false;
+	zoom = 1.0;
+	keepAspect = true;
+	resize = false;
 }
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxScrolledWindow(parent) {
 	
+	currentlyDrawing = false;
 	disreguardScroll = false;
 	this->ChangeImage(image);
 	zoom = 1.0;
@@ -173,6 +179,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : wxScrolledWindow(parent) {
 	
+	currentlyDrawing = false;
 	disreguardScroll = false;
 	this->ChangeImage(image);
 	zoom = 1.0;
@@ -191,6 +198,9 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 
 void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	
+	// Prepare the DC, zoom the correct amount and draw the bitmap
+	this->PrepareDC(dc);
+
 	// Clear and set background color
 	dc.Clear();
 	dc.SetBackground(wxBrush(this->GetBackgroundColour()));
@@ -205,18 +215,21 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	int imgHeight = bitmapDraw.GetHeight() * zoom;
 	this->SetVirtualSize(imgWidth, imgHeight);
 
-	// Prepare the DC, zoom the correct amount and draw the bitmap
-	this->PrepareDC(dc);
 	dc.SetUserScale(zoom, zoom);
 	dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
 }
 
 void ZoomImagePanel::ImageScroll::Redraw() {
-
+	
+	if (currentlyDrawing) {
+		return;
+	}
+	currentlyDrawing = true;
 	// Render a buffered DC from the client DC
 	wxClientDC dc(this);
 	wxBufferedDC dcBuffer(&dc);
 	this->Render(dcBuffer);
+	currentlyDrawing = false;
 }
 
 void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
@@ -296,10 +309,15 @@ void ZoomImagePanel::ImageScroll::OnDragContinue(wxMouseEvent& evt) {
 
 void ZoomImagePanel::ImageScroll::OnPaint(wxPaintEvent& evt) {
 
+	if (currentlyDrawing) {
+		return;
+	}
+	currentlyDrawing = true;
 	// Create buffered and dc and render
 	wxBufferedPaintDC paintDC(this);
 	this->Render(paintDC);
 	evt.Skip();
+	currentlyDrawing = false;
 }
 
 void ZoomImagePanel::ImageScroll::SetZoom(double zoomFactor) {

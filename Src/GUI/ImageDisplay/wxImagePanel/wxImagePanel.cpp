@@ -4,6 +4,7 @@
 
 WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(parent) {
 
+	currentlyDrawing = false;
 	zoom = 1.0;
 	keepAspect = doKeepAspect;
 	resize = false;
@@ -18,6 +19,7 @@ WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(paren
 
 WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect, bool staticImg) : wxPanel(parent) {
 
+	currentlyDrawing = false;
 	img = image;
 	zoom = 1.0;
 	keepAspect = doKeepAspect;
@@ -58,6 +60,8 @@ void WXImagePanel::ChangeImage(wxImage * newImage) {
 }
 
 void WXImagePanel::Render(wxDC & dc) {
+
+	this->PrepareDC(dc);
 
 	if (!doDraw) { return;  }
 	if (staticImage) {
@@ -102,17 +106,22 @@ void WXImagePanel::Render(wxDC & dc) {
 			bitmapDraw = wxBitmap(*img);
 		}
 	}
-
-
+	
 	dc.Clear();
 	dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
 }
 
 
 void WXImagePanel::Redraw() {
+
+	if (currentlyDrawing) {
+		return;
+	}
+	currentlyDrawing = true;
 	wxClientDC dc(this);
 	wxBufferedDC dcBuffer(&dc);
 	this->Render(dcBuffer);
+	currentlyDrawing = false;
 }
 
 void WXImagePanel::StopDrawing() {
@@ -120,9 +129,15 @@ void WXImagePanel::StopDrawing() {
 }
 
 void WXImagePanel::OnPaint(wxPaintEvent& event) {
+
+	if (currentlyDrawing) {
+		return;
+	}
+	currentlyDrawing = true;
 	wxBufferedPaintDC paintDC(this);
 	this->Render(paintDC);
 	event.Skip();
+	currentlyDrawing = false;
 }
 
 void WXImagePanel::OnSize(wxSizeEvent& event) {
@@ -131,7 +146,7 @@ void WXImagePanel::OnSize(wxSizeEvent& event) {
 		return;
 	}
 	this->SetSize(img->GetWidth(), img->GetHeight());
-	Refresh();
+	this->Redraw();
 	event.Skip();
 }
 

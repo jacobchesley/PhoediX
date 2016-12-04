@@ -39,6 +39,8 @@ private:
 	bool resize;
 	bool staticImage;
 	bool doDraw;
+
+	bool currentlyDrawing;
 };
 
 
