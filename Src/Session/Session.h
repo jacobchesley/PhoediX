@@ -60,8 +60,12 @@ public:
 	void SetName(wxString newName);
 	wxString GetName();
 
+	void SetProjectPath(wxString path);
+	wxString GetProjectPath();
+
 private:
 
+	wxString projectPath;
 	wxString imgFile;
 	PhoediXSessionEditList *editList;
 	wxVector <Snapshot*>  snapshotsList;

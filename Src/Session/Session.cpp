@@ -339,6 +339,15 @@ wxString PhoediXSession::GetName() {
 	return name;
 }
 
+void PhoediXSession::SetProjectPath(wxString path) {
+	projectPath = path;
+}
+
+wxString PhoediXSession::GetProjectPath() {
+	return projectPath;
+}
+
+
 wxVector<Snapshot*> PhoediXSession::GetSnapshots() {
 	return snapshotsList;
 }
