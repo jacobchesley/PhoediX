@@ -14,6 +14,7 @@
 #include "wx\filename.h"
 
 #include "GUI\Colors\Colors.h"
+#include "GUI\Icons\Icons.h"
 #include "GUI\Controls\DoubleSlider\DoubleSlider.h"
 #include "GUI\EditList\EditListPanel\EditListPanel.h"
 #include "Processing\ImageHandler\ImageHandler.h"
@@ -72,7 +73,7 @@ private:
 
 	wxButton * exportButton;
 
-	wxProgressDialog * progress;
+	wxGenericProgressDialog * progress;
 	wxCriticalSection locker;
 	enum ExportActions{
 		ID_BROWSE,

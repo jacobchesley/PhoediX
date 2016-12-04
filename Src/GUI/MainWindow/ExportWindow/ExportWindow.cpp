@@ -127,8 +127,11 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 	// Process both raw image (if it has one) and image itself
 	editList->ReprocessImageRaw();
 	progressSize = proc->GetLastNumEdits() + 1;
-	progress = new wxProgressDialog("Export Image Progress", "", progressSize, this, wxPD_SMOOTH);
-
+	progress = new wxGenericProgressDialog("Export Image Progress", "", progressSize, this, wxPD_SMOOTH | wxPD_APP_MODAL);
+	Icons icons;
+	wxIcon theIcon;
+	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
+	progress->SetIcon(theIcon);
 }
 
 void ExportWindow::ProcessingComplete(){
@@ -181,7 +184,7 @@ void ExportWindow::SetProgressEditNum(wxCommandEvent & evt){
 
 	// Update if we can
 	if(exportStarted && progress != NULL){
-		progress->Update(evt.GetInt());
+		progress->Update(evt.GetInt(), progress->GetMessage());
 	}
 }
 
