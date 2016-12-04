@@ -2,7 +2,7 @@
 
 #include "ImportImageDialog.h"
 
-ImportImageDialog::ImportImageDialog(wxWindow * parent) : wxDialog(parent, -1, "Rename Snapshot") {
+ImportImageDialog::ImportImageDialog(wxWindow * parent) : wxDialog(parent, -1, "Import Image To...") {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	mainSizer = new wxBoxSizer(wxVERTICAL);
@@ -25,11 +25,13 @@ ImportImageDialog::ImportImageDialog(wxWindow * parent) : wxDialog(parent, -1, "
 	buttonSizer->AddSpacer(10);
 	buttonSizer->Add(newButton);
 
+	mainSizer->AddSpacer(10);
 	mainSizer->Add(message, 0, wxALIGN_CENTER);
 	mainSizer->AddSpacer(20);
-	mainSizer->Add(buttonSizer, 0, wxALIGN_RIGHT);
+	mainSizer->Add(buttonSizer, 0, wxALIGN_CENTER);
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction) &ImportImageDialog::OnButton, this);
+	this->SetSize(this->GetClientSize());
 }
 
 void ImportImageDialog::OnButton(wxCommandEvent & evt) {
