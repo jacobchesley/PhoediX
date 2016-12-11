@@ -46,6 +46,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	menuTools->AppendSeparator();
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library"));
 
+	menuHelp->Append(MainWindow::MenuBar::ID_SHOW_SUPPORTED_CAMERAS, _("Supported Cameras (RAW)"));
 	menuHelp->Append(MainWindow::MenuBar::ID_ABOUT, _("About PhoediX"));
 
 	// Append menus to menu bar
@@ -123,7 +124,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	exportPaneInfo.Hide();
 	auiManager->AddPane(exportWindow, exportPaneInfo);
 	
-	settingsWindow = new SettingsWindow(this, processor);
+	settingsWindow = new SettingsWindow(this, processor, editList);
 	wxAuiPaneInfo settingsPaneInfo = wxAuiPaneInfo();
 	settingsPaneInfo.Float();
 	settingsPaneInfo.Caption("PhoediX Settings");
@@ -176,6 +177,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	auiManager->Update();
 
 	aboutWindow = new AboutWindow(this);
+	supportedCamerasWindow = new SupportedCamerasWindow(this);
 
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnNewProject, this, MainWindow::MenuBar::ID_NEW_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadProject, this, MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT);
@@ -193,6 +195,7 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowPixelPeep, this, MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLibrary, this, MainWindow::MenuBar::ID_SHOW_LIBRARY);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSupportedCameras, this, MainWindow::MenuBar::ID_SHOW_SUPPORTED_CAMERAS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowAbout, this, MainWindow::MenuBar::ID_ABOUT);
 
 	this->Bind(PROCESSOR_MESSAGE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveMessageFromProcessor, this, ID_PROCESSOR_MESSAGE);
@@ -207,7 +210,8 @@ MainWindow::MainWindow() : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDef
 
 	emptyImage = new wxImage(0, 0);
 	ImageHandler::LoadImageFromwxImage(emptyImage, processor->GetImage());
-	processor->SetOriginalImage(processor->GetImage());
+	processor->SetOriginalImage(new Image(*processor->GetImage()));
+	settingsWindow->ReadSettings();
 
 	this->SetMenuChecks();
 
@@ -738,6 +742,11 @@ void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 void MainWindow::ShowAbout(wxCommandEvent& WXUNUSED(evt)){
 	aboutWindow->CenterOnParent();
 	aboutWindow->Show();
+}
+
+void MainWindow::ShowSupportedCameras(wxCommandEvent& WXUNUSED(evt)) {
+	supportedCamerasWindow->CenterOnParent();
+	supportedCamerasWindow->Show();
 }
 
 void MainWindow::SetMenuChecks(){

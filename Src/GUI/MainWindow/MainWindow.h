@@ -11,27 +11,28 @@
 	#include "wx/wx.h"
 #endif
 
-#include "wx\aui\aui.h"
-#include "wx\thread.h"
-#include "wx\timer.h"
-#include "wx\msgdlg.h"
+#include "wx/aui/aui.h"
+#include "wx/thread.h"
+#include "wx/timer.h"
+#include "wx/msgdlg.h"
 
-#include "Processing\Processor\Processor.h"
-#include "Processing\ImageHandler\ImageHandler.h"
-#include "GUI\MainWindow\ExportWindow\ExportWindow.h"
-#include "GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.h"
-#include "GUI\MainWindow\SettingsWindow\SettingsWindow.h"
-#include "GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h"
-#include "GUI\EditList\EditListPanel\EditListPanel.h"
-#include "GUI\SnapshotWindow\SnapshotWindow.h"
-#include "GUI\AUI Manager\AUIManager.h"
-#include "GUI\Colors\Colors.h"
-#include "GUI\HistogramDisplay\HistogramDisplay.h"
-#include "GUI/MainWindow/AboutWindow/AboutWindow.h"
-#include "GUI/MainWindow/ImportImageDialog/ImportImageDialog.h"
+#include "Processing/Processor/Processor.h"
+#include "Processing/ImageHandler/ImageHandler.h"
+#include "GUI/ExportWindow/ExportWindow.h"
+#include "GUI/PixelPeepWindow/PixelPeepWindow.h"
+#include "GUI/SettingsWindow/SettingsWindow.h"
+#include "GUI/ImageDisplay/ZoomImagePanel/ZoomImagePanel.h"
+#include "GUI/EditList/EditListPanel/EditListPanel.h"
+#include "GUI/SnapshotWindow/SnapshotWindow.h"
+#include "GUI/AUI Manager/AUIManager.h"
+#include "GUI/Colors\Colors.h"
+#include "GUI/HistogramDisplay/HistogramDisplay.h"
+#include "GUI/AboutWindow/AboutWindow.h"
+#include "GUI/ImportImageDialog/ImportImageDialog.h"
 #include "GUI/LibraryWindow/LibraryWindow.h"
-#include "Session\Session.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/SupportedCamerasWindow/SupportedCamerasWindow.h"
+#include "Session/Session.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 /**
 	Main Window is the main display window of PhoediX.
@@ -60,6 +61,7 @@ private:
 	void ShowLibrary(wxCommandEvent& WXUNUSED(event));
 	void ShowSettings(wxCommandEvent& WXUNUSED(event));
 	void ShowAbout(wxCommandEvent& WXUNUSED(event));
+	void ShowSupportedCameras(wxCommandEvent& WXUNUSED(event));
 	void ShowEditList(wxCommandEvent& evt);
 	void ShowHistograms(wxCommandEvent& evt);
 	void OnReprocessTimer(wxTimerEvent& evt);
@@ -106,6 +108,7 @@ private:
 	PixelPeepWindow * pixelPeepWindow;
 	LibraryWindow * libraryWindow;
 	SnapshotWindow * snapshotWindow;
+	SupportedCamerasWindow * supportedCamerasWindow;
 	AboutWindow * aboutWindow;
 
 	Processor * processor;
@@ -138,6 +141,7 @@ private:
 		ID_SHOW_SNAPSHOTS,
 		ID_CLOSE_CURRENT_PROJECT,
 		ID_CLOSE_ALL_PROJECTS,
+		ID_SHOW_SUPPORTED_CAMERAS,
 		ID_ABOUT
 	};
 
