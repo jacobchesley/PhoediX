@@ -6726,9 +6726,9 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 
 	// process the raw image
 	processor->SendMessageToParent("RAW Image Processing");
-	//processor->rawPrcoessor.set_progress_handler(&Processor::RawCallback, NULL);
+	processor->rawPrcoessor.set_progress_handler(&Processor::RawCallback, NULL);
 	processor->rawErrorCode = processor->rawPrcoessor.dcraw_process();
-	//processor->rawPrcoessor.set_progress_handler(NULL, NULL);
+	processor->rawPrcoessor.set_progress_handler(NULL, NULL);
 	processor->SendMessageToParent("RAW Image Done Processing");
 
 	// Exit method before creating raw image from bad data
