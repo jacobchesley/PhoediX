@@ -7,23 +7,9 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	parWindow = parent;
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
-	colorSpaceSizer = new wxBoxSizer(wxHORIZONTAL);
-	colorSpaceLabel = new wxStaticText(this, -1, "Color Space");
-	colorSpaceLabel->SetForegroundColour(Colors::TextLightGrey);
-
-	colorSpaceSelection = new wxComboBox(this, -1);
-	colorSpaceSelection->AppendString("Adobe RGB");
-	colorSpaceSelection->AppendString("Pro Photo RGB");
-	colorSpaceSelection->AppendString("sRGB");
-	colorSpaceSelection->AppendString("Wide Gamut RGB");
-	colorSpaceSelection->SetSelection(2);
-
-	colorSpaceSizer->Add(colorSpaceLabel);
-	colorSpaceSizer->AddSpacer(10);
-	colorSpaceSizer->Add(colorSpaceSelection);
-
+	container = new wxBoxSizer(wxVERTICAL);
 	curveTabs = new wxNotebook(this, -1);
-
+	
 	lCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BRIGHT);
 	aCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
 	bCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
@@ -33,8 +19,6 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	curveTabs->AddPage(aCurve, "A Channel", false);
 	curveTabs->AddPage(bCurve, "B Channel", false);
 
-	container = new wxBoxSizer(wxVERTICAL);
-	container->Add(colorSpaceSizer);
 	container->Add(curveTabs, 1, wxEXPAND);
 
 	this->SetSizerAndFit(container);
@@ -184,8 +168,6 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 			bCurve16[i] = bVector16[i];
 		}
 
-
-
 		labCurveEdit->AddIntArray(lCurve16, numSteps16);
 		labCurveEdit->AddIntArray(aCurve16, numSteps16);
 		labCurveEdit->AddIntArray(bCurve16, numSteps16);
@@ -195,14 +177,6 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 	labCurveEdit->AddDoubleArray(lPoints, lControlPoints.size() * 2);
 	labCurveEdit->AddDoubleArray(aPoints, aControlPoints.size() * 2);
 	labCurveEdit->AddDoubleArray(bPoints, bControlPoints.size() * 2);
-
-	int colorSpace = 0;
-	if (colorSpaceSelection->GetSelection() == 0) { colorSpace = ColorSpaceENUM::ADOBE_RGB; }
-	if (colorSpaceSelection->GetSelection() == 1) { colorSpace = ColorSpaceENUM::PROPHOTO_RGB; }
-	if (colorSpaceSelection->GetSelection() == 2) { colorSpace = ColorSpaceENUM::sRGB; }
-	if (colorSpaceSelection->GetSelection() == 3) { colorSpace = ColorSpaceENUM::WIDE_GAMUT_RGB; }
-
-	labCurveEdit->AddParam(colorSpace);
 
 	// Set enabled / disabled
 	labCurveEdit->SetDisabled(isDisabled);

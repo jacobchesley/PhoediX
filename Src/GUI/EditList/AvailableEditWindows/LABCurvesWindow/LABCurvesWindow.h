@@ -17,7 +17,6 @@ class LABCurvesWindow :public EditWindow {
 public:
 	LABCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
 
-	void AddEditToProcessor();
 	void SetParamsAndFlags(ProcessorEdit * edit);
 	ProcessorEdit * GetParamsAndFlags();
 	bool CheckCopiedParamsAndFlags();
@@ -25,11 +24,7 @@ public:
 private:
 
 	wxWindow * parWindow;
-	wxButton * resetCurveButton;
 	
-	wxBoxSizer * colorSpaceSizer;
-	wxStaticText * colorSpaceLabel;
-	wxComboBox * colorSpaceSelection;
 	CurvePanel * lCurve;
 	CurvePanel * aCurve;
 	CurvePanel * bCurve;
