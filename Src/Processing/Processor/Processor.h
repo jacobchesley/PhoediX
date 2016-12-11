@@ -80,6 +80,9 @@ public:
 	void Enable16Bit();
 	void Disable16Bit();
 
+	void SetColorSpace(int newColorSpace);
+	int GetColorSpace();
+
 	void SetOriginalImage(Image * newOriginalImage);
 	Image* GetOriginalImage();
 	void RevertToOriginalImage(bool skipUpdate = false);
@@ -196,9 +199,11 @@ private:
 	static double pi;
 
 	wxWindow * parWindow;
+	int colorSpace;
 
 	void ShiftRGB(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
 	void AdjustHSL(double hShift, double sScale, double lScale, int dataStart = -1, int dataEnd = -1);
+	void AdjustLAB(double lScale, double aShift, double bShift, int dataStart = -1, int dataEnd = -1);
 	void AdjustBrightness(double brightAdjust, double detailsPreserve, double toneSetting, int tonePreservation, int dataStart = -1, int dataEnd = -1);
 	void AdjustContrast(double allContrast, double redContrast, double greenContrast, double blueContrast, 
 	double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
@@ -212,10 +217,10 @@ private:
 
 	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
 	int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16, int dataStart = -1, int dataEnd = -1);
-	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int colorSpace, int dataStart = -1, int dataEnd = -1);
+	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int dataStart = -1, int dataEnd = -1);
 	void HSLCurves(int * hChannel16, int * sChannel16, int * lChannel16, int dataStart = -1, int dataEnd = -1);
 
-	void SetupRotation(int editID, double angleDegrees, int crop);
+	bool SetupRotation(int editID, double angleDegrees, int crop);
 	void CleanupRotation(int editID);
 	void Rotate90CW(int dataStart = -1, int dataEnd = -1);
 	void Rotate180(int dataStart = -1, int dataEnd = -1);
@@ -227,7 +232,7 @@ private:
 	int GetFittedRotationWidth(double angleDegrees, int originalWidth, int originalHeight);
 	int GetFittedRotationHeight(double angleDegrees, int originalWidth, int originalHeight);
 
-	void SetupScale(int newWidth, int newHeight);
+	bool SetupScale(int newWidth, int newHeight);
 	void CleanupScale();
 	void ScaleNearest(int dataStart = -1, int dataEnd = -1);
 	void ScaleBilinear(int dataStart = -1, int dataEnd = -1);
@@ -240,8 +245,8 @@ private:
 	void MirrorHorizontal(int dataStart = -1, int dataEnd = -1);
 	void MirrorVertical(int dataStart = -1, int dataEnd = -1);
 
-	void RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace = sRGB);
-	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace = sRGB);
+	void RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpaceToUse);
+	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpaceToUse);
 	void XYZtoLAB(XYZ * xyz, LAB * lab);
 	void LABtoXYZ(LAB * lab, XYZ * xyz);
 

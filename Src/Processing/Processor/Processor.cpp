@@ -40,6 +40,8 @@ Processor::Processor(wxWindow * parent) {
 	editListInternal.clear();
 
 	restartRaw = true;
+
+	colorSpace = ColorSpaceENUM::sRGB;
 }
 
 Processor::~Processor() {
@@ -132,6 +134,14 @@ void Processor::Enable16Bit() {
 void Processor::Disable16Bit() {
 	img->Disable16Bit();
 	originalImg->Disable16Bit();
+}
+
+void Processor::SetColorSpace(int newColorSpace) {
+	colorSpace = newColorSpace;
+}
+
+int Processor::GetColorSpace() {
+	return colorSpace;
 }
 
 int Processor::ProcessEdits() {
@@ -575,7 +585,6 @@ void Processor::ShiftRGB(double all, double red, double green, double blue, int 
 	}
 }
 
-
 void Processor::AdjustHSL(double hShift, double sScale, double lScale, int dataStart, int dataEnd) {
 
 	if(hShift > 360.0) { hShift = 360.0; }
@@ -873,6 +882,116 @@ void Processor::AdjustHSL(double hShift, double sScale, double lScale, int dataS
 			tempRed = wxRound(tempRedHSL *65535.0);
 			tempGreen =  wxRound(tempGreenHSL * 65535.0);
 			tempBlue =  wxRound(tempBlueHSL * 65535.0);
+
+			// handle overflow or underflow
+			tempRed = (tempRed > 65535) ? 65535 : tempRed;
+			tempGreen = (tempGreen > 65535) ? 65535 : tempGreen;
+			tempBlue = (tempBlue > 65535) ? 65535 : tempBlue;
+
+			tempRed = (tempRed < 0) ? 0 : tempRed;
+			tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+
+			// Set the new pixel to the 16 bit data
+			redData16[i] = (uint16_t)tempRed;
+			greenData16[i] = (uint16_t)tempGreen;
+			blueData16[i] = (uint16_t)tempBlue;
+		}
+	}
+}
+
+void Processor::AdjustLAB(double lScale, double aShift, double bShift, int dataStart, int dataEnd) {
+	// Get number of pixels for the image
+	int dataSize = img->GetWidth() * img->GetHeight();
+	if (dataStart < 0 || dataEnd < 0) {
+		dataStart = 0;
+		dataEnd = dataSize;
+	}
+
+	RGB rgb;
+	XYZ xyz;
+	LAB lab;
+
+	int32_t tempRed;
+	int32_t tempGreen;
+	int32_t tempBlue;
+
+	// Process 8 bit data
+	if (img->GetColorDepth() == 8) {
+
+		// Get pointers to 8 bit data
+		uint8_t * redData8 = img->Get8BitDataRed();
+		uint8_t * greenData8 = img->Get8BitDataGreen();
+		uint8_t * blueData8 = img->Get8BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if (forceStop) { return; }
+
+			// Convert RGB to LAB color space
+			rgb.R = (float)redData8[i] / 256.0;
+			rgb.G = (float)greenData8[i] / 256.0;
+			rgb.B = (float)blueData8[i] / 256.0;
+			this->RGBtoXYZ(&rgb, &xyz, colorSpace);
+			this->XYZtoLAB(&xyz, &lab);
+			
+			// Apply LAB adjustment
+			lab.L = lab.L * lScale;
+			lab.A = lab.A + aShift;
+			lab.B = lab.B + bShift;
+
+			// Convert LAB back to RGB color space
+			this->LABtoXYZ(&lab, &xyz);
+			this->XYZtoRGB(&xyz, &rgb, colorSpace);
+			tempRed = (int32_t)(rgb.R * 256.0);
+			tempGreen = (int32_t)(rgb.G * 256.0);
+			tempBlue = (int32_t)(rgb.B * 256.0);
+
+			// handle overflow or underflow
+			tempRed = (tempRed > 255) ? 255 : tempRed;
+			tempGreen = (tempGreen > 255) ? 255 : tempGreen;
+			tempBlue = (tempBlue > 255) ? 255 : tempBlue;
+
+			tempRed = (tempRed < 0) ? 0 : tempRed;
+			tempGreen = (tempGreen < 0) ? 0 : tempGreen;
+			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
+
+			// Set the new pixel to the 8 bit data
+			redData8[i] = (uint8_t)tempRed;
+			greenData8[i] = (uint8_t)tempGreen;
+			blueData8[i] = (uint8_t)tempBlue;
+		}
+	}
+	// Process 16 bit data
+	else {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if (forceStop) { return; }
+
+			// Convert RGB to LAB color space
+			rgb.R = (float)redData16[i] / 65535.0;
+			rgb.G = (float)greenData16[i] / 65535.0;
+			rgb.B = (float)blueData16[i] / 65535.0;
+			this->RGBtoXYZ(&rgb, &xyz, colorSpace);
+			this->XYZtoLAB(&xyz, &lab);
+
+			// Apply LAB adjustment
+			lab.L = lab.L * lScale;
+			lab.A = lab.A + aShift;
+			lab.B = lab.B + bShift;
+
+			// Convert LAB back to RGB color space
+			this->LABtoXYZ(&lab, &xyz);
+			this->XYZtoRGB(&xyz, &rgb, colorSpace);
+			tempRed = (int32_t)(rgb.R * 65535.0);
+			tempGreen = (int32_t)(rgb.G * 65535.0);
+			tempBlue = (int32_t)(rgb.B * 65535.0);
 
 			// handle overflow or underflow
 			tempRed = (tempRed > 65535) ? 65535 : tempRed;
@@ -1724,7 +1843,7 @@ void Processor::RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8
 
 }
 
-void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int colorSpace,  int dataStart, int dataEnd){
+void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int dataStart, int dataEnd){
 
 	// Need to copy curves incase thread ends and destroys original curve table while we are still in it
 	// (but exiting soon)
@@ -1808,7 +1927,7 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 
 			// Convert LAB back to RGB color space
 			this->LABtoXYZ(&lab, &xyz);
-			this->XYZtoRGB(&xyz, &rgb);
+			this->XYZtoRGB(&xyz, &rgb, colorSpace);
 			tempRed = (int32_t)(rgb.R * 256.0);
 			tempGreen = (int32_t)(rgb.G * 256.0);
 			tempBlue = (int32_t)(rgb.B * 256.0);
@@ -1876,7 +1995,7 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int co
 
 			// Convert LAB back to RGB color space
 			this->LABtoXYZ(&lab, &xyz);
-			this->XYZtoRGB(&xyz, &rgb);
+			this->XYZtoRGB(&xyz, &rgb, colorSpace);
 			tempRed = (int32_t)(rgb.R * 65535.0);
 			tempGreen = (int32_t)(rgb.G * 65535.0);
 			tempBlue = (int32_t)(rgb.B * 65535.0);
@@ -2263,16 +2382,22 @@ void Processor::HSLCurves(int * hCurve16, int * sCurve16, int * lCurve16, int da
 	delete[] lCurve16Copy;
 }
 
-void Processor::SetupRotation(int editID, double angleDegrees, int crop){
-	
+bool Processor::SetupRotation(int editID, double angleDegrees, int crop){
+
 	// Copy image data to tmep image
 	if(editID == ProcessorEdit::EditType::ROTATE_180){
 		tempImage = new Image(*img);
+		if (tempImage->GetErrorStr() != "") {
+			return false;
+		}
 	}
 
 	// Copy image data to tmep image.  Width and height will be swapped in cleanup
 	else if (editID == ProcessorEdit::EditType::ROTATE_90_CW ||editID == ProcessorEdit::EditType::ROTATE_270_CW){
 		tempImage = new Image(*img);
+		if (tempImage->GetErrorStr() != "") {
+			return false;
+		}
 	}
 
 	// Create a blank temp image that will be filled in from rotation algorithms
@@ -2283,6 +2408,9 @@ void Processor::SetupRotation(int editID, double angleDegrees, int crop){
 		tempImage = new Image();
 		if(img->GetColorDepth() == 16){ 
 			tempImage->Enable16Bit();
+			if (tempImage->GetErrorStr() != "") {
+				return false;
+			}
 		}
 
 		// Set width and height to maximum size needed to fit whole image in rotation (with black surrounding borders)
@@ -2305,7 +2433,11 @@ void Processor::SetupRotation(int editID, double angleDegrees, int crop){
 
 		// Create blank image data
 		tempImage->InitImage();
+		if (tempImage->GetErrorStr() != "") {
+			return false;
+		}
 	}
+	return true;
 }
 
 void Processor::CleanupRotation(int editID){
@@ -3755,7 +3887,7 @@ int Processor::GetFittedRotationHeight(double angleDegrees, int originalWidth, i
 	}
 }
 
-void Processor::SetupScale(int newWidth, int newHeight){
+bool Processor::SetupScale(int newWidth, int newHeight){
 
 	// Create temp image with new scale size
 	tempImage = new Image();
@@ -3763,6 +3895,11 @@ void Processor::SetupScale(int newWidth, int newHeight){
 	tempImage->SetHeight(newHeight);
 	if (this->GetImage()->GetColorDepth() == 16) { tempImage->Enable16Bit(); }
 	tempImage->InitImage();
+
+	if (tempImage->GetErrorStr() != "") {
+		return false;
+	}
+	return true;
 }
 
 void Processor::CleanupScale(){
@@ -5120,7 +5257,7 @@ void Processor::MirrorVertical(int dataStart, int dataEnd) {
 	}
 }
 
-void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace) {
+void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpaceToUse) {
 
 	float tempR = rgb->R;
 	float tempG = rgb->G;
@@ -5149,7 +5286,7 @@ void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace) {
 	tempG *= 100.0f;
 	tempB *= 100.0f;
 
-	switch (colorSpace) {
+	switch (colorSpaceToUse) {
 
 	case ADOBE_RGB:
 		xyz->X = (tempR * 0.5767309f) + (tempG * 0.1855540f) + (tempB * 0.1881852f);
@@ -5177,7 +5314,7 @@ void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpace) {
 	}
 }
 
-void Processor::XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace) {
+void Processor::XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpaceToUse) {
 
 	float tempX = (float)xyz->X / 100.0f;
 	float tempY = (float)xyz->Y / 100.0f;
@@ -5187,7 +5324,7 @@ void Processor::XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpace) {
 	float tempG = 0.0f;
 	float tempB = 0.0f;
 
-	switch (colorSpace) {
+	switch (colorSpaceToUse) {
 
 	case ADOBE_RGB:
 		tempR = (tempX *  2.0413690f) + (tempY * -0.5649464f) + (tempZ * -0.3446944f);
@@ -5382,11 +5519,20 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 	// Get number of edits and set to a string to display in UI
 	size_t numberOfEdits = editVec.size();
+
+	int subtractEdits = 0;
+	if (editVec.size() > 0) {
+		if (editVec.at(0)->GetEditType() == ProcessorEdit::EditType::RAW) {
+			numberOfEdits -= 1;
+			subtractEdits = 1;
+		}
+	}
+
 	wxString numEditsStr;
 	numEditsStr << numberOfEdits;
 
 	// Go through each edit one by one.  Each of these will invoke at least 1 child thread for the edit itself
-	for (size_t editIndex = 0; editIndex < numberOfEdits; editIndex++) {
+	for (size_t editIndex = 0; editIndex < editVec.size(); editIndex++) {
 		
 		if(procParent->forceStop){
 			this->DeleteEditVector();
@@ -5413,7 +5559,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 		}
 
 		wxString curEditStr;
-		curEditStr << (editIndex + 1);
+		curEditStr << (editIndex + 1 - subtractEdits);
 
 		wxString fullEditNumStr = " (" + curEditStr + "/" + numEditsStr + ")";
 
@@ -5904,7 +6050,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Perform an edit on the data through the processor
 				// No multithreading for performance reasons.
-				procParent->SetupRotation(editToComplete, 180.0, 0);
+				if(!procParent->SetupRotation(editToComplete, 180.0, 0)) { break; }
 				procParent->Rotate180();
 				procParent->CleanupRotation(editToComplete);
 				procParent->SetUpdated(true);
@@ -5918,11 +6064,11 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Perform an edit on the data through the processor
 				// No multithreading for performance reasons.
-				procParent->SetupRotation(ProcessorEdit::EditType::ROTATE_180, 180.0, 0);
+				if (!procParent->SetupRotation(ProcessorEdit::EditType::ROTATE_180, 180.0, 0)) { break; }
 				procParent->Rotate180();
 				procParent->CleanupRotation(ProcessorEdit::EditType::ROTATE_180);
 
-				procParent->SetupRotation(ProcessorEdit::EditType::ROTATE_90_CW, 90.0, 0);
+				if (!procParent->SetupRotation(ProcessorEdit::EditType::ROTATE_90_CW, 90.0, 0)) { break; }
 				procParent->Rotate90CW();
 				procParent->CleanupRotation(ProcessorEdit::EditType::ROTATE_90_CW);
 
@@ -5944,7 +6090,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Multithread if needed
 				if(procParent->GetMultithread()){
 				
-					procParent->SetupRotation(editToComplete, angle, cropFlag);
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 
 					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
@@ -5973,7 +6119,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->SetupRotation(editToComplete, angle, cropFlag);
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 					procParent->RotateCustom(angle);
 					procParent->CleanupRotation(editToComplete);
 				}
@@ -5995,7 +6142,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Multithread if needed
 				if(procParent->GetMultithread()){
 				
-					procParent->SetupRotation(editToComplete, angle, cropFlag);
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 
 					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
@@ -6023,7 +6170,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->SetupRotation(editToComplete, angle, cropFlag);
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 					procParent->RotateCustomBilinear(angle);
 					procParent->CleanupRotation(editToComplete);
 				}
@@ -6045,7 +6192,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Multithread if needed
 				if(procParent->GetMultithread()){
 				
-					procParent->SetupRotation(editToComplete, angle, cropFlag);
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 
 					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
@@ -6073,7 +6220,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->SetupRotation(editToComplete, angle, cropFlag);
+					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 					procParent->RotateCustomBicubic(angle);
 					procParent->CleanupRotation(editToComplete);
 				}
@@ -6095,7 +6242,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Multithread if needed
 				if(procParent->GetMultithread()){
 				
-					procParent->SetupScale(width, height);
+					if (!procParent->SetupScale(width, height)) { break; }
 
 					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
@@ -6123,7 +6270,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->SetupScale(width, height);
+					if (!procParent->SetupScale(width, height)) { break; }
 					procParent->ScaleNearest();
 					procParent->CleanupScale();
 				}
@@ -6145,7 +6292,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Multithread if needed
 				if(procParent->GetMultithread()){
 				
-					procParent->SetupScale(width, height);
+					if (!procParent->SetupScale(width, height)) { break; }
 
 					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
@@ -6173,7 +6320,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->SetupScale(width, height);
+					if (!procParent->SetupScale(width, height)) { break; }
 					procParent->ScaleBilinear();
 					procParent->CleanupScale();
 				}
@@ -6195,7 +6342,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Multithread if needed
 				if(procParent->GetMultithread()){
 				
-					procParent->SetupScale(width, height);
+					if (!procParent->SetupScale(width, height)) { break; }
 
 					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
@@ -6223,7 +6370,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->SetupScale(width, height);
+					if (!procParent->SetupScale(width, height)) { break; }
 					procParent->ScaleBicubic();
 					procParent->CleanupScale();
 				}
@@ -6376,8 +6523,6 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 					int * aCurve16 = curEdit->GetIntArray(1);
 					int * bCurve16 = curEdit->GetIntArray(2);
 
-					int colorSpace = curEdit->GetParam(0);
-
 					// Multithread if needed
 					if(procParent->GetMultithread()){
 				
@@ -6396,12 +6541,12 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 							}
 							// Process current chunk of data
 							if(thread != numThreads - 1){
-								procParent->LABCurves(lCurve16, aCurve16, bCurve16, colorSpace, chunkSize * thread, chunkSize * (thread + 1));
+								procParent->LABCurves(lCurve16, aCurve16, bCurve16, chunkSize * thread, chunkSize * (thread + 1));
 							}
 
 							// Go all the way to end of data (incase of rounding error)
 							else{
-								procParent->LABCurves(lCurve16, aCurve16, bCurve16, colorSpace, chunkSize * thread, dataSize);
+								procParent->LABCurves(lCurve16, aCurve16, bCurve16, chunkSize * thread, dataSize);
 							}
 						}
 					}
@@ -6409,7 +6554,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 					// Single thread
 					else{
 						// Perform an edit on the data through the processor
-						procParent->LABCurves(lCurve16, aCurve16, bCurve16, colorSpace);
+						procParent->LABCurves(lCurve16, aCurve16, bCurve16);
 					}
 					procParent->SetUpdated(true);
 			
