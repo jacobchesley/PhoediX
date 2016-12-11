@@ -16,6 +16,7 @@ Image::Image() {
 	imageDataBlue16 = NULL;
 	width = 0;
 	height = 0;
+	errorMessage = "";
 }
 
 Image::Image(const Image& imageToCopy) {
@@ -23,6 +24,7 @@ Image::Image(const Image& imageToCopy) {
 	width = imageToCopy.width;
 	height = imageToCopy.height;
 	bit16Enabled = imageToCopy.bit16Enabled;
+	errorMessage = "";
 
 	int size = width * height;
 	if(size < 1){
@@ -187,6 +189,7 @@ void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 	width = inWidth;
 	height = inHeight;
 	uint64_t size = width * height * 3;
+	errorMessage = "";
 
 	if(width == 0 || height == 0){
 		if (bit16Enabled) {
@@ -316,6 +319,7 @@ void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 	width = inWidth;
 	height = inHeight;
 	int size = width * height * 3;
+	errorMessage = "";
 
 	if(width == 0 || height == 0){
 		if (bit16Enabled) {
@@ -542,7 +546,8 @@ void Image::SetHeight(int newHeight) {
 void Image::InitImage() {
 
 	int size = width * height * 3;
-
+	errorMessage = "";
+	if (size < 1) { return; }
 	// Init 16 bit data
 	if (bit16Enabled) {
 
@@ -670,7 +675,10 @@ wxString Image::GetErrorStr() {
 void Image::Enable16Bit() {
 	bit16Enabled = true;
 
-	int size = width * height;;
+	int size = width * height;
+	errorMessage = "";
+	if (size < 1) { return; }
+
 
 	// Delete current 16 bit image data if it exists
 	if (imageDataRed16 != NULL) {
@@ -721,7 +729,10 @@ void Image::Enable16Bit() {
 void Image::Disable16Bit() {
 	bit16Enabled = false;
 
-	int size = width * height;;
+	int size = width * height;
+	errorMessage = "";
+
+	if (size < 1) { return; }
 
 	// Delete current 16 bit image data if it exists
 	if (imageDataRed8 != NULL) {
