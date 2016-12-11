@@ -22,7 +22,6 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 	presetLabel = new wxStaticText(this, -1, "Preset");
 	presetLabel->SetForegroundColour(Colors::TextLightGrey);
 
-
 	presetBox = new wxComboBox(this, -1);
 	presetBox->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	presetBox->SetForegroundColour(Colors::TextLightGrey);
@@ -150,10 +149,14 @@ void ChannelMixerWindow::PopulateIntialPresets() {
 
 	ChannelMixerPreset defaultPreset = ChannelMixerPreset("Default", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 	ChannelMixerPreset sepiaPreset = ChannelMixerPreset("Sepia", 0.393, 0.769, 0.189, 0.349, 0.686, 0.168, 0.272, 0.534, 0.131);
+	ChannelMixerPreset greyscaleEyesight = ChannelMixerPreset("Greyscale Human Eyesight", 0.2126, 0.7152, 0.0722, 0.2126, 0.7152, 0.0722, 0.2126, 0.7152, 0.0722);
+	ChannelMixerPreset greyscaleAverage = ChannelMixerPreset("Greyscale Average", (1.0/3.0), (1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0));
 	ChannelMixerPreset customPreset = ChannelMixerPreset("Custom", 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
 	presetList.push_back(defaultPreset);
 	presetList.push_back(sepiaPreset);
+	presetList.push_back(greyscaleEyesight);
+	presetList.push_back(greyscaleAverage);
 	presetList.push_back(customPreset);
 
 	this->CreateComboPresetList();
