@@ -42,22 +42,6 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	settingsPanel->GetSizer()->Add(greenMatchingLabel);
 	settingsPanel->GetSizer()->Add(greenMatchingControl);
 
-	// Color Space
-	colorSpaceLabel = new wxStaticText(settingsPanel, -1, "Color Space");
-	colorSpaceLabel->SetForegroundColour(Colors::TextLightGrey);
-	colorSpaceControl = new wxComboBox(settingsPanel, -1);
-	colorSpaceControl->SetBackgroundColour(Colors::BackDarkDarkGrey);
-	colorSpaceControl->SetForegroundColour(Colors::TextLightGrey);
-	colorSpaceControl->Append("sRGB");
-	colorSpaceControl->Append("Adobe RGB");
-	colorSpaceControl->Append("Wide");
-	colorSpaceControl->Append("Pro Photo");
-	colorSpaceControl->Append("XYZ");
-	colorSpaceControl->Append("RAW");
-	colorSpaceControl->SetSelection(0);
-	settingsPanel->GetSizer()->Add(colorSpaceLabel);
-	settingsPanel->GetSizer()->Add(colorSpaceControl);
-
 	// Interpolation
 	interpolationLabel = new wxStaticText(settingsPanel, -1, "Interpolation");
 	interpolationLabel->SetForegroundColour(Colors::TextLightGrey);
@@ -765,21 +749,18 @@ void RawWindow::Process() {
 	}
 
 	// Choose Color Space
-	switch (colorSpaceControl->GetSelection()) {
-		case 0:
+	switch (proc->GetColorSpace()) {
+		case ColorSpaceENUM::sRGB:
 			proc->rawPrcoessor.imgdata.params.output_color = 1;
 			break;
-		case 1:
+		case ColorSpaceENUM::ADOBE_RGB:
 			proc->rawPrcoessor.imgdata.params.output_color = 2;
 			break;
-		case 2:
+		case ColorSpaceENUM::WIDE_GAMUT_RGB:
 			proc->rawPrcoessor.imgdata.params.output_color = 3;
 			break;
-		case 3:
+		case ColorSpaceENUM::PROPHOTO_RGB:
 			proc->rawPrcoessor.imgdata.params.output_color = 4;
-			break;
-		case 4:
-			proc->rawPrcoessor.imgdata.params.output_color = 0;
 			break;
 	}
 	
@@ -853,9 +834,8 @@ void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		if(edit->GetParam(20) == 1){ autoBrightControl->SetValue(true); } else { autoBrightControl->SetValue(false); }
 		exposureControl->SetValue(edit->GetParam(21));
 		exposurePreserveControl->SetValue(edit->GetParam(22));
-		colorSpaceControl->SetSelection((int)edit->GetParam(23));
-		flipControl->SetSelection((int)edit->GetParam(24));
-		if(edit->GetParam(25) == 1){ halfSizeControl->SetValue(true); } else { halfSizeControl->SetValue(false); }
+		flipControl->SetSelection((int)edit->GetParam(23));
+		if(edit->GetParam(24) == 1){ halfSizeControl->SetValue(true); } else { halfSizeControl->SetValue(false); }
 
 		this->Process();
 	}
@@ -893,10 +873,7 @@ ProcessorEdit * RawWindow::GetParamsAndFlags(){
 	rawEdit->AddParam(autoBrightControl->GetValue());
 	rawEdit->AddParam(exposureControl->GetValue());
 	rawEdit->AddParam(exposurePreserveControl->GetValue());
-	rawEdit->AddParam((double)colorSpaceControl->GetSelection());
-	rawEdit->AddParam((double)flipControl->GetSelection());
-
-	
+	rawEdit->AddParam((double)flipControl->GetSelection());	
 	rawEdit->AddParam((double)halfSizeControl->GetValue());
 
 	return rawEdit;

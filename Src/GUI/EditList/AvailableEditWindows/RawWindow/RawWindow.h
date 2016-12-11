@@ -51,9 +51,6 @@ class RawWindow : public EditWindow {
 		wxStaticText * greenMatchingLabel;
 		wxCheckBox * greenMatchingControl;
 	
-		wxStaticText * colorSpaceLabel;
-		wxComboBox * colorSpaceControl;
-
 		wxStaticText * flipLabel;
 		wxComboBox * flipControl;
 
