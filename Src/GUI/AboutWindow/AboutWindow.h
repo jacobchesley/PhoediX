@@ -3,7 +3,6 @@
 #ifndef ABOUT_WINDOW_H
 #define ABOUT_WINDOW_H
 
-
 // for compilers that support precompilation, includes "wx/wx.h"
 #include "wx/wxprec.h"
 
@@ -14,7 +13,6 @@
 
 #include "GUI\Icons\Icons.h"
 #include "GUI\Colors\Colors.h"
-#include "GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h"
 
 class AboutWindow : public wxFrame {
 
