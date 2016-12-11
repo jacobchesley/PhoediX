@@ -127,26 +127,14 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB">
       <UniqueIdentifier>{212613a4-d050-4c78-8bba-a13bfee5ca6b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Main Window\Export Window">
-      <UniqueIdentifier>{42574900-a77c-4f00-b945-5c4e112db4b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Scale">
       <UniqueIdentifier>{cd57c266-5eae-44cf-8f66-90f3d5875b75}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Crop">
       <UniqueIdentifier>{ae263040-26e2-4853-aca2-cab85d92c5cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Main Window\Pixel Peep">
-      <UniqueIdentifier>{b6a9d933-49f0-467b-b155-cec9715c641c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves">
       <UniqueIdentifier>{ee436ec2-11fe-4336-8d0d-917bf6e0f2cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Main Window\Settings Window">
-      <UniqueIdentifier>{7454ac40-37e3-495b-abf3-f5006c8f2931}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Main Window\About Window">
-      <UniqueIdentifier>{47200a5c-8425-415f-b807-52d4ccf00ee1}</UniqueIdentifier>
     </Filter>
     <Filter Include="GUI\Selections Window">
       <UniqueIdentifier>{c85dbce6-6844-4b5d-84b5-fae616d30ca8}</UniqueIdentifier>
@@ -172,8 +160,23 @@
     <Filter Include="Processing\Raw Error Codes">
       <UniqueIdentifier>{52782be7-b7f7-4650-9198-b6354a3d60c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Main Window\Import Image Dialog">
+    <Filter Include="GUI\About Window">
+      <UniqueIdentifier>{47200a5c-8425-415f-b807-52d4ccf00ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Export Window">
+      <UniqueIdentifier>{42574900-a77c-4f00-b945-5c4e112db4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Import Image Dialog">
       <UniqueIdentifier>{f3884e67-b828-43fb-b406-9b2991aecfd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Settings Window">
+      <UniqueIdentifier>{7454ac40-37e3-495b-abf3-f5006c8f2931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Supported Cameras">
+      <UniqueIdentifier>{4cd3ece5-f54c-4b03-a823-c530951cbdd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Pixel Peep Window">
+      <UniqueIdentifier>{b6a9d933-49f0-467b-b155-cec9715c641c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -285,26 +288,14 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.cpp">
-      <Filter>GUI\Main Window\Export Window</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\CropWindow\CropWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Crop</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.cpp">
-      <Filter>GUI\Main Window\Pixel Peep</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\HSLCurvesWindow\HSLCurvesWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.cpp">
-      <Filter>GUI\Main Window\Settings Window</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.cpp">
-      <Filter>GUI\Main Window\About Window</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp">
       <Filter>GUI\Selections Window</Filter>
@@ -327,8 +318,23 @@
     <ClCompile Include="..\Src\Processing\RawErrorCodes\RawError.cpp">
       <Filter>Processing\Raw Error Codes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.cpp">
-      <Filter>GUI\Main Window\Import Image Dialog</Filter>
+    <ClCompile Include="..\Src\GUI\SupportedCamerasWindow\SupportedCamerasWindow.cpp">
+      <Filter>GUI\Supported Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\ExportWindow\ExportWindow.cpp">
+      <Filter>GUI\Export Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\AboutWindow\AboutWindow.cpp">
+      <Filter>GUI\About Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.cpp">
+      <Filter>GUI\Import Image Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\PixelPeepWindow\PixelPeepWindow.cpp">
+      <Filter>GUI\Pixel Peep Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\SettingsWindow\SettingsWindow.cpp">
+      <Filter>GUI\Settings Window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -458,26 +464,14 @@
     <ClInclude Include="..\Src\GUI\Icons\Splash.h">
       <Filter>GUI\Icons</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.h">
-      <Filter>GUI\Main Window\Export Window</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\CropWindow\CropWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Crop</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.h">
-      <Filter>GUI\Main Window\Pixel Peep</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\HSLCurvesWindow\HSLCurvesWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.h">
-      <Filter>GUI\Main Window\Settings Window</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.h">
-      <Filter>GUI\Main Window\About Window</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryWindow.h">
       <Filter>GUI\Selections Window</Filter>
@@ -503,8 +497,23 @@
     <ClInclude Include="..\Src\Processing\RawErrorCodes\RawError.h">
       <Filter>Processing\Raw Error Codes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.h">
-      <Filter>GUI\Main Window\Import Image Dialog</Filter>
+    <ClInclude Include="..\Src\GUI\SupportedCamerasWindow\SupportedCamerasWindow.h">
+      <Filter>GUI\Supported Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\ExportWindow\ExportWindow.h">
+      <Filter>GUI\Export Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\AboutWindow\AboutWindow.h">
+      <Filter>GUI\About Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.h">
+      <Filter>GUI\Import Image Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\PixelPeepWindow\PixelPeepWindow.h">
+      <Filter>GUI\Pixel Peep Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\SettingsWindow\SettingsWindow.h">
+      <Filter>GUI\Settings Window</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

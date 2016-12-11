@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
+    <ClCompile Include="..\Src\GUI\AboutWindow\AboutWindow.cpp" />
     <ClCompile Include="..\Src\GUI\AUI Manager\AUIManager.cpp" />
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.cpp" />
@@ -45,23 +46,23 @@
     <ClCompile Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditSelection\EditSelection.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditWindow\EditWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\ExportWindow\ExportWindow.cpp" />
     <ClCompile Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.cpp" />
     <ClCompile Include="..\Src\GUI\Icons\Icons.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.cpp" />
+    <ClCompile Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelection.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\PixelPeepWindow\PixelPeepWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\SettingsWindow\SettingsWindow.cpp" />
     <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.cpp" />
     <ClCompile Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\SupportedCamerasWindow\SupportedCamerasWindow.cpp" />
     <ClCompile Include="..\Src\Processing\ImageHandler\ImageHandler.cpp" />
     <ClCompile Include="..\Src\Processing\Image\Image.cpp" />
     <ClCompile Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.cpp" />
@@ -74,6 +75,7 @@
   <ItemGroup>
     <ClInclude Include="..\Src\App\PhoediX.h" />
     <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
+    <ClInclude Include="..\Src\GUI\AboutWindow\AboutWindow.h" />
     <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h" />
     <ClInclude Include="..\Src\GUI\Colors\Colors.h" />
     <ClInclude Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.h" />
@@ -99,6 +101,7 @@
     <ClInclude Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditSelection\EditSelection.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditWindow\EditWindow.h" />
+    <ClInclude Include="..\Src\GUI\ExportWindow\ExportWindow.h" />
     <ClInclude Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.h" />
     <ClInclude Include="..\Src\GUI\Icons\delete_button.h" />
     <ClInclude Include="..\src\GUI\Icons\disable_button.h" />
@@ -110,17 +113,16 @@
     <ClInclude Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h" />
+    <ClInclude Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.h" />
     <ClInclude Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.h" />
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.h" />
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryWindow.h" />
-    <ClInclude Include="..\Src\GUI\MainWindow\AboutWindow\AboutWindow.h" />
-    <ClInclude Include="..\Src\GUI\MainWindow\ExportWindow\ExportWindow.h" />
-    <ClInclude Include="..\Src\GUI\MainWindow\ImportImageDialog\ImportImageDialog.h" />
     <ClInclude Include="..\Src\GUI\MainWindow\MainWindow.h" />
-    <ClInclude Include="..\Src\GUI\MainWindow\PixelPeepWindow\PixelPeepWindow.h" />
-    <ClInclude Include="..\Src\GUI\MainWindow\SettingsWindow\SettingsWindow.h" />
+    <ClInclude Include="..\Src\GUI\PixelPeepWindow\PixelPeepWindow.h" />
+    <ClInclude Include="..\Src\GUI\SettingsWindow\SettingsWindow.h" />
     <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotRenameDialog\SnapshotRenameDialog.h" />
     <ClInclude Include="..\Src\GUI\SnapshotWindow\SnapshotWindow.h" />
+    <ClInclude Include="..\Src\GUI\SupportedCamerasWindow\SupportedCamerasWindow.h" />
     <ClInclude Include="..\Src\Processing\ImageHandler\ImageHandler.h" />
     <ClInclude Include="..\Src\Processing\Image\Image.h" />
     <ClInclude Include="..\Src\Processing\ProcessorEdit\ProcessorEdit.h" />
