@@ -234,6 +234,7 @@ void ZoomImagePanel::ImageScroll::Redraw() {
 
 void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 	
+	if (newImage == NULL) { return; }
 	// Verify new image is okay
 	if (newImage->GetWidth() > 0 && newImage->GetHeight() > 0) {
 
