@@ -4,6 +4,7 @@
 
 wxDEFINE_EVENT(PROCESSOR_MESSAGE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(PROCESSOR_NUM_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(PROCESSOR_RAW_COMPLETE_EVENT, wxCommandEvent);
 
 double Processor::pi = 3.141592653589793238463;
 
@@ -350,6 +351,15 @@ void Processor::SendProcessorEditNumToParent(int editNum){
 	if (parWindow != NULL) {
 		wxCommandEvent evt(PROCESSOR_NUM_EVENT, ID_PROCESSOR_NUM);
 		evt.SetInt(editNum);
+		wxPostEvent(parWindow, evt);
+	}
+}
+
+void Processor::SendRawComplete() {
+
+	// Send add edit event with edit ID to parent window (the edit panel)
+	if (parWindow != NULL) {
+		wxCommandEvent evt(PROCESSOR_RAW_COMPLETE_EVENT, ID_RAW_COMPLETE);
 		wxPostEvent(parWindow, evt);
 	}
 }
@@ -1965,9 +1975,9 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int da
 			}
 
 			// Convert RGB to LAB color space
-			rgb.R = (float)redData16[i] / 65535.0;
-			rgb.G = (float)greenData16[i] / 65535.0;
-			rgb.B = (float)blueData16[i] / 65535.0;
+			rgb.R = (float)redData16[i] / 65536.0;
+			rgb.G = (float)greenData16[i] / 65536.0;
+			rgb.B = (float)blueData16[i] / 65536.0;
 			this->RGBtoXYZ(&rgb, &xyz, colorSpace);
 			this->XYZtoLAB(&xyz, &lab);
 
@@ -1996,9 +2006,9 @@ void Processor::LABCurves(int * lCurve16, int * aCurve16, int * bCurve16, int da
 			// Convert LAB back to RGB color space
 			this->LABtoXYZ(&lab, &xyz);
 			this->XYZtoRGB(&xyz, &rgb, colorSpace);
-			tempRed = (int32_t)(rgb.R * 65535.0);
-			tempGreen = (int32_t)(rgb.G * 65535.0);
-			tempBlue = (int32_t)(rgb.B * 65535.0);
+			tempRed = (int32_t)(rgb.R * 65536.0);
+			tempGreen = (int32_t)(rgb.G * 65536.0);
+			tempBlue = (int32_t)(rgb.B * 65536.0);
 
 			// handle overflow or underflow
 			tempRed = (tempRed > 65535) ? 65535 : tempRed;
@@ -6805,7 +6815,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		processor->ProcessEdits();
 		processor->DeleteRawImage();
 		processor->SendMessageToParent("");
-		
+		processor->SendRawComplete();
 	}
 	else{
 		

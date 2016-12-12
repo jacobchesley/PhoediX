@@ -43,7 +43,8 @@ public:
 	/**
 		Constructor for the main window.
 	*/
-	MainWindow();
+	MainWindow(wxApp * application);
+	bool OriginalImageDispalyed();
 
 private:
 
@@ -59,6 +60,8 @@ private:
 	void ShowPixelPeep(wxCommandEvent& WXUNUSED(event));
 	void ShowSnapshots(wxCommandEvent& WXUNUSED(event));
 	void ShowLibrary(wxCommandEvent& WXUNUSED(event));
+	void ShowOriginal(wxCommandEvent& WXUNUSED(event));
+	void ShowOriginalWindow(wxCommandEvent& WXUNUSED(event));
 	void ShowSettings(wxCommandEvent& WXUNUSED(event));
 	void ShowAbout(wxCommandEvent& WXUNUSED(event));
 	void ShowSupportedCameras(wxCommandEvent& WXUNUSED(event));
@@ -90,6 +93,7 @@ private:
 
 	void RecieveMessageFromProcessor(wxCommandEvent& messageEvt);
 	void RecieveNumFromProcessor(wxCommandEvent& numEvt);
+	void RecieveRawComplete(wxCommandEvent& WXUNUSED(evt));
 
 	wxAuiManager * auiManager;
 
@@ -114,6 +118,7 @@ private:
 	Processor * processor;
 
 	ZoomImagePanel * imagePanel;
+	ZoomImagePanel * originalImagePanel;
 	wxImage * emptyImage;
 	HistogramDisplay * histogramDisplay;
 
@@ -123,6 +128,7 @@ private:
 	int numnUnnamedProjectsOpen;
 
 	wxTimer * reprocessCountdown;
+	wxApp * app;
 
 	enum MenuBar {
 		ID_NEW_PROJECT,
@@ -136,6 +142,8 @@ private:
 		ID_SHOW_EDIT_LIST,
 		ID_SHOW_HISTOGRAMS,
 		ID_SHOW_SETTINGS,
+		ID_SHOW_ORIGINAL,
+		ID_SHOW_ORIGINAL_WINDOW,
 		ID_SHOW_PIXEL_PEEP,
 		ID_SHOW_LIBRARY,
 		ID_SHOW_SNAPSHOTS,
@@ -148,7 +156,7 @@ private:
 	class ImagePanelUpdateThread : public wxThread {
 
 		public:
-			ImagePanelUpdateThread(ZoomImagePanel * imagePanel, PixelPeepWindow * pixelPeepWindow, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow);
+			ImagePanelUpdateThread(MainWindow * mainWin, ZoomImagePanel * imagePanel, PixelPeepWindow * pixelPeepWindow, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow);
 			void StopWatching();
 
 		protected:
@@ -161,6 +169,7 @@ private:
 			Processor * proc;
 			ExportWindow * exportWin;
 			PixelPeepWindow * pixelPeep;
+			MainWindow * parent;
 	};
 
 	ImagePanelUpdateThread * imgPanelThread;

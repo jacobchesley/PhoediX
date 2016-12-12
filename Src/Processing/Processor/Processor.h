@@ -23,11 +23,13 @@
 
 enum {
 	ID_PROCESSOR_MESSAGE,
-	ID_PROCESSOR_NUM
+	ID_PROCESSOR_NUM,
+	ID_RAW_COMPLETE,
 };
 
 wxDECLARE_EVENT(PROCESSOR_MESSAGE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(PROCESSOR_NUM_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(PROCESSOR_RAW_COMPLETE_EVENT, wxCommandEvent);
 
 enum ColorSpaceENUM {
 	ADOBE_RGB,
@@ -253,6 +255,7 @@ private:
 
 	void SendMessageToParent(wxString message);
 	void SendProcessorEditNumToParent(int num);
+	void SendRawComplete();
 
 	wxVector<ProcessorEdit*> editListInternal;
 	wxCriticalSection editListCritical;
