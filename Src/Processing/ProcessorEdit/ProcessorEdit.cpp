@@ -75,7 +75,7 @@ ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 
 
 		// Allocate new int array
-		int intArraySize = edit.GetIntArraySize(intArrayIdx);
+		size_t intArraySize = edit.GetIntArraySize(intArrayIdx);
 		int * newIntArray = new int[edit.GetIntArraySize(intArrayIdx)];
 
 		// Copy int array
@@ -91,7 +91,7 @@ ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 	for(size_t doubleArrayIdx = 0; doubleArrayIdx < edit.GetNumDoubleArrays(); doubleArrayIdx ++){
 		
 		// Allocate new int array
-		int doubleArraySize = edit.GetDoubleArraySize(doubleArrayIdx);
+		size_t doubleArraySize = edit.GetDoubleArraySize(doubleArrayIdx);
 		double* newDoubleArray = new double[edit.GetDoubleArraySize(doubleArrayIdx)];
 
 		// Copy int array
@@ -151,11 +151,11 @@ void ProcessorEdit::ClearDoubleArray() {
 	doubleArraySizes.resize(0);
 }
 
-int ProcessorEdit::GetParamsSize() {
+size_t ProcessorEdit::GetParamsSize() {
 	return params.size();
 }
 
-int ProcessorEdit::GetNumDoubleArrays() {
+size_t ProcessorEdit::GetNumDoubleArrays() {
 	return doubleArrays.size();
 }
 
@@ -174,17 +174,17 @@ double * ProcessorEdit::GetDoubleArray(size_t index) {
 	return doubleArrays.at(index);
 }
 
-int ProcessorEdit::GetIntArraySize(size_t index) {
+size_t ProcessorEdit::GetIntArraySize(size_t index) {
 	if (index >= intArraySizes.size()) { return 0; }
 	return intArraySizes.at(index);
 }
 
-int ProcessorEdit::GetDoubleArraySize(size_t index) {
+size_t ProcessorEdit::GetDoubleArraySize(size_t index) {
 	if(index >= doubleArraySizes.size()) { return 0; }
 	return doubleArraySizes.at(index);
 }
 
-int ProcessorEdit::GetNumIntArrays() {
+size_t ProcessorEdit::GetNumIntArrays() {
 	return intArraySizes.size();
 }
 
@@ -196,7 +196,7 @@ void ProcessorEdit::ClearFlags() {
 	flags.clear();
 }
 
-int ProcessorEdit::GetFlagsSize() {
+size_t ProcessorEdit::GetFlagsSize() {
 	return flags.size();
 }
 

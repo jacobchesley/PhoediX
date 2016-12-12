@@ -340,7 +340,7 @@ void EditListPanel::DeleteEdit(wxCommandEvent& deleteEvt) {
 void EditListPanel::CopyEdit(wxCommandEvent& copyEvt) {
 
 	// Get edit number that is requesting to be copied
-	int editNum = copyEvt.GetInt();
+	size_t editNum = (size_t) copyEvt.GetInt();
 
 	// Cant copy edit that does not exist in list
 	if(editNum > scroller->GetEditList().size() - 1 || editNum < 0){
@@ -355,7 +355,7 @@ void EditListPanel::CopyEdit(wxCommandEvent& copyEvt) {
 void EditListPanel::PasteEdit(wxCommandEvent& pasteEvt) {
 
 	// Get edit number that is requesting to be pasted
-	int editNum = pasteEvt.GetInt();
+	size_t editNum = (size_t)pasteEvt.GetInt();
 
 	// Cant paste edit that does not exist in list
 	if(editNum > scroller->GetEditList().size() - 1 || editNum < 0){

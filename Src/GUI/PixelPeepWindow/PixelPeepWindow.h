@@ -24,7 +24,6 @@ public:
 	 PixelPeepWindow (wxWindow * parent);
 	 void UpdateImage(Image * newImage);
 	 void UpdatePosition(int x, int y);
-	 void ZeroOutPixels();
 
 private:
 
@@ -42,7 +41,6 @@ private:
 		void OnClick(wxMouseEvent & evt);
 		void OnPopupMenuClick(wxCommandEvent& evt);
 		void PaintNow();
-		void ZeroOutPixels();
 		void InitGrid();
 		wxString GetHex8FromRGB8(int r, int g, int b);
 		wxString GetHex16FromRGB16(int r, int g, int b);
@@ -75,7 +73,7 @@ private:
 		int selectedI;
 		int selectedJ;
 
-		int gridSize;
+		size_t gridSize;
 		void OnPaint(wxPaintEvent & evt);
 		void OnSize(wxSizeEvent& event);
 		void Render(wxDC& dc);

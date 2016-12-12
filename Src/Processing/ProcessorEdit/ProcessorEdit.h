@@ -23,7 +23,6 @@ public :
 
 	~ProcessorEdit();
 
-
 	void AddParam(double param);
 	void AddFlag(int flag);
 	void AddIntArray(int * addArray, int arraySize);
@@ -34,17 +33,17 @@ public :
 	void ClearIntArray();
 	void ClearDoubleArray();
 
-	int GetParamsSize();
-	int GetFlagsSize();
-	int GetNumIntArrays();
-	int GetNumDoubleArrays();
+	size_t GetParamsSize();
+	size_t GetFlagsSize();
+	size_t GetNumIntArrays();
+	size_t GetNumDoubleArrays();
 	
 	double GetParam(size_t index);
 	int GetFlag(size_t index);
 	int * GetIntArray(size_t index);
-	int GetIntArraySize(size_t index);
+	size_t GetIntArraySize(size_t index);
 	double * GetDoubleArray(size_t index);
-	int GetDoubleArraySize(size_t index);
+	size_t GetDoubleArraySize(size_t index);
 
 	void SetDisabled(bool disable);
 	bool GetDisabled();

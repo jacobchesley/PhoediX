@@ -74,7 +74,7 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set brightness control points
 	double * brightArray = edit->GetDoubleArray(0);
 	int curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(0); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(0); i+=2){
 
 		Point brightPoint;
 		brightPoint.x = brightArray[i];
@@ -87,7 +87,7 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set red control points
 	double * redArray = edit->GetDoubleArray(1);
 	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(1); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(1); i+=2){
 
 		Point redPoint;
 		redPoint.x = redArray[i];
@@ -101,7 +101,7 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set green control points
 	double * greenArray = edit->GetDoubleArray(2);
 	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(2); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(2); i+=2){
 
 		Point greenPoint;
 		greenPoint.x = greenArray[i];
@@ -115,7 +115,7 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set blue control points
 	double * blueArray = edit->GetDoubleArray(3);
 	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(3); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(3); i+=2){
 
 		Point bluePoint;
 		bluePoint.x = blueArray[i];

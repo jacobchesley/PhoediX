@@ -101,7 +101,7 @@ void DirectorySelections::OnAddDirectory(wxCommandEvent& WXUNUSED(evt)) {
 }
 
 void DirectorySelections::OnDeleteDir(wxCommandEvent& evt) {
-	int dirNum = evt.GetInt();
+	size_t dirNum = (size_t)evt.GetInt();
 
 	// Remove all edit items from the sizer, but do not destroy them
 	this->GetSizer()->Clear();

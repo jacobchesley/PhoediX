@@ -439,7 +439,7 @@ void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 	currentSession.SetProjectPath(saveFileDialog.GetPath());
 
 	// Change name on menu object
-	int numWindowMenuItems = menuWindow->GetMenuItems().size();
+	size_t numWindowMenuItems = menuWindow->GetMenuItems().size();
 	for(size_t i = 0; i < numWindowMenuItems; i++){
 		if(currentSession.GetID() == menuWindow->GetMenuItems()[i]->GetId()){
 			menuWindow->GetMenuItems()[i]->SetItemLabel(currentSession.GetName());
@@ -524,7 +524,7 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 
 void MainWindow::CheckUncheckSession(int sessionID){
 
-	int numWindowMenuItems = menuWindow->GetMenuItems().size();
+	size_t numWindowMenuItems = menuWindow->GetMenuItems().size();
 	for(size_t i = 0; i < numWindowMenuItems; i++){
 		if(sessionID == menuWindow->GetMenuItems()[i]->GetId()){
 			menuWindow->GetMenuItems()[i]->Check(true);

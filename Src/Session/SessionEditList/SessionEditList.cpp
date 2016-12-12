@@ -278,7 +278,7 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 		wxXmlNode * paramsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Parameters");
 		wxString paramIdx;
 		wxString paramStr;
-		for (int paramIndex = 0; paramIndex < curEdit->GetParamsSize(); paramIndex++) {
+		for (size_t paramIndex = 0; paramIndex < curEdit->GetParamsSize(); paramIndex++) {
 
 			paramIdx = "";
 			paramStr = "";
@@ -293,7 +293,7 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 		wxXmlNode * flagsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Flags");
 		wxString flagIdx;
 		wxString flagStr;
-		for (int flagIndex = 0; flagIndex < curEdit->GetFlagsSize(); flagIndex++) {
+		for (size_t flagIndex = 0; flagIndex < curEdit->GetFlagsSize(); flagIndex++) {
 
 			flagIdx = "";
 			flagStr = "";
@@ -309,13 +309,13 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 		wxString doubleIdx;
 		wxString doubleStrTemp;
 		wxString doubleStr;
-		for (int doubleIndex = 0; doubleIndex < curEdit->GetNumDoubleArrays(); doubleIndex++) {
+		for (size_t doubleIndex = 0; doubleIndex < curEdit->GetNumDoubleArrays(); doubleIndex++) {
 
 			doubleIdx = "";
 			doubleStr = "";
 			doubleIdx << doubleIndex;
 
-			for (int doubleNum = 0; doubleNum < curEdit->GetDoubleArraySize(doubleIndex); doubleNum++) {
+			for (size_t doubleNum = 0; doubleNum < curEdit->GetDoubleArraySize(doubleIndex); doubleNum++) {
 				doubleStrTemp = "";
 				doubleStrTemp = wxNumberFormatter::ToString(curEdit->GetDoubleArray(doubleIndex)[doubleNum], EDIT_PRECISSION, wxNumberFormatter::Style_None);
 				doubleStr += doubleStrTemp + ",";

@@ -63,7 +63,7 @@ void SnapshotWindow::OnResize(wxSizeEvent& WXUNUSED(evt)) {
 
 void SnapshotWindow::OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt)){
 	
-	int numberRemoved = 0;
+	size_t numberRemoved = 0;
 	Snapshot * test;
 	for(size_t i = 0; i < snapshotList->GetItemCount() + numberRemoved; i++){
 
@@ -98,7 +98,7 @@ void SnapshotWindow::OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt)){
 
 void SnapshotWindow::OnRenameSnapshot(wxCommandEvent & WXUNUSED(evt)){
 
-	int selectedRow = snapshotList->GetSelectedRow();
+	size_t selectedRow = snapshotList->GetSelectedRow();
 
 	// If selected row is okay and only one selected row
 	if(selectedRow != wxNOT_FOUND && selectedRow < snapshots.size()){
@@ -122,7 +122,7 @@ void SnapshotWindow::OnRenameSnapshot(wxCommandEvent & WXUNUSED(evt)){
 }
 
 void SnapshotWindow::OnRestoreSnapshot(wxCommandEvent & WXUNUSED(evt)){
-	if(snapshotList->GetSelectedRow() != wxNOT_FOUND && snapshotList->GetSelectedRow() < snapshots.size()){
+	if(snapshotList->GetSelectedRow() != wxNOT_FOUND && (size_t)snapshotList->GetSelectedRow() < snapshots.size()){
 	
 		editPanel->AddEditWindows(snapshots.at(snapshotList->GetSelectedRow())->editList);
 		PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(snapshots.at(snapshotList->GetSelectedRow())->auiPerspective);

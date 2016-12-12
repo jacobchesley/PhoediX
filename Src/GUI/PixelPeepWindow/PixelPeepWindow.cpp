@@ -123,8 +123,8 @@ void PixelPeepWindow::PixelGrid::OnClick(wxMouseEvent & evt) {
 	int pixelWidth = width / gridSize;
 	int pixelHeight = height / gridSize;
 
-	for (int i = 0; i < gridSize; i++) {
-		for (int j = 0; j < gridSize; j++) {
+	for (size_t i = 0; i < gridSize; i++) {
+		for (size_t j = 0; j < gridSize; j++) {
 
 			int gridX1 = pixelWidth * i;
 			int gridY1 = pixelHeight * j;
@@ -296,8 +296,8 @@ void PixelPeepWindow::PixelGrid::Render(wxDC & dc) {
 	// Grid size over 2 to go left and right of cursor on image
 	int gridSizeOver2 = gridSize / 2.0;
 
-	for (int i = 0; i < gridSize; i++) {
-		for (int j = 0; j < gridSize; j++) {
+	for (size_t i = 0; i < gridSize; i++) {
+		for (size_t j = 0; j < gridSize; j++) {
 
 			// Colors that will represent each pixel block
 			int red = 0;
@@ -428,9 +428,9 @@ wxString PixelPeepWindow::PixelGrid::GetHex16FromRGB16(int r, int g, int b) {
 	wxString redPrepend;
 	wxString greenPrepend;
 	wxString bluePrepend;
-	for (int i = 0; i < 4 - redStr.Length(); i++) { redPrepend += "0"; }
-	for (int i = 0; i < 4 - greenStr.Length(); i++) { greenPrepend += "0"; }
-	for (int i = 0; i < 4 - blueStr.Length(); i++) { bluePrepend += "0"; }
+	for (size_t i = 0; i < 4 - redStr.Length(); i++) { redPrepend += "0"; }
+	for (size_t i = 0; i < 4 - greenStr.Length(); i++) { greenPrepend += "0"; }
+	for (size_t i = 0; i < 4 - blueStr.Length(); i++) { bluePrepend += "0"; }
 
 	redStr = redPrepend + redStr;
 	greenStr = greenPrepend + greenStr;

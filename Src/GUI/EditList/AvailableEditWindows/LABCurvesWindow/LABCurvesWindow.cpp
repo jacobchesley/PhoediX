@@ -69,7 +69,7 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set l control points
 	double * lArray = edit->GetDoubleArray(0);
 	int curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(0); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(0); i+=2){
 
 		Point lPoint;
 		lPoint.x = lArray[i];
@@ -82,7 +82,7 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set a control points
 	double * aArray = edit->GetDoubleArray(1);
 	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(1); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(1); i+=2){
 
 		Point aPoint;
 		aPoint.x = aArray[i];
@@ -96,7 +96,7 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Set b control points
 	double * bArray = edit->GetDoubleArray(2);
 	curID = 0;
-	for(int i = 0; i < edit->GetDoubleArraySize(2); i+=2){
+	for(size_t i = 0; i < edit->GetDoubleArraySize(2); i+=2){
 
 		Point bPoint;
 		bPoint.x = bArray[i];
