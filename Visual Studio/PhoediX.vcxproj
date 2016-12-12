@@ -132,6 +132,13 @@
     <ClInclude Include="..\Src\Session\Session.h" />
     <ClInclude Include="..\Src\Session\SessionEditList\SessionEditList.h" />
     <ClInclude Include="..\Src\Spline\Spline.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PhoediX.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Icon\px.ico" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>PhoediX</ProjectName>

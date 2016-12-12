@@ -178,6 +178,9 @@
     <Filter Include="GUI\Pixel Peep Window">
       <UniqueIdentifier>{b6a9d933-49f0-467b-b155-cec9715c641c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{8efae2cb-afda-493a-85e4-ea7334586c7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -515,5 +518,18 @@
     <ClInclude Include="..\Src\GUI\SettingsWindow\SettingsWindow.h">
       <Filter>GUI\Settings Window</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PhoediX.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Icon\px.ico">
+      <Filter>Resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>
