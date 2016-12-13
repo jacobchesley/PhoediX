@@ -3,7 +3,6 @@
 #ifndef PIXEL_PEEP_WINDOW_H
 #define PIXEL_PEEP_WINDOW_H
 
-
 // for compilers that support precompilation, includes "wx/wx.h"
 #include "wx/wxprec.h"
 
@@ -48,13 +47,13 @@ private:
 	private:
 
 		struct ColorValue {
-			int R_8 = -1;
-			int G_8 = -1;
-			int B_8 = -1;
+			int R_8;
+			int G_8;
+			int B_8;
 
-			int R_16 = -1;
-			int G_16 = -1;
-			int B_16 = -1;
+			int R_16;
+			int G_16;
+			int B_16;
 
 			wxString HEX_8;
 			wxString HEX_16;
