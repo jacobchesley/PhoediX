@@ -309,7 +309,7 @@ AllObjects : $(AllObjectsStr)
 AllObjectsOutStr = $(AppObjectsOut) $(AllGUIObjectsOut) $(ProcessingObjectsOut) $(SessionObjectsOut) $(SplineObjectsOut)
 
 Link :
-	$(LL) $(LINK_FLAG) PhoediX $(AllObjectsOutStr) $(LINK_ALL)
+	$(LL) $(LINK_FLAG) $(BUILD_DIR)/PhoediX $(AllObjectsOutStr) $(LINK_ALL)
 
 clean :
 	rm -rf $(BUILD_DIR)
