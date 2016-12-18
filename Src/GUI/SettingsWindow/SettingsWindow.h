@@ -16,10 +16,10 @@
 #include "wx/stdpaths.h"
 #include "wx/textfile.h"
 
-#include "GUI\Colors\Colors.h"
-#include "Processing\Image\Image.h"
-#include "Processing\Processor\Processor.h"
-#include "GUI\EditList\EditListPanel\EditListPanel.h"
+#include "GUI/Colors/Colors.h"
+#include "Processing/Image/Image.h"
+#include "Processing/Processor/Processor.h"
+#include "GUI/EditList/EditListPanel/EditListPanel.h"
 
 enum {
 	ID_RELOAD_IMAGE

@@ -2,6 +2,8 @@
 
 #include "MainWindow.h"
 
+wxDEFINE_EVENT(UPDATE_IMAGE_EVENT, wxCommandEvent);
+
 MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDefaultSize){
 
 	app = application;
@@ -11,7 +13,8 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->SetIcon(theIcon);
 
 	this->SetSizeProperties();
-	
+	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
+
 	// Create and add menu bar with menus
 	menuBar = new wxMenuBar();
 
@@ -62,8 +65,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	// Set the menu bar
 	this->SetMenuBar(menuBar);
 	this->EnableDisableMenuItemsNoProject(false);
-
-	this->SetBackgroundColour(Colors::BackDarkDarkGrey);
 
 	// Set the status bar
 	this->CreateStatusBar();
@@ -225,6 +226,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
 	this->Bind(wxEVT_AUI_PANE_CLOSE, (wxObjectEventFunction)&MainWindow::OnPaneClose, this);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::OnReprocessTimer, this);
+	this->Bind(UPDATE_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnUpdateImage, this, ID_UPDATE_IMAGE);
 
 	imgPanelThread = new ImagePanelUpdateThread(this, imagePanel, pixelPeepWindow, processor, histogramDisplay, exportWindow);
 	imgPanelThread->Run();
@@ -388,7 +390,7 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	// At least one session exists now, enable menu items related to sessions
 	this->EnableDisableMenuItemsNoProject(true);
 
-	reprocessCountdown->Start(500, true);
+	//reprocessCountdown->Start(500, true);
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {
@@ -419,7 +421,7 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 		// No sessions exists now, disable menu items related to sessions
 		this->EnableDisableMenuItemsNoProject(false);
 	}
-	reprocessCountdown->Start(500, true);
+	//reprocessCountdown->Start(500, true);
 }
 
 
@@ -571,7 +573,7 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 		this->CreateNewProject();
 		this->OpenImage(openFileDialog.GetPath());
 		this->ShowImageRelatedWindows();
-		reprocessCountdown->Start(500, true);
+		//reprocessCountdown->Start(500, true);
 	}
 
 	// Ask to import to current project, or to new project if sessions already exists
@@ -582,13 +584,13 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 		if (importReturn == ImportImageDialog::ID_IMPORT_CURRENT_PROJECT) {
 			this->OpenImage(openFileDialog.GetPath());
 			this->ShowImageRelatedWindows();
-			reprocessCountdown->Start(500, true);
+			//reprocessCountdown->Start(500, true);
 		}
 		else if (importReturn == ImportImageDialog::ID_IMPORT_NEW_PROJECT) {
 			this->CreateNewProject();
 			this->OpenImage(openFileDialog.GetPath());
 			this->ShowImageRelatedWindows();
-			reprocessCountdown->Start(500, true);
+			//reprocessCountdown->Start(500, true);
 		}
 	}
 }
@@ -951,6 +953,35 @@ void MainWindow::RecieveNumFromProcessor(wxCommandEvent& numEvt) {
 	exportWindow->SetEditNum(numEvt.GetInt());
 }
 
+void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
+	// Do not update image display if original image is checked
+	if (this->OriginalImageDispalyed()) { 
+		processor->SetDoFitImage(false);
+		processor->SetUpdated(false);
+		return;
+	}
+
+	processor->Lock();
+	if (processor->GetImage()->GetWidth() < 1 || processor->GetImage()->GetHeight() < 1) {
+		processor->Unlock();
+		processor->SetDoFitImage(false);
+		processor->SetUpdated(false);
+		return;
+	}
+	imagePanel->ChangeImage(processor->GetImage());
+	pixelPeepWindow->UpdateImage(processor->GetImage());
+	histogramDisplay->UpdateHistograms();
+	if (processor->GetDoFitImage()) {
+		imagePanel->FitImage();
+	}
+	processor->Unlock();
+	imagePanel->Redraw();
+	
+	exportWindow->ProcessingComplete();
+	processor->SetDoFitImage(false);
+	processor->SetUpdated(false);
+}
+
 void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 
 	// Kill current raw processing and wait until raw thread is stopped
@@ -1019,7 +1050,7 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 	
 	while (continueWatch) {
 		if (proc->GetUpdated() && !proc->GetLocked() && !proc->GetLockedRaw()) {
-
+			/*
 			// Do not update image display if original image is checked
 			if (parent->OriginalImageDispalyed()) { 
 				proc->SetDoFitImage(false);
@@ -1046,6 +1077,9 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 			exportWin->ProcessingComplete();
 			proc->SetDoFitImage(false);
 			proc->SetUpdated(false);
+			*/
+			wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
+			wxPostEvent(parent, evt);
 		}
 		this->Sleep(20);
 	}

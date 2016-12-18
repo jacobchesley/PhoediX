@@ -383,9 +383,9 @@ wxString PixelPeepWindow::PixelGrid::GetHex8FromRGB8(int r, int g, int b) {
 	char blueBuff[3];
 
 	// Convert ints to char array
-	_itoa(r, redBuff, 16);
-	_itoa(g, greenBuff, 16);
-	_itoa(b, blueBuff, 16);
+	snprintf(redBuff, 3, "%x", r);
+	snprintf(greenBuff, 3, "%x", g);
+	snprintf(blueBuff, 3, "%x", b);
 
 	// Convert char arrays to strings
 	wxString redStr = wxString::FromUTF8(redBuff);
@@ -415,9 +415,9 @@ wxString PixelPeepWindow::PixelGrid::GetHex16FromRGB16(int r, int g, int b) {
 	char blueBuff[5];
 
 	// Convert ints to char array
-	_itoa(r, redBuff, 16);
-	_itoa(g, greenBuff, 16);
-	_itoa(b, blueBuff, 16);
+	snprintf(redBuff, 5, "%x", r);
+	snprintf(greenBuff, 5, "%x", g);
+	snprintf(blueBuff, 5, "%x", b);
 
 	// Convert char arrays to strings
 	wxString redStr = wxString::FromUTF8(redBuff);

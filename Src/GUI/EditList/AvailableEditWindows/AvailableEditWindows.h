@@ -11,25 +11,25 @@
 #include "wx/wx.h"
 #endif
 
-#include "GUI\EditList\EditWindow\EditWindow.h"
+#include "GUI/EditList/EditWindow/EditWindow.h"
 
-#include "AdjustBrightnessWindow\AdjustBrightnessWindow.h"
-#include "ChannelMixerWindow\ChannelMixerWindow.h"
-#include "ContrastWindow\ContrastWindow.h"
-#include "GreyscaleWindow\ConvertGreyscaleWindow.h"
-#include "LABCurvesWindow\LABCurvesWindow.h"
-#include "HSLCurvesWindow\HSLCurvesWindow.h"
-#include "MirrorWindow\MirrorWindow.h"
-#include "RawWindow\RawWindow.h"
-#include "RGBCurvesWindow\RGBCurvesWindow.h"
-#include "RotationWindow\RotationWindow.h"
-#include "AdjustHSLWindow\AdjustHSLWindow.h"
-#include "ShiftRGBWindow\ShiftRGBWindow.h"
-#include "ScaleWindow\ScaleWindow.h"
-#include "CropWindow\CropWindow.h"
+#include "AdjustBrightnessWindow/AdjustBrightnessWindow.h"
+#include "ChannelMixerWindow/ChannelMixerWindow.h"
+#include "ContrastWindow/ContrastWindow.h"
+#include "ConvertGreyscaleWindow/ConvertGreyscaleWindow.h"
+#include "LABCurvesWindow/LABCurvesWindow.h"
+#include "HSLCurvesWindow/HSLCurvesWindow.h"
+#include "MirrorWindow/MirrorWindow.h"
+#include "RawWindow/RawWindow.h"
+#include "RGBCurvesWindow/RGBCurvesWindow.h"
+#include "RotationWindow/RotationWindow.h"
+#include "AdjustHSLWindow/AdjustHSLWindow.h"
+#include "ShiftRGBWindow/ShiftRGBWindow.h"
+#include "ScaleWindow/ScaleWindow.h"
+#include "CropWindow/CropWindow.h"
 
-#include "GUI\EditList\AvailableEdits\AvailableEdits.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/EditList/AvailableEdits/AvailableEdits.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class AvailableEditWindows {
 

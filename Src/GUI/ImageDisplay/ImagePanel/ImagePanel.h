@@ -11,11 +11,11 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\dc.h"
-#include "wx\dcbuffer.h"
+#include "wx/dc.h"
+#include "wx/dcbuffer.h"
 
-#include "Processing\ImageHandler\ImageHandler.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "Processing/ImageHandler/ImageHandler.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class ImagePanel : public wxPanel {
 public:

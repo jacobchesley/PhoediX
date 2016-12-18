@@ -8,12 +8,12 @@
 #ifndef WX_PRECOMP	
 #include "wx/wx.h"
 
-#include "spline/spline.h"
+#include "Spline/Spline.h"
 #include "wx/dcbuffer.h"
 #endif
 
-#include "GUI\Colors\Colors.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/Colors/Colors.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 enum {
 	CURVE_CHANNEL_BRIGHT,

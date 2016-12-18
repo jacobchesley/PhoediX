@@ -44,7 +44,11 @@ void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
 		LibRaw rawProc;
 
 		rawProc.recycle();
-		rawProc.open_file(path.wc_str());
+		#ifdef __WXMSW__
+			rawProc.open_file(path.wc_str());
+		#else
+			rawProc.open_file(path.c_str());
+		#endif
 		rawProc.unpack();
 		rawProc.imgdata.params.half_size = 1;
 		rawProc.imgdata.params.use_camera_wb = 1;

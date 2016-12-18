@@ -61,9 +61,6 @@
     <Filter Include="GUI\Controls\Double Slider">
       <UniqueIdentifier>{142ee05b-d801-4715-8698-a8769101ac85}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Processing\Processor Edit">
-      <UniqueIdentifier>{7226847e-aebb-4289-b367-b5eb1fb26691}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Edit List\Edit Window">
       <UniqueIdentifier>{c42d52d7-d5a3-4e4e-a236-9e6c0bdf06d9}</UniqueIdentifier>
     </Filter>
@@ -136,15 +133,6 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves">
       <UniqueIdentifier>{ee436ec2-11fe-4336-8d0d-917bf6e0f2cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Selections Window">
-      <UniqueIdentifier>{c85dbce6-6844-4b5d-84b5-fae616d30ca8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Selections Window\Selections Image">
-      <UniqueIdentifier>{066dffb1-86f7-42b7-a1e7-34eaf66387f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GUI\Selections Window\Directory Selection">
-      <UniqueIdentifier>{738ac250-d89e-423e-88ac-499bdbe41c7b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Image Display\Zoom Image Frame">
       <UniqueIdentifier>{ca64e03e-a3eb-4a4a-b210-e4dc3c770e46}</UniqueIdentifier>
     </Filter>
@@ -172,14 +160,26 @@
     <Filter Include="GUI\Settings Window">
       <UniqueIdentifier>{7454ac40-37e3-495b-abf3-f5006c8f2931}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Supported Cameras">
-      <UniqueIdentifier>{4cd3ece5-f54c-4b03-a823-c530951cbdd8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Pixel Peep Window">
       <UniqueIdentifier>{b6a9d933-49f0-467b-b155-cec9715c641c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{8efae2cb-afda-493a-85e4-ea7334586c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Processing\Processor Edit">
+      <UniqueIdentifier>{7226847e-aebb-4289-b367-b5eb1fb26691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Library Window">
+      <UniqueIdentifier>{c85dbce6-6844-4b5d-84b5-fae616d30ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Library Window\Library Image">
+      <UniqueIdentifier>{066dffb1-86f7-42b7-a1e7-34eaf66387f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Library Window\Directory Selections">
+      <UniqueIdentifier>{738ac250-d89e-423e-88ac-499bdbe41c7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Supported Cameras Window">
+      <UniqueIdentifier>{4cd3ece5-f54c-4b03-a823-c530951cbdd8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -234,14 +234,8 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Contrast</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\GUI\AUI Manager\AUIManager.cpp">
-      <Filter>GUI\AUI Manager</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.cpp">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Rotation</Filter>
@@ -301,13 +295,10 @@
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp">
-      <Filter>GUI\Selections Window</Filter>
+      <Filter>GUI\Library Window</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.cpp">
-      <Filter>GUI\Selections Window\Selections Image</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelection.cpp">
-      <Filter>GUI\Selections Window\Directory Selection</Filter>
+      <Filter>GUI\Library Window\Library Image</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.cpp">
       <Filter>GUI\Image Display\Zoom Image Frame</Filter>
@@ -322,7 +313,7 @@
       <Filter>Processing\Raw Error Codes</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\SupportedCamerasWindow\SupportedCamerasWindow.cpp">
-      <Filter>GUI\Supported Cameras</Filter>
+      <Filter>GUI\Supported Cameras Window</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\ExportWindow\ExportWindow.cpp">
       <Filter>GUI\Export Window</Filter>
@@ -338,6 +329,15 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\SettingsWindow\SettingsWindow.cpp">
       <Filter>GUI\Settings Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.cpp">
+      <Filter>GUI\Library Window\Directory Selections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\AUIManager\AUIManager.cpp">
+      <Filter>GUI\AUI Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ConvertGreyscaleWindow\ConvertGreyscaleWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -407,12 +407,6 @@
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Contrast</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h">
-      <Filter>GUI\AUI Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.h">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Rotation</Filter>
     </ClInclude>
@@ -477,13 +471,13 @@
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\HSL Curves</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryWindow.h">
-      <Filter>GUI\Selections Window</Filter>
+      <Filter>GUI\Library Window</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.h">
-      <Filter>GUI\Selections Window\Selections Image</Filter>
+      <Filter>GUI\Library Window\Library Image</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.h">
-      <Filter>GUI\Selections Window\Directory Selection</Filter>
+      <Filter>GUI\Library Window\Directory Selections</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.h">
       <Filter>GUI\Image Display\Zoom Image Frame</Filter>
@@ -501,7 +495,7 @@
       <Filter>Processing\Raw Error Codes</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\SupportedCamerasWindow\SupportedCamerasWindow.h">
-      <Filter>GUI\Supported Cameras</Filter>
+      <Filter>GUI\Supported Cameras Window</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\ExportWindow\ExportWindow.h">
       <Filter>GUI\Export Window</Filter>
@@ -520,6 +514,12 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\AUIManager\AUIManager.h">
+      <Filter>GUI\AUI Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ConvertGreyscaleWindow\ConvertGreyscaleWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 // Copyright 2016 Jacob Chesley
 
-#include "spline.h"
+#include "Spline.h"
 
 Spline::Spline(int Precision, bool PreventXOverlap) {
 

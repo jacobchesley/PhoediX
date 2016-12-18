@@ -96,7 +96,6 @@ void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 void EditWindow::StartWatchdog(){
 	watchdog = new WatchForUpdateThread(this, 50);
 	watchdog->Run();
-	watchdog->SetPriority(2);
 }
 
 void EditWindow::StopWatchdog(){

@@ -11,9 +11,9 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\dc.h"
-#include "wx\dcbuffer.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "wx/dc.h"
+#include "wx/dcbuffer.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class WXImagePanel : public wxPanel {
 public:

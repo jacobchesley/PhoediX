@@ -11,11 +11,11 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\thread.h"
+#include "wx/thread.h"
 
-#include "Processing\ProcessorEdit\ProcessorEdit.h"
-#include "Processing\Processor\Processor.h"
-#include "wx\event.h"
+#include "Processing/ProcessorEdit/ProcessorEdit.h"
+#include "Processing/Processor/Processor.h"
+#include "wx/event.h"
 
 enum {
 	ID_REPROCESS_IMAGE,

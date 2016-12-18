@@ -10,8 +10,8 @@
 #ifndef WX_PRECOMP
 	#include "wx/wx.h"
 #endif
-#include "Processing\ProcessorEdit\ProcessorEdit.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "Processing/ProcessorEdit/ProcessorEdit.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 struct Snapshot{
 	int snapshotIndex;

@@ -1,7 +1,7 @@
 // Copyright 2016 Jacob Chesley
 
 #include "AboutWindow.h"
-#include "App\PhoediX.h"
+#include "App/PhoediX.h"
 #include "libraw.h"
 #include "tiffio.h"
 
@@ -30,18 +30,13 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	versionTitle->SetForegroundColour(Colors::TextLightGrey);
 	versionValue->SetForegroundColour(Colors::TextLightGrey);
 
-	buildDateTime = NULL;
-	if((buildDateTime = (char*)malloc(strlen(PHOEDIX_BUILD_DATE_STRING)+strlen(PHOEDIX_BUILD_TIME_STRING)+1 + 1)) != NULL){
-		buildDateTime[0] = '\0';   // ensures the memory is an empty string
-		strcat(buildDateTime, PHOEDIX_BUILD_DATE_STRING);
-		strcat(buildDateTime, " ");
-		strcat(buildDateTime, PHOEDIX_BUILD_TIME_STRING);
-		buildDateValue = new wxStaticText(this, -1, buildDateTime);
-		free(buildDateTime);
-	} 
-	else {
-		buildDateValue = new wxStaticText(this, -1, PHOEDIX_BUILD_DATE_STRING);
-	}
+	char buildDateTime[100];
+	memset(buildDateTime, '\0', 100 * sizeof(char));
+
+	strcat(buildDateTime, PHOEDIX_BUILD_DATE_STRING);
+	strcat(buildDateTime, " ");
+	strcat(buildDateTime, PHOEDIX_BUILD_TIME_STRING);
+	buildDateValue = new wxStaticText(this, -1, buildDateTime);
 
 	buildDateTitle = new wxStaticText(this, -1, "PhoediX Build Date");
 	buildDateTitle->SetForegroundColour(Colors::TextLightGrey);

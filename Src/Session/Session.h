@@ -13,9 +13,9 @@
 
 #include "wx/xml/xml.h"
 
-#include "SessionEditList\SessionEditList.h"
-#include "Processing\Snapshot\Snapshot.h"
-#include "wx\datetime.h"
+#include "SessionEditList/SessionEditList.h"
+#include "Processing/Snapshot/Snapshot.h"
+#include "wx/datetime.h"
 
 class PhoediXSession{
 

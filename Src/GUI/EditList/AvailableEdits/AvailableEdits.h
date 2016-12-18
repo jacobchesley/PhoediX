@@ -11,9 +11,9 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\listctrl.h"
-#include "GUI\Colors\Colors.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "wx/listctrl.h"
+#include "GUI/Colors/Colors.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 enum AvailableEditIDS {
 	EDIT_ID_SHIFT_RGB,

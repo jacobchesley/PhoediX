@@ -11,10 +11,10 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\listctrl.h"
-#include "GUI\EditList\AvailableEdits\AvailableEdits.h"
-#include "GUI\Colors\Colors.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "wx/listctrl.h"
+#include "GUI/EditList/AvailableEdits/AvailableEdits.h"
+#include "GUI/Colors/Colors.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 enum {
 	ID_EDIT_ADD

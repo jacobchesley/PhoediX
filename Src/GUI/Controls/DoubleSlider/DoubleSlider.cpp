@@ -6,7 +6,7 @@ DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, dou
 
 	isDisabled = false;
 	textPrec = textPrecision;
-	wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+	wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 	minText = new wxStaticText(this, -1, wxString::Format(formatString, minVal));
 	maxText = new wxStaticText(this, -1, wxString::Format(formatString, maxVal));
 	valText = new wxTextCtrl(this, - 1, wxString::Format(formatString, maxVal), wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxTE_PROCESS_ENTER);
@@ -185,7 +185,7 @@ void DoubleSlider::OnSlide(wxCommandEvent& slideEvt) {
 
 	// Convert current value to the text with specified precision
 	double val = this->GetValue();
-	wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+	wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 	wxString valStr = wxString::Format(formatString, val);
 
 	// Update the text control with the controls value
@@ -214,7 +214,7 @@ void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
 		val = min;
 
 		// Format the string correctly and set the text
-		wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+		wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 		wxString valStr = wxString::Format(formatString, val);
 		valText->SetValue(valStr);
 	}
@@ -224,7 +224,7 @@ void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
 		val = max;
 
 		// Format the string correctly and set the text
-		wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+		wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 		wxString valStr = wxString::Format(formatString, val);
 		valText->SetValue(valStr);
 	}
@@ -240,7 +240,7 @@ void DoubleSlider::OnTextEnter(wxCommandEvent& textEvt) {
 
 void DoubleSlider::OnText(wxCommandEvent& WXUNUSED(evt)){
 	if(isDisabled){
-		wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+		wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 		wxString valStr = wxString::Format(formatString, this->GetValue());
 		valText->SetValue(valStr);
 		return;
@@ -305,7 +305,7 @@ void DoubleSlider::SetValue(double newVal) {
 	slide->SetValue(newSlideLocation);
 
 	// Convert current value to the text with specified precision
-	wxString formatString = "%." + wxString::Format(wxT("%i"), textPrec) + "f";
+	wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 	wxString valStr = wxString::Format(formatString, newVal);
 
 	// Update the text control with the controls value

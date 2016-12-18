@@ -234,8 +234,12 @@ bool ImageHandler::CheckRaw(wxString fileName){
 
 	// Attempt to open file in LibRaw raw processor and get the error code returned
 	LibRaw tempRawProc;
-	int result = tempRawProc.open_file(fileName.wc_str());
-
+	int result = -1;
+	#ifdef __WXMSW__
+		result = tempRawProc.open_file(fileName.wc_str());
+	#else
+		result = tempRawProc.open_file(fileName.c_str());
+	#endif
 	// Return true / false based on error code
 	if(result == LIBRAW_SUCCESS){ return true; }
 	else{ return false; }

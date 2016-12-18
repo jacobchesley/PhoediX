@@ -3,14 +3,14 @@
 #ifndef RAW_WINDOW_H
 #define RAW_WINDOW_H
 
-#include "wx\listctrl.h"
+#include "wx/listctrl.h"
 
-#include "GUI\Controls\CollapsiblePane\CollapsiblePane.h"
-#include "GUI\EditList\EditWindow\EditWindow.h"
-#include "GUI\Controls\DoubleSlider\DoubleSlider.h"
-#include "GUI\Colors\Colors.h"
-#include "Processing\Processor\Processor.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/Controls/CollapsiblePane/CollapsiblePane.h"
+#include "GUI/EditList/EditWindow/EditWindow.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/Colors/Colors.h"
+#include "Processing/Processor/Processor.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class RawWindow : public EditWindow {
 	public:

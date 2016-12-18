@@ -13,10 +13,10 @@
 
 #include "wx/filename.h"
 
-#include "Processing\Image\Image.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "Processing/Image/Image.h"
+#include "Debugging/MemoryLeakCheck.h"
 #include "libraw.h"
-#include "tiffconf.vc.h"
+//#include "tiffconf.vc.h"
 #include "tiffio.h"
 
 class ImageHandler {

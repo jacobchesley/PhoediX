@@ -11,6 +11,7 @@
 	#include "wx/wx.h"
 #endif
 
+#include <stdlib.h>
 #include "wx/clipbrd.h"
 #include "wx/dc.h"
 #include "wx/dcbuffer.h"

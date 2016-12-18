@@ -3,11 +3,11 @@
 #ifndef ADJUST_BRIGHTNESS_WINDOW_H
 #define ADJUST_BRIGHTNESS_WINDOW_H
 
-#include "GUI\EditList\EditWindow\EditWindow.h"
-#include "GUI\Controls\DoubleSlider\DoubleSlider.h"
-#include "GUI\Colors\Colors.h"
-#include "Processing\Processor\Processor.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/EditList/EditWindow/EditWindow.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/Colors/Colors.h"
+#include "Processing/Processor/Processor.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class AdjustBrightnessWindow : public EditWindow {
 public:

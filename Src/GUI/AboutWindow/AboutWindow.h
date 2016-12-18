@@ -11,8 +11,8 @@
 #include "wx/wx.h"
 #endif
 
-#include "GUI\Icons\Icons.h"
-#include "GUI\Colors\Colors.h"
+#include "GUI/Icons/Icons.h"
+#include "GUI/Colors/Colors.h"
 
 class AboutWindow : public wxFrame {
 
@@ -54,8 +54,6 @@ private:
 	wxStaticText * libtiffVersionValue;
 
 	wxButton * okayButton;
-
-	char * buildDateTime;
 
 	enum{
 		ID_OKAY

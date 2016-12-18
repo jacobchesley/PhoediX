@@ -16,7 +16,7 @@
 
 #include "Processing/Snapshot/Snapshot.h"
 #include "Processing/Snapshot/Snapshot.h"
-#include "GUI/AUI Manager/AUIManager.h"
+#include "GUI/AUIManager/AUIManager.h"
 #include "GUI/EditList/EditListPanel/EditListPanel.h"
 #include "GUI/SnapshotWindow/SnapshotRenameDialog/SnapshotRenameDialog.h"
 #include "GUI/Colors/Colors.h"

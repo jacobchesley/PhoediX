@@ -11,7 +11,7 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\textfile.h"
+#include "wx/textfile.h"
 
 class Logger {
 public:

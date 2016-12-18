@@ -155,6 +155,14 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	zoom = 1.0;
 	keepAspect = true;
 	resize = false;
+	bitmapDraw = wxBitmap(wxImage(1, 1));
+
+	this->SetBackgroundColour(parent->GetBackgroundColour());
+	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
+	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
+	this->Bind(wxEVT_MOTION, (wxObjectEventFunction)&ImageScroll::OnDragContinue, this);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
+	this->SetDoubleBuffered(true);
 }
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxScrolledWindow(parent) {
@@ -206,7 +214,7 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	dc.SetBackground(wxBrush(this->GetBackgroundColour()));
 
 	// Do not attempt to draw bitmap if it is not okay
-	if (!bitmapDraw.IsOk()) {
+	if (!bitmapDraw.IsOk() || bitmapDraw.GetWidth() < 1 || bitmapDraw.GetHeight() < 1) {
 		return; 
 	}
 
@@ -214,6 +222,8 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	int imgWidth = bitmapDraw.GetWidth() * zoom;
 	int imgHeight = bitmapDraw.GetHeight() * zoom;
 	this->SetVirtualSize(imgWidth, imgHeight);
+
+	if(imgWidth < 1 || imgHeight < 1){ return ;}
 
 	dc.SetUserScale(zoom, zoom);
 	dc.DrawBitmap(bitmapDraw, wxPoint(0, 0));
@@ -227,6 +237,7 @@ void ZoomImagePanel::ImageScroll::Redraw() {
 	currentlyDrawing = true;
 	// Render a buffered DC from the client DC
 	wxClientDC dc(this);
+	if(!dc.IsOk()){ return; }
 	wxBufferedDC dcBuffer(&dc);
 	this->Render(dcBuffer);
 	currentlyDrawing = false;
@@ -234,7 +245,10 @@ void ZoomImagePanel::ImageScroll::Redraw() {
 
 void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 	
-	if (newImage == NULL) { return; }
+	if (newImage == NULL) { 
+		bitmapDraw = wxBitmap(wxImage(1, 1));
+		return; 
+	}
 	// Verify new image is okay
 	if (newImage->GetWidth() > 0 && newImage->GetHeight() > 0) {
 
@@ -258,12 +272,25 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 			bitmapDraw = wxBitmap(wxImage(1, 1));
 		}
 	}
+	else{
+			bitmapDraw = wxBitmap(wxImage(1, 1));
+	}
 }
 
 void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 
-	if (newImage->IsOk()) {
-		bitmapDraw = wxBitmap(*newImage);
+	if (newImage == NULL) { 
+		bitmapDraw = wxBitmap(wxImage(1, 1));
+		return; 
+	}
+
+	if (newImage->IsOk()){
+		if(newImage->GetWidth() > 0 && newImage->GetHeight() > 0) {
+			bitmapDraw = wxBitmap(*newImage);
+		}
+		else {
+			bitmapDraw = wxBitmap(1, 1);
+		}
 	}
 	else {
 		bitmapDraw = wxBitmap(1, 1);
@@ -316,6 +343,7 @@ void ZoomImagePanel::ImageScroll::OnPaint(wxPaintEvent& evt) {
 	currentlyDrawing = true;
 	// Create buffered and dc and render
 	wxBufferedPaintDC paintDC(this);
+	if(!paintDC.IsOk()){ return; }
 	this->Render(paintDC);
 	evt.Skip();
 	currentlyDrawing = false;

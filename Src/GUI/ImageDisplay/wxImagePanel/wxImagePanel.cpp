@@ -9,6 +9,7 @@ WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(paren
 	keepAspect = doKeepAspect;
 	resize = false;
 	staticImage = false;
+	bitmapDraw = wxBitmap(1, 1); 
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&WXImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
@@ -26,10 +27,7 @@ WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect
 	staticImage = staticImg;
 	resize = false;
 
-	if (staticImage) {
-		bitmapDraw = wxBitmap(*image);
-
-	}
+	this->ChangeImage(image);
 
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&WXImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
@@ -49,10 +47,21 @@ void WXImagePanel::SetResize(bool doResize) {
 }
 
 void WXImagePanel::ChangeImage(wxImage * newImage) {
+	if(newImage == NULL){ 
+
+		bitmapDraw = wxBitmap(1, 1); 
+		return;
+	}
 	if (staticImage) {
-		bitmapDraw = wxBitmap(*newImage);
-		this->SetSize(newImage->GetSize());
-		this->SetMinSize(newImage->GetSize());
+
+		if(newImage->GetWidth() > 0 || newImage->GetHeight() > 0){
+			bitmapDraw = wxBitmap(*newImage);
+			this->SetSize(newImage->GetSize());
+			this->SetMinSize(newImage->GetSize());
+		}
+		else{
+			bitmapDraw = wxBitmap(1, 1);
+		}
 	}
 	img = newImage;
 	this->SetSize(img->GetSize());
@@ -72,9 +81,9 @@ void WXImagePanel::Render(wxDC & dc) {
 		return;
 	}
 
-	if(img == NULL){
-		return;
-	}
+	if(img == NULL){ return; }
+	if(img->GetWidth() < 1 || img->GetHeight() < 1){ return; }
+
 	// Get current width and height
 	int newWidth = this->GetSize().GetWidth();
 	int newHeight = this->GetSize().GetHeight();

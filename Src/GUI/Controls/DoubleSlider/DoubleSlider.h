@@ -11,7 +11,7 @@
 #include "wx/wx.h"
 #endif
 
-#include "Debugging\MemoryLeakCheck.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class DoubleSlider : public wxPanel {
 public:

@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
     <ClCompile Include="..\Src\GUI\AboutWindow\AboutWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\AUI Manager\AUIManager.cpp" />
+    <ClCompile Include="..\Src\GUI\AUIManager\AUIManager.cpp" />
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.cpp" />
@@ -32,8 +32,8 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelMixerWindow\ChannelMixerWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ConvertGreyscaleWindow\ConvertGreyscaleWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\CropWindow\CropWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\HSLCurvesWindow\HSLCurvesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.cpp" />
@@ -54,7 +54,7 @@
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.cpp" />
-    <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelection.cpp" />
+    <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp" />
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp" />
@@ -76,7 +76,7 @@
     <ClInclude Include="..\Src\App\PhoediX.h" />
     <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
     <ClInclude Include="..\Src\GUI\AboutWindow\AboutWindow.h" />
-    <ClInclude Include="..\Src\GUI\AUI Manager\AUIManager.h" />
+    <ClInclude Include="..\Src\GUI\AUIManager\AUIManager.h" />
     <ClInclude Include="..\Src\GUI\Colors\Colors.h" />
     <ClInclude Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.h" />
     <ClInclude Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.h" />
@@ -87,8 +87,8 @@
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelMixerWindow\ChannelMixerWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ConvertGreyscaleWindow\ConvertGreyscaleWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\CropWindow\CropWindow.h" />
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\GreyscaleWindow\ConvertGreyscaleWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\HSLCurvesWindow\HSLCurvesWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\LABCurvesWindow\LABCurvesWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\MirrorWindow\MirrorWindow.h" />

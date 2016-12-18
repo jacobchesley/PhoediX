@@ -11,7 +11,7 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\mstream.h"
+#include "wx/mstream.h"
 
 #include "up_button.h"
 #include "down_button.h"

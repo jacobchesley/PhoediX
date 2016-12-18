@@ -374,7 +374,11 @@ void EditListPanel::DisableEdit(wxCommandEvent& WXUNUSED(event)) {
 void EditListPanel::AddRawWindow(){
 
 	if (!proc->GetLockedRaw()) {
-		proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+		#ifdef __WXMSW__
+			proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+		#else
+			proc->rawPrcoessor.open_file(proc->GetFilePath().c_str());
+		#endif
 		proc->rawPrcoessor.unpack();
 	}
 	// Get number of edits already in list
@@ -402,7 +406,11 @@ void EditListPanel::AddRawWindow(){
 void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 
 	if (!proc->GetLockedRaw()) {
-		proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+		#ifdef __WXMSW__
+			proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+		#else
+			proc->rawPrcoessor.open_file(proc->GetFilePath().c_str());
+		#endif
 		proc->rawPrcoessor.unpack();
 	}
 	// Get number of edits already in list

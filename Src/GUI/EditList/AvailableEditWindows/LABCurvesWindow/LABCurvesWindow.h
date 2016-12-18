@@ -3,15 +3,15 @@
 #ifndef LAB_CURVE_H
 #define LAB_CURVE_H
 
-#include "wx\notebook.h"
+#include "wx/notebook.h"
 
-#include "GUI\EditList\EditWindow\EditWindow.h"
-#include "GUI\Controls\DoubleSlider\DoubleSlider.h"
+#include "GUI/EditList/EditWindow/EditWindow.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/Controls/CurvesPanel/CurvesPanel.h"
 
-#include "GUI\Colors\Colors.h"
-#include "Processing\Processor\Processor.h"
-#include "gui\controls\curvespanel\curvespanel.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/Colors/Colors.h"
+#include "Processing/Processor/Processor.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class LABCurvesWindow :public EditWindow {
 public:

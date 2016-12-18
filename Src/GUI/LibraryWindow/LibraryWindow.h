@@ -11,20 +11,20 @@
 	#include "wx/wx.h"
 #endif
 
-#include "wx\dir.h"
-#include "wx\file.h"
-#include "wx\wrapsizer.h"
-#include "wx\progdlg.h"
+#include "wx/dir.h"
+#include "wx/file.h"
+#include "wx/wrapsizer.h"
+#include "wx/progdlg.h"
 
-#include "GUI\LibraryWindow\DirectorySelections\DirectorySelections.h"
-#include "GUI\Colors\Colors.h"
-#include "GUI\Controls\DoubleSlider\DoubleSlider.h"
-#include "GUI\AUI Manager\AUIManager.h"
-#include "GUI\Icons\Icons.h"
-#include "GUI\LibraryWindow\LibraryImage\LibraryImage.h"
-#include "Processing\ImageHandler\ImageHandler.h"
-#include "Processing\Processor\Processor.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/LibraryWindow/DirectorySelections/DirectorySelections.h"
+#include "GUI/Colors/Colors.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/AUIManager/AUIManager.h"
+#include "GUI/Icons/Icons.h"
+#include "GUI/LibraryWindow/LibraryImage/LibraryImage.h"
+#include "Processing/ImageHandler/ImageHandler.h"
+#include "Processing/Processor/Processor.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 
 class LibraryWindow : public wxScrolledWindow {

@@ -24,8 +24,8 @@
 #include "GUI/ImageDisplay/ZoomImagePanel/ZoomImagePanel.h"
 #include "GUI/EditList/EditListPanel/EditListPanel.h"
 #include "GUI/SnapshotWindow/SnapshotWindow.h"
-#include "GUI/AUI Manager/AUIManager.h"
-#include "GUI/Colors\Colors.h"
+#include "GUI/AUIManager/AUIManager.h"
+#include "GUI/Colors/Colors.h"
 #include "GUI/HistogramDisplay/HistogramDisplay.h"
 #include "GUI/AboutWindow/AboutWindow.h"
 #include "GUI/ImportImageDialog/ImportImageDialog.h"
@@ -33,6 +33,12 @@
 #include "GUI/SupportedCamerasWindow/SupportedCamerasWindow.h"
 #include "Session/Session.h"
 #include "Debugging/MemoryLeakCheck.h"
+
+enum {
+	ID_UPDATE_IMAGE
+};
+
+wxDECLARE_EVENT(UPDATE_IMAGE_EVENT, wxCommandEvent);
 
 /**
 	Main Window is the main display window of PhoediX.
@@ -94,6 +100,7 @@ private:
 	void RecieveMessageFromProcessor(wxCommandEvent& messageEvt);
 	void RecieveNumFromProcessor(wxCommandEvent& numEvt);
 	void RecieveRawComplete(wxCommandEvent& WXUNUSED(evt));
+	void OnUpdateImage(wxCommandEvent& WXUNUSED(event));
 
 	wxAuiManager * auiManager;
 

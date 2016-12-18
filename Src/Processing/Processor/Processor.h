@@ -11,13 +11,13 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\thread.h"
+#include "wx/thread.h"
 
-#include "Processing\Image\Image.h"
-#include "Processing\ImageHandler\ImageHandler.h"
-#include "Debugging\MemoryLeakCheck.h"
-#include "Processing\ProcessorEdit\ProcessorEdit.h"
-#include "Processing\RawErrorCodes\RawError.h"
+#include "Processing/Image/Image.h"
+#include "Processing/ImageHandler/ImageHandler.h"
+#include "Debugging/MemoryLeakCheck.h"
+#include "Processing/ProcessorEdit/ProcessorEdit.h"
+#include "Processing/RawErrorCodes/RawError.h"
 #include "libraw.h"
 #include <omp.h>
 

@@ -10,16 +10,16 @@
 #ifndef WX_PRECOMP
 	#include "wx/wx.h"
 #endif
-#include "wx\progdlg.h"
-#include "wx\filename.h"
+#include "wx/progdlg.h"
+#include "wx/filename.h"
 
-#include "GUI\Colors\Colors.h"
-#include "GUI\Icons\Icons.h"
-#include "GUI\Controls\DoubleSlider\DoubleSlider.h"
-#include "GUI\EditList\EditListPanel\EditListPanel.h"
-#include "Processing\ImageHandler\ImageHandler.h"
-#include "Processing\Processor\Processor.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/Colors/Colors.h"
+#include "GUI/Icons/Icons.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/EditList/EditListPanel/EditListPanel.h"
+#include "Processing/ImageHandler/ImageHandler.h"
+#include "Processing/Processor/Processor.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 enum {
 	ID_UPDATE_EXPORT_PROGRESS_NUM_EVENT,

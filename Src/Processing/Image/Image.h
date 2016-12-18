@@ -12,7 +12,7 @@
 #endif
 
 #include <stdint.h>
-#include "Debugging\MemoryLeakCheck.h"
+#include "Debugging/MemoryLeakCheck.h"
 #include <math.h>
  #include <iostream>  
 

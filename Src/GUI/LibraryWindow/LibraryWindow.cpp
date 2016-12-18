@@ -302,8 +302,11 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 
 			// We have a raw image we can load in
 			if (ImageHandler::CheckRaw(fileName)) {
-
-				rawProc.open_file(fileName.wc_str());
+				#ifdef __WXMSW__
+					rawProc.open_file(fileName.wc_str());
+				#else
+					rawProc.open_file(fileName.c_str());
+				#endif
 				rawProc.unpack();
 				rawProc.imgdata.params.half_size = 1;
 				rawProc.imgdata.params.use_camera_wb = 1;

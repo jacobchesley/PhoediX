@@ -11,16 +11,16 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\thread.h"
+#include "wx/thread.h"
 
-#include "GUI\EditList\AvailableEdits\AvailableEdits.h"
-#include "GUI\EditList\AvailableEditWindows\AvailableEditWindows.h"
-#include "GUI\EditList\EditListItem\EditListItem.h"
-#include "GUI\EditList\EditSelection\EditSelection.h"
-#include "GUI\AUI Manager\AUIManager.h"
-#include "GUI\Colors\Colors.h"
-#include "Processing\Processor\Processor.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/EditList/AvailableEdits/AvailableEdits.h"
+#include "GUI/EditList/AvailableEditWindows/AvailableEditWindows.h"
+#include "GUI/EditList/EditListItem/EditListItem.h"
+#include "GUI/EditList/EditSelection/EditSelection.h"
+#include "GUI/AUIManager/AUIManager.h"
+#include "GUI/Colors/Colors.h"
+#include "Processing/Processor/Processor.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 wxDECLARE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
 

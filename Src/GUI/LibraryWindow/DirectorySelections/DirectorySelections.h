@@ -11,10 +11,10 @@
 #include "wx/wx.h"
 #endif
 
-#include "GUI\Colors\Colors.h"
-#include "GUI\AUI Manager\AUIManager.h"
-#include "GUI\Icons\Icons.h"
-#include "Debugging\MemoryLeakCheck.h"
+#include "GUI/Colors/Colors.h"
+#include "GUI/AUIManager/AUIManager.h"
+#include "GUI/Icons/Icons.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 enum {
 	ID_DELETE_EVT

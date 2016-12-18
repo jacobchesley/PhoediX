@@ -5486,8 +5486,6 @@ void Processor::ProcessThread::DeleteEditVector() {
 
 wxThread::ExitCode Processor::ProcessThread::Entry() {
 
-	this->SetPriority(95);
-
 	// Wait for raw image to process (must process raw before image data)
 	while (procParent->GetLockedRaw()) {
 		this->Sleep(20);
@@ -6690,8 +6688,6 @@ Processor::RawProcessThread::RawProcessThread(Processor * processorPar, bool unp
 
 wxThread::ExitCode Processor::RawProcessThread::Entry() {
 
-	this->SetPriority(95);
-
 	if (unpackProcess) {
 		while (processor->GetLockedRaw()) {
 			this->Sleep(20);
@@ -6702,7 +6698,11 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		processor->SendMessageToParent("Opening Raw File");
 		processor->rawPrcoessor.recycle();
 
-		processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
+		#ifdef __WXMSW__
+			processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
+		#else
+			processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().c_str());
+		#endif
 			// Open failed, present error and return
 			if(processor->rawErrorCode != 0){
 
@@ -6749,7 +6749,11 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			processor->SendMessageToParent("RAW Image processing canceled");
 			processor->forceStopRaw = false;
 
-			processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
+			#ifdef __WXMSW__
+				processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
+			#else
+				processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().c_str());
+			#endif
 			// Open failed, present error and return
 			if(processor->rawErrorCode != 0){
 

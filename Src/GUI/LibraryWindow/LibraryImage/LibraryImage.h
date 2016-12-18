@@ -11,10 +11,10 @@
 #include "wx/wx.h"
 #endif
 
-#include "GUI\Colors\Colors.h"
-#include "GUI\ImageDisplay\wxImagePanel\wxImagePanel.h"
-#include "GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.h"
-#include "Processing\ImageHandler\ImageHandler.h"
+#include "GUI/Colors/Colors.h"
+#include "GUI/ImageDisplay/wxImagePanel/wxImagePanel.h"
+#include "GUI/ImageDisplay/ZoomImageFrame/ZoomImageFrame.h"
+#include "Processing/ImageHandler/ImageHandler.h"
 
 class LibraryImage : public wxPanel {
 

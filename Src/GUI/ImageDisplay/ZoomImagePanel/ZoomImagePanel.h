@@ -11,16 +11,16 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\dc.h"
-#include "wx\dcbuffer.h"
-#include "wx\rawbmp.h"
+#include "wx/dc.h"
+#include "wx/dcbuffer.h"
+#include "wx/rawbmp.h"
 
-#include "GUI\Colors\Colors.h"
-#include "GUI\Controls\DoubleSlider\DoubleSlider.h"
-#include "Processing\Image\Image.h"
-#include "Processing\ImageHandler\ImageHandler.h"
+#include "GUI/Colors/Colors.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "Processing/Image/Image.h"
+#include "Processing/ImageHandler/ImageHandler.h"
 
-#include "Debugging\MemoryLeakCheck.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class ZoomImagePanel : public wxPanel {
 public:
