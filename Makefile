@@ -25,6 +25,10 @@ LINK_ALL = $(WX_LFALGS)	$(LIBRAW_LINK_PATH)/libraw.so $(LIBTIFF_LINK_PATH)/libti
 
 SRC=./Src
 
+All:
+	$(MAKE) clean
+	$(MAKE) AllObjects
+	$(MAKE) Link
 #App
 AppObjects = PhoediX.o
 AppObjectsOut = $(OUT_DIR)/PhoediX.o
