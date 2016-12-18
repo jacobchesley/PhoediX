@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="PX.svg">
+   sodipodi:docname="PX.svg"
+   inkscape:export-filename="C:\Development\PhoediX\Graphics\PX\PX.png"
+   inkscape:export-xdpi="25.4"
+   inkscape:export-ydpi="25.4">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -25,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35"
-     inkscape:cx="-142.40282"
-     inkscape:cy="764.2933"
+     inkscape:zoom="0.0875"
+     inkscape:cx="1602.8196"
+     inkscape:cy="590.17544"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
