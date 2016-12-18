@@ -11,9 +11,9 @@
 #include "wx/wx.h"
 #endif
 
-#include "wx\aui\aui.h"
+#include "wx/aui/aui.h"
 
-#include "Debugging\MemoryLeakCheck.h"
+#include "Debugging/MemoryLeakCheck.h"
 
 class PhoedixAUIManager {
 
