@@ -92,17 +92,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	histogramPaneInfo.Hide();
 	auiManager->AddPane(histogramDisplay, histogramPaneInfo);
 
-	editList = new EditListPanel(this, processor);
-	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
-	editListInfo.Right();
-	editListInfo.Caption("Edit List");
-	editListInfo.Name("EditList");
-	editListInfo.CloseButton(true);
-	editListInfo.PinButton(true);
-	editListInfo.DestroyOnClose(false);
-	editListInfo.Hide();
-	auiManager->AddPane(editList, editListInfo);
-
 	imagePanel = new ZoomImagePanel(this, processor->GetImage());
 	imagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
 
@@ -130,6 +119,17 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	imageInfo.Caption("Working Image");
 	imageInfo.Hide();
 	auiManager->AddPane(imagePanel, imageInfo);
+
+	editList = new EditListPanel(this, processor, imagePanel);
+	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
+	editListInfo.Right();
+	editListInfo.Caption("Edit List");
+	editListInfo.Name("EditList");
+	editListInfo.CloseButton(true);
+	editListInfo.PinButton(true);
+	editListInfo.DestroyOnClose(false);
+	editListInfo.Hide();
+	auiManager->AddPane(editList, editListInfo);
 
 	exportWindow = new ExportWindow(this, processor, editList);
 	wxAuiPaneInfo exportPaneInfo = wxAuiPaneInfo();
@@ -253,11 +253,31 @@ void MainWindow::SetSizeProperties(){
 	this->Maximize(true);
 }
 
+void MainWindow::OpenFiles(wxArrayString files) {
+
+	for (size_t i = 0; i < files.size(); i++) {
+
+		// Check if PhoediX project
+		if (PhoediXSession::CheckIfSession(files.Item(i))) {
+			this->LoadProject(files.Item(i));
+		}
+		else{
+			this->CreateNewProject();
+			this->OpenImage(files.Item(i));
+		}
+	}
+}
+
 void MainWindow::OnNewProject(wxCommandEvent& WXUNUSED(event)) {
 	this->CreateNewProject();
 }
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
+
+	if (this->CheckCurrentSessionNeedsSaved()) {
+		wxMessageDialog msg(this, "Current project is not saved to disk.  Are you sure you want to continue closing this project?", "Close Project?", wxYES_NO | wxNO_DEFAULT);
+		if (msg.ShowModal() == wxID_NO) { return; }
+	}
 
 	imagePanel->ChangeImage(emptyImage);
 
@@ -351,10 +371,9 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 void MainWindow::OpenSession(PhoediXSession * session) {
 
 	processor->KillRawProcessing();
-	editList->RemoveAllWindows();
 	imagePanel->ChangeImage(emptyImage);
 	histogramDisplay->ZeroOutHistograms();
-
+	
 	// Set the new image
 	this->OpenImage(session->GetImageFilePath());
 	if(session->GetImageScrollWidth() > 0 && session->GetImageScrollHeight() > 0) {
@@ -447,6 +466,18 @@ void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 			menuWindow->GetMenuItems()[i]->SetItemLabel(currentSession.GetName());
 		}
 	}
+
+	// Replace existing session in saved sessions
+	bool sessionSavedBefore = false;
+	for (size_t i = 0; i < savedSessions.size(); i++) {
+		if (savedSessions[i].GetID() == currentSession.GetID()) {
+			savedSessions[i] = currentSession;
+			sessionSavedBefore = true;
+		}
+	}
+	if (!sessionSavedBefore) {
+		savedSessions.push_back(currentSession);
+	}
 }
 
 void MainWindow::QuickSaveProject(wxCommandEvent & WXUNUSED(evt)) {
@@ -462,6 +493,18 @@ void MainWindow::QuickSaveProject(wxCommandEvent & WXUNUSED(evt)) {
 	else {
 		this->SaveCurrentSession();
 		currentSession.SaveSessionToFile(currentSession.GetProjectPath());
+	}
+
+	// Replace existing session in saved sessions
+	bool sessionSavedBefore = false;
+	for (size_t i = 0; i < savedSessions.size(); i++) {
+		if (savedSessions[i].GetID() == currentSession.GetID()) {
+			savedSessions[i] = currentSession;
+			sessionSavedBefore = true;
+		}
+	}
+	if (!sessionSavedBefore) {
+		savedSessions.push_back(currentSession);
 	}
 }
 
@@ -491,7 +534,6 @@ void MainWindow::SaveCurrentSession() {
 			allSessions[i] = currentSession;
 		}
 	}
-
 }
 
 void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
@@ -501,17 +543,21 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
 		return;
 	}
+	this->LoadProject(openFileDialog.GetPath());
+}
+
+void MainWindow::LoadProject(wxString projectPath) {
 
 	// Save the current session
 	this->SaveCurrentSession();
 
-	//this->CloseSession(&currentSession);
-
 	// Load the new session from file
 	PhoediXSession session;
-	session.LoadSessionFromFile(openFileDialog.GetPath());
-	session.SetName(openFileDialog.GetFilename());
-	session.SetProjectPath(openFileDialog.GetPath());
+	session.LoadSessionFromFile(projectPath);
+
+	wxFileName projectFile(projectPath);
+	session.SetName(projectFile.GetFullName());
+	session.SetProjectPath(projectFile.GetPath());
 	this->SetUniqueID(&session);
 
 	// Append the session to the menu bar
@@ -520,6 +566,7 @@ void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
 
 	// Add new session to all session vector, set current session and open
 	allSessions.push_back(session);
+	savedSessions.push_back(session);
 	currentSession = session;
 	this->OpenSession(&session);
 }
@@ -596,17 +643,18 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
-	this->OpenImage(currentSession.GetImageFilePath());
+
+	this->OpenImage(currentSession.GetImageFilePath(), true);
 }
 
-void MainWindow::OpenImage(wxString imagePath){
+void MainWindow::OpenImage(wxString imagePath, bool rawWindowOpen){
 
 	// Make sure file name is correct and exists
 	wxFileName imageFile(imagePath);
 	if(!imageFile.IsOk()){ return; }
 	if(!imageFile.FileExists()){ return; }
 
-	editList->RemoveRawWindow();
+	if (!rawWindowOpen) { editList->RemoveRawWindow(); }
 
 	// Handle Raw Image
 	if(ImageHandler::CheckRaw(imagePath)){
@@ -616,7 +664,7 @@ void MainWindow::OpenImage(wxString imagePath){
 		processor->SetFileName(imageFile.GetFullName());
 		this->SetTitle("PhoediX - " + imageFile.GetFullName());
 		exportWindow->RawImageLoaded(true);
-		editList->AddRawWindow();
+		if (!rawWindowOpen) { editList->AddRawWindow(); }
 		processor->SetDoFitImage(true);
 
 		this->ShowImageRelatedWindows();
@@ -954,6 +1002,7 @@ void MainWindow::RecieveNumFromProcessor(wxCommandEvent& numEvt) {
 }
 
 void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
+
 	// Do not update image display if original image is checked
 	if (this->OriginalImageDispalyed()) { 
 		processor->SetDoFitImage(false);
@@ -965,7 +1014,6 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 	if (processor->GetImage()->GetWidth() < 1 || processor->GetImage()->GetHeight() < 1) {
 		processor->Unlock();
 		processor->SetDoFitImage(false);
-		processor->SetUpdated(false);
 		return;
 	}
 	imagePanel->ChangeImage(processor->GetImage());
@@ -979,7 +1027,20 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 	
 	exportWindow->ProcessingComplete();
 	processor->SetDoFitImage(false);
-	processor->SetUpdated(false);
+}
+
+bool MainWindow::CheckCurrentSessionNeedsSaved() {
+	if (currentSession.GetID() >= 0) {
+		for (size_t i = 0; i < savedSessions.size(); i++) {
+			if (savedSessions[i].GetID() == currentSession.GetID()) {
+				return !PhoediXSession::CompareSessions(&currentSession, &savedSessions[i]);
+			}
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
@@ -1050,34 +1111,8 @@ wxThread::ExitCode MainWindow::ImagePanelUpdateThread::Entry() {
 	
 	while (continueWatch) {
 		if (proc->GetUpdated() && !proc->GetLocked() && !proc->GetLockedRaw()) {
-			/*
-			// Do not update image display if original image is checked
-			if (parent->OriginalImageDispalyed()) { 
-				proc->SetDoFitImage(false);
-				proc->SetUpdated(false);
-				continue; 
-			}
-
-			proc->Lock();
-			if (proc->GetImage()->GetWidth() < 1 || proc->GetImage()->GetHeight() < 1) {
-				proc->Unlock();
-				proc->SetDoFitImage(false);
-				proc->SetUpdated(false);
-				continue;
-			}
-			imgPanel->ChangeImage(proc->GetImage());
-			pixelPeep->UpdateImage(proc->GetImage());
-			histogramDisp->UpdateHistograms();
-			if (proc->GetDoFitImage()) {
-				imgPanel->FitImage();
-			}
-			proc->Unlock();
-			imgPanel->Redraw();
-			
-			exportWin->ProcessingComplete();
-			proc->SetDoFitImage(false);
+	
 			proc->SetUpdated(false);
-			*/
 			wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
 			wxPostEvent(parent, evt);
 		}

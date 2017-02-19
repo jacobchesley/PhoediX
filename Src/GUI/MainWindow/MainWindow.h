@@ -51,6 +51,7 @@ public:
 	*/
 	MainWindow(wxApp * application);
 	bool OriginalImageDispalyed();
+	void OpenFiles(wxArrayString files);
 
 private:
 
@@ -77,9 +78,10 @@ private:
 	void OnImagePanelMouse(wxMouseEvent & evt);
 
 	void CreateNewProject();
-	void OpenImage(wxString imagePath);
+	void OpenImage(wxString imagePath, bool rawWindowOpen = false);
 	void ShowImageRelatedWindows();
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
+	void LoadProject(wxString projectPath);
 
 	void OnOpenWindow(wxCommandEvent& evt);
 	void OpenSession(PhoediXSession * session);
@@ -101,6 +103,8 @@ private:
 	void RecieveNumFromProcessor(wxCommandEvent& numEvt);
 	void RecieveRawComplete(wxCommandEvent& WXUNUSED(evt));
 	void OnUpdateImage(wxCommandEvent& WXUNUSED(event));
+
+	bool CheckCurrentSessionNeedsSaved();
 
 	wxAuiManager * auiManager;
 
@@ -131,6 +135,7 @@ private:
 
 	PhoediXSession currentSession;
 	wxVector<PhoediXSession> allSessions;
+	wxVector<PhoediXSession> savedSessions;
 
 	int numnUnnamedProjectsOpen;
 
