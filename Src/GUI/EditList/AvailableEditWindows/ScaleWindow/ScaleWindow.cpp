@@ -264,6 +264,10 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 
+	int curProcesseedWidth = 0;
+	int curProcesseedHeight = 0;
+	this->GetProcessor()->CalcualteWidthHeightEdits(this->GetPreviousEdits(), &curProcesseedWidth, &curProcesseedHeight);
+
 	// Nearest Nieghbor selection
 	if (scaleInterpolation->GetSelection() == 0) {
 	
@@ -272,8 +276,8 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 		// Use a percentage to scale width and height
 		if(scaleMethod->GetSelection() == 0){
 			double scaleVal = scalePercentage->GetValue() / 100.0;
-			scaleEdit->AddParam(proc->GetOriginalImage()->GetWidth() * scaleVal);
-			scaleEdit->AddParam(proc->GetOriginalImage()->GetHeight() * scaleVal);
+			scaleEdit->AddParam(curProcesseedWidth * scaleVal);
+			scaleEdit->AddParam(curProcesseedHeight * scaleVal);
 			scaleEdit->AddFlag(scaleMethod->GetSelection());
 			scaleEdit->AddFlag(keepAspect->GetValue());
 
@@ -305,8 +309,8 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 		// Use a percentage to scale width and height
 		if(scaleMethod->GetSelection() == 0){
 			double scaleVal = scalePercentage->GetValue() / 100.0;
-			scaleEdit->AddParam(proc->GetOriginalImage()->GetWidth() * scaleVal);
-			scaleEdit->AddParam(proc->GetOriginalImage()->GetHeight() * scaleVal);
+			scaleEdit->AddParam(curProcesseedWidth * scaleVal);
+			scaleEdit->AddParam(curProcesseedHeight * scaleVal);
 			scaleEdit->AddFlag(scaleMethod->GetSelection());
 			scaleEdit->AddFlag(keepAspect->GetValue());
 
@@ -338,8 +342,8 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 		// Use a percentage to scale width and height
 		if(scaleMethod->GetSelection() == 0){
 			double scaleVal = scalePercentage->GetValue() / 100.0;
-			scaleEdit->AddParam(proc->GetOriginalImage()->GetWidth() * scaleVal);
-			scaleEdit->AddParam(proc->GetOriginalImage()->GetHeight() * scaleVal);
+			scaleEdit->AddParam(curProcesseedWidth * scaleVal);
+			scaleEdit->AddParam(curProcesseedHeight * scaleVal);
 			scaleEdit->AddFlag(scaleMethod->GetSelection());
 			scaleEdit->AddFlag(keepAspect->GetValue());
 
