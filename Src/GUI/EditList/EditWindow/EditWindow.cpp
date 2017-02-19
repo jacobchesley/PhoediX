@@ -6,7 +6,7 @@ wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 
-EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * processor) : wxScrolledWindow(parent) {
+EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * zoomImgPanel) : wxScrolledWindow(parent) {
 	editNme = editName;
 	watchdog = NULL;
 	watchdogRealtime = NULL;
@@ -14,6 +14,7 @@ EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * process
 	parWindow = parent;
 	activated = false;
 	proc = processor;
+	imgPanel = zoomImgPanel;
 
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 }
@@ -104,6 +105,35 @@ void EditWindow::StopWatchdog(){
 	}
 }
 
+ZoomImagePanel * EditWindow::GetZoomImagePanel() {
+	return imgPanel;
+}
+
+Processor * EditWindow::GetProcessor() {
+	return proc;
+}
+
+void EditWindow::SetPreviousEdits(wxVector<ProcessorEdit*> prevEdits) {
+
+	this->DestroyPreviousEdits();
+
+	// Copy edits to previous edits
+	for (size_t i = 0; i < prevEdits.size(); i++) {
+		previousEdits.push_back(new ProcessorEdit(*prevEdits.at(i)));
+	}
+}
+wxVector<ProcessorEdit*> EditWindow::GetPreviousEdits() {
+	return previousEdits;
+}
+
+void EditWindow::DestroyPreviousEdits() {
+
+	// Delete previous edits, then clear vector
+	for (size_t i = 0; i < previousEdits.size(); i++) {
+		delete previousEdits.at(i);
+	}
+	previousEdits.clear();
+}
 
 EditWindow::WatchForUpdateThread::WatchForUpdateThread(EditWindow * windowPar, int sleeptime){
 	window = windowPar;
