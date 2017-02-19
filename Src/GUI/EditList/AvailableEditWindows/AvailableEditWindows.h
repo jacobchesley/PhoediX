@@ -11,6 +11,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/ImageDisplay/ZoomImagePanel/ZoomImagePanel.h"
 #include "GUI/EditList/EditWindow/EditWindow.h"
 
 #include "AdjustBrightnessWindow/AdjustBrightnessWindow.h"
@@ -34,8 +35,8 @@
 class AvailableEditWindows {
 
 	public:
-		static EditWindow* GetEditWindow(int editID, wxWindow* parent, Processor * processor);
-		static EditWindow* GetEditWindow(ProcessorEdit * edit, wxWindow* parent, Processor * processor);
+		static EditWindow* GetEditWindow(int editID, wxWindow* parent, Processor * processor, ZoomImagePanel * imgPanel);
+		static EditWindow* GetEditWindow(ProcessorEdit * edit, wxWindow* parent, Processor * processor, ZoomImagePanel * imgPanel);
 		static int GetEditIDFromEdit(ProcessorEdit * edit);
 };
 

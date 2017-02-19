@@ -2,7 +2,7 @@
 
 #include "AvailableEditWindows.h"
 
-EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, Processor * processor) {
+EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, Processor * processor, ZoomImagePanel * imgPanel) {
 
 	EditWindow * newEditWindow = NULL;
 
@@ -58,20 +58,20 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			break;
 
 		case AvailableEditIDS::EDIT_ID_CROP:
-			newEditWindow = new CropWindow(parent, "Crop Image", processor);
+			newEditWindow = new CropWindow(parent, "Crop Image", processor, imgPanel);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_RAW:
-			newEditWindow = new RawWindow(parent, "Raw Processor", processor);
+			newEditWindow = new RawWindow(parent, "Raw Processor", processor, imgPanel);
 			break;
 	}
 
 	return newEditWindow;
 }
 
-EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow * parent, Processor * processor) {
+EditWindow* AvailableEditWindows::GetEditWindow(ProcessorEdit * edit, wxWindow * parent, Processor * processor, ZoomImagePanel * imgPanel) {
 
-	return AvailableEditWindows::GetEditWindow(AvailableEditWindows::GetEditIDFromEdit(edit), parent, processor);
+	return AvailableEditWindows::GetEditWindow(AvailableEditWindows::GetEditIDFromEdit(edit), parent, processor, imgPanel);
 
 }
 
