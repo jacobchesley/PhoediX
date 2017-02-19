@@ -54,6 +54,7 @@ public :
 
 	wxString GetEditTag();
 
+	static bool CompareProcessorEdits(ProcessorEdit * editOne, ProcessorEdit * editTwo);
 	enum EditType {
 		UNDEFINED = 0,
 		SHIFT_RGB,

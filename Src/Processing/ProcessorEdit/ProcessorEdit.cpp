@@ -321,6 +321,11 @@ void ProcessorEdit::SetEditType(int editType) {
 		case EditType::SCALE_BICUBIC:
 			tag = "SCALE_BICUBIC";
 			break;
+
+		case EditType::CROP:
+			tag = "CROP";
+			break;
+
 		case EditType::RAW:
 			tag = "RAW";
 			break;
@@ -338,7 +343,7 @@ void ProcessorEdit::SetEditType(int editType) {
 
 void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 
-	if (inTag == "ADJUST_CONTRAST") { editInt = EditType::ADJUST_CONTRAST; tag = inTag; }
+	     if (inTag == "ADJUST_CONTRAST") { editInt = EditType::ADJUST_CONTRAST; tag = inTag; }
 	else if (inTag == "CHANNEL_MIXER") { editInt = EditType::CHANNEL_MIXER; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_AVG") { editInt = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { editInt = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
@@ -363,10 +368,54 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "SCALE_NEAREST") { editInt = EditType::SCALE_NEAREST; tag = inTag; }
 	else if (inTag == "SCALE_BILINEAR") { editInt = EditType::SCALE_BILINEAR; tag = inTag; }
 	else if (inTag == "SCALE_BICUBIC") { editInt = EditType::SCALE_BICUBIC; tag = inTag; }
+	else if (inTag == "CROP") { editInt = EditType::CROP; tag = inTag; }
 	else if (inTag == "RAW") { editInt = EditType::RAW; tag = inTag; }
 	else{ editInt = EditType::UNDEFINED; tag = "UNDEFINED"; }
 }
 
 wxString ProcessorEdit::GetEditTag() {
 	return tag;
+}
+
+bool ProcessorEdit::CompareProcessorEdits(ProcessorEdit * editOne, ProcessorEdit * editTwo) {
+
+
+	if (editOne->GetEditType() != editOne->GetEditType()) { return false; }
+	if (editOne->GetDisabled() != editOne->GetDisabled()) { return false; }
+
+	// Compare params
+	if (editOne->GetParamsSize() != editTwo->GetParamsSize()) { return false; }
+	for (size_t i = 0; i < editOne->GetParamsSize(); i++) {
+		if (editOne->GetParam(i) != editTwo->GetParam(i)) { return false; }
+	}
+
+	// Compare Flags
+	if (editOne->GetFlagsSize() != editTwo->GetFlagsSize()) { return false; }
+	for (size_t i = 0; i < editOne->GetFlagsSize(); i++) {
+		if (editOne->GetFlag(i) != editTwo->GetFlag(i)) { return false; }
+	}
+
+	// Compare Int Arrays
+	if (editOne->GetNumIntArrays() != editTwo->GetNumIntArrays()) { return false; }
+	for (size_t i = 0; i < editOne->GetNumIntArrays(); i++) {
+
+		if (editOne->GetIntArraySize(i) != editTwo->GetIntArraySize(i)) { return false; }
+		for (size_t j = 0; j < editOne->GetIntArraySize(i); j++) {
+
+			if (editOne->GetIntArray(i)[j] != editTwo->GetIntArray(i)[j]) { return false; }
+		}
+	}
+
+	// Compare Double Arrays
+	if (editOne->GetNumDoubleArrays() != editTwo->GetNumDoubleArrays()) { return false; }
+	for (size_t i = 0; i < editOne->GetNumDoubleArrays(); i++) {
+
+		if (editOne->GetDoubleArraySize(i) != editTwo->GetDoubleArraySize(i)) { return false; }
+		for (size_t j = 0; j < editOne->GetDoubleArraySize(i); j++) {
+
+			if (editOne->GetDoubleArray(i)[j] != editTwo->GetDoubleArray(i)[j]) { return false; }
+		}
+	}
+
+	return true;
 }
