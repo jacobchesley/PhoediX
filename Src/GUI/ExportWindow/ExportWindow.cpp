@@ -139,7 +139,7 @@ void ExportWindow::ProcessingComplete(){
 	if(exportStarted){
 		
 		// Make sure progress bar is including saving image step
-		this->SetEditNum(proc->GetLastNumEdits() + 1);
+		//this->SetEditNum(proc->GetLastNumEdits() + 1);
 		this->SetMessage("Saving Image");
 		wxString extension = "";
 		int fileType = ImageHandler::SaveType::JPEG;
@@ -182,7 +182,11 @@ void ExportWindow::SetProgressEditNum(wxCommandEvent & evt){
 		return;
 	}
 
-	// Update if we can
+	// If we cant enter, we are in the middle of closing the progress bar
+	if (!locker.TryEnter()) {
+		return;
+	}
+
 	if(exportStarted && progress != NULL){
 		progress->Update(evt.GetInt(), progress->GetMessage());
 	}
@@ -195,6 +199,7 @@ void ExportWindow::CloseProgress(wxCommandEvent& WXUNUSED(evt)){
 	
 	// Destroy
 	if(exportStarted && progress != NULL){
+		exportStarted = false;
 		progress->Destroy();
 		progress->Close();
 		wxSafeYield();
