@@ -86,15 +86,18 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	proc = processor;
 	editList = editLst;
 	parWindow = parent;
+	blankMessageTimer = new wxTimer(this);
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnApply, this, SettingsWindow::ID_APPLY_SETTINGS);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnCancel, this, SettingsWindow::ID_CANCEL);
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&SettingsWindow::SendBlankMessageTimer, this);
 }
 
 void SettingsWindow::OnApply(wxCommandEvent& WXUNUSED(evt)) {
-	this->ApplySettings();
+	this->ApplySettings(true);
 }
 
-void SettingsWindow::ApplySettings(){
+void SettingsWindow::ApplySettings(bool ShowMessage){
 
 	if (colorDepth->GetSelection() == 0 && lastColorDepth != colorDepth->GetSelection()) {
 		proc->GetOriginalImage()->Disable16Bit();
@@ -130,8 +133,20 @@ void SettingsWindow::ApplySettings(){
 	if (colorSpace->GetSelection() == 2) { proc->SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); }
 	if (colorSpace->GetSelection() == 3) { proc->SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); }
 
+	lastSettings.bitDepth = colorDepth->GetSelection();
+	lastSettings.colorSpace = colorSpace->GetSelection();
+	lastSettings.numThreads = numThreads->GetValue();
+
 	this->WriteSettings();
 	editList->ReprocessImageRaw();
+
+	// Send applied settings message to parent to display in info bar
+	if (ShowMessage) {
+		wxCommandEvent evt(PROCESSOR_MESSAGE_EVENT, ID_PROCESSOR_MESSAGE);
+		evt.SetString("Settings Applied");
+		wxPostEvent(parWindow, evt);
+		blankMessageTimer->Start(1000, true);
+	}
 }
 
 void SettingsWindow::ReadSettings() {
@@ -186,7 +201,7 @@ void SettingsWindow::ReadSettings() {
 			}
 		}
 	}
-	this->ApplySettings();
+	this->ApplySettings(false);
 }
 
 void SettingsWindow::WriteSettings() {
@@ -233,4 +248,17 @@ void SettingsWindow::WriteLines(wxTextFile * file) {
 	file->AddLine(numThreadsSettingsStr);
 
 	file->Write();
+}
+
+void SettingsWindow::SendBlankMessageTimer(wxTimerEvent& WXUNUSED(event)) {
+	wxCommandEvent evt(PROCESSOR_MESSAGE_EVENT, ID_PROCESSOR_MESSAGE);
+	evt.SetString("");
+	wxPostEvent(parWindow, evt);
+}
+
+void SettingsWindow::OnCancel(wxCommandEvent& WXUNUSED(evt)) {
+
+	colorDepth->SetSelection(lastSettings.bitDepth);
+	colorSpace->SetSelection(lastSettings.colorSpace);
+	numThreads->SetValue(lastSettings.numThreads);
 }

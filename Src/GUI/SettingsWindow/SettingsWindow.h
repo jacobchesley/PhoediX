@@ -16,6 +16,7 @@
 #include "wx/stdpaths.h"
 #include "wx/textfile.h"
 
+#include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Image/Image.h"
 #include "Processing/Processor/Processor.h"
@@ -25,20 +26,28 @@ enum {
 	ID_RELOAD_IMAGE
 };
 
+struct Settings{
+	int bitDepth;
+	int colorSpace;
+	int numThreads;
+};
+
 wxDECLARE_EVENT(RELOAD_IMAGE_EVENT, wxCommandEvent);
 
 class SettingsWindow : public wxScrolledWindow {
 
 public:
 	SettingsWindow(wxWindow * parent, Processor * processor, EditListPanel * editLst);
-	void ApplySettings();
+	void ApplySettings(bool ShowMessage = false);
 	void ReadSettings();
 	void WriteSettings();
 	
 private:
 
 	void OnApply(wxCommandEvent& WXUNUSED(evt));
+	void OnCancel(wxCommandEvent& WXUNUSED(evt));
 	void WriteLines(wxTextFile * file);
+	void SendBlankMessageTimer(wxTimerEvent& WXUNUSED(event));
 
 	wxWindow * parWindow;
 	wxBoxSizer * mainSizer;
@@ -62,7 +71,9 @@ private:
 
 	Processor * proc;
 	EditListPanel * editList;
-
+	
+	wxTimer * blankMessageTimer;
+	Settings lastSettings;
 	enum {
 		ID_APPLY_SETTINGS,
 		ID_CANCEL
