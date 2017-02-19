@@ -13,6 +13,7 @@
 
 #include "wx/dc.h"
 #include "wx/dcbuffer.h"
+#include "wx/graphics.h"
 #include "wx/rawbmp.h"
 
 #include "GUI/Colors/Colors.h"
@@ -21,6 +22,19 @@
 #include "Processing/ImageHandler/ImageHandler.h"
 
 #include "Debugging/MemoryLeakCheck.h"
+
+enum {
+	ID_GRID_MOVE_EVENT
+};
+
+wxDECLARE_EVENT(GRID_MOVE_EVENT, wxCommandEvent);
+
+struct Grid {
+	int startX;
+	int startY;
+	int width;
+	int height;
+};
 
 class ZoomImagePanel : public wxPanel {
 public:
@@ -40,6 +54,18 @@ public:
 	void SetDrag(int x, int y);
 	void FitImage();
 	void DestroyTimer();
+
+	void ActivateGrid();
+	void DeactivateGrid();
+	bool GetGridActive();
+	Grid GetGrid();
+	void SetGrid(Grid newGrid);
+	void SetGridOwner(int ownerID);
+	int GetGridOwner();
+	void SetGridAspect(double aspect);
+	double GetGridAspect();
+	void SetEnforceGridAspect(bool enforceGridAspect);
+	bool GetEnforceGridAspect();
 
 private:
 
@@ -62,10 +88,22 @@ private:
 		ZOOM_FIT
 	};
 
+	enum GridHitTaget {
+		TOP_LEFT_CORNER,
+		TOP_RIGHT_CORNER,
+		BOTTOM_LEFT_CORNER,
+		BOTTOM_RIGHT_CORNER,
+		TOP,
+		BOTTOM,
+		LEFT,
+		RIGHT
+	};
+
 	wxTimer * reguardScrollCountdown;
 
 	class ImageScroll : public wxScrolledWindow {
 	public:
+
 		ImageScroll(wxWindow * parent);
 		ImageScroll(wxWindow * parent, Image * img);
 		ImageScroll(wxWindow * parent, wxImage * img);
@@ -77,15 +115,27 @@ private:
 		double GetZoom();
 		void DisreguardScroll();
 		void ReguardScroll();
+		bool GetReguardScroll();
+		void ActivateGrid();
+		void DeactivateGrid();
+		bool GetGridActive();
+		Grid GetGrid();
+		void SetGrid(Grid newGrid);
+		void SetGridOwner(int newOwner);
+		int GetGridOwner();
+		void SetGridAspect(double aspect);
+		double GetGridAspect();
+		void SetEnforceGridAspect(bool enforceGridAspect);
+		bool GetEnforceGridAspect();
 
 	private:
 
 		bool disreguardScroll;
 		void OnDragStart(wxMouseEvent & evt);
-		void OnDragContinue(wxMouseEvent & evt);
 		void OnPaint(wxPaintEvent & evt);
 		void Render(wxDC& dc);
 		void OnRightDown(wxMouseEvent & evt);
+		bool GetGridMoving();
 		wxBitmap bitmapDraw;
 		int oldWidth;
 		int oldHeight;
@@ -103,6 +153,15 @@ private:
 		int scrollStartY;
 
 		bool currentlyDrawing;
+		bool gridActive;
+
+		Grid grid;
+		Grid drawGrid;
+		bool gridMoving;
+		int gridOwner;
+
+		bool enforceGridAspect;
+		double gridAspect;
 	};
 
 	ImageScroll * scroller;
