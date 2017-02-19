@@ -13,6 +13,7 @@
 
 #include "wx/thread.h"
 
+#include "GUI/ImageDisplay/ZoomImagePanel/ZoomImagePanel.h"
 #include "Processing/ProcessorEdit/ProcessorEdit.h"
 #include "Processing/Processor/Processor.h"
 #include "wx/event.h"
@@ -29,7 +30,7 @@ wxDECLARE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 
 class EditWindow : public wxScrolledWindow{
 	public:
-		EditWindow(wxWindow * parent, wxString editName, Processor * processor);
+		EditWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * zoomImgPanel = NULL);
 
 		void DoProcess();
 		void Process(wxCommandEvent& WXUNUSED(event));
@@ -51,6 +52,10 @@ class EditWindow : public wxScrolledWindow{
 		void Activate();
 		void Deactivate();
 
+		void SetPreviousEdits(wxVector<ProcessorEdit*> prevEdits);
+		wxVector<ProcessorEdit*> GetPreviousEdits();
+		void DestroyPreviousEdits();
+
 		enum {
 			ID_PROCESS_EDITS
 		};
@@ -58,6 +63,8 @@ class EditWindow : public wxScrolledWindow{
 	protected:
 		void SetUpdated(bool update);
 		bool GetUpdated();
+		ZoomImagePanel * GetZoomImagePanel();
+		Processor * GetProcessor();
 		bool isDisabled;
 		
 	private:
@@ -67,6 +74,8 @@ class EditWindow : public wxScrolledWindow{
 		wxString editNme;
 		bool activated;
 		Processor * proc;
+		ZoomImagePanel * imgPanel;
+		wxVector<ProcessorEdit*> previousEdits;
 
 		class WatchForUpdateThread : public wxThread {
 
@@ -81,7 +90,7 @@ class EditWindow : public wxScrolledWindow{
 			bool contin;
 			EditWindow * window;
 			int slp;
-	};
+		};
 
 	WatchForUpdateThread * watchdog;
 	WatchForUpdateThread * watchdogRealtime;
