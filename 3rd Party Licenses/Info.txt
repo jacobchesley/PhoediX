@@ -1,0 +1,9 @@
+wxWidgets is statically linked to PhoediX.  No modifications to wxWidgets were made for use with PhoediX.  You (the user) are free to download wxWidgets library from http://wxwidgets.org/ and build wxWidgets for use with PhoediX.
+
+LibRaw and LibTIFF libraries are dynamically linked with PhoediX.  No modifications to either LibRaw or LibTIFF libraries were made for use with PhoediX.  Source code for LibRaw and LibTIFFF is included in the sub folder "Libraries Source Code."
+
+Please see LICENSE.wxWindows for license information reguarding wxWidgets.
+Please see LICENSE.LGPL for LibRaw license.
+Please see Copyrights for copyright information and license for LibTIFF.
+
+Please see Copyrights file for copyright information for each library.
