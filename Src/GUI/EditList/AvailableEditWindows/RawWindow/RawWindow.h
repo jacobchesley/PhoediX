@@ -14,7 +14,7 @@
 
 class RawWindow : public EditWindow {
 	public:
-		RawWindow(wxWindow * parent, wxString editName, Processor * processor);
+		RawWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * imgPanel);
 		void Process();
 		void ProcessEvt(wxCommandEvent& WXUNUSED(event));
 		void SetParamsAndFlags(ProcessorEdit * edit);

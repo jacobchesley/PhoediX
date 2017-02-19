@@ -2,7 +2,7 @@
 
 #include "RawWindow.h"
 
-RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
+RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * imgPanel) : EditWindow(parent, editName, processor, imgPanel) {
 
 	parWindow = parent;
 	proc = processor;
@@ -809,33 +809,36 @@ void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 	if(edit == NULL){ return;}
 
-	if(edit->GetEditType() == ProcessorEdit::EditType::RAW && edit->GetParamsSize() == 26){
+	if(edit->GetEditType() == ProcessorEdit::EditType::RAW && edit->GetParamsSize() == 24){
+
 		brightnessControl->SetValue(edit->GetParam(0));
 		highlightControl->SetSelection((int)edit->GetParam(1));
 		satLevelControl->SetValue(edit->GetParam(2));
 		autoBrightThrControl->SetValue(edit->GetParam(3));
 		maxThrControl->SetValue(edit->GetParam(4));
+
 		gammaLevelControl->SetValue(edit->GetParam(5));
 		gammaSlopeControl->SetValue(edit->GetParam(6));
 		interpolationControl->SetSelection((int)edit->GetParam(7));
 		if(edit->GetParam(8) == 1){ halfSizeControl->SetValue(true); } else { halfSizeControl->SetValue(false); }
 		if(edit->GetParam(9) == 1){ greenMatchingControl->SetValue(true); } else { greenMatchingControl->SetValue(false); }
-		redMultiplierControl->SetValue(edit->GetParam(10));
-		greenMultiplierControl->SetValue(edit->GetParam(11));
-		blueMultiplierControl->SetValue(edit->GetParam(12));
-		if(edit->GetParam(13) == 1){ cfaCleanControl->SetValue(true); } else { cfaCleanControl->SetValue(false); }
-		cfaCleanLControl->SetValue(edit->GetParam(14));
-		cfaCleanCControl->SetValue(edit->GetParam(15));
-		waveletNoiseControl->SetValue(edit->GetParam(16));
-		if(edit->GetParam(17) == 1){ cfaCleanLineEnableControl->SetValue(true); } else { cfaCleanLineEnableControl->SetValue(false); }
-		cfaCleanLineControl->SetValue(edit->GetParam(18));
+
+		whiteBalancePresetsControl->SetSelection((int)edit->GetParam(10));
+		redMultiplierControl->SetValue(edit->GetParam(11));
+		greenMultiplierControl->SetValue(edit->GetParam(12));
+		blueMultiplierControl->SetValue(edit->GetParam(13));
+
+		waveletNoiseControl->SetValue(edit->GetParam(14));
+		if(edit->GetParam(15) == 1){ cfaCleanControl->SetValue(true); } else { cfaCleanControl->SetValue(false); }
+		cfaCleanLControl->SetValue(edit->GetParam(16));
+		cfaCleanCControl->SetValue(edit->GetParam(17));
+		if(edit->GetParam(18) == 1){ cfaCleanLineEnableControl->SetValue(true); } else { cfaCleanLineEnableControl->SetValue(false); }
+		cfaCleanLineControl->SetValue(edit->GetParam(19));
 	
-		whiteBalancePresetsControl->SetSelection((int)edit->GetParam(19));
 		if(edit->GetParam(20) == 1){ autoBrightControl->SetValue(true); } else { autoBrightControl->SetValue(false); }
 		exposureControl->SetValue(edit->GetParam(21));
 		exposurePreserveControl->SetValue(edit->GetParam(22));
 		flipControl->SetSelection((int)edit->GetParam(23));
-		if(edit->GetParam(24) == 1){ halfSizeControl->SetValue(true); } else { halfSizeControl->SetValue(false); }
 
 		this->Process();
 	}
@@ -857,24 +860,22 @@ ProcessorEdit * RawWindow::GetParamsAndFlags(){
 	rawEdit->AddParam((double)halfSizeControl->GetValue());
 	rawEdit->AddParam((double)greenMatchingControl->GetValue());
 	
+	rawEdit->AddParam((double)whiteBalancePresetsControl->GetSelection());
 	rawEdit->AddParam(redMultiplierControl->GetValue());
 	rawEdit->AddParam(greenMultiplierControl->GetValue());
 	rawEdit->AddParam(blueMultiplierControl->GetValue());
+
+	rawEdit->AddParam(waveletNoiseControl->GetValue());
 	rawEdit->AddParam((double)cfaCleanControl->GetValue());
 	rawEdit->AddParam(cfaCleanLControl->GetValue());
-
 	rawEdit->AddParam(cfaCleanCControl->GetValue());
-	rawEdit->AddParam(waveletNoiseControl->GetValue());
 	rawEdit->AddParam((double)cfaCleanLineEnableControl->GetValue());
 	rawEdit->AddParam(cfaCleanLineControl->GetValue());
-	rawEdit->AddParam((double)whiteBalancePresetsControl->GetSelection());
 
-	
-	rawEdit->AddParam(autoBrightControl->GetValue());
+	rawEdit->AddParam((double)autoBrightControl->GetValue());
 	rawEdit->AddParam(exposureControl->GetValue());
 	rawEdit->AddParam(exposurePreserveControl->GetValue());
 	rawEdit->AddParam((double)flipControl->GetSelection());	
-	rawEdit->AddParam((double)halfSizeControl->GetValue());
 
 	return rawEdit;
 }
