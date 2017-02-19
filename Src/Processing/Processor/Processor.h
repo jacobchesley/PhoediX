@@ -132,6 +132,11 @@ public:
 	void SetHasEdits(bool doesHaveEdits);
 	bool GetHasEdits();
 
+	void CalculateWidthHeightRotation(ProcessorEdit * rotationEdit, int origWidth, int origHeight, int * width, int * height);
+	void CalculateWidthHeightScale(ProcessorEdit * scaleEdit, int * width, int * height);
+	void CalculateWidthHeightCrop(ProcessorEdit * cropEdit, int * width, int * height);
+	void CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * width, int * height);
+
 	inline double FastTanH(double x);
 
 	enum RotationCropping{

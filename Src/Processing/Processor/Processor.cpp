@@ -5446,6 +5446,98 @@ void Processor::LABtoXYZ(LAB * lab, XYZ * xyz) {
 	xyz->Z = tempZ * 108.883f;
 }
 
+void Processor::CalculateWidthHeightRotation(ProcessorEdit * rotationEdit, int origWidth, int origHeight, int * width, int * height) {
+
+	// No rotation and 180 degree rotation have same width and height as original image
+	if (rotationEdit->GetEditType()== ProcessorEdit::EditType::ROTATE_180 || rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE) {
+		*width = origWidth;
+		*height = origHeight;
+	}
+
+	// 90 degree and 270 degree rotation cause width and height to flip
+	else if (rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_90_CW || rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW) {
+		*width = origHeight;
+		*height = origWidth;
+	}
+
+	// Calculate width and height based on angle, and crop flag
+	else if (rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC ||
+		rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
+		rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST) {
+
+		if (rotationEdit->GetParamsSize() != 1 || rotationEdit->GetFlagsSize() != 3) { return; }
+		double angleDegrees = rotationEdit->GetParam(0);
+		int cropFlag = rotationEdit->GetFlag(2);
+
+		// Set width and height to maximum size needed to fit whole image in rotation (with black surrounding borders)
+		if (cropFlag == Processor::RotationCropping::EXPAND) {
+			*width = this->GetExpandedRotationWidth(angleDegrees, origWidth, origHeight);
+			*height = this->GetExpandedRotationHeight(angleDegrees, origWidth, origHeight);
+		}
+
+		// Set width and height to minumum size needed to fit image with no border
+		else if (cropFlag == Processor::RotationCropping::FIT) {
+			*width = this->GetFittedRotationWidth(angleDegrees, origWidth, origHeight);
+			*height = this->GetFittedRotationHeight(angleDegrees, origWidth, origHeight);
+		}
+
+		// Rotated image is same size as current image
+		else {
+			*width = origWidth;
+			*height = origHeight;
+		}
+	}
+}
+
+void Processor::CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * width, int * height) {
+
+	// Start with original image dimmensions
+	*width = this->GetOriginalImage()->GetWidth();
+	*height = this->GetOriginalImage()->GetHeight();
+
+	ProcessorEdit * curEdit;
+
+	for (size_t i = 0; i < edits.size(); i++) {
+		curEdit = edits.at(i);
+
+		if (curEdit->GetEditType() == ProcessorEdit::EditType::SCALE_NEAREST ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::SCALE_BILINEAR ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::SCALE_BICUBIC) {
+
+			// Set width and height to scale width and height
+			if (curEdit->GetParamsSize() == 2) {
+				*width = (int)curEdit->GetParam(0);
+				*height = (int)curEdit->GetParam(1);
+			}
+		}
+
+		if (curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_90_CW ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_180 ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
+			curEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC) {
+
+			this->CalculateWidthHeightRotation(curEdit, *width, *height, width, height);
+
+		}
+
+		if (curEdit->GetEditType() == ProcessorEdit::EditType::CROP) {
+
+
+			// Set width and height to crop width and height
+			if (curEdit->GetParamsSize() == 4) {
+
+				// Params 0 and 1 are x and y start points
+				*width = (int)curEdit->GetParam(2);
+				*height = (int)curEdit->GetParam(3);
+			}
+			
+		}
+	}
+}
+
 Processor::ProcessThread::ProcessThread(Processor * processor, ProcessorEdit * edit) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
 	editVec = wxVector<ProcessorEdit*>();
@@ -5573,9 +5665,11 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 		switch (editToComplete) {
 
-		case ProcessorEdit::EditType::RAW:
-			procParent->SetUpdated(true);
-			continue;
+			case ProcessorEdit::EditType::RAW: {
+				procParent->SetUpdated(true);
+				procParent->SendProcessorEditNumToParent(editIndex + 1);
+				continue;
+			}
 
 			// Peform a Brightness Adjustment edit
 			case ProcessorEdit::EditType::ADJUST_BRIGHTNESS: {
@@ -6620,7 +6714,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			// Peform Crop edit
 			case ProcessorEdit::EditType::CROP: {
 			
-				procParent->SendMessageToParent("Processing CROP" + fullEditNumStr);
+				procParent->SendMessageToParent("Processing crop" + fullEditNumStr);
 
 				// Get crop dimmensions
 				int startX = curEdit->GetParam(0);
