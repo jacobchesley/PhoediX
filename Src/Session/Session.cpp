@@ -2,6 +2,7 @@
 
 #include "Session.h"
 #include <random>
+#include "App/PhoediX.h"
 
 PhoediXSession::PhoediXSession(){
 	editList = new PhoediXSessionEditList();
@@ -190,6 +191,7 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	// Create root XML Doc
 	wxXmlDocument session;
 	wxXmlNode * sessionInfo = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "PhoediXProject");
+	sessionInfo->AddAttribute("PhoediX_Version", PHOEDIX_VERSION_STRING);
 	session.SetRoot(sessionInfo);
 
 	// Write the image file path to XML Doc
@@ -386,4 +388,66 @@ void PhoediXSession::SetSnapshots(wxVector<Snapshot*> snapshots) {
 		// push onto list
 		snapshotsList.push_back(tempSnapshot);
 	}
+}
+
+bool PhoediXSession::CompareSessions(PhoediXSession * sessionOne, PhoediXSession * sessionTwo) {
+
+	if (sessionOne->GetName() != sessionTwo->GetName()) { return false; }
+	if (sessionOne->GetImageFilePath() != sessionTwo->GetImageFilePath()) { return false; }
+
+	wxVector<ProcessorEdit*> editListOne = sessionOne->GetEditList()->GetSessionEditList();
+	wxVector<ProcessorEdit*> editListTwo = sessionTwo->GetEditList()->GetSessionEditList();
+
+	if (editListOne.size() != editListTwo.size()) { return false; }
+
+	// Compare edit lists
+	for (size_t i = 0; i < editListOne.size(); i++) {
+		ProcessorEdit * editOne = editListOne.at(i);
+		ProcessorEdit * editTwo = editListTwo.at(i);
+		
+		if (ProcessorEdit::CompareProcessorEdits(editOne, editTwo) == false) { return false; }
+	}
+
+	// Compare Snapshots
+	if (sessionOne->GetSnapshots().size() != sessionTwo->GetSnapshots().size()) { return false; }
+
+	wxVector<Snapshot*> snapListOne = sessionOne->GetSnapshots();
+	wxVector<Snapshot*> snapListTwo = sessionTwo->GetSnapshots();
+
+	for (size_t i = 0; i < snapListOne.size(); i++) {
+
+		// Snapshot attributes
+		if (snapListOne.at(i)->snapshotIndex != snapListTwo.at(i)->snapshotIndex) { return false; }
+		if (snapListOne.at(i)->snapshotName != snapListTwo.at(i)->snapshotName) { return false; }
+
+		// Compare snapshot edit list
+		wxVector<ProcessorEdit*> snapEditListOne = snapListOne.at(i)->editList;
+		wxVector<ProcessorEdit*> snapEditListTwo = snapListTwo.at(i)->editList;
+		if (snapEditListOne.size() != snapEditListTwo.size()) { return false; }
+		
+		// Compare edit lists
+		for (size_t j = 0; j < snapEditListOne.size(); j++) {
+			ProcessorEdit * editOne = snapEditListOne.at(j);
+			ProcessorEdit * editTwo = snapEditListTwo.at(j);
+
+			if (ProcessorEdit::CompareProcessorEdits(editOne, editTwo) == false) { return false; }
+		}
+	}
+	return true;
+}
+
+bool PhoediXSession::CheckIfSession(wxString filePath) {
+
+	// Load the project, return if it fails
+	wxXmlDocument session;
+	{
+		// Disable error dialog
+		wxLogNull logNo;
+		if (!session.Load(filePath)) { return false; }
+	}
+	
+	// Verify root node
+	if (session.GetRoot()->GetName() != "PhoediXProject") { return false; }
+
+	return true;
 }

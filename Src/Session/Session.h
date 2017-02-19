@@ -11,11 +11,12 @@
 #include "wx/wx.h"
 #endif
 
+#include "wx/datetime.h"
+#include "Wx/wfstream.h"
 #include "wx/xml/xml.h"
 
 #include "SessionEditList/SessionEditList.h"
 #include "Processing/Snapshot/Snapshot.h"
-#include "wx/datetime.h"
 
 class PhoediXSession{
 
@@ -62,6 +63,9 @@ public:
 
 	void SetProjectPath(wxString path);
 	wxString GetProjectPath();
+
+	static bool CompareSessions(PhoediXSession * sessionOne, PhoediXSession * sessionTwo);
+	static bool CheckIfSession(wxString filePath);
 
 private:
 
