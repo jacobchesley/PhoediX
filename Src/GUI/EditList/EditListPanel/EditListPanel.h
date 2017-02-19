@@ -31,7 +31,7 @@ enum {
 class EditListPanel : public wxPanel {
 public:
 
-	EditListPanel(wxWindow * parent, Processor * processor);
+	EditListPanel(wxWindow * parent, Processor * processor, ZoomImagePanel * imgPanel);
 	wxVector<Edit> edits;
 
 	void AddRawWindow();
@@ -54,6 +54,7 @@ private:
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
 	void ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event));
 	void ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event));
+	void PopulatePreviousEdits();
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
 	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActviate);
@@ -76,6 +77,9 @@ private:
 
 	Processor * proc;
 	bool hasRaw;
+	wxWindow * par;
+
+	ZoomImagePanel * imagePanel;
 
 	enum Buttons {
 		ADD_EDIT_BUTTON = 100
@@ -102,6 +106,9 @@ private:
 		wxVector<EditListItem*> GetEditList();
 
 	private:
+
+		void OnCropActivate(wxCommandEvent& evt);
+		void OnCropDeactivate(wxCommandEvent& evt);
 
 		wxWindow * parWindow;
 		void RedrawEdits();

@@ -4,8 +4,9 @@
 
 wxDEFINE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
 
-EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel(parent) {
+EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImagePanel * imgPanel) : wxPanel(parent) {
 
+	par = parent;
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
 	this->SetBackgroundColour(Colors::BackDarkGrey);
@@ -58,10 +59,13 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor) : wxPanel
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListPanel::OnRightClick, this);
 	this->Bind(START_EDITS_COMPLETE, (wxObjectEventFunction)&EditListPanel::StartEditsComplete, this, ID_START_EDITS_COMPLETE);
+
 	proc = processor;
 	hasRaw = false;
 	startEdits = NULL;
 	editsStarted = false;
+	imagePanel = imgPanel;
+
 	this->InitializeEdits();
 }
 
@@ -76,6 +80,7 @@ void EditListPanel::InitializeEdits() {
 		wxString editDescription = allEdits.at(i).GetDescription();
 		editSelection->AddEditSelection(editName, editDescription);
 	}
+	editSelection->FitEdits();
 }
 
 void EditListPanel::OnRightClick(wxMouseEvent& WXUNUSED(event)){
@@ -133,13 +138,18 @@ void EditListPanel::AddEditsToProcessor() {
 
 	// Create a vector of Edit list Items that are displayed on the panel
 	wxVector<EditListItem*> editList = scroller->GetEditList();
+	wxVector<ProcessorEdit*> runningEditList;
+
 	for (size_t i = 0; i < editList.size(); i++) {
 
 		// Add each edit from the edit window, to the processor
 		if (editList.at(i)->GetEditWindow() != NULL) {
 
+			editList.at(i)->GetEditWindow()->DestroyPreviousEdits();
+			editList.at(i)->GetEditWindow()->SetPreviousEdits(runningEditList);
 			editList.at(i)->GetEditWindow()->SetDisabled(editList.at(i)->GetDisabled());
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
+			runningEditList.push_back(editList.at(i)->GetEditWindow()->GetParamsAndFlags());
 		}
 	}
 }
@@ -198,6 +208,21 @@ void EditListPanel::ReprocessImageRaw(bool unpack) {
 	}
 }
 
+void EditListPanel::PopulatePreviousEdits() {
+
+	// Create a vector of Edit list Items that are displayed on the panel
+	wxVector<EditListItem*> editList = scroller->GetEditList();
+	wxVector<ProcessorEdit*> runningEditList = wxVector<ProcessorEdit*>();
+
+	for (size_t i = 0; i < editList.size(); i++) {
+
+		if (editList.at(i)->GetEditWindow() != NULL) {
+			runningEditList.push_back(editList.at(i)->GetEditWindow()->GetParamsAndFlags());
+			editList.at(i)->GetEditWindow()->SetPreviousEdits(runningEditList);
+		}
+	}
+}
+
 void EditListPanel::StartEditsComplete() {
 	editsStarted = false;
 }
@@ -214,7 +239,7 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 	int editID = addEvt.GetInt();
 
 	// Create new edit window and add it to panel
-	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(editID, this, proc);
+	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(editID, this, proc, imagePanel);
 	this->AddEditWindowToPanel(newEditWindow, editID, false, true);
 
 	// Reprocess the image with the new edit added
@@ -236,7 +261,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 
 			// Add the correct type of window, and set parameter for window based on edit
 			else{
-				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc);
+				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc, imagePanel);
 				
 				if (newEditWindow != NULL) {
 					this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled(), false);
@@ -282,6 +307,7 @@ void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool d
 		int id = scroller->GetNextID();
 		wxString idStr;
 		idStr << id;
+
 		// Create the info to style the AUI Pane
 		wxAuiPaneInfo editWindowInfo = wxAuiPaneInfo();
 		editWindowInfo.DestroyOnClose(false);
@@ -385,7 +411,7 @@ void EditListPanel::AddRawWindow(){
 	size_t numEdits = scroller->GetNextID();
 
 	// Add new raw processor edit panel to list
-	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc);
+	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc, imagePanel);
 	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false, true);
 
 	//Move raw processor edit to top
@@ -417,7 +443,7 @@ void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 	size_t numEdits = scroller->GetNextID();
 
 	// Add new raw processor edit panel to list
-	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc);
+	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc, imagePanel);
 	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false, true);
 	newEditWindow->SetParamsAndFlags(editForParams);
 
@@ -435,13 +461,13 @@ void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 }
 
 void EditListPanel::RemoveRawWindow() {
+
 	if (scroller->GetNumTopEdits() == 1) {
 		scroller->DeleteEdit(0);
 		scroller->SetNumTopEdits(0);
 		hasRaw = false;
 	}
 }
-
 
 EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
@@ -598,6 +624,13 @@ int EditListPanel::EditListScroll::GetNextID() {
 
 wxVector<EditListItem*> EditListPanel::EditListScroll::GetEditList() {
 	return editList;
+}
+
+void EditListPanel::EditListScroll::OnCropActivate(wxCommandEvent& evt) {
+	wxPostEvent(parWindow, evt);
+}
+void EditListPanel::EditListScroll::OnCropDeactivate(wxCommandEvent& evt) {
+	wxPostEvent(parWindow, evt);
 }
 
 EditListPanel::StartEditsThread::StartEditsThread(EditListPanel * parent, Processor * processor, bool processRaw, bool unpack) : wxThread(wxTHREAD_DETACHED) {
