@@ -27,6 +27,7 @@ class EditSelection : public wxScrolledWindow {
 public:
 	EditSelection(wxWindow * parent);
 	void AddEditSelection(wxString editName, wxString editDescription);
+	void FitEdits();
 
 private:
 	void OnClose(wxCommandEvent& WXUNUSED(event));

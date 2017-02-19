@@ -69,3 +69,7 @@ void EditSelection::OnAdd(wxCommandEvent& WXUNUSED(event)) {
 		wxPostEvent(parWindow, evt);		
 	}
 }
+
+void EditSelection::FitEdits() {
+	editList->SetSize(editList->GetBestSize());
+}
