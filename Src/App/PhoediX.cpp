@@ -14,6 +14,7 @@ bool PhoediX::OnInit(){
     if (!wxApp::OnInit()){
 		return false;
 	}
+	
 	wxInitAllImageHandlers();
 
 	//Icons icons;
@@ -25,5 +26,19 @@ bool PhoediX::OnInit(){
     // Create and show the main window
 	MainWindow * mainWindow = new MainWindow(this);
 	mainWindow->Show();
+	mainWindow->OpenFiles(filesToOpen);
     return true;
+}
+
+void PhoediX::OnInitCmdLine(wxCmdLineParser& parser) {
+	parser.SetDesc(cmdLineDesc);
+	// must refuse '/' as parameter starter or cannot use "/path" style paths
+	parser.SetSwitchChars(wxT("-"));
+}
+
+bool PhoediX::OnCmdLineParsed(wxCmdLineParser& parser) {
+	for (int i = 0; i < parser.GetParamCount(); i++){
+		filesToOpen.Add(parser.GetParam(i));
+	}
+	return true;
 }
