@@ -21,6 +21,7 @@
 #include "Processing/Image/Image.h"
 #include "Processing/Processor/Processor.h"
 #include "GUI/EditList/EditListPanel/EditListPanel.h"
+#include "Settings/Settings.h"
 
 enum {
 	ID_RELOAD_IMAGE

@@ -70,6 +70,7 @@
     <ClCompile Include="..\Src\Processing\RawErrorCodes\RawError.cpp" />
     <ClCompile Include="..\Src\Session\Session.cpp" />
     <ClCompile Include="..\Src\Session\SessionEditList\SessionEditList.cpp" />
+    <ClCompile Include="..\Src\Settings\Settings.cpp" />
     <ClCompile Include="..\Src\Spline\Spline.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +132,7 @@
     <ClInclude Include="..\Src\Processing\Snapshot\Snapshot.h" />
     <ClInclude Include="..\Src\Session\Session.h" />
     <ClInclude Include="..\Src\Session\SessionEditList\SessionEditList.h" />
+    <ClInclude Include="..\Src\Settings\Settings.h" />
     <ClInclude Include="..\Src\Spline\Spline.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

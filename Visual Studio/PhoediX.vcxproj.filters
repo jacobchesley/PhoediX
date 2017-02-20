@@ -181,6 +181,9 @@
     <Filter Include="GUI\Supported Cameras Window">
       <UniqueIdentifier>{4cd3ece5-f54c-4b03-a823-c530951cbdd8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{81b6c7e5-f2a9-46d2-ac46-4869dfb38201}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -338,6 +341,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ConvertGreyscaleWindow\ConvertGreyscaleWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Settings\Settings.cpp">
+      <Filter>Settings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -520,6 +526,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ConvertGreyscaleWindow\ConvertGreyscaleWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Greyscale</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Settings\Settings.h">
+      <Filter>Settings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

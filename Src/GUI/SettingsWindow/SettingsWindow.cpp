@@ -103,6 +103,7 @@ void SettingsWindow::ApplySettings(bool ShowMessage){
 		proc->GetOriginalImage()->Disable16Bit();
 		proc->GetImage()->Disable16Bit();
 		lastColorDepth = colorDepth->GetSelection();
+		PhoedixSettings::SetBitDepth(8);
 
 		wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
 		wxPostEvent(parWindow, reloadEvent);
@@ -112,6 +113,7 @@ void SettingsWindow::ApplySettings(bool ShowMessage){
 		proc->GetOriginalImage()->Enable16Bit();
 		proc->GetImage()->Enable16Bit();
 		lastColorDepth = colorDepth->GetSelection();
+		PhoedixSettings::SetBitDepth(16);
 
 		wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
 		wxPostEvent(parWindow, reloadEvent);
@@ -121,17 +123,19 @@ void SettingsWindow::ApplySettings(bool ShowMessage){
 	if (numThreads->GetValue() > 1) {
 		proc->SetMultithread(true);
 		proc->SetNumThreads(numThreads->GetValue());
+		PhoedixSettings::SetNumThreads(numThreads->GetValue());
 	}
 	else {
 		proc->SetMultithread(false);
 		proc->SetNumThreads(1);
+		PhoedixSettings::SetNumThreads(1);
 	}
 
 	// Set Color Space
-	if (colorSpace->GetSelection() == 0) { proc->SetColorSpace(ColorSpaceENUM::sRGB); }
-	if (colorSpace->GetSelection() == 1) { proc->SetColorSpace(ColorSpaceENUM::ADOBE_RGB); }
-	if (colorSpace->GetSelection() == 2) { proc->SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); }
-	if (colorSpace->GetSelection() == 3) { proc->SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); }
+	if (colorSpace->GetSelection() == 0) { proc->SetColorSpace(ColorSpaceENUM::sRGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::sRGB); }
+	if (colorSpace->GetSelection() == 1) { proc->SetColorSpace(ColorSpaceENUM::ADOBE_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::ADOBE_RGB); }
+	if (colorSpace->GetSelection() == 2) { proc->SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); }
+	if (colorSpace->GetSelection() == 3) { proc->SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); }
 
 	lastSettings.bitDepth = colorDepth->GetSelection();
 	lastSettings.colorSpace = colorSpace->GetSelection();
