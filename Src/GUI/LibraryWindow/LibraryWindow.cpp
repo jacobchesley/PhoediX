@@ -2,8 +2,13 @@
 
 #include "LibraryWindow.h"
 
+wxDEFINE_EVENT(POPULATION_STARTED_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(POPULATION_COMPLETE_EVENT, wxCommandEvent);
 
 LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
+
+	populationStarted = false;
+	populationCanceled = false;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	
@@ -73,6 +78,8 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnMove, this, LibraryWindow::MenuBar::ID_MOVE_TO);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&LibraryWindow::OnResize, this);
 	this->Bind(ADD_LIB_IMAGE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnAddImage, this);
+	this->Bind(POPULATION_STARTED_EVENT, (wxObjectEventFunction)&LibraryWindow::OnPopulationStart, this);
+	this->Bind(POPULATION_COMPLETE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnPopulationComplete, this);
 }
 
 void LibraryWindow::OnShowDirectories(wxCommandEvent& WXUNUSED(evt)){
@@ -86,8 +93,11 @@ void LibraryWindow::OnResize(wxSizeEvent& WXUNUSED(evt)) {
 
 void LibraryWindow::OnImport(wxCommandEvent& WXUNUSED(evt)){
 
-	LoadImagesThread * testImgThread = new LoadImagesThread(this);
-	testImgThread->Run();
+	if (!populationStarted) {
+		testImgThread = new LoadImagesThread(this);
+		testImgThread->Run();
+		populationCanceled = false;
+	}
 }
 
 void LibraryWindow::OnCopy(wxCommandEvent& WXUNUSED(evt)){
@@ -118,10 +128,15 @@ void LibraryWindow::OnHoverClearButton(wxMouseEvent& WXUNUSED(evt)) {
 
 	// Display a popup menu of options
 	wxMenu popupMenu;
-	popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_UNSELECTED, "Clear Unselected Images");
-	popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_SELECTED, "Clear Selected Images");
-	popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_ALL, "Clear All Images");
-
+	
+	if (populationStarted) {
+		popupMenu.Append(LibraryWindow::MenuBar::ID_CANCEL_PROCESS, "Cancel Population");
+	}
+	else {
+		popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_UNSELECTED, "Clear Unselected Images");
+		popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_SELECTED, "Clear Selected Images");
+		popupMenu.Append(LibraryWindow::MenuBar::ID_CLEAR_ALL, "Clear All Images");
+	}
 	popupMenu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(LibraryWindow::OnPopupMenuClick), NULL, this);
 	this->PopupMenu(&popupMenu);
 }
@@ -147,6 +162,15 @@ void LibraryWindow::OnPopupMenuClick(wxCommandEvent& inEvt) {
 		// Clear all
 		case LibraryWindow::MenuBar::ID_CLEAR_ALL: {
 			this->ClearAll();
+			break;
+		}
+
+		// Cancel Processing
+		case LibraryWindow::MenuBar::ID_CANCEL_PROCESS: {
+			if (testImgThread != NULL) {
+				populationCanceled = true;
+				testImgThread->Cancel();
+			}
 			break;
 		}
 	}
@@ -236,6 +260,15 @@ void LibraryWindow::OnAddImage(AddLibraryImageEvent & evt){
 	}
 }
 
+void LibraryWindow::OnPopulationStart(wxSizeEvent & WXUNUSED(evt)) {
+	populationStarted = true;
+}
+
+void LibraryWindow::OnPopulationComplete(wxSizeEvent & WXUNUSED(evt)) {
+	populationStarted = false;
+	populationCanceled = false;
+}
+
 bool LibraryWindow::CheckIfImageInDisplay(wxString imagePath){
 	for(size_t i = 0; i < includedImagePaths.size(); i++){
 		if(includedImagePaths.at(i).CmpNoCase(imagePath) == 0){
@@ -246,14 +279,22 @@ bool LibraryWindow::CheckIfImageInDisplay(wxString imagePath){
 }
 void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxString filePath) {
 	
+	if (populationCanceled) {
+		return;
+	}
+	locker.Enter();
 	LibraryImage * newLibImage = new LibraryImage(this, newImage, fileName, filePath);
 	newImage->Destroy();
 	delete newImage;
-	imagesLayout->Add(newLibImage);
-	imagesLayout->AddSpacer(50);
-	libraryImages.push_back(newLibImage);	
+
+	int idx = imagePaths.Add(fileName);
+
+	imagesLayout->Insert((idx * 2), newLibImage);
+	imagesLayout->Insert((idx * 2) + 1, new wxPanel(this, -1, wxDefaultPosition, wxSize(50, 50)));
+	libraryImages.insert(libraryImages.begin() + idx, newLibImage);
 	this->Layout();
 	this->FitInside();
+	locker.Leave();
 }
 
 wxVector<wxString> LibraryWindow::GetSelectedFileNames() {
@@ -271,13 +312,31 @@ wxVector<wxString> LibraryWindow::GetSelectedFileNames() {
 
 LibraryWindow::LoadImagesThread::LoadImagesThread(LibraryWindow * parent) : wxThread(wxTHREAD_DETACHED){
 	par = parent;
+	canceled = false;
+}
+
+void LibraryWindow::LibraryWindow::LoadImagesThread::Cancel() {
+	canceled = true;
 }
 
 wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 
+	wxCommandEvent start(POPULATION_STARTED_EVENT, ID_POPULATION_STARTED);
+	wxPostEvent(par, start);
+
+	int totalThreads = PhoedixSettings::GetNumThreads();
 	int maxSize = 250;
 
-	LibRaw rawProc;
+	LibRaw * rawProcs = new LibRaw[totalThreads];
+	int * rawErrors = new int[totalThreads];
+	libraw_processed_image_t ** rawImgs = new libraw_processed_image_t *[totalThreads];
+	wxImage ** displayImage = new wxImage*[totalThreads];
+
+	for (int i = 0; i < totalThreads; i++) {
+		rawErrors[i] = LIBRAW_SUCCESS;
+		rawImgs[i] = NULL;
+		displayImage[i] = NULL;
+	}
 
 	// Get all directories to check
 	wxVector<wxString> allDirectories = par->directorySelections->GetDirectoryList();
@@ -285,6 +344,7 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 	// Go through all directories
 	for (size_t dir = 0; dir < allDirectories.size(); dir++) {
 
+		if (canceled) { break; }
 		// Check directory, and continue if it does not exist
 		if (!wxDir::Exists(allDirectories[dir])) {
 			continue;
@@ -295,73 +355,87 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 		wxDir::GetAllFiles(allDirectories[dir], &allFileNames);
 
 		// Go through all files, check if each are an image
-		for (size_t file = 0; file < allFileNames.size(); file++) {
+		
+		omp_set_dynamic(0);     // Explicitly disable dynamic teams
+		omp_set_num_threads(totalThreads); // Use 4 threads for all consecutive parallel regions
+		#pragma omp parallel for
+		for (int file = 0; file < allFileNames.size(); file++) {
+
+			if (canceled) { break; }
 
 			wxString fileName = allFileNames[file];
-			wxImage * displayImage = NULL;
 
+			if (par->CheckIfImageInDisplay(fileName)) { continue; }
+			
 			// We have a raw image we can load in
 			if (ImageHandler::CheckRaw(fileName)) {
 				#ifdef __WXMSW__
-					rawProc.open_file(fileName.wc_str());
+					rawProcs[omp_get_thread_num()].open_file(fileName.wc_str());
 				#else
-					rawProc.open_file(fileName.c_str());
+					rawProcs[omp_get_thread_num()].open_file(fileName.c_str());
 				#endif
-				rawProc.unpack();
-				rawProc.imgdata.params.half_size = 1;
-				rawProc.imgdata.params.use_camera_wb = 1;
-				rawProc.imgdata.params.use_auto_wb = 0;
+				rawProcs[omp_get_thread_num()].unpack();
+				rawProcs[omp_get_thread_num()].imgdata.params.half_size = 1;
+				rawProcs[omp_get_thread_num()].imgdata.params.use_camera_wb = 1;
+				rawProcs[omp_get_thread_num()].imgdata.params.use_auto_wb = 0;
 
-				int rawError = LIBRAW_SUCCESS;
+				rawProcs[omp_get_thread_num()].dcraw_process();
+				rawImgs[omp_get_thread_num()] = rawProcs[omp_get_thread_num()].dcraw_make_mem_image(&rawErrors[omp_get_thread_num()]);
 
-				rawProc.dcraw_process();
-				libraw_processed_image_t * rawImg = rawProc.dcraw_make_mem_image(&rawError);
+				if (rawErrors[omp_get_thread_num()] == LIBRAW_SUCCESS) {
 
-				if (rawError == LIBRAW_SUCCESS) {
-
-					displayImage = new wxImage(rawImg->width, rawImg->height);
-					ImageHandler::CopyImageFromRaw(rawImg, displayImage);
+					displayImage[omp_get_thread_num()] = NULL;
+					displayImage[omp_get_thread_num()] = new wxImage(rawImgs[omp_get_thread_num()]->width, rawImgs[omp_get_thread_num()]->height);
+					ImageHandler::CopyImageFromRaw(rawImgs[omp_get_thread_num()], displayImage[omp_get_thread_num()]);
 				}
-				rawProc.dcraw_clear_mem(rawImg);
-				rawProc.recycle();
+				rawProcs[omp_get_thread_num()].dcraw_clear_mem(rawImgs[omp_get_thread_num()]);
+				rawProcs[omp_get_thread_num()].recycle();
 			}
 
 			// We have an image we can load in
 			else if (ImageHandler::CheckImage(fileName)) {
-				displayImage = new wxImage(fileName);
+				displayImage[omp_get_thread_num()] = new wxImage(fileName);
 			}
 			else {
 				continue;
 			}
 
-			if (displayImage != NULL) {
+			if (displayImage[omp_get_thread_num()] != NULL) {
 				// Scale image based on width > height
-				if (displayImage->GetHeight() < displayImage->GetWidth()) {
-					double aspect = (double)displayImage->GetHeight() / (double)displayImage->GetWidth();
-					displayImage->Rescale(maxSize, maxSize * aspect, wxIMAGE_QUALITY_HIGH);
+				if (displayImage[omp_get_thread_num()]->GetHeight() < displayImage[omp_get_thread_num()]->GetWidth()) {
+					double aspect = (double)displayImage[omp_get_thread_num()]->GetHeight() / (double)displayImage[omp_get_thread_num()]->GetWidth();
+					displayImage[omp_get_thread_num()]->Rescale(maxSize, maxSize * aspect, wxIMAGE_QUALITY_HIGH);
 
 				}
 				// Scale image based on height > width
-				else if (displayImage->GetHeight() > displayImage->GetWidth()) {
-					double aspect = (double)displayImage->GetWidth() / (double)displayImage->GetHeight();
-					displayImage->Rescale(maxSize * aspect, maxSize, wxIMAGE_QUALITY_HIGH);
+				else if (displayImage[omp_get_thread_num()]->GetHeight() > displayImage[omp_get_thread_num()]->GetWidth()) {
+					double aspect = (double)displayImage[omp_get_thread_num()]->GetWidth() / (double)displayImage[omp_get_thread_num()]->GetHeight();
+					displayImage[omp_get_thread_num()]->Rescale(maxSize * aspect, maxSize, wxIMAGE_QUALITY_HIGH);
 				}
 
 				// Image has same width and height, set to max size
 				else {
-					displayImage->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
+					displayImage[omp_get_thread_num()]->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
 				}
 				
 				// Send the image to the parent to be added to the window
 				wxFileName tempFile(fileName);
 
-				AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage, tempFile.GetFullName(), fileName);
+				AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage[omp_get_thread_num()], tempFile.GetFullName(), fileName);
 				wxPostEvent(par, libImageEvent);
 
 			}
 		}
 	}
-	rawProc.recycle();
+
+	delete[] rawProcs;
+	delete[] rawErrors;
+	delete[] rawImgs;
+	delete[] displayImage;
+
+	wxCommandEvent finish(POPULATION_COMPLETE_EVENT, ID_POPULATION_COMPLETE);
+	wxPostEvent(par, finish);
+
 	return 0;
 }
 

@@ -24,8 +24,17 @@
 #include "GUI/LibraryWindow/LibraryImage/LibraryImage.h"
 #include "Processing/ImageHandler/ImageHandler.h"
 #include "Processing/Processor/Processor.h"
+#include "Settings/Settings.h"
 #include "Debugging/MemoryLeakCheck.h"
+#include <omp.h>
 
+enum {
+	ID_POPULATION_STARTED,
+	ID_POPULATION_COMPLETE
+};
+
+wxDECLARE_EVENT(POPULATION_STARTED_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(POPULATION_COMPLETE_EVENT, wxCommandEvent);
 
 class LibraryWindow : public wxScrolledWindow {
 
@@ -35,6 +44,7 @@ public:
 protected:
 			
 	void AddLibraryImage(wxImage* newImage, wxString fileName, wxString filePath);
+	bool CheckIfImageInDisplay(wxString imagePath);
 
 private:
 	
@@ -49,7 +59,9 @@ private:
 	void ClearUnselected();
 	void OnResize(wxSizeEvent & WXUNUSED(evt));
 	void OnAddImage(AddLibraryImageEvent & evt);
-	bool CheckIfImageInDisplay(wxString imagePath);
+	void OnPopulationStart(wxSizeEvent & WXUNUSED(evt));
+	void OnPopulationComplete(wxSizeEvent & WXUNUSED(evt));
+
 	wxVector<wxString> GetSelectedFileNames();
 
 	wxBoxSizer * mainLayout;
@@ -62,11 +74,16 @@ private:
 	wxButton * moveButton;
 
 	wxWrapSizer * imagesLayout;
+	wxSortedArrayString imagePaths;
 
 	wxVector<LibraryImage*> libraryImages;
 	wxVector<wxString> includedImagePaths;
 
 	DirectorySelections * directorySelections;
+
+	wxCriticalSection locker;
+	bool populationStarted;
+	bool populationCanceled;
 
 	enum MenuBar{
 		ID_SHOW_DIRECTORY_LIST,
@@ -75,7 +92,8 @@ private:
 		ID_CLEAR_SELECTED,
 		ID_CLEAR_UNSELECTED,
 		ID_COPY_TO,
-		ID_MOVE_TO
+		ID_MOVE_TO,
+		ID_CANCEL_PROCESS
 	};
 
 	class CopyImagesThread : public wxThread {
@@ -94,13 +112,17 @@ private:
 	class LoadImagesThread : public wxThread {
 	public:
 		LoadImagesThread(LibraryWindow * parent);
+		void Cancel();
 	protected:
 
 		virtual ExitCode Entry();
 	private:
 		LibraryWindow * par;
+		bool canceled;
 
 	};
+
+	LoadImagesThread * testImgThread;
 };
 
 #endif
