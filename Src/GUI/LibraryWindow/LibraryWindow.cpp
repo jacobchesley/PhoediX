@@ -178,9 +178,15 @@ void LibraryWindow::OnPopupMenuClick(wxCommandEvent& inEvt) {
 
 void LibraryWindow::ClearAll(){
 
+	// Iterate over all library images
+	for (size_t i = 0; i < libraryImages.size(); i++) {
+		imagesLayout->Detach(libraryImages.at(i));
+		libraryImages.at(i)->Destroy();
+	}
 	imagesLayout->Clear(true);
 	libraryImages.clear();
 	includedImagePaths.clear();
+	imagePaths.Clear();
 	this->Layout();
 	this->FitInside();
 }
@@ -207,10 +213,13 @@ void LibraryWindow::ClearSelected() {
 	// Clear library image vector
 	libraryImages.clear();
 	includedImagePaths.clear();
+	imagePaths.Clear();
 
 	// Add library images to keep
 	for (size_t i = 0; i < libraryImagesTokeep.size(); i++) {
 		libraryImages.push_back(libraryImagesTokeep.at(i));
+		includedImagePaths.push_back(libraryImagesTokeep.at(i)->GetPath());
+		imagePaths.Add(libraryImagesTokeep.at(i)->GetPath());
 	}
 
 	this->Layout();
@@ -239,10 +248,13 @@ void LibraryWindow::ClearUnselected() {
 	// Clear library image vector
 	libraryImages.clear();
 	includedImagePaths.clear();
+	imagePaths.clear();
 
 	// Add library images to keep
 	for (size_t i = 0; i < libraryImagesTokeep.size(); i++) {
 		libraryImages.push_back(libraryImagesTokeep.at(i));
+		includedImagePaths.push_back(libraryImagesTokeep.at(i)->GetPath());
+		imagePaths.Add(libraryImagesTokeep.at(i)->GetPath());
 	}
 
 	this->Layout();
@@ -286,12 +298,14 @@ void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxStr
 	LibraryImage * newLibImage = new LibraryImage(this, newImage, fileName, filePath);
 	newImage->Destroy();
 	delete newImage;
+	newImage = NULL;
 
 	int idx = imagePaths.Add(fileName);
-
-	imagesLayout->Insert((idx * 2), newLibImage);
-	imagesLayout->Insert((idx * 2) + 1, new wxPanel(this, -1, wxDefaultPosition, wxSize(50, 50)));
+	imagesLayout->Insert((idx * 3), new wxPanel(this, -1, wxDefaultPosition, wxSize(25, 25)));
+	imagesLayout->Insert((idx * 3) + 1, newLibImage);
+	imagesLayout->Insert((idx * 3) + 2, new wxPanel(this, -1, wxDefaultPosition, wxSize(25, 25)));
 	libraryImages.insert(libraryImages.begin() + idx, newLibImage);
+
 	this->Layout();
 	this->FitInside();
 	locker.Leave();
