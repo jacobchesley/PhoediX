@@ -266,3 +266,8 @@ void SettingsWindow::OnCancel(wxCommandEvent& WXUNUSED(evt)) {
 	colorSpace->SetSelection(lastSettings.colorSpace);
 	numThreads->SetValue(lastSettings.numThreads);
 }
+
+void SettingsWindow::Cleanup() {
+	blankMessageTimer->Stop();
+	delete blankMessageTimer;
+}

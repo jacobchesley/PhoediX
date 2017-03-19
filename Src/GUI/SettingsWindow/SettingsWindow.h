@@ -42,6 +42,7 @@ public:
 	void ApplySettings(bool ShowMessage = false);
 	void ReadSettings();
 	void WriteSettings();
+	void Cleanup();
 	
 private:
 
