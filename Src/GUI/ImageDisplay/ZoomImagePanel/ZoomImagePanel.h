@@ -44,6 +44,7 @@ public:
 	void Redraw();
 	void ChangeImage(Image * newImage);
 	void ChangeImage(wxImage * newImage);
+	void NoImage();
 	void SetZoom(float zoom);
 	float GetZoom();
 
@@ -111,6 +112,7 @@ private:
 		void SetZoom(double zoomFactor);
 		void ChangeImage(Image * newImage);
 		void ChangeImage(wxImage * newImage);
+		void NoImage();
 		void FitImage();
 		double GetZoom();
 		void DisreguardScroll();
@@ -162,6 +164,7 @@ private:
 
 		bool enforceGridAspect;
 		double gridAspect;
+		bool noImage;
 	};
 
 	ImageScroll * scroller;

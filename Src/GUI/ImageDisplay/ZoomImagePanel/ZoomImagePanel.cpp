@@ -194,6 +194,10 @@ bool ZoomImagePanel::GetEnforceGridAspect() {
 	return scroller->GetEnforceGridAspect();
 }
 
+void ZoomImagePanel::NoImage() {
+	scroller->NoImage();
+}
+
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	currentlyDrawing = false;
@@ -202,6 +206,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	keepAspect = true;
 	resize = false;
 	bitmapDraw = wxBitmap(wxImage(1, 1));
+	noImage = true;
 
 	gridActive = false;
 	gridOwner = -1;
@@ -233,6 +238,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	zoom = 1.0;
 	keepAspect = true;
 	resize = false;
+	noImage = false;
 
 	SetScrollbars(1, 1, image->GetWidth(), image->GetHeight());
 	
@@ -266,6 +272,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	zoom = 1.0;
 	keepAspect = true;
 	resize = false;
+	noImage = false;
 
 	gridActive = false;
 	gridOwner = -1;
@@ -291,6 +298,10 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	this->SetDoubleBuffered(true);
 }
 
+void ZoomImagePanel::ImageScroll::NoImage() {
+	noImage = true;
+}
+
 void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 
 	// Prepare the DC, zoom the correct amount and draw the bitmap
@@ -300,6 +311,7 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	dc.Clear();
 	dc.SetBackground(wxBrush(this->GetBackgroundColour()));
 
+	if (noImage) { return; }
 	// Do not attempt to draw bitmap if it is not okay
 	if (!bitmapDraw.IsOk() || bitmapDraw.GetWidth() < 1 || bitmapDraw.GetHeight() < 1) {
 		return;
@@ -415,6 +427,7 @@ void ZoomImagePanel::ImageScroll::Redraw() {
 
 void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 	
+	noImage = false;
 	if (newImage == NULL) { 
 		bitmapDraw = wxBitmap(wxImage(1, 1));
 		return; 
@@ -449,6 +462,7 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 
 void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 
+	noImage = false;
 	if (newImage == NULL) { 
 		bitmapDraw = wxBitmap(wxImage(1, 1));
 		return; 
