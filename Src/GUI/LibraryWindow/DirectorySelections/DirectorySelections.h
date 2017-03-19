@@ -11,6 +11,8 @@
 #include "wx/wx.h"
 #endif
 
+#include "wx/dir.h"
+
 #include "GUI/Colors/Colors.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Icons/Icons.h"
@@ -47,7 +49,7 @@ private:
 	class DirectoryDisplayItem : public wxPanel {
 	public:
 		DirectoryDisplayItem(wxWindow * parent);
-		wxString GetDirectoryName();
+		wxVector<wxString> GetDirectoriesNames();
 		void SetSequence(int sequence);
 		int GetSequence();
 
@@ -65,6 +67,7 @@ private:
 		wxBoxSizer * mainLayout;
 		wxTextCtrl * directoryText;
 		wxButton * directoryButton;
+		wxCheckBox * subDirectoriesCheck;
 		wxButton * deleteButton;
 		enum {
 			ID_SHOW_DIRECTORY,

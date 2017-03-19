@@ -20,6 +20,10 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 	directoryButton->SetBackgroundColour(Colors::BackDarkGrey);
 	directoryButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
+	subDirectoriesCheck = new wxCheckBox(this, -1, "Sub Directories");
+	subDirectoriesCheck->SetForegroundColour(Colors::TextLightGrey);
+	subDirectoriesCheck->SetBackgroundColour(this->GetBackgroundColour());
+
 	deleteButton = new wxButton(this, DirectorySelections::DirectoryDisplayItem::ID_DELETE, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	deleteButton->SetBackgroundColour(this->GetBackgroundColour());
 
@@ -29,6 +33,9 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 	this->GetSizer()->Add(directoryText, 1, wxEXPAND);
 	this->GetSizer()->AddSpacer(15);
 	this->GetSizer()->Add(directoryButton);
+	this->GetSizer()->AddSpacer(15);
+	this->GetSizer()->Add(subDirectoriesCheck);
+	this->GetSizer()->AddSpacer(15);
 	this->GetSizer()->Add(deleteButton);
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&DirectorySelections::DirectoryDisplayItem::OnShowDirectory, this, DirectorySelections::DirectoryDisplayItem::ID_SHOW_DIRECTORY);
@@ -64,8 +71,24 @@ int DirectorySelections::DirectoryDisplayItem::GetSequence() {
 	return seq;
 }
 
-wxString DirectorySelections::DirectoryDisplayItem::GetDirectoryName() {
-	return directoryText->GetValue();
+wxVector<wxString> DirectorySelections::DirectoryDisplayItem::GetDirectoriesNames() {
+
+	wxVector<wxString> returnList;
+	returnList.push_back(directoryText->GetValue());
+
+	// Add all sub directories to vector if needed
+	if (subDirectoriesCheck->IsChecked()) {
+		
+		wxDir directory(directoryText->GetValue());
+		wxString dirName;
+		bool cont = directory.GetFirst(&dirName, "", wxDIR_DIRS);
+		while (cont) {
+			cont = directory.GetNext(&dirName);
+			returnList.push_back(dirName);
+		}
+	}
+
+	return returnList;
 }
 
 DirectorySelections::DirectorySelections(wxWindow * parent) : wxScrolledWindow(parent) {
@@ -85,7 +108,8 @@ DirectorySelections::DirectorySelections(wxWindow * parent) : wxScrolledWindow(p
 
 	this->AddDirectoryDisplayItem();
 	this->SetSize(this->GetBestVirtualSize());
-
+	this->FitInside();
+	this->SetScrollRate(5, 5);
 }
 
 void DirectorySelections::AddDirectoryDisplayItem() {
@@ -142,7 +166,11 @@ wxVector<wxString> DirectorySelections::GetDirectoryList() {
 	wxVector<wxString> returnVec;
 
 	for (size_t i = 0; i < directoryItems.size(); i++) {
-		returnVec.push_back(directoryItems[i]->GetDirectoryName());
+
+		wxVector<wxString> subDirs = directoryItems[i]->GetDirectoriesNames();
+		for (size_t j = 0; j < subDirs.size(); j++) {
+			returnVec.push_back(subDirs[j]);
+		}
 	}
 
 	return returnVec;
