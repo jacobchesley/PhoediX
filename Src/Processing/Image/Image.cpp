@@ -21,6 +21,9 @@ Image::Image() {
 
 Image::Image(const Image& imageToCopy) {
 
+	uint32_t origWidth = width;
+	uint32_t origHeight = height;
+
 	width = imageToCopy.width;
 	height = imageToCopy.height;
 	bit16Enabled = imageToCopy.bit16Enabled;
@@ -43,19 +46,21 @@ Image::Image(const Image& imageToCopy) {
 	if (bit16Enabled) {
 
 		// Delete current 16 bit image data if it exists
-		if (imageDataRed16 != NULL) {
-			delete[] imageDataRed16;
-			imageDataRed16 = NULL;
-		}
+		if (origWidth > 0 && origHeight > 0){
+			if (imageDataRed16 != NULL) {
+				delete[] imageDataRed16;
+				imageDataRed16 = NULL;
+			}
 
-		if (imageDataGreen16 != NULL) {
-			delete[] imageDataGreen16;
-			imageDataGreen16 = NULL;
-		}
+			if (imageDataGreen16 != NULL) {
+				delete[] imageDataGreen16;
+				imageDataGreen16 = NULL;
+			}
 
-		if (imageDataBlue16 != NULL) {
-			delete[] imageDataBlue16;
-			imageDataBlue16 = NULL;
+			if (imageDataBlue16 != NULL) {
+				delete[] imageDataBlue16;
+				imageDataBlue16 = NULL;
+			}
 		}
 
 		// Create new image data
@@ -89,20 +94,22 @@ Image::Image(const Image& imageToCopy) {
 
 	// Copy the 8 bit data
 	else{
-		// Delete current 8 bit image data if it exists
-		if (imageDataRed8 != NULL) {
-			delete[] imageDataRed8;
-			imageDataRed8 = NULL;
-		}
+		if (origWidth > 0 && origHeight > 0) {
+			// Delete current 8 bit image data if it exists
+			if (imageDataRed8 != NULL) {
+				delete[] imageDataRed8;
+				imageDataRed8 = NULL;
+			}
 
-		if (imageDataGreen8 != NULL) {
-			delete[] imageDataGreen8;
-			imageDataGreen8 = NULL;
-		}
+			if (imageDataGreen8 != NULL) {
+				delete[] imageDataGreen8;
+				imageDataGreen8 = NULL;
+			}
 
-		if (imageDataBlue8 != NULL) {
-			delete[] imageDataBlue8;
-			imageDataBlue8 = NULL;
+			if (imageDataBlue8 != NULL) {
+				delete[] imageDataBlue8;
+				imageDataBlue8 = NULL;
+			}
 		}
 
 		// Create new image data
@@ -186,68 +193,14 @@ void Image::Destroy() {
 
 void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 
+	this->Destroy();
 	width = inWidth;
 	height = inHeight;
 	uint64_t size = width * height * 3;
 	errorMessage = "";
 
-	if(width == 0 || height == 0){
-		if (bit16Enabled) {
-			// Delete current 16 bit image data if it exists
-			if (imageDataRed16 != NULL) {
-				delete[] imageDataRed16;
-				imageDataRed16 = NULL;
-			}
-
-			if (imageDataGreen16 != NULL) {
-				delete[] imageDataGreen16;
-				imageDataGreen16 = NULL;
-			}
-
-			if (imageDataBlue16 != NULL) {
-				delete[] imageDataBlue16;
-				imageDataBlue16 = NULL;
-			}
-		}
-		else{
-			// Delete current 8 bit image data if it exists
-			if (imageDataRed8 != NULL) {
-				delete[] imageDataRed8;
-				imageDataRed8 = NULL;
-			}
-
-			if (imageDataGreen8 != NULL) {
-				delete[] imageDataGreen8;
-				imageDataGreen8 = NULL;
-			}
-
-			if (imageDataBlue8 != NULL) {
-				delete[] imageDataBlue8;
-				imageDataBlue8 = NULL;
-			}
-		}
-		return;
-	}
-
-
 	// Convert the 8 bit data into 16 bit data
 	if (bit16Enabled) {
-
-		// Delete current 16 bit image data if it exists
-		if (imageDataRed16 != NULL) {
-			delete[] imageDataRed16;
-			imageDataRed16 = NULL;
-		}
-
-		if (imageDataGreen16 != NULL) {
-			delete[] imageDataGreen16;
-			imageDataGreen16 = NULL;
-		}
-
-		if (imageDataBlue16 != NULL) {
-			delete[] imageDataBlue16;
-			imageDataBlue16 = NULL;
-		}
 
 		// Create new image data
 		try{
@@ -274,21 +227,6 @@ void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 
 	// Copy the 8 bit data
 	else{
-		// Delete current 8 bit image data if it exists
-		if (imageDataRed8 != NULL) {
-			delete[] imageDataRed8;
-			imageDataRed8 = NULL;
-		}
-
-		if (imageDataGreen8 != NULL) {
-			delete[] imageDataGreen8;
-			imageDataGreen8 = NULL;
-		}
-
-		if (imageDataBlue8 != NULL) {
-			delete[] imageDataBlue8;
-			imageDataBlue8 = NULL;
-		}
 
 		// Create new image data
 		try{
@@ -316,66 +254,15 @@ void Image::SetDataFrom8(uint8_t * inData, int inWidth, int inHeight) {
 
 void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 
+	this->Destroy();
 	width = inWidth;
 	height = inHeight;
 	int size = width * height * 3;
 	errorMessage = "";
 
-	if(width == 0 || height == 0){
-		if (bit16Enabled) {
-			// Delete current 16 bit image data if it exists
-			if (imageDataRed16 != NULL) {
-				delete[] imageDataRed16;
-				imageDataRed16 = NULL;
-			}
-
-			if (imageDataGreen16 != NULL) {
-				delete[] imageDataGreen16;
-				imageDataGreen16 = NULL;
-			}
-
-			if (imageDataBlue16 != NULL) {
-				delete[] imageDataBlue16;
-				imageDataBlue16 = NULL;
-			}
-		}
-		else{
-			// Delete current 8 bit image data if it exists
-			if (imageDataRed8 != NULL) {
-				delete[] imageDataRed8;
-				imageDataRed8 = NULL;
-			}
-
-			if (imageDataGreen8 != NULL) {
-				delete[] imageDataGreen8;
-				imageDataGreen8 = NULL;
-			}
-
-			if (imageDataBlue8 != NULL) {
-				delete[] imageDataBlue8;
-				imageDataBlue8 = NULL;
-			}
-		}
-	}
 
 	// Copy the 16 bit data
 	if (bit16Enabled) {
-
-		// Delete current 16 bit image data if it exists
-		if (imageDataRed16 != NULL) {
-			delete[] imageDataRed16;
-			imageDataRed16 = NULL;
-		}
-
-		if (imageDataGreen16 != NULL) {
-			delete[] imageDataGreen16;
-			imageDataGreen16 = NULL;
-		}
-
-		if (imageDataBlue16 != NULL) {
-			delete[] imageDataBlue16;
-			imageDataBlue16 = NULL;
-		}
 
 		// Create new image data
 		try{
@@ -403,22 +290,6 @@ void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 	// Set the 8 bit data
 	else{
 
-		// Delete current 8 bit image data if it exists
-		if (imageDataRed8 != NULL) {
-			delete[] imageDataRed8;
-			imageDataRed8 = NULL;
-		}
-
-		if (imageDataGreen8 != NULL) {
-			delete[] imageDataGreen8;
-			imageDataGreen8 = NULL;
-		}
-
-		if (imageDataBlue8 != NULL) {
-			delete[] imageDataBlue8;
-			imageDataBlue8 = NULL;
-		}
-
 		// Create new image data
 		try{
 			imageDataRed8 = new uint8_t[size / 3];
@@ -445,28 +316,13 @@ void Image::SetDataFrom16(uint16_t * inData, int inWidth, int inHeight) {
 
 void Image::SetDataFrom16(uint8_t * inData, int inWidth, int inHeight) {
 
+	this->Destroy();
 	width = inWidth;
 	height = inHeight;
 	int size = width * height * 3;
 
 	// Copy the 16 bit data
 	if (bit16Enabled) {
-
-		// Delete current 16 bit image data if it exists
-		if (imageDataRed16 != NULL) {
-			delete[] imageDataRed16;
-			imageDataRed16 = NULL;
-		}
-
-		if (imageDataGreen16 != NULL) {
-			delete[] imageDataGreen16;
-			imageDataGreen16 = NULL;
-		}
-
-		if (imageDataBlue16 != NULL) {
-			delete[] imageDataBlue16;
-			imageDataBlue16 = NULL;
-		}
 
 		// Create new image data
 		try{
@@ -494,22 +350,7 @@ void Image::SetDataFrom16(uint8_t * inData, int inWidth, int inHeight) {
 
 	// Set the 8 bit data
 	else{
-		// Delete current 8 bit image data if it exists
-		if (imageDataRed8 != NULL) {
-			delete[] imageDataRed8;
-			imageDataRed8 = NULL;
-		}
-
-		if (imageDataGreen8 != NULL) {
-			delete[] imageDataGreen8;
-			imageDataGreen8 = NULL;
-		}
-
-		if (imageDataBlue8 != NULL) {
-			delete[] imageDataBlue8;
-			imageDataBlue8 = NULL;
-		}
-
+	
 		// Create new image data
 		try{
 			imageDataRed8 = new uint8_t[size / 3];
