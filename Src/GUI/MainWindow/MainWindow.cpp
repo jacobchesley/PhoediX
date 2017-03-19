@@ -64,7 +64,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 
 	// Set the menu bar
 	this->SetMenuBar(menuBar);
-	this->EnableDisableMenuItemsNoProject(false);
 
 	// Set the status bar
 	this->CreateStatusBar();
@@ -79,6 +78,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	auiManager = new wxAuiManager(this);
 	auiManager->GetArtProvider()->SetColor(wxAuiPaneDockArtSetting::wxAUI_DOCKART_BACKGROUND_COLOUR, Colors::BackDarkDarkGrey);
 	PhoedixAUIManager::SetPhoedixAUIManager(auiManager);
+	PhoedixAUIManager::SetMainWindow(this);
 
 	histogramDisplay = new HistogramDisplay(this, processor);
 	wxAuiPaneInfo histogramPaneInfo = wxAuiPaneInfo();
@@ -223,6 +223,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(PROCESSOR_NUM_EVENT, (wxObjectEventFunction)&MainWindow::RecieveNumFromProcessor, this, ID_PROCESSOR_NUM);
 	this->Bind(PROCESSOR_RAW_COMPLETE_EVENT, (wxObjectEventFunction)&MainWindow::RecieveRawComplete, this, ID_RAW_COMPLETE);
 	this->Bind(RELOAD_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::ReloadImage, this, ID_RELOAD_IMAGE);
+	this->Bind(OPEN_IMAGE_NEW_PROJECT_EVENT, (wxObjectEventFunction)&MainWindow::OnImportImageNewProject, this, ID_OPEN_IMAGE_NEW_PROJECT);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
 	this->Bind(wxEVT_AUI_PANE_CLOSE, (wxObjectEventFunction)&MainWindow::OnPaneClose, this);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::OnReprocessTimer, this);
@@ -232,8 +233,8 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	imgPanelThread->Run();
 
 	emptyImage = new wxImage(0, 0);
-	ImageHandler::LoadImageFromwxImage(emptyImage, processor->GetImage());
-	processor->SetOriginalImage(new Image(*processor->GetImage()));
+	emptyPhxImage = new Image();
+	processor->SetOriginalImage(emptyPhxImage);
 	settingsWindow->ReadSettings();
 
 	this->SetMenuChecks();
@@ -243,6 +244,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	reprocessCountdown = new wxTimer(this);
 
 	pixelPeepWindow->UpdatePosition(0, 0);
+	this->EnableDisableMenuItemsNoProject(false);
 }
 
 void MainWindow::SetSizeProperties(){
@@ -274,8 +276,11 @@ void MainWindow::OnNewProject(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 
-	if (this->CheckCurrentSessionNeedsSaved()) {
-		wxMessageDialog msg(this, "Current project is not saved to disk.  Are you sure you want to continue closing this project?", "Close Project?", wxYES_NO | wxNO_DEFAULT);
+	this->SaveCurrentSession();
+	if (this->CheckSessionNeedsSaved(&currentSession)) {
+		
+		wxString message = currentSession.GetName() + " project is not saved to disk.  Are you sure you want to continue closing this project?";
+		wxMessageDialog msg(this, message, "Close Project?", wxYES_NO | wxNO_DEFAULT);
 		if (msg.ShowModal() == wxID_NO) { return; }
 	}
 
@@ -307,35 +312,59 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 	else{
 		currentSession = PhoediXSession();
 		this->EnableDisableMenuItemsNoProject(false);
+		this->SetTitle("PhoediX");
 	}
 }
 
 void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
-	// Close current session in UI
-	if (allSessions.size() > 0) {
-		this->CloseSession(&currentSession);
-	}
-
-	// Remove all sessions from menu window
+	wxVector<PhoediXSession *> sessionsToClose;
 	for (size_t i = 0; i < allSessions.size(); i++) {
-		if(menuWindow->FindChildItem(allSessions.at(i).GetID())){
-			menuWindow->Delete(allSessions.at(i).GetID());
+
+		// Ask if needs saving, then close if okay
+		if (this->CheckSessionNeedsSaved(&allSessions.at(i))) {
+
+			wxString message = allSessions.at(i).GetName() + " project is not saved to disk.  Are you sure you want to continue closing this project?";
+			wxMessageDialog msg(this, message, "Close Project?", wxYES_NO | wxNO_DEFAULT);
+			if (msg.ShowModal() == wxID_YES) { 
+				sessionsToClose.push_back(&allSessions.at(i)); 
+			}
+		}
+
+		// Session does not need saved, close
+		else {
+			sessionsToClose.push_back(&allSessions.at(i));
 		}
 	}
 
-	histogramDisplay->DestroyHistograms();
+	// Remove all closed sessions from menu window
+	for (size_t i = 0; i < sessionsToClose.size(); i++) {
 
-	// Clear all sessions
-	for (size_t i = 0; i < allSessions.size(); i++) {
-		allSessions.at(i).Destroy();
+		// Close and destroy the session
+		this->CloseSession(sessionsToClose.at(i));
+		sessionsToClose.at(i)->Destroy();
 	}
-	allSessions.clear();	
 
-	currentSession = PhoediXSession();
+	size_t numRemoved = 0;
+	for (size_t i = 0; i < allSessions.size(); i++) {
+		if (allSessions.at(i).GetID() < 0) {
+			allSessions.erase(allSessions.begin() + i - numRemoved);
+			numRemoved += 1;
+		}
+	}
+	
+	// Set current session to last opened session (if any sessions are open)
+	if (allSessions.size() > 0) {
+		currentSession = allSessions.at(allSessions.size() - 1);
+		this->OpenSession(&currentSession);
+	}
 
 	// No sessions opened, disable menu items related to sessions
-	this->EnableDisableMenuItemsNoProject(false);
+	else {
+		currentSession = PhoediXSession();
+		this->EnableDisableMenuItemsNoProject(false);
+		this->SetTitle("PhoediX");
+	}
 }
 
 void MainWindow::CreateNewProject(){
@@ -358,8 +387,18 @@ void MainWindow::CreateNewProject(){
 
 void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 	
+	// If the session to open is the same as the one currently opened, keep open
+	if (evt.GetId() == currentSession.GetID()) {
+		menuWindow->FindChildItem(evt.GetId())->Check();
+		return;
+	}
+
+	// Find the session to open
 	for (size_t i = 0; i < allSessions.size(); i++) {
+
 		if (allSessions[i].GetID() == evt.GetId() && currentSession.GetID() != allSessions[i].GetID()) {
+
+			// Save the current session, open, and set current session
 			this->SaveCurrentSession();
 			this->OpenSession(&allSessions[i]);
 			currentSession = allSessions[i];
@@ -389,9 +428,11 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	histogramDisplay->SetHistogramDisplay(session->GetHistogramDisplaySelect());
 	
 	// Populate the panel with the edits
-	wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
-	editList->AddEditWindows(editLayers);
 
+	if(session->GetEditList() != NULL){
+		wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
+		editList->AddEditWindows(editLayers);
+	}
 	// Load snapshots
 	snapshotWindow->DeleteAllSnapshots();
 	snapshotWindow->AddSnapshots(session->GetSnapshots());
@@ -419,18 +460,20 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 
 	// Check the current session in the window, and uncheck all other sessions
 	if (menuWindow->FindItem(session->GetID())) {
-		menuWindow->Remove(session->GetID());
+		menuWindow->Delete(session->GetID());
 	}
 
 	// Remove all edits from panel and snapshots
-	editList->RemoveAllWindows();
-	snapshotWindow->DeleteAllSnapshots();
+	if (session->GetID() == currentSession.GetID()) {
+		editList->RemoveAllWindows();
+		snapshotWindow->DeleteAllSnapshots();
 
-	processor->GetOriginalImage()->Destroy();
-	processor->GetImage()->Destroy();
+		processor->GetOriginalImage()->Destroy();
+		processor->GetImage()->Destroy();
 
-	histogramDisplay->ZeroOutHistograms();
-	pixelPeepWindow->UpdateImage(NULL);
+		histogramDisplay->ZeroOutHistograms();
+		pixelPeepWindow->UpdateImage(NULL);
+	}
 
 	if (allSessions.size() > 0) {
 		// At least one session exists now, enable menu items related to sessions
@@ -571,6 +614,12 @@ void MainWindow::LoadProject(wxString projectPath) {
 	this->OpenSession(&session);
 }
 
+void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {
+
+	this->CreateNewProject();
+	this->OpenImage(evt.GetString());
+}
+
 void MainWindow::CheckUncheckSession(int sessionID){
 
 	size_t numWindowMenuItems = menuWindow->GetMenuItems().size();
@@ -650,9 +699,22 @@ void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
 void MainWindow::OpenImage(wxString imagePath, bool rawWindowOpen){
 
 	// Make sure file name is correct and exists
+	emptyPhxImage->Destroy();
 	wxFileName imageFile(imagePath);
-	if(!imageFile.IsOk()){ return; }
-	if(!imageFile.FileExists()){ return; }
+	if(!imageFile.IsOk()){ 
+		imagePanel->NoImage();
+		processor->SetOriginalImage(emptyPhxImage);
+		processor->SetFilePath("");
+		this->SetTitle("PhoediX");
+		return; 
+	}
+	if(!imageFile.FileExists()){ 
+		imagePanel->NoImage();
+		processor->SetOriginalImage(emptyPhxImage);
+		processor->SetFilePath("");
+		this->SetTitle("PhoediX");
+		return; 
+	}
 
 	if (!rawWindowOpen) { editList->RemoveRawWindow(); }
 
@@ -964,6 +1026,17 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 	menuTools->GetMenuItems()[1]->Enable(enable);
 	menuTools->GetMenuItems()[2]->Enable(enable);
 	menuTools->GetMenuItems()[3]->Enable(enable);
+
+	if (!enable) {
+		menuView->GetMenuItems()[0]->Check(false);
+		menuView->GetMenuItems()[1]->Check(false);
+		menuView->GetMenuItems()[2]->Check(false);
+
+		auiManager->GetPane(imagePanel).Hide();
+		auiManager->GetPane(editList).Hide();
+		auiManager->GetPane(histogramDisplay).Hide();
+		auiManager->Update();
+	}
 }
 
 void MainWindow::OnPaneClose(wxAuiManagerEvent& evt){
@@ -1029,18 +1102,15 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 	processor->SetDoFitImage(false);
 }
 
-bool MainWindow::CheckCurrentSessionNeedsSaved() {
-	if (currentSession.GetID() >= 0) {
-		for (size_t i = 0; i < savedSessions.size(); i++) {
-			if (savedSessions[i].GetID() == currentSession.GetID()) {
-				return !PhoediXSession::CompareSessions(&currentSession, &savedSessions[i]);
-			}
-		}
-		return true;
-	}
-	else {
-		return false;
-	}
+bool MainWindow::CheckSessionNeedsSaved(PhoediXSession * session) {
+
+	PhoediXSession sessionOnDisk;
+
+	if (session->GetProjectPath() == "") { return true; }
+	sessionOnDisk.LoadSessionFromFile(session->GetProjectPath() + wxFileName::GetPathSeparator() + session->GetName());
+	sessionOnDisk.SetName(session->GetName());
+	sessionOnDisk.SetProjectPath(session->GetProjectPath());
+	return !PhoediXSession::CompareSessions(session, &sessionOnDisk);
 }
 
 void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
@@ -1088,11 +1158,13 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	// Delete all snapshots
 	snapshotWindow->DeleteAllSnapshots();
 
+	settingsWindow->Cleanup();
 	auiManager->UnInit();
 	delete auiManager;
 	
 	delete processor;
 	delete emptyImage;
+	delete emptyPhxImage;
 
 	this->Destroy();
 }

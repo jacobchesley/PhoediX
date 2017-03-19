@@ -82,6 +82,7 @@ private:
 	void ShowImageRelatedWindows();
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
 	void LoadProject(wxString projectPath);
+	void OnImportImageNewProject(wxCommandEvent& evt);
 
 	void OnOpenWindow(wxCommandEvent& evt);
 	void OpenSession(PhoediXSession * session);
@@ -104,7 +105,7 @@ private:
 	void RecieveRawComplete(wxCommandEvent& WXUNUSED(evt));
 	void OnUpdateImage(wxCommandEvent& WXUNUSED(event));
 
-	bool CheckCurrentSessionNeedsSaved();
+	bool CheckSessionNeedsSaved(PhoediXSession * session);
 
 	wxAuiManager * auiManager;
 
@@ -131,6 +132,7 @@ private:
 	ZoomImagePanel * imagePanel;
 	ZoomImagePanel * originalImagePanel;
 	wxImage * emptyImage;
+	Image * emptyPhxImage;
 	HistogramDisplay * histogramDisplay;
 
 	PhoediXSession currentSession;
