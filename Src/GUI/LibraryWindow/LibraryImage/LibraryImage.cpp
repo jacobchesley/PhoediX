@@ -2,6 +2,9 @@
 
 #include "LibraryImage.h"
 
+wxDEFINE_EVENT(OPEN_IMAGE_NEW_PROJECT_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(ADD_LIB_IMAGE_EVENT, AddLibraryImageEvent);
+
 LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName, wxString filePath) : wxPanel(parent) {
 	
 	this->SetBackgroundColour(Colors::BackDarkDarkGrey);;
@@ -15,6 +18,7 @@ LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName
 
 	imageDisplay = new WXImagePanel(this, image, true, true);
 	imageDisplay->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(LibraryImage::OnLeftDoubleClick), NULL, this);
+	imageDisplay->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(LibraryImage::OnRightClick), NULL, this);
 
 	nameDisplay = new wxStaticText(this, -1, fileName);
 	selectBox = new wxCheckBox(this, -1, "");
@@ -32,6 +36,7 @@ LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName
 	this->GetSizer()->Layout();
 
 	this->Bind(wxEVT_LEFT_DCLICK, (wxMouseEventFunction)&LibraryImage::OnLeftDoubleClick, this);
+	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&LibraryImage::OnRightClick, this);
 }
 
 void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
@@ -88,6 +93,32 @@ void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
 	}
 }
 
+void LibraryImage::OnRightClick(wxMouseEvent& WXUNUSED(evt)) {
+
+	// Display a popup menu of options
+	wxMenu popupMenu;
+	popupMenu.Append(LibraryImage::PopupMenuActions::OPEN_IN_NEW_PROJECT, "Open Image in New Project");
+	popupMenu.Append(LibraryImage::PopupMenuActions::VIEW_IMAGE_DETAILS, "View Image Details");
+
+	popupMenu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(LibraryImage::OnPopupMenuClick), NULL, this);
+	this->PopupMenu(&popupMenu);
+}
+
+void LibraryImage::OnPopupMenuClick(wxCommandEvent& inEvt) {
+
+	int id = inEvt.GetId();
+
+	switch (id) {
+
+		// Send event to main window to open image in new project
+		case LibraryImage::PopupMenuActions::OPEN_IN_NEW_PROJECT: {
+			wxCommandEvent evt(OPEN_IMAGE_NEW_PROJECT_EVENT, ID_OPEN_IMAGE_NEW_PROJECT);
+			evt.SetString(this->GetPath());
+			wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
+		}
+	}
+}
+
 void LibraryImage::ChangeImage(wxImage * newImage) {
 	img = newImage;
 }
@@ -138,5 +169,3 @@ wxString AddLibraryImageEvent::GetFileName() const {
 wxString AddLibraryImageEvent::GetFilePath() const {
 	return path;
 }
-
-wxDEFINE_EVENT(ADD_LIB_IMAGE_EVENT, AddLibraryImageEvent);

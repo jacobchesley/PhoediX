@@ -15,6 +15,15 @@
 #include "GUI/ImageDisplay/wxImagePanel/wxImagePanel.h"
 #include "GUI/ImageDisplay/ZoomImageFrame/ZoomImageFrame.h"
 #include "Processing/ImageHandler/ImageHandler.h"
+#include "GUI/AUIManager/AUIManager.h"
+
+enum {
+	ID_ADD_LIB_IMAGE_EVT,
+	ID_OPEN_IMAGE_NEW_PROJECT
+};
+
+wxDECLARE_EVENT(OPEN_IMAGE_NEW_PROJECT_EVENT, wxCommandEvent);
+
 
 class LibraryImage : public wxPanel {
 
@@ -32,6 +41,8 @@ public:
 private:
 
 	void OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt));
+	void OnRightClick(wxMouseEvent& WXUNUSED(evt));
+	void OnPopupMenuClick(wxCommandEvent& inEvt);
 
 	wxImage * img;
 	wxBoxSizer * mainLayout;
@@ -41,6 +52,10 @@ private:
 	wxStaticText * nameDisplay;
 	wxString path;
 
+	enum PopupMenuActions {
+		OPEN_IN_NEW_PROJECT,
+		VIEW_IMAGE_DETAILS
+	};
 };
 
 class AddLibraryImageEvent : public wxEvent{
@@ -56,10 +71,6 @@ private:
 	wxImage * libImage;
 	wxString name;
 	wxString path;
-};
-
-enum {
-	ID_ADD_LIB_IMAGE_EVT
 };
 
 wxDECLARE_EVENT(ADD_LIB_IMAGE_EVENT, AddLibraryImageEvent);
