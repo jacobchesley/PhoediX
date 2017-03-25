@@ -56,6 +56,8 @@ PixelPeepWindow::PixelGrid::PixelGrid(wxWindow * parent) : wxPanel(parent) {
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&PixelPeepWindow::PixelGrid::OnClick, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&PixelPeepWindow::PixelGrid::OnClick, this);
 	this->SetDoubleBuffered(true);
+
+	this->SetSizeHints(wxSize(150, 150));
 }
 
 void PixelPeepWindow::PixelGrid::InitGrid() {
