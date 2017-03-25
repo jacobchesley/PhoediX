@@ -947,6 +947,20 @@ void ZoomImagePanel::ImageScroll::OnRightDown(wxMouseEvent & evt) {
 	wxCoord newY;
 
 	this->CalcUnscrolledPosition(evt.GetX(), evt.GetY(), &newX, &newY);
+
+	int imgWidth = bitmapDraw.GetWidth() * zoom;
+	int imgHeight = bitmapDraw.GetHeight() * zoom;
+	int thisWidth = this->GetClientSize().GetWidth();
+	int thisHeight = this->GetClientSize().GetHeight();
+	int xShift = 0;
+	int yShift = 0;
+
+	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth) / 2); }
+	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2); }
+	
+	newX -= xShift;
+	newY -= yShift;
+
 	newEvent.SetX(newX / zoom);
 	newEvent.SetY(newY / zoom);
 
