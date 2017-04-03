@@ -379,9 +379,9 @@ wxString ProcessorEdit::GetEditTag() {
 
 bool ProcessorEdit::CompareProcessorEdits(ProcessorEdit * editOne, ProcessorEdit * editTwo) {
 
-
-	if (editOne->GetEditType() != editOne->GetEditType()) { return false; }
-	if (editOne->GetDisabled() != editOne->GetDisabled()) { return false; }
+	// Compare edit types and disabled param
+	if (editOne->GetEditType() != editTwo->GetEditType()) { return false; }
+	if (editOne->GetDisabled() != editTwo->GetDisabled()) { return false; }
 
 	// Compare params
 	if (editOne->GetParamsSize() != editTwo->GetParamsSize()) { return false; }
