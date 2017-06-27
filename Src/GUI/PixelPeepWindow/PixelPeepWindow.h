@@ -82,7 +82,7 @@ private:
 		int posX;
 		int posY;
 
-		wxVector<wxVector<ColorValue>> colorGrid;
+		wxVector<wxVector<ColorValue> > colorGrid;
 	};
 	PixelGrid * pixelGrid;
 };
