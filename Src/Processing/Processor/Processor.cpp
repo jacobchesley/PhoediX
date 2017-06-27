@@ -595,7 +595,7 @@ void Processor::ShiftRGB(double all, double red, double green, double blue, int 
 	}
 }
 
-void Processor::AdjustHSL(double hShift, double sScale, double lScale, int dataStart, int dataEnd) {
+void Processor::AdjustHSL(double hShift, double sScale, double lScale, RGBChannelENUM channels, int dataStart, int dataEnd) {
 
 	if(hShift > 360.0) { hShift = 360.0; }
 	if(hShift < 0.0) { hShift = 0.0; }
@@ -631,6 +631,17 @@ void Processor::AdjustHSL(double hShift, double sScale, double lScale, int dataS
 	double tempR = 0.0;
 	double tempG = 0.0;
 	double tempB = 0.0;
+
+	int channelSelectR = 0;
+	int channelSelectG = 0;
+	int channelSelectB = 0;
+	if (channels == RGBChannelENUM::RED_GREEN_BLUE) { channelSelectR = 1; channelSelectG = 1; channelSelectB = 1; }
+	if (channels == RGBChannelENUM::RED_GREEN) { channelSelectR = 1; channelSelectG = 1; }
+	if (channels == RGBChannelENUM::RED_BLUE) { channelSelectR = 1; channelSelectB = 1; }
+	if (channels == RGBChannelENUM::GREEN_BLUE) { channelSelectG = 1; channelSelectB = 1; }
+	if (channels == RGBChannelENUM::RED) { channelSelectR = 1; }
+	if (channels == RGBChannelENUM::GREEN) { channelSelectG = 1; }
+	if (channels == RGBChannelENUM::BLUE) { channelSelectB = 1; }
 
 	// Process 8 bit data
 	if(img->GetColorDepth() == 8){
@@ -765,9 +776,9 @@ void Processor::AdjustHSL(double hShift, double sScale, double lScale, int dataS
 			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
 
 			// Set the new pixel to the 8 bit data
-			redData8[i] = (uint8_t)tempRed;
-			greenData8[i] = (uint8_t)tempGreen;
-			blueData8[i] = (uint8_t)tempBlue;
+			redData8[i] = (uint8_t) ((tempRed * channelSelectR) + redData8[i] * (!channelSelectR));
+			greenData8[i] = (uint8_t) ((tempGreen* channelSelectG) + greenData8[i] * (!channelSelectG));
+			blueData8[i] = (uint8_t)((tempBlue* channelSelectB) + blueData8[i] * (!channelSelectB));
 		}
 	}
 	// Process 16 bit data
@@ -903,9 +914,9 @@ void Processor::AdjustHSL(double hShift, double sScale, double lScale, int dataS
 			tempBlue = (tempBlue < 0) ? 0 : tempBlue;
 
 			// Set the new pixel to the 16 bit data
-			redData16[i] = (uint16_t)tempRed;
-			greenData16[i] = (uint16_t)tempGreen;
-			blueData16[i] = (uint16_t)tempBlue;
+			redData16[i] = (uint16_t)((tempRed * channelSelectR) + redData16[i] * (!channelSelectR));
+			greenData16[i] = (uint16_t)((tempGreen* channelSelectG) + greenData16[i] * (!channelSelectG));
+			blueData16[i] = (uint16_t)((tempBlue* channelSelectB) + blueData16[i] * (!channelSelectB));
 		}
 	}
 }
@@ -5267,6 +5278,68 @@ void Processor::MirrorVertical(int dataStart, int dataEnd) {
 	}
 }
 
+void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd) {
+
+	int width = img->GetWidth();
+
+	// Get number of pixels for the image
+	int dataSize = img->GetWidth() * img->GetHeight();
+	if (dataStart < 0 || dataEnd < 0) {
+		dataStart = 0;
+		dataEnd = dataSize;
+	}
+
+	int64_t tempRed;
+	int64_t tempGreen;
+	int64_t tempBlue;
+
+	int x = 0;
+	int y = 0;
+
+	// Process 8 bit data
+	if (img->GetColorDepth() == 8) {
+
+		// Get pointers to 8 bit data
+		uint8_t * redData8 = img->Get8BitDataRed();
+		uint8_t * greenData8 = img->Get8BitDataGreen();
+		uint8_t * blueData8 = img->Get8BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if (forceStop) { return; }
+
+			x = i % width;
+			y = i / width;
+
+			if ((x - pixelBlurSize) > 0) {
+
+			}
+
+		}
+	}
+
+	// Process 16 bit data
+	else {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if (forceStop) { return; }
+
+			x = i % width;
+			y = i / width;
+		}
+	}
+}
+
+void Processor::BoxBlurVertical(int pixelBlurSize, int dataStart, int dataEnd) {
+
+}
+
 void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpaceToUse) {
 
 	float tempR = rgb->R;
@@ -5576,6 +5649,43 @@ void Processor::ProcessThread::DeleteEditVector() {
 	editVec.clear();
 }
 
+void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize) {
+
+	int numThreads = procParent->GetNumThreads();
+	int dataSize = 0;
+	if (maxDataSize > -1) {
+		dataSize = maxDataSize;
+	}
+	else {
+		dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
+	}
+
+	int chunkSize = dataSize / numThreads;
+	static wxCriticalSection critical;
+	wxMutex mutexLock;
+	wxCondition wait(mutexLock);
+	int threadComplete = 0;
+
+	for (int thread = 0; thread < numThreads; thread++) {
+
+		// Process current chunk of data
+		if (thread != numThreads - 1) {
+			EditThread * editWorker = new EditThread(procParent, edit, chunkSize * thread, chunkSize * (thread + 1), &critical, &wait, numThreads, &threadComplete);
+			editWorker->Run();
+		}
+
+		// Go all the way to end of data (incase of rounding error)
+		else {
+			EditThread * editWorker = new EditThread(procParent, edit, chunkSize * thread, dataSize, &critical, &wait, numThreads, &threadComplete);
+			editWorker->Run();
+		}
+	}
+
+	// Wait for all worker threads to complete
+	wait.Wait();
+	procParent->SetUpdated(true);
+}
+
 wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 	// Wait for raw image to process (must process raw before image data)
@@ -5685,27 +5795,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->AdjustBrightness(brighnessAmount, detailsPreservation, toneSetting, toneFlag, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->AdjustBrightness(brighnessAmount, detailsPreservation, toneSetting, toneFlag, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -5730,27 +5820,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ShiftRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ShiftRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift, chunkSize * thread,  dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -5772,35 +5842,17 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				double saturationScale = curEdit->GetParam(1);
 				double luminaceScale = curEdit->GetParam(2);
 
+				RGBChannelENUM channel = (RGBChannelENUM)curEdit->GetFlag(0);
+
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->AdjustHSL(hueShift, saturationScale, luminaceScale, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->AdjustHSL(hueShift, saturationScale, luminaceScale, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					procParent->AdjustHSL(hueShift, saturationScale, luminaceScale);
+					procParent->AdjustHSL(hueShift, saturationScale, luminaceScale, channel);
 				}
 				procParent->SetUpdated(true);
 			}
@@ -5823,29 +5875,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast, 
-								allCenter, redCenter, greenCenter, blueCenter, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast, 
-								allCenter, redCenter, greenCenter, blueCenter, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -5874,29 +5904,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if (procParent->GetMultithread()) {
-
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for (int thread = 0; thread < numThreads; thread++) {
-
-						// Process current chunk of data
-						if (thread != numThreads - 1) {
-							procParent->AdjustContrastCurve(allContrast, redContrast, greenContrast, blueContrast, 
-								allCenter, redCenter, greenCenter, blueCenter, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else {
-							procParent->AdjustContrastCurve(allContrast, redContrast, greenContrast, blueContrast, 
-								allCenter, redCenter, greenCenter, blueCenter, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -5916,27 +5924,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ConvertGreyscale((1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ConvertGreyscale((1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -5955,27 +5943,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ConvertGreyscale(0.2126, 0.7152, 0.0722, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ConvertGreyscale(0.2126, 0.7152, 0.0722, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -5999,27 +5967,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ConvertGreyscale(redScale, greenScale, blueScale, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ConvertGreyscale(redScale, greenScale, blueScale, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -6048,34 +5996,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				double blueBlueScale = curEdit->GetParam(8);
 
 				// Multithread if needed
-				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ChannelScale(redRedScale, redGreenScale, redBlueScale,
-								greenRedScale, greenGreenScale, greenBlueScale,
-								blueRedScale, blueGreenScale, blueBlueScale, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ChannelScale(redRedScale, redGreenScale, redBlueScale,
-								greenRedScale, greenGreenScale, greenBlueScale,
-								blueRedScale, blueGreenScale, blueBlueScale, chunkSize * thread, dataSize);
-						}
-					}
+				if (procParent->GetMultithread()) {
+					this->Multithread(curEdit);
 				}
-
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
@@ -6094,36 +6017,15 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					procParent->SetupRotation(editToComplete, 90.0, 0);
 
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					if(dataSize < 1){ 
+					if (procParent->GetTempImage()->GetWidth() < 1 || procParent->GetTempImage()->GetHeight() < 1) {
 						procParent->SendMessageToParent("Image rotation failure: " + procParent->GetTempImage()->GetErrorStr());
 						this->DeleteEditVector();
 						return 0;
 					}
 
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->Rotate90CW(chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->Rotate90CW(chunkSize * thread,  dataSize);
-						}
-					}
-					procParent->CleanupRotation(editToComplete);
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -6191,37 +6093,15 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-
-					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->RotateCustom(angle, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->RotateCustom(angle, chunkSize * thread,  dataSize);
-						}
-					}
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupRotation(editToComplete);
 				}
 
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
 					procParent->RotateCustom(angle);
 					procParent->CleanupRotation(editToComplete);
@@ -6243,29 +6123,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-
-					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->RotateCustomBilinear(angle, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->RotateCustomBilinear(angle, chunkSize * thread,  dataSize);
-						}
-					}
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupRotation(editToComplete);
 				}
 
@@ -6293,29 +6153,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					if (!procParent->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-
-					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->RotateCustomBicubic(angle, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->RotateCustomBicubic(angle, chunkSize * thread,  dataSize);
-						}
-					}
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupRotation(editToComplete);
 				}
 
@@ -6343,29 +6183,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					if (!procParent->SetupScale(width, height)) { break; }
-
-					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ScaleNearest(chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ScaleNearest(chunkSize * thread, chunkSize * (thread + 1));
-						}
-					}
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupScale();
 				}
 
@@ -6393,29 +6213,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					if (!procParent->SetupScale(width, height)) { break; }
-
-					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ScaleBilinear(chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ScaleBilinear(chunkSize * thread, chunkSize * (thread + 1));
-						}
-					}
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupScale();
 				}
 
@@ -6443,29 +6243,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
 					if (!procParent->SetupScale(width, height)) { break; }
-
-					int numThreads = procParent->GetNumThreads();
 					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);
-					omp_set_num_threads(numThreads);
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->ScaleBicubic(chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->ScaleBicubic(chunkSize * thread, chunkSize * (thread + 1));
-						}
-					}
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupScale();
 				}
 
@@ -6473,7 +6253,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				else{
 					// Perform an edit on the data through the processor
 					if (!procParent->SetupScale(width, height)) { break; }
-					procParent->ScaleBicubic();
+					int dataSize = procParent->GetTempImage()->GetWidth() * procParent->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
 					procParent->CleanupScale();
 				}
 				procParent->SetUpdated(true);
@@ -6487,27 +6268,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->MirrorHorizontal(chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->MirrorHorizontal(chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -6526,27 +6287,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-				
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->MirrorVertical(chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->MirrorVertical(chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 				}
 
 				// Single thread
@@ -6578,29 +6319,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 					// Multithread if needed
 					if(procParent->GetMultithread()){
-				
-						int numThreads = procParent->GetNumThreads();
-						int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-						int chunkSize = dataSize / numThreads;
-
-						omp_set_dynamic(0);     // Explicitly disable dynamic teams
-						omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-						#pragma omp parallel for 
-						for(int thread = 0; thread < numThreads; thread++){
-
-							// Process current chunk of data
-							if(thread != numThreads - 1){
-								procParent->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
-									brightCurve16, redCurve16, greenCurve16, blueCurve16, chunkSize * thread, chunkSize * (thread + 1));
-							}
-
-							// Go all the way to end of data (incase of rounding error)
-							else{
-								procParent->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
-									brightCurve16, redCurve16, greenCurve16, blueCurve16, chunkSize * thread, dataSize);
-							}
-						}
+						this->Multithread(curEdit);
 					}
 
 					// Single thread
@@ -6627,30 +6346,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 					// Multithread if needed
 					if(procParent->GetMultithread()){
-				
-						int numThreads = procParent->GetNumThreads();
-						int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-						int chunkSize = dataSize / numThreads;
-
-						omp_set_dynamic(0);     // Explicitly disable dynamic teams
-						omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-						#pragma omp parallel for 
-						for(int thread = 0; thread < numThreads; thread++){
-
-							if(procParent->forceStop){
-								continue;
-							}
-							// Process current chunk of data
-							if(thread != numThreads - 1){
-								procParent->LABCurves(lCurve16, aCurve16, bCurve16, chunkSize * thread, chunkSize * (thread + 1));
-							}
-
-							// Go all the way to end of data (incase of rounding error)
-							else{
-								procParent->LABCurves(lCurve16, aCurve16, bCurve16, chunkSize * thread, dataSize);
-							}
-						}
+						this->Multithread(curEdit);
 					}
 
 					// Single thread
@@ -6677,27 +6373,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 					// Multithread if needed
 					if(procParent->GetMultithread()){
-				
-						int numThreads = procParent->GetNumThreads();
-						int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-						int chunkSize = dataSize / numThreads;
-
-						omp_set_dynamic(0);     // Explicitly disable dynamic teams
-						omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-						#pragma omp parallel for 
-						for(int thread = 0; thread < numThreads; thread++){
-
-							// Process current chunk of data
-							if(thread != numThreads - 1){
-								procParent->HSLCurves(hCurve16, sCurve16, lCurve16, chunkSize * thread, chunkSize * (thread + 1));
-							}
-
-							// Go all the way to end of data (incase of rounding error)
-							else{
-								procParent->HSLCurves(hCurve16, sCurve16, lCurve16, chunkSize * thread, chunkSize * (thread + 1));
-							}
-						}
+						this->Multithread(curEdit);
 					}
 
 					// Single thread
@@ -6724,29 +6400,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	
 				// Multithread if needed
 				if(procParent->GetMultithread()){
-						
 					procParent->SetupCrop(newWidth, newHeight);
-
-					int numThreads = procParent->GetNumThreads();
-					int dataSize = procParent->GetImage()->GetWidth() * procParent->GetImage()->GetHeight();
-					int chunkSize = dataSize / numThreads;
-
-					omp_set_dynamic(0);     // Explicitly disable dynamic teams
-					omp_set_num_threads(numThreads); // Use 4 threads for all consecutive parallel regions
-
-					#pragma omp parallel for 
-					for(int thread = 0; thread < numThreads; thread++){
-
-						// Process current chunk of data
-						if(thread != numThreads - 1){
-							procParent->Crop(startX, startY, chunkSize * thread, chunkSize * (thread + 1));
-						}
-
-						// Go all the way to end of data (incase of rounding error)
-						else{
-							procParent->Crop(startX, startY, chunkSize * thread, dataSize);
-						}
-					}
+					this->Multithread(curEdit);
 					procParent->CleanupCrop();
 				}
 
@@ -6774,6 +6429,308 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	return (wxThread::ExitCode)0;
 }
 
+Processor::EditThread::EditThread(Processor * processor, ProcessorEdit * edit, int dataStart, int dataEnd, wxCriticalSection * criticalSection, wxCondition * condition, int numThreads, int * threadsComplete) : wxThread(wxTHREAD_DETACHED) {
+	procParent = processor;
+	procEdit = edit;
+	start = dataStart;
+	end = dataEnd;
+	critical = criticalSection;
+	cond = condition;
+	threads = numThreads;
+	complete = threadsComplete;
+}
+
+wxThread::ExitCode Processor::EditThread::Entry() {
+
+	switch (procEdit->GetEditType()) {
+
+		case ProcessorEdit::EditType::RAW: {
+			return (wxThread::ExitCode) 0;
+		}
+
+		// Peform a Brightness Adjustment edit
+		case ProcessorEdit::EditType::ADJUST_BRIGHTNESS: {
+
+			// Get all parameters from the edit
+			double brighnessAmount = procEdit->GetParam(0);
+			double detailsPreservation = procEdit->GetParam(1);
+			double toneSetting = procEdit->GetParam(2);
+
+			int toneFlag = procEdit->GetFlag(0);
+			procParent->AdjustBrightness(brighnessAmount, detailsPreservation, toneSetting, toneFlag, start, end);
+		}
+		 break;
+
+		// Peform a Shift RGB edit
+		case ProcessorEdit::EditType::SHIFT_RGB: {
+
+			// Get all parameters from the edit
+			double allBrightShift = procEdit->GetParam(0);
+			double redBrightShift = procEdit->GetParam(1);
+			double greenBrightShift = procEdit->GetParam(2);
+			double blueBrightShift = procEdit->GetParam(3);
+
+			procParent->ShiftRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift, start, end);
+		}
+		 break;
+
+		// Peform an HSL adjustment
+		case ProcessorEdit::EditType::ADJUST_HSL: {
+
+			// Get all parameters from the edit
+			double hueShift = procEdit->GetParam(0);
+			double saturationScale = procEdit->GetParam(1);
+			double luminaceScale = procEdit->GetParam(2);
+			RGBChannelENUM channel = (RGBChannelENUM)procEdit->GetFlag(0);
+
+			procParent->AdjustHSL(hueShift, saturationScale, luminaceScale, channel, start, end);
+
+		}
+		break;
+
+		// Peform an Adjust Contrast edit
+		case ProcessorEdit::EditType::ADJUST_CONTRAST: {
+
+			// Get all parameters from the edit
+			double allContrast = procEdit->GetParam(0);
+			double redContrast = procEdit->GetParam(1);
+			double greenContrast = procEdit->GetParam(2);
+			double blueContrast = procEdit->GetParam(3);
+			double allCenter = procEdit->GetParam(4);
+			double redCenter = procEdit->GetParam(5);
+			double greenCenter = procEdit->GetParam(6);
+			double blueCenter = procEdit->GetParam(7);
+
+
+			procParent->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast,
+				allCenter, redCenter, greenCenter, blueCenter, start, end);
+		}
+		break;
+
+		// Peform an Adjust Contrast edit
+		case ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE: {
+
+			// Get all parameters from the edit
+			double allContrast = procEdit->GetParam(0);
+			double redContrast = procEdit->GetParam(1);
+			double greenContrast = procEdit->GetParam(2);
+			double blueContrast = procEdit->GetParam(3);
+			double allCenter = procEdit->GetParam(4);
+			double redCenter = procEdit->GetParam(5);
+			double greenCenter = procEdit->GetParam(6);
+			double blueCenter = procEdit->GetParam(7);
+
+			procParent->AdjustContrastCurve(allContrast, redContrast, greenContrast, blueContrast,
+				allCenter, redCenter, greenCenter, blueCenter, start, end);
+		}
+		break;
+
+		 // Peform a greyscale conversion, averaging RGB values
+		case ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG: {
+
+			procParent->ConvertGreyscale((1.0 / 3.0), (1.0 / 3.0), (1.0 / 3.0), start, end);
+		}
+		break;
+
+		// Peform a greyscale conversion, using humany eyesight values
+		case ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE: {
+
+			procParent->ConvertGreyscale(0.2126, 0.7152, 0.0722, start, end);
+		}
+		break;
+
+		// Peform a greyscale conversion, using custom scalars
+		case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM: {
+
+			// Get all parameters from the edit
+			double redScale = procEdit->GetParam(0);
+			double greenScale = procEdit->GetParam(1);
+			double blueScale = procEdit->GetParam(2);
+
+			procParent->ConvertGreyscale(redScale, greenScale, blueScale, start, end);
+		}
+		break;
+
+		// Peform a greyscale conversion, using custom scalars
+		case ProcessorEdit::EditType::CHANNEL_MIXER: {
+
+			// Get all parameters from the edit
+			double redRedScale = procEdit->GetParam(0);
+			double redGreenScale = procEdit->GetParam(1);
+			double redBlueScale = procEdit->GetParam(2);
+			double greenRedScale = procEdit->GetParam(3);
+			double greenGreenScale = procEdit->GetParam(4);
+			double greenBlueScale = procEdit->GetParam(5);
+			double blueRedScale = procEdit->GetParam(6);
+			double blueGreenScale = procEdit->GetParam(7);
+			double blueBlueScale = procEdit->GetParam(8);
+
+			procParent->ChannelScale(redRedScale, redGreenScale, redBlueScale,
+				greenRedScale, greenGreenScale, greenBlueScale,
+				blueRedScale, blueGreenScale, blueBlueScale, start, end);
+		}
+		 break;
+
+		// Peform a 90 degree clockwise roctation
+		case ProcessorEdit::EditType::ROTATE_90_CW: {
+
+			procParent->Rotate90CW(start, end);
+		}
+		break;
+
+
+		// Peform a 180 degree clockwise roctation (not multithreaded)
+		case ProcessorEdit::EditType::ROTATE_180: {
+			return (wxThread::ExitCode) 0;
+		}
+		break;
+
+		// Peform a 270 degree clockwise roctation (not multithreaded)
+		case ProcessorEdit::EditType::ROTATE_270_CW: {
+
+			return (wxThread::ExitCode) 0;
+		}
+		break;
+
+		// Peform a custom angle clockwise roctation
+		case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
+
+			double angle = procEdit->GetParam(0);
+			procParent->RotateCustom(angle, start, end);
+		}
+		break;
+
+		// Peform a custom angle clockwise roctation using bilinear interpolation
+		case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
+
+			double angle = procEdit->GetParam(0);
+			procParent->RotateCustomBilinear(angle, start, end);
+		}
+		break;
+
+		// Peform a custom angle clockwise roctation using bicubic interpolation
+		case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
+
+			// Perform an edit on the data through the processor
+			double angle = procEdit->GetParam(0);
+			procParent->RotateCustomBicubic(angle, start, end);
+
+		}
+
+		break;
+
+		// Peform a sclaing of the image using nearest neighbor
+		case ProcessorEdit::EditType::SCALE_NEAREST: {
+			procParent->ScaleNearest(start, end);
+		}
+		break;
+
+		// Peform a sclaing of the image using bilinear interpolation
+		case ProcessorEdit::EditType::SCALE_BILINEAR: {
+
+			procParent->ScaleBilinear(start, end);
+		}
+		break;
+
+		// Peform a sclaing of the image using bicubic interpolation
+		case ProcessorEdit::EditType::SCALE_BICUBIC: {
+
+			procParent->ScaleBicubic(start, end);
+		}
+		break;
+
+		// Peform a horizontal image flip
+		case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
+
+			procParent->MirrorHorizontal(start, end);
+		}
+		break;
+
+		// Peform a vertical image flip
+		case ProcessorEdit::EditType::MIRROR_VERTICAL: {
+
+			procParent->MirrorVertical(start, end);
+
+		}
+		break;
+
+		// Peform RGB Curves edit
+		case ProcessorEdit::EditType::RGB_CURVES: {
+
+			if (procEdit->GetNumIntArrays() == 8) {
+
+				// Get 8 bit curve data
+				int * brightCurve8 = procEdit->GetIntArray(0);
+				int * redCurve8 = procEdit->GetIntArray(1);
+				int * greenCurve8 = procEdit->GetIntArray(2);
+				int * blueCurve8 = procEdit->GetIntArray(3);
+
+				// Get 16 bit curve data
+				int * brightCurve16 = procEdit->GetIntArray(4);
+				int * redCurve16 = procEdit->GetIntArray(5);
+				int * greenCurve16 = procEdit->GetIntArray(6);
+				int * blueCurve16 = procEdit->GetIntArray(7);
+
+				procParent->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
+					brightCurve16, redCurve16, greenCurve16, blueCurve16, start, end);
+			}
+		}
+		break;
+
+		// Peform LAB Curves edit
+		case ProcessorEdit::EditType::LAB_CURVES: {
+
+			if (procEdit->GetNumIntArrays() == 3) {
+
+				// Get LAB curve data
+				int * lCurve16 = procEdit->GetIntArray(0);
+				int * aCurve16 = procEdit->GetIntArray(1);
+				int * bCurve16 = procEdit->GetIntArray(2);
+
+				procParent->LABCurves(lCurve16, aCurve16, bCurve16, start, end);
+			}
+		}
+		break;
+
+		// Peform HSL Curves edit
+		case ProcessorEdit::EditType::HSL_CURVES: {
+
+			if (procEdit->GetNumIntArrays() == 3) {
+
+				// Get LAB curve data
+				int * hCurve16 = procEdit->GetIntArray(0);
+				int * sCurve16 = procEdit->GetIntArray(1);
+				int * lCurve16 = procEdit->GetIntArray(2);
+
+				procParent->HSLCurves(hCurve16, sCurve16, lCurve16, start, end);
+			}
+		}
+		break;
+
+		// Peform Crop edit
+		case ProcessorEdit::EditType::CROP: {
+
+			// Get crop dimmensions
+			int startX = procEdit->GetParam(0);
+			int startY = procEdit->GetParam(1);
+
+			procParent->Crop(startX, startY, start, end);
+		}
+		break;
+	}
+
+	critical->Enter();
+	*complete += 1;
+	critical->Leave();
+
+	// All worker threads have finished, signal condition to continue
+	if (*complete == threads) {
+		wxMutexLocker(*lock);
+		cond->Broadcast();
+	}
+
+	return (wxThread::ExitCode)0;
+}
 
 Processor::RawProcessThread::RawProcessThread(Processor * processorPar, bool unpackAndProcess) : wxThread(wxTHREAD_DETACHED) {
 	processor = processorPar;

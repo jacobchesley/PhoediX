@@ -19,7 +19,6 @@
 #include "Processing/ProcessorEdit/ProcessorEdit.h"
 #include "Processing/RawErrorCodes/RawError.h"
 #include "libraw.h"
-#include <omp.h>
 
 enum {
 	ID_PROCESSOR_MESSAGE,
@@ -36,6 +35,16 @@ enum ColorSpaceENUM {
 	PROPHOTO_RGB,
 	sRGB,
 	WIDE_GAMUT_RGB
+};
+
+enum RGBChannelENUM {
+	RED_GREEN_BLUE,
+	RED,
+	GREEN,
+	BLUE,
+	GREEN_BLUE,
+	RED_BLUE,
+	RED_GREEN
 };
 
 struct RGB {
@@ -209,7 +218,7 @@ private:
 	int colorSpace;
 
 	void ShiftRGB(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
-	void AdjustHSL(double hShift, double sScale, double lScale, int dataStart = -1, int dataEnd = -1);
+	void AdjustHSL(double hShift, double sScale, double lScale, RGBChannelENUM channels, int dataStart = -1, int dataEnd = -1);
 	void AdjustLAB(double lScale, double aShift, double bShift, int dataStart = -1, int dataEnd = -1);
 	void AdjustBrightness(double brightAdjust, double detailsPreserve, double toneSetting, int tonePreservation, int dataStart = -1, int dataEnd = -1);
 	void AdjustContrast(double allContrast, double redContrast, double greenContrast, double blueContrast, 
@@ -252,11 +261,13 @@ private:
 	void MirrorHorizontal(int dataStart = -1, int dataEnd = -1);
 	void MirrorVertical(int dataStart = -1, int dataEnd = -1);
 
+	void BoxBlurHorizontal(int pixelBlurSize, int dataStart = -1, int dataEnd = -1);
+	void BoxBlurVertical(int pixelBlurSize, int dataStart = -1, int dataEnd = -1);
+
 	void RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpaceToUse);
 	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpaceToUse);
 	void XYZtoLAB(XYZ * xyz, LAB * lab);
 	void LABtoXYZ(LAB * lab, XYZ * xyz);
-
 
 	void SendMessageToParent(wxString message);
 	void SendProcessorEditNumToParent(int num);
@@ -276,7 +287,9 @@ private:
 			virtual ExitCode Entry();
 
 		private:
+
 			void DeleteEditVector();
+			void Multithread(ProcessorEdit * edit, int maxDataSize = -1);
 			Processor * procParent;
 			wxVector<ProcessorEdit*> editVec;
 			bool terminated;
@@ -295,8 +308,25 @@ private:
 			bool unpackProcess;
 	};
 
-	ProcessThread* processThread;
+	class EditThread : public wxThread {
+		public:
+			EditThread(Processor * processor, ProcessorEdit * edit, int dataStart, int dataEnd, wxCriticalSection * mutex, wxCondition * condition, int numThreads, int * threadsComplete);
 
+		protected:
+			virtual ExitCode Entry();
+
+	private:
+		Processor * procParent;
+		ProcessorEdit * procEdit;
+		int start;
+		int end;
+		wxCriticalSection * critical;
+		wxCondition * cond;
+		int threads;
+		int * complete;
+	};
+
+	ProcessThread* processThread;
 };
 
 #endif 
