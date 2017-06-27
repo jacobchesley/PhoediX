@@ -5661,7 +5661,6 @@ void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize
 	}
 
 	int chunkSize = dataSize / numThreads;
-	static wxCriticalSection critical;
 	wxMutex mutexLock;
 	wxCondition wait(mutexLock);
 	int threadComplete = 0;
@@ -5670,13 +5669,13 @@ void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize
 
 		// Process current chunk of data
 		if (thread != numThreads - 1) {
-			EditThread * editWorker = new EditThread(procParent, edit, chunkSize * thread, chunkSize * (thread + 1), &critical, &wait, numThreads, &threadComplete);
+			EditThread * editWorker = new EditThread(procParent, edit, chunkSize * thread, chunkSize * (thread + 1), &mutexLock, &wait, numThreads, &threadComplete);
 			editWorker->Run();
 		}
 
 		// Go all the way to end of data (incase of rounding error)
 		else {
-			EditThread * editWorker = new EditThread(procParent, edit, chunkSize * thread, dataSize, &critical, &wait, numThreads, &threadComplete);
+			EditThread * editWorker = new EditThread(procParent, edit, chunkSize * thread, dataSize, &mutexLock, &wait, numThreads, &threadComplete);
 			editWorker->Run();
 		}
 	}
@@ -6429,12 +6428,12 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	return (wxThread::ExitCode)0;
 }
 
-Processor::EditThread::EditThread(Processor * processor, ProcessorEdit * edit, int dataStart, int dataEnd, wxCriticalSection * criticalSection, wxCondition * condition, int numThreads, int * threadsComplete) : wxThread(wxTHREAD_DETACHED) {
+Processor::EditThread::EditThread(Processor * processor, ProcessorEdit * edit, int dataStart, int dataEnd, wxMutex * mutLockIn,  wxCondition * condition, int numThreads, int * threadsComplete) : wxThread(wxTHREAD_DETACHED) {
 	procParent = processor;
 	procEdit = edit;
 	start = dataStart;
 	end = dataEnd;
-	critical = criticalSection;
+	mutLock = mutLockIn;
 	cond = condition;
 	threads = numThreads;
 	complete = threadsComplete;
@@ -6719,13 +6718,13 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		break;
 	}
 
-	critical->Enter();
+	mutLock->Lock();
 	*complete += 1;
-	critical->Leave();
+	mutLock->Unlock();
 
 	// All worker threads have finished, signal condition to continue
 	if (*complete == threads) {
-		wxMutexLocker(*lock);
+		mutLock->Lock();
 		cond->Broadcast();
 	}
 

@@ -310,7 +310,7 @@ private:
 
 	class EditThread : public wxThread {
 		public:
-			EditThread(Processor * processor, ProcessorEdit * edit, int dataStart, int dataEnd, wxCriticalSection * mutex, wxCondition * condition, int numThreads, int * threadsComplete);
+			EditThread(Processor * processor, ProcessorEdit * edit, int dataStart, int dataEnd, wxMutex * mutLockIn, wxCondition * condition, int numThreads, int * threadsComplete);
 
 		protected:
 			virtual ExitCode Entry();
@@ -320,7 +320,7 @@ private:
 		ProcessorEdit * procEdit;
 		int start;
 		int end;
-		wxCriticalSection * critical;
+		wxMutex * mutLock;
 		wxCondition * cond;
 		int threads;
 		int * complete;
