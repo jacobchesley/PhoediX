@@ -338,7 +338,7 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 	wxCommandEvent start(POPULATION_STARTED_EVENT, ID_POPULATION_STARTED);
 	wxPostEvent(par, start);
 
-	int totalThreads = PhoedixSettings::GetNumThreads();
+	int totalThreads = 1;
 	int maxSize = 250;
 
 	LibRaw * rawProcs = new LibRaw[totalThreads];
@@ -379,58 +379,58 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 			// We have a raw image we can load in
 			if (ImageHandler::CheckRaw(fileName)) {
 				#ifdef __WXMSW__
-					rawProcs[omp_get_thread_num()].open_file(fileName.wc_str());
+					rawProcs[0].open_file(fileName.wc_str());
 				#else
-					rawProcs[omp_get_thread_num()].open_file(fileName.c_str());
+					rawProcs[0].open_file(fileName.c_str());
 				#endif
-				rawProcs[omp_get_thread_num()].unpack();
-				rawProcs[omp_get_thread_num()].imgdata.params.half_size = 1;
-				rawProcs[omp_get_thread_num()].imgdata.params.use_camera_wb = 1;
-				rawProcs[omp_get_thread_num()].imgdata.params.use_auto_wb = 0;
+				rawProcs[0].unpack();
+				rawProcs[0].imgdata.params.half_size = 1;
+				rawProcs[0].imgdata.params.use_camera_wb = 1;
+				rawProcs[0].imgdata.params.use_auto_wb = 0;
 
-				rawProcs[omp_get_thread_num()].dcraw_process();
-				rawImgs[omp_get_thread_num()] = rawProcs[omp_get_thread_num()].dcraw_make_mem_image(&rawErrors[omp_get_thread_num()]);
+				rawProcs[0].dcraw_process();
+				rawImgs[0] = rawProcs[0].dcraw_make_mem_image(&rawErrors[0]);
 
-				if (rawErrors[omp_get_thread_num()] == LIBRAW_SUCCESS) {
+				if (rawErrors[0] == LIBRAW_SUCCESS) {
 
-					displayImage[omp_get_thread_num()] = NULL;
-					displayImage[omp_get_thread_num()] = new wxImage(rawImgs[omp_get_thread_num()]->width, rawImgs[omp_get_thread_num()]->height);
-					ImageHandler::CopyImageFromRaw(rawImgs[omp_get_thread_num()], displayImage[omp_get_thread_num()]);
+					displayImage[0] = NULL;
+					displayImage[0] = new wxImage(rawImgs[0]->width, rawImgs[0]->height);
+					ImageHandler::CopyImageFromRaw(rawImgs[0], displayImage[0]);
 				}
-				rawProcs[omp_get_thread_num()].dcraw_clear_mem(rawImgs[omp_get_thread_num()]);
-				rawProcs[omp_get_thread_num()].recycle();
+				rawProcs[0].dcraw_clear_mem(rawImgs[0]);
+				rawProcs[0].recycle();
 			}
 
 			// We have an image we can load in
 			else if (ImageHandler::CheckImage(fileName)) {
-				displayImage[omp_get_thread_num()] = new wxImage(fileName);
+				displayImage[0] = new wxImage(fileName);
 			}
 			else {
 				continue;
 			}
 
-			if (displayImage[omp_get_thread_num()] != NULL) {
+			if (displayImage[0] != NULL) {
 				// Scale image based on width > height
-				if (displayImage[omp_get_thread_num()]->GetHeight() < displayImage[omp_get_thread_num()]->GetWidth()) {
-					double aspect = (double)displayImage[omp_get_thread_num()]->GetHeight() / (double)displayImage[omp_get_thread_num()]->GetWidth();
-					displayImage[omp_get_thread_num()]->Rescale(maxSize, maxSize * aspect, wxIMAGE_QUALITY_HIGH);
+				if (displayImage[0]->GetHeight() < displayImage[0]->GetWidth()) {
+					double aspect = (double)displayImage[0]->GetHeight() / (double)displayImage[0]->GetWidth();
+					displayImage[0]->Rescale(maxSize, maxSize * aspect, wxIMAGE_QUALITY_HIGH);
 
 				}
 				// Scale image based on height > width
-				else if (displayImage[omp_get_thread_num()]->GetHeight() > displayImage[omp_get_thread_num()]->GetWidth()) {
-					double aspect = (double)displayImage[omp_get_thread_num()]->GetWidth() / (double)displayImage[omp_get_thread_num()]->GetHeight();
-					displayImage[omp_get_thread_num()]->Rescale(maxSize * aspect, maxSize, wxIMAGE_QUALITY_HIGH);
+				else if (displayImage[0]->GetHeight() > displayImage[0]->GetWidth()) {
+					double aspect = (double)displayImage[0]->GetWidth() / (double)displayImage[0]->GetHeight();
+					displayImage[0]->Rescale(maxSize * aspect, maxSize, wxIMAGE_QUALITY_HIGH);
 				}
 
 				// Image has same width and height, set to max size
 				else {
-					displayImage[omp_get_thread_num()]->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
+					displayImage[0]->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
 				}
 				
 				// Send the image to the parent to be added to the window
 				wxFileName tempFile(fileName);
 
-				AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage[omp_get_thread_num()], tempFile.GetFullName(), fileName);
+				AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage[0], tempFile.GetFullName(), fileName);
 				wxPostEvent(par, libImageEvent);
 
 			}
