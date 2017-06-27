@@ -739,7 +739,7 @@ void RawWindow::Process() {
 		proc->rawPrcoessor.imgdata.params.exp_correc = 1;
 
 		// Calculate stops to float value for exposure
-		float exposeCorrect = (float) std::pow(2.0, exposureControl->GetValue());
+		float exposeCorrect = (float) pow(2.0, exposureControl->GetValue());
 		proc->rawPrcoessor.imgdata.params.exp_shift = exposeCorrect;
 
 		proc->rawPrcoessor.imgdata.params.exp_preser = (float)exposurePreserveControl->GetValue();
