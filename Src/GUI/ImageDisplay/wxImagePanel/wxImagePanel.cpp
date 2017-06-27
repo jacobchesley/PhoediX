@@ -14,7 +14,10 @@ WXImagePanel::WXImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(paren
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&WXImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
 
-	this->SetDoubleBuffered(true);
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
+
 	doDraw = true;
 }
 
@@ -32,7 +35,10 @@ WXImagePanel::WXImagePanel(wxWindow * parent, wxImage * image, bool doKeepAspect
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&WXImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&WXImagePanel::OnSize, this);
 
-	this->SetDoubleBuffered(true);
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
+		
 	this->SetSize(img->GetSize());
 	this->SetMinSize(img->GetSize());
 	doDraw = true;

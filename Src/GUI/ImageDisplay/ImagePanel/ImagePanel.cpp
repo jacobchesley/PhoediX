@@ -11,7 +11,9 @@ ImagePanel::ImagePanel(wxWindow * parent, bool doKeepAspect) : wxPanel(parent) {
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&ImagePanel::OnSize, this);
 
-	this->SetDoubleBuffered(true);
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 }
 
 ImagePanel::ImagePanel(wxWindow * parent, Image * image, bool doKeepAspect) : wxPanel(parent) {
@@ -24,7 +26,9 @@ ImagePanel::ImagePanel(wxWindow * parent, Image * image, bool doKeepAspect) : wx
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImagePanel::OnPaint, this);
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&ImagePanel::OnSize, this);
 
-	this->SetDoubleBuffered(true);
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 }
 
 void ImagePanel::SetKeepAspect(bool doKeepAspect) {

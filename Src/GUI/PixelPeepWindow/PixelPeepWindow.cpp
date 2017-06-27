@@ -7,7 +7,10 @@ PixelPeepWindow::PixelPeepWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
-	this->SetDoubleBuffered(true);
+
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 
 	gridSize = new wxComboBox(this, -1);
 	gridSize->SetBackgroundColour(this->GetBackgroundColour());
@@ -55,7 +58,10 @@ PixelPeepWindow::PixelGrid::PixelGrid(wxWindow * parent) : wxPanel(parent) {
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&PixelPeepWindow::PixelGrid::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&PixelPeepWindow::PixelGrid::OnClick, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&PixelPeepWindow::PixelGrid::OnClick, this);
-	this->SetDoubleBuffered(true);
+	
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 
 	this->SetSizeHints(wxSize(150, 150));
 }

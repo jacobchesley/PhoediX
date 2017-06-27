@@ -32,7 +32,9 @@ ZoomImagePanel::ZoomImagePanel(wxWindow * parent, Image * img) : wxPanel(parent)
 
 void ZoomImagePanel::InitControls(){
 
-	this->SetDoubleBuffered(true);
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	controlSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -227,7 +229,10 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
-	this->SetDoubleBuffered(true);
+
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 }
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxScrolledWindow(parent) {
@@ -261,7 +266,10 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
-	this->SetDoubleBuffered(true);
+
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 }
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : wxScrolledWindow(parent) {
@@ -295,7 +303,10 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
-	this->SetDoubleBuffered(true);
+	
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
 }
 
 void ZoomImagePanel::ImageScroll::NoImage() {
