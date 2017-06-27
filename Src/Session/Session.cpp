@@ -1,8 +1,11 @@
 // Copyright 2016 Jacob Chesley
 
 #include "Session.h"
-#include <random>
 #include "App/PhoediX.h"
+
+#if defined(__WXMSW__) || defined(__WXGTK__)
+#include <random>
+#endif
 
 PhoediXSession::PhoediXSession(){
 	editList = new PhoediXSessionEditList();
@@ -325,8 +328,17 @@ void PhoediXSession::SetImageScrollY(int y) {
 }
 
 void PhoediXSession::GenerateID() {
-
-	id = rand() % 20000 + 500;
+    #if defined(__WXMSW__) || defined(__WXGTK__)
+        id = rand() % 20000 + 500;
+    #endif
+    
+    #if defined(__WXMAC__)
+        FILE * fp = fopen("/dev/random", "r");
+        if(!fp){ return;}
+        for(int i = 0; i < sizeof(id); i++){ id <<= 8; id |= fgetc(fp); }
+        fclose(fp);
+    id = id % 20000 + 500;
+    #endif
 }
 
 int PhoediXSession::GetID() {
