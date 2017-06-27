@@ -41,4 +41,4 @@ private:
 
 	void OnCombo(wxCommandEvent& WXUNUSED(event));
 };
-#endif#pragma once
+#endif

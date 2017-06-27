@@ -39,4 +39,4 @@ private:
 	Processor * proc;
 
 };
-#endif#pragma once
+#endif
