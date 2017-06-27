@@ -29,11 +29,12 @@ private:
 	wxStaticText * hueShiftLabel;
 	wxStaticText * saturationScaleLabel;
 	wxStaticText * luminaceScaleLabel;
+	wxStaticText * channelLabel;
 
 	DoubleSlider * hueShiftSlider;
 	DoubleSlider * saturationScaleSlider;
-	DoubleSlider * greenBrightSlider;
 	DoubleSlider * luminaceScaleSlider;
+	wxComboBox * channelSelect;
 
 	Processor * proc;
 };
