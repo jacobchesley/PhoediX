@@ -26,7 +26,6 @@
 #include "Processing/Processor/Processor.h"
 #include "Settings/Settings.h"
 #include "Debugging/MemoryLeakCheck.h"
-#include <omp.h>
 
 enum {
 	ID_POPULATION_STARTED,

@@ -368,11 +368,6 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 		wxArrayString allFileNames;
 		wxDir::GetAllFiles(allDirectories[dir], &allFileNames);
 
-		// Go through all files, check if each are an image
-		
-		omp_set_dynamic(0);     // Explicitly disable dynamic teams
-		omp_set_num_threads(totalThreads); // Use 4 threads for all consecutive parallel regions
-		#pragma omp parallel for
 		for (int file = 0; file < allFileNames.size(); file++) {
 
 			if (canceled) { break; }
