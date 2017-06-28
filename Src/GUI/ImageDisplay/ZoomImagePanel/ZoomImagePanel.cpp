@@ -314,10 +314,11 @@ void ZoomImagePanel::ImageScroll::NoImage() {
 }
 
 void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
-
+    
 	// Prepare the DC, zoom the correct amount and draw the bitmap
 	this->PrepareDC(dc);
-
+    dc.SetUserScale(zoom, zoom);
+    
 	// Clear and set background color
 	dc.Clear();
 	dc.SetBackground(wxBrush(this->GetBackgroundColour()));
@@ -342,10 +343,9 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	int yShift = 0;
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth)/ 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
-
-	dc.SetUserScale(zoom, zoom);
+    
 	dc.DrawBitmap(bitmapDraw, wxPoint(xShift, yShift));
-
+    
 	if (gridActive){
 		
 		int sectionLength = 40.0;  // Black and Whilte lines will be 20 pixels
@@ -423,15 +423,12 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 }
 
 void ZoomImagePanel::ImageScroll::Redraw() {
-	
-	if (currentlyDrawing) {
-		//return;
-	}
+
 	currentlyDrawing = true;
 	// Render a buffered DC from the client DC
 	wxClientDC dc(this);
 	if(!dc.IsOk()){ return; }
-	wxBufferedDC dcBuffer(&dc);
+	//wxBufferedDC dcBuffer(&dc);
 	this->Render(dc);
 	currentlyDrawing = false;
 }
@@ -796,6 +793,7 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			this->Update();
 		
 			mouse.SetState(wxGetMouseState());
+            wxSafeYield();
 		}
 
 		grid.startX = drawGrid.startX;
@@ -834,7 +832,10 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 
 			// Scroll to new calculated position
 			this->Scroll(newScrollPosX, newScrollPosY);
+            this->Refresh();
+            this->Update();
 			mouse.SetState(wxGetMouseState());
+            wxSafeYield();
 		}
 	}
 }
@@ -843,9 +844,16 @@ void ZoomImagePanel::ImageScroll::OnPaint(wxPaintEvent& evt) {
 
 	currentlyDrawing = true;
 	// Create buffered and dc and render
-	wxBufferedPaintDC paintDC(this);
-	if(!paintDC.IsOk()){ return; }
-	this->Render(paintDC);
+    if(this->IsDoubleBuffered()){
+        wxBufferedPaintDC paintDC(this);
+        if(!paintDC.IsOk()){ return; }
+        this->Render(paintDC);
+    }
+    else{
+        wxPaintDC paintDC(this);
+        if(!paintDC.IsOk()){ return; }
+        this->Render(paintDC);
+    }
 	evt.Skip(false);
 	currentlyDrawing = false;
 }

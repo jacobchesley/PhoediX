@@ -145,7 +145,7 @@ private:
 	wxApp * app;
 
 	enum MenuBar {
-		ID_NEW_PROJECT,
+		ID_NEW_PROJECT = 1,
 		ID_SHOW_LOAD_PROJECT,
 		ID_SHOW_SAVE_PROJECT,
 		ID_QUICK_SAVE_PROJECT,
