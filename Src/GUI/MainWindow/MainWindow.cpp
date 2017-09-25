@@ -226,7 +226,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(OPEN_IMAGE_NEW_PROJECT_EVENT, (wxObjectEventFunction)&MainWindow::OnImportImageNewProject, this, ID_OPEN_IMAGE_NEW_PROJECT);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&MainWindow::OnClose, this);
 	this->Bind(wxEVT_AUI_PANE_CLOSE, (wxObjectEventFunction)&MainWindow::OnPaneClose, this);
-	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::OnReprocessTimer, this);
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::ClearStatusbarText, this, EVT_CLEAR_STATUS_TIMER);
 	this->Bind(UPDATE_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnUpdateImage, this, ID_UPDATE_IMAGE);
 
 	imgPanelThread = new ImagePanelUpdateThread(this, imagePanel, pixelPeepWindow, processor, histogramDisplay, exportWindow);
@@ -241,7 +241,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 
 	numnUnnamedProjectsOpen = 0;
 
-	reprocessCountdown = new wxTimer(this);
+	clearStatusTimer = new wxTimer(this, EVT_CLEAR_STATUS_TIMER);
 
 	pixelPeepWindow->UpdatePosition(0, 0);
 	this->EnableDisableMenuItemsNoProject(false);
@@ -444,13 +444,11 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	// Set zoom and drag after window has been positioned
 	imagePanel->SetZoom(session->GetImageZoomLevel());
 	imagePanel->SetDrag(session->GetImageScrollX(), session->GetImageScrollY());
-
+	imagePanel->SetFitImage(session->GetFitImage());
 	this->SetMenuChecks();
 
 	// At least one session exists now, enable menu items related to sessions
 	this->EnableDisableMenuItemsNoProject(true);
-
-	//reprocessCountdown->Start(500, true);
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {
@@ -521,6 +519,8 @@ void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
 	if (!sessionSavedBefore) {
 		savedSessions.push_back(currentSession);
 	}
+	this->SetStatusbarText(currentSession.GetName() + " Saved");
+	clearStatusTimer->StartOnce(1000);
 }
 
 void MainWindow::QuickSaveProject(wxCommandEvent & WXUNUSED(evt)) {
@@ -535,7 +535,9 @@ void MainWindow::QuickSaveProject(wxCommandEvent & WXUNUSED(evt)) {
 	// Save project to loaded location
 	else {
 		this->SaveCurrentSession();
-		currentSession.SaveSessionToFile(currentSession.GetProjectPath());
+		currentSession.SaveSessionToFile(currentSession.GetProjectPath() + wxFileName::GetPathSeparator() + currentSession.GetName());
+		this->SetStatusbarText(currentSession.GetName() + " Saved");
+		clearStatusTimer->StartOnce(1000);
 	}
 
 	// Replace existing session in saved sessions
@@ -564,6 +566,7 @@ void MainWindow::SaveCurrentSession() {
 	currentSession.SetImageZoomLevel(imagePanel->GetZoom());
 	currentSession.SetImageScrollX(imagePanel->GetDragX());
 	currentSession.SetImageScrollY(imagePanel->GetDragY());
+	currentSession.SetFitImage(imagePanel->GetFitImage());
 	if(processor->GetImage() != NULL){
 		currentSession.SetImageScrollWidth(processor->GetImage()->GetWidth());
 		currentSession.SetImageScrollHeight(processor->GetImage()->GetHeight());
@@ -727,7 +730,7 @@ void MainWindow::OpenImage(wxString imagePath, bool rawWindowOpen){
 		this->SetTitle("PhoediX - " + imageFile.GetFullName());
 		exportWindow->RawImageLoaded(true);
 		if (!rawWindowOpen) { editList->AddRawWindow(); }
-		processor->SetDoFitImage(true);
+		//processor->SetDoFitImage(true);
 
 		this->ShowImageRelatedWindows();
 	}
@@ -744,7 +747,7 @@ void MainWindow::OpenImage(wxString imagePath, bool rawWindowOpen){
 			processor->SetOriginalImage(processor->GetImage());
 			originalImagePanel->ChangeImage(processor->GetOriginalImage());
 			processor->SetUpdated(true);
-			processor->SetDoFitImage(true);
+			//processor->SetDoFitImage(true);
 			processor->Unlock();
 
 			// Write image path to current session
@@ -1065,6 +1068,10 @@ void MainWindow::SetStatusbarText(wxString text) {
 	statusBarText->Show();
 }
 
+void MainWindow::ClearStatusbarText(wxTimerEvent& WXUNUSED(evt)){
+	this->SetStatusbarText("");
+}
+
 void MainWindow::RecieveMessageFromProcessor(wxCommandEvent& messageEvt) {
 	this->SetStatusbarText(messageEvt.GetString());
 	exportWindow->SetMessage(messageEvt.GetString());
@@ -1132,8 +1139,6 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	// Stop watching for image panel updates
 	imgPanelThread->StopWatching();
 
-	reprocessCountdown->Stop();
-	delete reprocessCountdown;
 	imagePanel->DestroyTimer();
 	originalImagePanel->DestroyTimer();
 

@@ -98,6 +98,7 @@ private:
 	void OnPaneClose(wxAuiManagerEvent& evt);
 
 	void SetStatusbarText(wxString text);
+	void ClearStatusbarText(wxTimerEvent& WXUNUSED(evt));
 	void OnClose(wxCloseEvent& WXUNUSED(evt));
 
 	void RecieveMessageFromProcessor(wxCommandEvent& messageEvt);
@@ -141,11 +142,11 @@ private:
 
 	int numnUnnamedProjectsOpen;
 
-	wxTimer * reprocessCountdown;
+	wxTimer * clearStatusTimer;
 	wxApp * app;
 
 	enum MenuBar {
-		ID_NEW_PROJECT,
+		ID_NEW_PROJECT = 1,
 		ID_SHOW_LOAD_PROJECT,
 		ID_SHOW_SAVE_PROJECT,
 		ID_QUICK_SAVE_PROJECT,
@@ -166,6 +167,11 @@ private:
 		ID_SHOW_SUPPORTED_CAMERAS,
 		ID_ABOUT
 	};
+
+	enum EVENT_IDS{
+		EVT_CLEAR_STATUS_TIMER = 1
+	};
+
 
 	class ImagePanelUpdateThread : public wxThread {
 
