@@ -329,7 +329,7 @@ LibraryWindow::LoadImagesThread::LoadImagesThread(LibraryWindow * parent) : wxTh
 	canceled = false;
 }
 
-void LibraryWindow::LibraryWindow::LoadImagesThread::Cancel() {
+void LibraryWindow::LoadImagesThread::Cancel() {
 	canceled = true;
 }
 
