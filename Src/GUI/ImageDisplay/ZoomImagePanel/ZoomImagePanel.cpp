@@ -97,7 +97,9 @@ void ZoomImagePanel::OnZoom100(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
-	this->FitImage();
+
+	if(scroller->GetFitImage()){ this->SetFitImage(false); }
+	else{ this->SetFitImage(true); }
 }
 
 void ZoomImagePanel::OnScrollRightDown(wxMouseEvent& evt) {
@@ -106,8 +108,38 @@ void ZoomImagePanel::OnScrollRightDown(wxMouseEvent& evt) {
 }
 
 void ZoomImagePanel::FitImage() {
+
 	scroller->FitImage();
-	zoomSlider->SetValue(scroller->GetZoom()*100.0);
+	zoomSlider->SetValue(scroller->GetZoom() * 100.0);
+}
+
+bool ZoomImagePanel::GetFitImage(){
+	return scroller->GetFitImage();
+}
+
+void ZoomImagePanel::SetFitImage(bool fitImage){
+
+	if(fitImage){
+		// Enable fitting image and hide controls (can't zoom if image is always fit)
+		lastDragX = this->GetDragX();
+		lastDragY = this->GetDragY();
+		scroller->EnableFitImage();
+		fullImageView->SetBackgroundColour(Colors::BackGrey);
+		scroller->FitImage();
+		zoomSlider->Hide();
+		viewImage100->Hide();
+		this->Layout();
+	}
+	else{
+		// Disable fitting image and reshow all controls
+		scroller->DisableFitImage();
+		fullImageView->SetBackgroundColour(Colors::BackDarkDarkGrey);
+		zoomSlider->Show();
+		viewImage100->Show();
+		scroller->SetZoom(zoomSlider->GetValue()/100.0);
+		this->SetDrag(lastDragX, lastDragY);
+		this->Layout();
+	}
 }
 
 void ZoomImagePanel::SetZoom(float zoom) {
@@ -206,9 +238,9 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	disreguardScroll = false;
 	zoom = 1.0;
 	keepAspect = true;
-	resize = false;
 	bitmapDraw = wxBitmap(wxImage(1, 1));
 	noImage = true;
+	doFit = false;
 
 	gridActive = false;
 	gridOwner = -1;
@@ -242,8 +274,8 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	this->ChangeImage(image);
 	zoom = 1.0;
 	keepAspect = true;
-	resize = false;
 	noImage = false;
+	doFit = false;
 
 	SetScrollbars(1, 1, image->GetWidth(), image->GetHeight());
 	
@@ -279,8 +311,8 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	this->ChangeImage(image);
 	zoom = 1.0;
 	keepAspect = true;
-	resize = false;
 	noImage = false;
+	doFit = false;
 
 	gridActive = false;
 	gridOwner = -1;
@@ -314,10 +346,11 @@ void ZoomImagePanel::ImageScroll::NoImage() {
 }
 
 void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
-
+    
 	// Prepare the DC, zoom the correct amount and draw the bitmap
 	this->PrepareDC(dc);
-
+    dc.SetUserScale(zoom, zoom);
+    
 	// Clear and set background color
 	dc.Clear();
 	dc.SetBackground(wxBrush(this->GetBackgroundColour()));
@@ -342,91 +375,52 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	int yShift = 0;
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth)/ 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
-
-	dc.SetUserScale(zoom, zoom);
+   
 	dc.DrawBitmap(bitmapDraw, wxPoint(xShift, yShift));
-
+    
 	if (gridActive){
 		
-		int sectionLength = 40.0;  // Black and Whilte lines will be 20 pixels
-		int numLinesHorizontal = drawGrid.width / (double)sectionLength;
-		int numLinesVertical = drawGrid.height / (double)sectionLength;
-
-		int lastLineHorizontalLength = drawGrid.width % sectionLength;
-		int lastLineVerticalLength = drawGrid.height % sectionLength;
+		int lineWidth = (int) (4.0 / this->GetZoom());
+		if(this->GetZoom() < 1.0){ lineWidth = 2;}
 
 		wxColour white(255, 255, 255);
+		wxDash dashPattern[2];
+		dashPattern[0] = 15;
+		dashPattern[1] = 15;
+		wxPen dashPen(white, lineWidth, wxPENSTYLE_USER_DASH);
+		dashPen.SetDashes(2, dashPattern);
+
 		wxColour black(0, 0, 0);
-		wxPen gridPenWhite(white, 12, wxPENSTYLE_SOLID);
-		wxPen gridPenBlack(black, 12, wxPENSTYLE_SOLID);
+		wxPen blackPen(black, lineWidth, wxPENSTYLE_SOLID);
 
-		// Draw black and white top line
-		int horizontalLineSectionWidth = drawGrid.width / (double)numLinesHorizontal;
+		int bottomLineRaise = -1.0 * lineWidth;
 
-		for (size_t i = 0; i < numLinesHorizontal; i++) {
+		// Draw solid black line
+		dc.SetPen(blackPen);
 
-			if (i % 2 == 0) { dc.SetPen(gridPenBlack); }
-			else{ dc.SetPen(gridPenWhite); }
-			int lineStartX = (horizontalLineSectionWidth * i) + (drawGrid.startX + xShift);
-			int lineEndX = (horizontalLineSectionWidth * (i + 1)) + (drawGrid.startX + xShift);
-			int y = (drawGrid.startY + yShift);
-			dc.DrawLine(lineStartX, y, lineEndX, y);
-			if (i == numLinesHorizontal - 1) {
-				dc.DrawLine(lineEndX, y, lineEndX + lastLineHorizontalLength, y);
-			}
-		}
+		// Top Line and Bottom Line (solid black)
+		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift);
+		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift + bottomLineRaise, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY  + drawGrid.height + yShift + bottomLineRaise);
 
-		// Draw black and white bottom line
-		for (size_t i = 0; i < numLinesHorizontal; i++) {
+		// Left Line and Right Line (solid black)
+		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift);
+		dc.DrawLine(drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + drawGrid.height + yShift);
 
-			if (i % 2 == 0) { dc.SetPen(gridPenBlack); }
-			else { dc.SetPen(gridPenWhite); }
-			int lineStartX = (horizontalLineSectionWidth * i) + (drawGrid.startX + xShift);
-			int lineEndX = (horizontalLineSectionWidth * (i + 1)) + (drawGrid.startX + xShift);
-			int y = drawGrid.height + (drawGrid.startY + yShift);
-			dc.DrawLine(lineStartX, y, lineEndX, y);
-			if (i == numLinesHorizontal - 1) {
-				dc.DrawLine(lineEndX, y, lineEndX + lastLineHorizontalLength, y);
-			}
-		}
+		// Draw dashed white line on top of solid black line
+		dc.SetPen(dashPen);
 
-		// Draw black and white left line
-		int verticalLineSectionWidth = drawGrid.height / (double)numLinesVertical;
+		// Top Line and Bottom Line (dashed white)
+		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift);
+		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift + bottomLineRaise, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY  + drawGrid.height + yShift + + bottomLineRaise);
 
-		for (size_t i = 0; i < numLinesVertical; i++) {
-
-			if (i % 2 == 0) { dc.SetPen(gridPenBlack); }
-			else { dc.SetPen(gridPenWhite); }
-			int lineStartY = (verticalLineSectionWidth * i) + (drawGrid.startY + yShift);;
-			int lineEndY = (verticalLineSectionWidth * (i + 1)) + (drawGrid.startY + yShift);
-			int x = (drawGrid.startX + xShift);
-			dc.DrawLine(x, lineStartY, x, lineEndY);
-			if (i == numLinesVertical - 1) {
-				dc.DrawLine(x, lineEndY, x, lineEndY + lastLineVerticalLength);
-			}
-		}
-
-		// Draw black and white right line
-		for (size_t i = 0; i < numLinesVertical; i++) {
-
-			if (i % 2 == 0) { dc.SetPen(gridPenBlack); }
-			else { dc.SetPen(gridPenWhite); }
-			int lineStartY = (verticalLineSectionWidth * i) + (drawGrid.startY + yShift);
-			int lineEndY = (verticalLineSectionWidth * (i + 1)) + (drawGrid.startY + yShift);
-			int x = drawGrid.width + (drawGrid.startX + xShift);
-			dc.DrawLine(x, lineStartY, x, lineEndY);
-			if (i == numLinesVertical - 1) {
-				dc.DrawLine(x, lineEndY, x, lineEndY + lastLineVerticalLength);
-			}
-		}
+		// Left Line and Right Line (dashed white)
+		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift);
+		dc.DrawLine(drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + drawGrid.height + yShift);
 	}
 }
 
 void ZoomImagePanel::ImageScroll::Redraw() {
-	
-	if (currentlyDrawing) {
-		//return;
-	}
+
 	currentlyDrawing = true;
 	// Render a buffered DC from the client DC
 	wxClientDC dc(this);
@@ -469,6 +463,12 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 	else{
 			bitmapDraw = wxBitmap(wxImage(1, 1));
 	}
+
+	if(doFit){
+		// No need to refresh, this will be taken care of during rendering.
+		// Just need to set zoom factor
+		this->FitImage(false); 
+	}
 }
 
 void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
@@ -489,6 +489,12 @@ void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 	}
 	else {
 		bitmapDraw = wxBitmap(1, 1);
+	}
+
+	if(doFit){
+		// No need to refresh, this will be taken care of during rendering.
+		// Just need to set zoom factor
+		this->FitImage(false); 
 	}
 }
 
@@ -796,6 +802,7 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			this->Update();
 		
 			mouse.SetState(wxGetMouseState());
+            wxSafeYield();
 		}
 
 		grid.startX = drawGrid.startX;
@@ -834,32 +841,59 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 
 			// Scroll to new calculated position
 			this->Scroll(newScrollPosX, newScrollPosY);
+            this->Refresh();
+            this->Update();
 			mouse.SetState(wxGetMouseState());
+            wxSafeYield();
 		}
 	}
 }
 
 void ZoomImagePanel::ImageScroll::OnPaint(wxPaintEvent& evt) {
 
+	if(doFit){
+		// No need to refresh, this will be taken care of during rendering.
+		// Just need to set zoom factor
+		this->FitImage(false); 
+	}
 	currentlyDrawing = true;
 	// Create buffered and dc and render
-	wxBufferedPaintDC paintDC(this);
-	if(!paintDC.IsOk()){ return; }
-	this->Render(paintDC);
+    if(this->IsDoubleBuffered()){
+        wxBufferedPaintDC paintDC(this);
+        if(!paintDC.IsOk()){ return; }
+        this->Render(paintDC);
+    }
+    else{
+        wxPaintDC paintDC(this);
+        if(!paintDC.IsOk()){ return; }
+        this->Render(paintDC);
+    }
 	evt.Skip(false);
 	currentlyDrawing = false;
 }
 
-void ZoomImagePanel::ImageScroll::SetZoom(double zoomFactor) {
+void ZoomImagePanel::ImageScroll::SetZoom(double zoomFactor, bool refresh) {
 	zoom = zoomFactor;
-	this->Redraw();
+	if(refresh){ this->Redraw(); }
 }
 
 double ZoomImagePanel::ImageScroll::GetZoom() {
 	return zoom;
 }
 
-void ZoomImagePanel::ImageScroll::FitImage() {
+void ZoomImagePanel::ImageScroll::EnableFitImage(){
+	doFit = true;
+}
+
+void ZoomImagePanel::ImageScroll::DisableFitImage(){
+	doFit = false;
+}
+
+bool ZoomImagePanel::ImageScroll::GetFitImage(){
+	return doFit;
+}
+
+void ZoomImagePanel::ImageScroll::FitImage(bool refresh) {
 
 	int width = this->GetClientSize().GetWidth();
 	int height = this->GetClientSize().GetHeight();
@@ -871,10 +905,10 @@ void ZoomImagePanel::ImageScroll::FitImage() {
 	double zoomHeight = (double)height / (double)imageHeight;
 
 	if (zoomWidth <= zoomHeight) {
-		this->SetZoom(zoomWidth);
+		this->SetZoom(zoomWidth, refresh);
 	}
 	else {
-		this->SetZoom(zoomHeight);
+		this->SetZoom(zoomHeight, refresh);
 	}
 }
 

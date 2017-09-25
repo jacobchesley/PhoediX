@@ -52,6 +52,9 @@ public:
 	int GetDragY();
 	void SetTempSize(int tempWidth, int tempHeight);
 
+	bool GetFitImage();
+	void SetFitImage(bool fitImage);
+
 	void SetDrag(int x, int y);
 	void FitImage();
 	void DestroyTimer();
@@ -84,6 +87,9 @@ private:
 	wxButton * fullImageView;
 	wxButton * viewImage100;
 
+	int lastDragX;
+	int lastDragY;
+
 	enum Buttons {
 		ZOOM_100,
 		ZOOM_FIT
@@ -109,11 +115,14 @@ private:
 		ImageScroll(wxWindow * parent, Image * img);
 		ImageScroll(wxWindow * parent, wxImage * img);
 		void Redraw();
-		void SetZoom(double zoomFactor);
+		void SetZoom(double zoomFactor, bool refresh = true);
 		void ChangeImage(Image * newImage);
 		void ChangeImage(wxImage * newImage);
 		void NoImage();
-		void FitImage();
+		void FitImage(bool refresh = true);
+		void EnableFitImage();
+		void DisableFitImage();
+		bool GetFitImage();
 		double GetZoom();
 		void DisreguardScroll();
 		void ReguardScroll();
@@ -144,7 +153,6 @@ private:
 
 		double zoom;
 		bool keepAspect;
-		bool resize;
 
 		int lastWidth;
 		int lastHeight;
@@ -165,6 +173,7 @@ private:
 		bool enforceGridAspect;
 		double gridAspect;
 		bool noImage;
+		bool doFit;
 	};
 
 	ImageScroll * scroller;
