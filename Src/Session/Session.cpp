@@ -16,6 +16,7 @@ PhoediXSession::PhoediXSession(){
 	imgHeight = 0;
 	id = -1;
 	name = "";
+	fitImage = false;
 }
 
 void PhoediXSession::Destroy(){
@@ -99,6 +100,16 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 			// Get first child (the actual content)
 			if(sessionInfo->GetChildren() != NULL){
 				imgHeight = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Fit Image
+		if (sessionInfo->GetName() == "FitImage") {
+			// Get first child (the actual content)
+			if(sessionInfo->GetChildren() != NULL){
+				int fitImageInt = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+				if(fitImageInt == 0){ fitImage = false;}
+				else{ fitImage = true; }
 			}
 		}
 
@@ -225,6 +236,10 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	wxXmlNode * imageHeight = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ImageHeight");
 	imageHeight->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), imgHeight)));
 
+	// Write fit image
+	wxXmlNode * imageFit = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "FitImage");
+	imageFit->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)fitImage)));
+
 	// Write the perspective for AUI to XML Doc
 	wxXmlNode * perspective = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "Perspective");
 	perspective->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", auiPerspective));
@@ -325,6 +340,14 @@ int PhoediXSession::GetImageScrollHeight() {
 
 void PhoediXSession::SetImageScrollY(int y) {
 	imgScrollY = y;
+}
+
+void PhoediXSession::SetFitImage(bool imageFit) {
+	fitImage = imageFit;
+}
+
+bool PhoediXSession::GetFitImage(){
+	return fitImage;
 }
 
 void PhoediXSession::GenerateID() {

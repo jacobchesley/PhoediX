@@ -49,6 +49,9 @@ public:
 	void SetImageScrollHeight(int height);
 	int GetImageScrollHeight();
 
+	void SetFitImage(bool fitImage);
+	bool GetFitImage();
+
 	int GetHistogramDisplaySelect();
 	void SetHistogramDisplaySelect(int selection);
 
@@ -78,6 +81,7 @@ private:
 	int imgScrollY;
 	int imgWidth;
 	int imgHeight;
+	bool fitImage;
 	wxString auiPerspective;
 	int histogramDisplaySelect;
 	int id;
