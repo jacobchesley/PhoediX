@@ -261,6 +261,8 @@ private:
 	void MirrorHorizontal(int dataStart = -1, int dataEnd = -1);
 	void MirrorVertical(int dataStart = -1, int dataEnd = -1);
 
+	void SetupBlur();
+	void CleanupBlur();
 	void BoxBlurHorizontal(int pixelBlurSize, int dataStart = -1, int dataEnd = -1);
 	void BoxBlurVertical(int pixelBlurSize, int dataStart = -1, int dataEnd = -1);
 

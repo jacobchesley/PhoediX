@@ -5289,12 +5289,22 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 		dataEnd = dataSize;
 	}
 
-	int64_t tempRed;
-	int64_t tempGreen;
-	int64_t tempBlue;
+	int64_t tempRed = 0;
+	int64_t tempGreen = 0;
+	int64_t tempBlue = 0;
 
 	int x = 0;
 	int y = 0;
+
+	int16_t redAdd = 0;
+	int16_t greenAdd = 0;
+	int16_t blueAdd = 0;
+
+	int16_t redSub = 0;
+	int16_t greenSub = 0;
+	int16_t blueSub = 0;
+
+	bool doBox = false;
 
 	// Process 8 bit data
 	if (img->GetColorDepth() == 8) {
@@ -5304,6 +5314,10 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 		uint8_t * greenData8 = img->Get8BitDataGreen();
 		uint8_t * blueData8 = img->Get8BitDataBlue();
 
+		uint8_t * redData8Dup = tempImage->Get8BitDataRed();
+		uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
+		uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
+
 		for (int i = dataStart; i < dataEnd; i++) {
 
 			if (forceStop) { return; }
@@ -5311,10 +5325,21 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 			x = i % width;
 			y = i / width;
 
-			if ((x - pixelBlurSize) > 0) {
+			if(doBox){
 
 			}
 
+			// Calculate first pixel value
+			else{
+				for(int j = -1 * pixelBlurSize; j < pixelBlurSize; j++){
+					tempRed += redData8[i + pixelBlurSize];
+					tempGreen += greenData8[i + pixelBlurSize];
+					tempBlue += blueData8[i + pixelBlurSize];
+				}
+				redData8Dup[i] = tempRed / ((pixelBlurSize * 2) + 1);
+				greenData8Dup[i] = tempGreen / ((pixelBlurSize * 2) + 1);
+				blueData8Dup[i] = tempBlue / ((pixelBlurSize * 2) + 1);
+			}
 		}
 	}
 
@@ -5326,12 +5351,32 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 		uint16_t * greenData16 = img->Get16BitDataGreen();
 		uint16_t * blueData16 = img->Get16BitDataBlue();
 
+		uint16_t * redData16Dup = tempImage->Get16BitDataRed();
+		uint16_t * greenData16Dup = tempImage->Get16BitDataGreen();
+		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
+
 		for (int i = dataStart; i < dataEnd; i++) {
 
 			if (forceStop) { return; }
 
 			x = i % width;
 			y = i / width;
+
+			if(doBox){
+
+			}
+
+			// Calculate first pixel value
+			else{
+				for(int j = -1 * pixelBlurSize; j < pixelBlurSize; j++){
+					tempRed += redData16[i + pixelBlurSize];
+					tempGreen += greenData16[i + pixelBlurSize];
+					tempBlue += blueData16[i + pixelBlurSize];
+				}
+				redData16Dup[i] = tempRed / ((pixelBlurSize * 2) + 1);
+				greenData16Dup[i] = tempGreen / ((pixelBlurSize * 2) + 1);
+				blueData16Dup[i] = tempBlue / ((pixelBlurSize * 2) + 1);
+			}
 		}
 	}
 }
@@ -6714,6 +6759,12 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 			int startY = procEdit->GetParam(1);
 
 			procParent->Crop(startX, startY, start, end);
+		}
+		break;
+
+		// Peform Horizontal Blur edit
+		case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
+
 		}
 		break;
 	}

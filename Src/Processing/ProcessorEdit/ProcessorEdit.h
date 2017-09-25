@@ -84,7 +84,9 @@ public :
 		SCALE_NEAREST,
 		SCALE_BILINEAR,
 		SCALE_BICUBIC,
-		CROP
+		CROP,
+		HORIZONTAL_BLUR,
+		VERTICAL_BLUR
 	};
 	
 private:
