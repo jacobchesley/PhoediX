@@ -17,6 +17,7 @@ PhoediXSession::PhoediXSession(){
 	id = -1;
 	name = "";
 	fitImage = false;
+	histogramDisplaySelect = 0;
 }
 
 void PhoediXSession::Destroy(){
