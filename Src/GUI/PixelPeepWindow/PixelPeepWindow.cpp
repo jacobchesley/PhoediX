@@ -404,10 +404,15 @@ wxString PixelPeepWindow::PixelGrid::GetHex8FromRGB8(int r, int g, int b) {
 	char blueBuff[3];
 
 	// Convert ints to char array
-	_snprintf(redBuff, 3, "%x", r);
-	_snprintf(greenBuff, 3, "%x", g);
-	_snprintf(blueBuff, 3, "%x", b);
-
+	#if defined(__WXMSW__) 
+		_snprintf(redBuff, 3, "%x", r);
+		_snprintf(greenBuff, 3, "%x", g);
+		_snprintf(blueBuff, 3, "%x", b);
+	#else
+		snprintf(redBuff, 3, "%x", r);
+		snprintf(greenBuff, 3, "%x", g);
+		snprintf(blueBuff, 3, "%x", b);
+	#endif
 	// Convert char arrays to strings
 	wxString redStr = wxString::FromUTF8(redBuff);
 	wxString greenStr = wxString::FromUTF8(greenBuff);
@@ -436,10 +441,15 @@ wxString PixelPeepWindow::PixelGrid::GetHex16FromRGB16(int r, int g, int b) {
 	char blueBuff[5];
 
 	// Convert ints to char array
-	_snprintf(redBuff, 5, "%x", r);
-	_snprintf(greenBuff, 5, "%x", g);
-	_snprintf(blueBuff, 5, "%x", b);
-
+	#if defined(__WXMSW__) 
+		_snprintf(redBuff, 5, "%x", r);
+		_snprintf(greenBuff, 5, "%x", g);
+		_snprintf(blueBuff, 5, "%x", b);
+	#else
+		snprintf(redBuff, 5, "%x", r);
+		snprintf(greenBuff, 5, "%x", g);
+		snprintf(blueBuff, 5, "%x", b);
+	#endif
 	// Convert char arrays to strings
 	wxString redStr = wxString::FromUTF8(redBuff);
 	wxString greenStr = wxString::FromUTF8(greenBuff);
