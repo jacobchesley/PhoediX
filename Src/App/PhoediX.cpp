@@ -15,15 +15,16 @@ bool PhoediX::OnInit(){
 		return false;
 	}
 	
+	Logger::SetApp(this);
+	Logger::SetLogFileName();
+	Logger::SetLogLevel(Logger::LogLevel::LOG_VERBOSE);
+	Logger::LogToConsole(true);
+	Logger::LogToFile(true);
+
 	wxInitAllImageHandlers();
-
-	//Icons icons;
-	//wxBitmap splashBitmap(icons.SplashBackground);
-
-	//wxSplashScreen* splash = new wxSplashScreen(splashBitmap, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 4000, NULL, -1, wxDefaultPosition, wxDefaultSize,wxBORDER_SIMPLE | wxSTAY_ON_TOP);
-	//wxYield();
    
     // Create and show the main window
+	Logger::Log("PhoediX App - Creating and Showing Main Window", Logger::LogLevel::LOG_VERBOSE);
 	MainWindow * mainWindow = new MainWindow(this);
 	mainWindow->Show();
 	mainWindow->OpenFiles(filesToOpen);
