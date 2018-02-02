@@ -457,7 +457,7 @@ void ZoomImagePanel::ImageScroll::Redraw() {
 	wxClientDC dc(this);
 	if(!dc.IsOk()){ return; }
 	wxBufferedDC dcBuffer(&dc);
-	this->Render(dc);
+	this->Render(dcBuffer);
 	currentlyDrawing = false;
 }
 

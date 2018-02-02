@@ -1,6 +1,7 @@
 // Copyright 2016 Jacob Chesley
 
 #include "MainWindow.h"
+#include "Debugging/Logger/Logger.h"
 
 MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDefaultPosition, wxDefaultSize){
 
@@ -366,9 +367,9 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::CreateNewProject(){
 
+
 	// Save the current session
 	this->SaveCurrentSession();
-
 	PhoediXSession newSession;
 	this->SetUniqueID(&newSession);
 	newSession.SetName("Untitled - " + wxString::Format(wxT("%i"), numnUnnamedProjectsOpen + 1));
@@ -376,7 +377,7 @@ void MainWindow::CreateNewProject(){
 
 	menuWindow->AppendCheckItem(newSession.GetID(), _(newSession.GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession.GetID());
-
+    
 	allSessions.push_back(newSession);
 	currentSession = newSession;
 	this->OpenSession(&currentSession);
@@ -656,7 +657,7 @@ void MainWindow::SetUniqueID(PhoediXSession * session) {
 }
 
 void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
-
+   
 	wxFileDialog openFileDialog(this, _("Open Image"), "", "", ImageHandler::imageOpenDialogList, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
 		return;
@@ -666,6 +667,7 @@ void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
 
 	// If no sessions exist, create a new project and open image to the new project
 	if (allSessions.size() <= 0) {
+        
 		this->CreateNewProject();
 		this->OpenImage(openFileDialog.GetPath());
 		this->ShowImageRelatedWindows();

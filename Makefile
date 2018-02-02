@@ -1,8 +1,11 @@
-WX_BUILD_PATH = /home/jacob/Development/wxWidgets-master/build-release/
-LIBRAW_PATH = /home/jacob/Development/LibRaw-0.18.0-Beta2
-LIBTIFF_PATH = /home/jacob/Development/tiff-4.0.7
+WX_BUILD_PATH = /Users/jacob/Development/wxWidgets-master/build-release/
+LIBRAW_PATH = /Users/jacob/Development/LibRaw-0.18.2
+LIBTIFF_PATH = /Users/jacob/Development/tiff-4.0.7
 
 # No need to modify any lines below.
+
+APP_NAME = PhoediX.app
+RESOURCES = $(PWD)/macOSResources
 
 LIBRAW_INCLUDE_PATH = $(LIBRAW_PATH)/libraw
 LIBTIFF_INCLUDE_PATH = $(LIBTIFF_PATH)/libtiff
@@ -11,7 +14,7 @@ LIBRAW_LINK_PATH = $(LIBRAW_PATH)/lib/.libs
 LIBTIFF_LINK_PATH = $(LIBTIFF_PATH)/libtiff/.libs
 
 CC = g++
-COMPILE_FLAG = -w -c -fopenmp
+COMPILE_FLAG = -w -c -mmacosx-version-min=10.7 -g
 
 WX_CXXFLAGS = $(shell $(WX_BUILD_PATH)./wx-config --cxxflags)
 WX_LFALGS = $(shell $(WX_BUILD_PATH)./wx-config --libs all)
@@ -21,7 +24,7 @@ INCLUDE_ALL = -I$(SRC) $(WX_CXXFLAGS) -I$(LIBRAW_INCLUDE_PATH) -I$(LIBTIFF_INCLU
 
 LL = g++
 LINK_FLAG = -o
-LINK_ALL = $(WX_LFALGS)	$(LIBRAW_LINK_PATH)/libraw.so $(LIBTIFF_LINK_PATH)/libtiff.so -lgomp
+LINK_ALL = $(WX_LFALGS)	$(LIBRAW_LINK_PATH)/libraw.dylib $(LIBTIFF_LINK_PATH)/libtiff.dylib -mmacosx-version-min=10.7
 
 SRC=./Src
 
@@ -139,14 +142,16 @@ EditWindow.o : $(SRC_EDITLIST_EDITWINDOW)/EditWindow.h $(SRC_EDITLIST_EDITWINDOW
 	$(CC) -o $(OUT_DIR)/EditWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITLIST_EDITWINDOW)/EditWindow.cpp
 
 #Edit Windows
-EditWindowObjects = AvailableEditWindows.o AdjustBrightnessWindow.o AdjustHSLWindow.o ChannelMixerWindow.o ContrastWindow.o CropWindow.o ConvertGreyscaleWindow.o HSLCurvesWindow.o LABCurvesWindow.o MirrorWindow.o RawWindow.o RGBCurvesWindow.o RotationWindow.o ScaleWindow.o ShiftRGBWindow.o
-EditWindowObjectsOut = $(OUT_DIR)/AvailableEditWindows.o $(OUT_DIR)/AdjustBrightnessWindow.o $(OUT_DIR)/AdjustHSLWindow.o $(OUT_DIR)/ChannelMixerWindow.o $(OUT_DIR)/ContrastWindow.o $(OUT_DIR)/CropWindow.o $(OUT_DIR)/ConvertGreyscaleWindow.o $(OUT_DIR)/HSLCurvesWindow.o $(OUT_DIR)/LABCurvesWindow.o $(OUT_DIR)/MirrorWindow.o $(OUT_DIR)/RawWindow.o $(OUT_DIR)/RGBCurvesWindow.o $(OUT_DIR)/RotationWindow.o $(OUT_DIR)/ScaleWindow.o $(OUT_DIR)/ShiftRGBWindow.o
+EditWindowObjects = AvailableEditWindows.o AdjustBrightnessWindow.o AdjustHSLWindow.o AdjustLABWindow.o AdjustRGBWindow.o ChannelMixerWindow.o ContrastWindow.o CropWindow.o ConvertGreyscaleWindow.o HSLCurvesWindow.o LABCurvesWindow.o MirrorWindow.o RawWindow.o RGBCurvesWindow.o RotationWindow.o ScaleWindow.o
+EditWindowObjectsOut = $(OUT_DIR)/AvailableEditWindows.o $(OUT_DIR)/AdjustBrightnessWindow.o $(OUT_DIR)/AdjustHSLWindow.o $(OUT_DIR)/AdjustLABWindow.o $(OUT_DIR)/AdjustRGBWindow.o $(OUT_DIR)/ChannelMixerWindow.o $(OUT_DIR)/ContrastWindow.o $(OUT_DIR)/CropWindow.o $(OUT_DIR)/ConvertGreyscaleWindow.o $(OUT_DIR)/HSLCurvesWindow.o $(OUT_DIR)/LABCurvesWindow.o $(OUT_DIR)/MirrorWindow.o $(OUT_DIR)/RawWindow.o $(OUT_DIR)/RGBCurvesWindow.o $(OUT_DIR)/RotationWindow.o $(OUT_DIR)/ScaleWindow.o
 EditWindows : $(EditWindowObjects)
 
 SRC_EDITLIST = $(SRC_GUI)/EditList
 SRC_AVAILABLEEDITWINDOWS = $(SRC_EDITLIST)/AvailableEditWindows
 SRC_EDITWINDOW_ADJUSTBRIGHTNESSWINDOW = $(SRC_AVAILABLEEDITWINDOWS)/AdjustBrightnessWindow
 SRC_EDITWINDOW_ADJUSTHSLWINDOW = $(SRC_AVAILABLEEDITWINDOWS)/AdjustHSLWindow
+SRC_EDITWINDOW_ADJUSTLABWINDOW = $(SRC_AVAILABLEEDITWINDOWS)/AdjustLABWindow
+SRC_EDITWINDOW_ADJUSTRGBWINDOW = $(SRC_AVAILABLEEDITWINDOWS)/AdjustRGBWindow
 SRC_EDITWINDOW_CHANNELMIXERWINDOW= $(SRC_AVAILABLEEDITWINDOWS)/ChannelMixerWindow
 SRC_EDITWINDOW_CONTRASTWINDOW = $(SRC_AVAILABLEEDITWINDOWS)/ContrastWindow
 SRC_EDITWINDOW_CONVERTGREYSCALEWINDOW = $(SRC_AVAILABLEEDITWINDOWS)/ConvertGreyscaleWindow
@@ -168,6 +173,12 @@ AdjustBrightnessWindow.o : $(SRC_EDITWINDOW_ADJUSTBRIGHTNESSWINDOW)/AdjustBright
 
 AdjustHSLWindow.o : $(SRC_EDITWINDOW_ADJUSTHSLWINDOW)/AdjustHSLWindow.h $(SRC_EDITWINDOW_ADJUSTHSLWINDOW)/AdjustHSLWindow.cpp $(OUT_DIR)
 	$(CC) -o $(OUT_DIR)/AdjustHSLWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITWINDOW_ADJUSTHSLWINDOW)/AdjustHSLWindow.cpp
+
+AdjustLABWindow.o : $(SRC_EDITWINDOW_ADJUSTLABWINDOW)/AdjustLABWindow.h $(SRC_EDITWINDOW_ADJUSTLABWINDOW)/AdjustLABWindow.cpp $(OUT_DIR)
+	$(CC) -o $(OUT_DIR)/AdjustLABWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITWINDOW_ADJUSTLABWINDOW)/AdjustLABWindow.cpp
+
+AdjustRGBWindow.o : $(SRC_EDITWINDOW_ADJUSTRGBWINDOW)/AdjustRGBWindow.h $(SRC_EDITWINDOW_ADJUSTRGBWINDOW)/AdjustRGBWindow.cpp $(OUT_DIR)
+	$(CC) -o $(OUT_DIR)/AdjustRGBWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITWINDOW_ADJUSTRGBWINDOW)/AdjustRGBWindow.cpp
 
 ChannelMixerWindow.o : $(SRC_EDITWINDOW_CHANNELMIXERWINDOW)/ChannelMixerWindow.h $(SRC_EDITWINDOW_CHANNELMIXERWINDOW)/ChannelMixerWindow.cpp $(OUT_DIR)
 	$(CC) -o $(OUT_DIR)/ChannelMixerWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITWINDOW_CHANNELMIXERWINDOW)/ChannelMixerWindow.cpp
@@ -201,9 +212,6 @@ RotationWindow.o : $(SRC_EDITWINDOW_ROTATIONWINDOW)/RotationWindow.h $(SRC_EDITW
 
 ScaleWindow.o : $(SRC_EDITWINDOW_SCALEWINDOW)/ScaleWindow.h $(SRC_EDITWINDOW_SCALEWINDOW)/ScaleWindow.cpp $(OUT_DIR)
 	$(CC) -o $(OUT_DIR)/ScaleWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITWINDOW_SCALEWINDOW)/ScaleWindow.cpp
-
-ShiftRGBWindow.o : $(SRC_EDITWINDOW_SHIFTRGBWINDOW)/ShiftRGBWindow.h $(SRC_EDITWINDOW_SHIFTRGBWINDOW)/ShiftRGBWindow.cpp $(OUT_DIR)
-	$(CC) -o $(OUT_DIR)/ShiftRGBWindow.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EDITWINDOW_SHIFTRGBWINDOW)/ShiftRGBWindow.cpp
 
 #Controls
 ControlsObjects = CollapsiblePane.o CurvesPanel.o DoubleSlider.o 
@@ -303,10 +311,30 @@ Spline.o : $(SRC_SPLINE)/Spline.h $(SRC_SPLINE)/Spline.cpp $(OUT_DIR)
 	$(CC) -o $(OUT_DIR)/Spline.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_SPLINE)/Spline.cpp
 
 
-AllObjectsStr = $(AppObjects) $(AllGUIObjects) $(ProcessingObjects) $(SessionObjects) $(SplineObjects)
+#Settings
+SettingsObjects = Settings.o
+SettingsObjectsOut = $(OUT_DIR)/Settings.o
+Settings : $(Settings)
+
+SRC_SETTINGS = $(SRC)/Settings
+
+Settings.o : $(SRC_SETTINGS)/Settings.h $(SRC_SETTINGS)/Settings.cpp $(OUT_DIR) 
+	$(CC) -o $(OUT_DIR)/Settings.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_SETTINGS)/Settings.cpp
+
+#Logger
+LoggerObjects = Logger.o
+LoggerObjectsOut = $(OUT_DIR)/Logger.o
+Logger : $(Logger)
+
+SRC_LOGGER = $(SRC)/Debugging/Logger
+
+Logger.o : $(SRC_LOGGER)/Logger.h $(SRC_LOGGER)/Logger.cpp $(OUT_DIR) 
+	$(CC) -o $(OUT_DIR)/Logger.o $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_LOGGER)/Logger.cpp
+
+AllObjectsStr = $(AppObjects) $(AllGUIObjects) $(ProcessingObjects) $(SessionObjects) $(SplineObjects) $(SettingsObjects) $(LoggerObjects)
 AllObjects : $(AllObjectsStr)
 
-AllObjectsOutStr = $(AppObjectsOut) $(AllGUIObjectsOut) $(ProcessingObjectsOut) $(SessionObjectsOut) $(SplineObjectsOut)
+AllObjectsOutStr = $(AppObjectsOut) $(AllGUIObjectsOut) $(ProcessingObjectsOut) $(SessionObjectsOut) $(SplineObjectsOut) $(SettingsObjectsOut) $(LoggerObjectsOut)
 
 Link :
 	$(LL) $(LINK_FLAG) $(BUILD_DIR)/PhoediX $(AllObjectsOutStr) $(LINK_ALL)
@@ -315,3 +343,19 @@ clean :
 	rm -rf $(BUILD_DIR)
 	mkdir $(BUILD_DIR)
 	mkdir $(OUT_DIR)
+
+MacApp:
+	SetFile -t APPL $(BUILD_DIR)/PhoediX
+	rm -rf $(BUILD_DIR)/$(APP_NAME)
+	mkdir $(BUILD_DIR)/$(APP_NAME)
+	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents
+	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS
+	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/Resources
+	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/Resources/English.lproj
+	
+	cp $(RESOURCES)/Info.plist $(BUILD_DIR)/$(APP_NAME)/Contents
+	echo -n ‘APPL????’ > $(BUILD_DIR)/$(APP_NAME)/Contents/PkgInfo
+	cp $(BUILD_DIR)/PhoediX $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS/PhoediX
+	#cp $(LIBRAW_LINK_PATH)/libraw.dylib $(BUILD_DIR)/$(APP_NAME)/Contents/Frameworks
+	#cp $(LIBTIFF_LINK_PATH)/libtiff.dylib $(BUILD_DIR)/$(APP_NAME)/Contents/Frameworks
+
