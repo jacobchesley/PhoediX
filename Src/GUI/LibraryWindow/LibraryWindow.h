@@ -121,6 +121,24 @@ private:
 
 	};
 
+	class LoadSubsetImagesThread : public wxThread {
+	public:
+		LoadSubsetImagesThread (LibraryWindow * parent, wxArrayString imagesToLoad, wxMutex * mutLockIn, wxCondition * condition, int numThreads, int * threadsComplete);
+		void Cancel();
+	protected:
+
+		virtual ExitCode Entry();
+	private:
+		LibraryWindow * par;
+		bool canceled;
+		wxArrayString toLoad;
+		wxMutex * mutLock;
+		wxCondition * cond;
+		int threads;
+		int * complete;
+
+	};
+
 	LoadImagesThread * testImgThread;
 };
 

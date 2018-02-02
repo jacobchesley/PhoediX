@@ -13,12 +13,16 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			newEditWindow = new AdjustBrightnessWindow(parent, "Adjust Brightness", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_SHIFT_RGB:
-			newEditWindow = new ShiftRGBWindow(parent, "Shift RGB", processor);
+		case AvailableEditIDS::EDIT_ID_ADJUST_RGB:
+			newEditWindow = new AdjustRGBWindow(parent, "Adjust RGB", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_ADJUST_HSL:
-			newEditWindow = new AdjustHSLWindow(parent, "Scale HSL", processor);
+			newEditWindow = new AdjustHSLWindow(parent, "Adjust HSL", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_ADJUST_LAB:
+			newEditWindow = new AdjustLABWindow(parent, "Adjust LAB", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_CONTRAST:
@@ -83,11 +87,14 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 	case ProcessorEdit::EditType::ADJUST_BRIGHTNESS:
 		return AvailableEditIDS::EDIT_ID_ADJUST_BRIGHTNESS;
 
-	case ProcessorEdit::EditType::SHIFT_RGB:
-		return AvailableEditIDS::EDIT_ID_SHIFT_RGB;
+	case ProcessorEdit::EditType::ADJUST_RGB:
+		return AvailableEditIDS::EDIT_ID_ADJUST_RGB;
 
 	case ProcessorEdit::EditType::ADJUST_HSL:
 		return AvailableEditIDS::EDIT_ID_ADJUST_HSL;
+
+	case ProcessorEdit::EditType::ADJUST_LAB:
+		return AvailableEditIDS::EDIT_ID_ADJUST_LAB;
 
 	case ProcessorEdit::EditType::ADJUST_CONTRAST:
 		return AvailableEditIDS::EDIT_ID_CONTRAST;

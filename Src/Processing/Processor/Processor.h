@@ -24,27 +24,19 @@ enum {
 	ID_PROCESSOR_MESSAGE,
 	ID_PROCESSOR_NUM,
 	ID_RAW_COMPLETE,
+	ID_UPDATE_IMAGE,
 };
 
 wxDECLARE_EVENT(PROCESSOR_MESSAGE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(PROCESSOR_NUM_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(PROCESSOR_RAW_COMPLETE_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(UPDATE_IMAGE_EVENT, wxCommandEvent);
 
 enum ColorSpaceENUM {
 	ADOBE_RGB,
 	PROPHOTO_RGB,
 	sRGB,
 	WIDE_GAMUT_RGB
-};
-
-enum RGBChannelENUM {
-	RED_GREEN_BLUE,
-	RED,
-	GREEN,
-	BLUE,
-	GREEN_BLUE,
-	RED_BLUE,
-	RED_GREEN
 };
 
 struct RGB {
@@ -122,6 +114,10 @@ public:
 	void Unlock();
 	bool GetLocked();
 
+	void EnableFastEdit();
+	void DisableFastEdit();
+	bool GetFastEdit();
+
 	void Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
 	void Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey);
 
@@ -142,11 +138,13 @@ public:
 	bool GetHasEdits();
 
 	void CalculateWidthHeightRotation(ProcessorEdit * rotationEdit, int origWidth, int origHeight, int * width, int * height);
-	void CalculateWidthHeightScale(ProcessorEdit * scaleEdit, int * width, int * height);
-	void CalculateWidthHeightCrop(ProcessorEdit * cropEdit, int * width, int * height);
 	void CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * width, int * height);
 
 	inline double FastTanH(double x);
+
+	void SetParentWindow(wxWindow * parent);
+	wxWindow * GetParentWindow();
+
 
 	enum RotationCropping{
 		KEEP_SIZE,
@@ -212,14 +210,16 @@ private:
 	ProcessorEdit * copiedEdit;
 	wxVector<ProcessorEdit*> copiedEditList;
 
+	bool fastEdit; 
+
 	static double pi;
 
 	wxWindow * parWindow;
 	int colorSpace;
 
-	void ShiftRGB(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
-	void AdjustHSL(double hShift, double sScale, double lScale, RGBChannelENUM channels, int dataStart = -1, int dataEnd = -1);
-	void AdjustLAB(double lScale, double aShift, double bShift, int dataStart = -1, int dataEnd = -1);
+	void AdjustRGB(double all, double red, double green, double blue, int dataStart = -1, int dataEnd = -1);
+	void AdjustHSL(double hShift, double sScale, double lScale, double rScale, double gScale, double bScale, int dataStart = -1, int dataEnd = -1);
+	void AdjustLAB(double lScale, double aShift, double bShift, double rScale, double gScale, double bScale, int dataStart = -1, int dataEnd = -1);
 	void AdjustBrightness(double brightAdjust, double detailsPreserve, double toneSetting, int tonePreservation, int dataStart = -1, int dataEnd = -1);
 	void AdjustContrast(double allContrast, double redContrast, double greenContrast, double blueContrast, 
 	double allCenter, double redCenter, double greenCenter, double blueCenter, int dataStart = -1, int dataEnd = -1);
@@ -233,8 +233,8 @@ private:
 
 	void RGBCurves(int * brightCurve8, int * redCurve8, int * greenCurve8, int * blueCurve8,
 	int * brightCurve16, int * redCurve16, int * greenCurve16, int * blueCurve16, int dataStart = -1, int dataEnd = -1);
-	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, int dataStart = -1, int dataEnd = -1);
-	void HSLCurves(int * hChannel16, int * sChannel16, int * lChannel16, int dataStart = -1, int dataEnd = -1);
+	void LABCurves(int * lChannel16, int * aChannel16, int * bChannel16, double redScale, double greenScale, double blueScale, int dataStart = -1, int dataEnd = -1);
+	void HSLCurves(int * hChannel16, int * sChannel16, int * lChannel16, double rScale, double gScale, double bScale, int dataStart = -1, int dataEnd = -1);
 
 	bool SetupRotation(int editID, double angleDegrees, int crop);
 	void CleanupRotation(int editID);
@@ -254,9 +254,9 @@ private:
 	void ScaleBilinear(int dataStart = -1, int dataEnd = -1);
 	void ScaleBicubic(int dataStart = -1, int dataEnd = -1);
 
-	void SetupCrop(int newWidth, int newHeight);
+	void SetupCrop(double newWidth, double newHeight);
 	void CleanupCrop();
-	void Crop(int startPointX, int startPointY, int dataStart = -1, int dataEnd = -1);
+	void Crop(double startPointX, double startPointY, int dataStart = -1, int dataEnd = -1);
 
 	void MirrorHorizontal(int dataStart = -1, int dataEnd = -1);
 	void MirrorVertical(int dataStart = -1, int dataEnd = -1);
@@ -292,7 +292,7 @@ private:
 
 			void DeleteEditVector();
 			void Multithread(ProcessorEdit * edit, int maxDataSize = -1);
-			Processor * procParent;
+			Processor * processor;
 			wxVector<ProcessorEdit*> editVec;
 			bool terminated;
 	};
@@ -318,7 +318,7 @@ private:
 			virtual ExitCode Entry();
 
 	private:
-		Processor * procParent;
+		Processor * processor;
 		ProcessorEdit * procEdit;
 		int start;
 		int end;

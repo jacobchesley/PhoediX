@@ -14,12 +14,51 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	aCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
 	bCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
 
+	lCurve->SetMinSize(wxSize(100, 100));
+	aCurve->SetMinSize(wxSize(100, 100));
+	bCurve->SetMinSize(wxSize(100, 100));
+
+	// 2 Columns, 15 pixel vertical gap, 5 pixel horizontal gap
+	gridSizer = new wxFlexGridSizer(2, 15, 5);
+
+	rLabel = new wxStaticText(this, -1, "Red");
+	gLabel = new wxStaticText(this, -1, "Green");
+	bLabel = new wxStaticText(this, -1, "Blue");
+
+	rScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+	gScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+	bScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+
+	rLabel->SetForegroundColour(Colors::TextLightGrey);
+	gLabel->SetForegroundColour(Colors::TextLightGrey);
+	bLabel->SetForegroundColour(Colors::TextLightGrey);
+
+	rScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	rScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	gScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	gScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	bScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	bScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+
+	rScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);;
+	gScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
+	bScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
+
 	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
 	curveTabs->AddPage(lCurve, "L Channel", true);
 	curveTabs->AddPage(aCurve, "A Channel", false);
 	curveTabs->AddPage(bCurve, "B Channel", false);
 
+	gridSizer->Add(rLabel);
+	gridSizer->Add(rScaleSlider);
+	gridSizer->Add(gLabel);
+	gridSizer->Add(gScaleSlider);
+	gridSizer->Add(bLabel);
+	gridSizer->Add(bScaleSlider);
+
 	container->Add(curveTabs, 1, wxEXPAND);
+	container->AddSpacer(10);
+	container->Add(gridSizer);
 
 	this->SetSizerAndFit(container);
 	container->Layout();
@@ -27,6 +66,8 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	proc = processor;
 
 	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
 	this->StartWatchdog();
 }
 
@@ -111,6 +152,9 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	lCurve->SetControlPoints(lControlPoints);
 	aCurve->SetControlPoints(aControlPoints);
 	bCurve->SetControlPoints(bControlPoints);
+	rScaleSlider->SetValue(edit->GetParam(0));
+	bScaleSlider->SetValue(edit->GetParam(1));
+	gScaleSlider->SetValue(edit->GetParam(2));
 }
 
 ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
@@ -177,6 +221,9 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 	labCurveEdit->AddDoubleArray(lPoints, lControlPoints.size() * 2);
 	labCurveEdit->AddDoubleArray(aPoints, aControlPoints.size() * 2);
 	labCurveEdit->AddDoubleArray(bPoints, bControlPoints.size() * 2);
+	labCurveEdit->AddParam(rScaleSlider->GetValue());
+	labCurveEdit->AddParam(gScaleSlider->GetValue());
+	labCurveEdit->AddParam(bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	labCurveEdit->SetDisabled(isDisabled);
@@ -192,7 +239,7 @@ bool LABCurvesWindow::CheckCopiedParamsAndFlags(){
 	if(edit->GetEditType() != ProcessorEdit::EditType::LAB_CURVES){ return false; }
 
 	// Need 3 double arrars (L, A and B)
-	if(edit->GetNumDoubleArrays() != 3){
+	if(edit->GetNumDoubleArrays() != 3 && edit->GetParamsSize() != 3){
 		return false;
 	}
 

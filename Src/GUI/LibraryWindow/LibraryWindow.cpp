@@ -338,19 +338,8 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 	wxCommandEvent start(POPULATION_STARTED_EVENT, ID_POPULATION_STARTED);
 	wxPostEvent(par, start);
 
-	int totalThreads = 1;
-	int maxSize = 250;
-
-	LibRaw * rawProcs = new LibRaw[totalThreads];
-	int * rawErrors = new int[totalThreads];
-	libraw_processed_image_t ** rawImgs = new libraw_processed_image_t *[totalThreads];
-	wxImage ** displayImage = new wxImage*[totalThreads];
-
-	for (int i = 0; i < totalThreads; i++) {
-		rawErrors[i] = LIBRAW_SUCCESS;
-		rawImgs[i] = NULL;
-		displayImage[i] = NULL;
-	}
+	int totalThreads = PhoedixSettings::GetNumThreads();
+	wxArrayString allFiles;
 
 	// Get all directories to check
 	wxVector<wxString> allDirectories = par->directorySelections->GetDirectoryList();
@@ -359,93 +348,182 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 	for (size_t dir = 0; dir < allDirectories.size(); dir++) {
 
 		if (canceled) { break; }
+
 		// Check directory, and continue if it does not exist
-		if (!wxDir::Exists(allDirectories[dir])) {
-			continue;
-		}
+		if (!wxDir::Exists(allDirectories[dir])) {continue; }
 
 		// Get all file names
 		wxArrayString allFileNames;
 		wxDir::GetAllFiles(allDirectories[dir], &allFileNames);
 
-		for (int file = 0; file < allFileNames.size(); file++) {
-
-			if (canceled) { break; }
-
-			wxString fileName = allFileNames[file];
-
-			if (par->CheckIfImageInDisplay(fileName)) { continue; }
-			
-			// We have a raw image we can load in
-			if (ImageHandler::CheckRaw(fileName)) {
-				#ifdef __WXMSW__
-					rawProcs[0].open_file(fileName.wc_str());
-				#else
-					rawProcs[0].open_file(fileName.c_str());
-				#endif
-				rawProcs[0].unpack();
-				rawProcs[0].imgdata.params.half_size = 1;
-				rawProcs[0].imgdata.params.use_camera_wb = 1;
-				rawProcs[0].imgdata.params.use_auto_wb = 0;
-
-				rawProcs[0].dcraw_process();
-				rawImgs[0] = rawProcs[0].dcraw_make_mem_image(&rawErrors[0]);
-
-				if (rawErrors[0] == LIBRAW_SUCCESS) {
-
-					displayImage[0] = NULL;
-					displayImage[0] = new wxImage(rawImgs[0]->width, rawImgs[0]->height);
-					ImageHandler::CopyImageFromRaw(rawImgs[0], displayImage[0]);
-				}
-				rawProcs[0].dcraw_clear_mem(rawImgs[0]);
-				rawProcs[0].recycle();
-			}
-
-			// We have an image we can load in
-			else if (ImageHandler::CheckImage(fileName)) {
-				displayImage[0] = new wxImage(fileName);
-			}
-			else {
-				continue;
-			}
-
-			if (displayImage[0] != NULL) {
-				// Scale image based on width > height
-				if (displayImage[0]->GetHeight() < displayImage[0]->GetWidth()) {
-					double aspect = (double)displayImage[0]->GetHeight() / (double)displayImage[0]->GetWidth();
-					displayImage[0]->Rescale(maxSize, maxSize * aspect, wxIMAGE_QUALITY_HIGH);
-
-				}
-				// Scale image based on height > width
-				else if (displayImage[0]->GetHeight() > displayImage[0]->GetWidth()) {
-					double aspect = (double)displayImage[0]->GetWidth() / (double)displayImage[0]->GetHeight();
-					displayImage[0]->Rescale(maxSize * aspect, maxSize, wxIMAGE_QUALITY_HIGH);
-				}
-
-				// Image has same width and height, set to max size
-				else {
-					displayImage[0]->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
-				}
-				
-				// Send the image to the parent to be added to the window
-				wxFileName tempFile(fileName);
-
-				AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage[0], tempFile.GetFullName(), fileName);
-				wxPostEvent(par, libImageEvent);
-
-			}
+		// Add file names to list of files
+		for(size_t file = 0; file < allFileNames.size(); file++){
+			allFiles.Add(allFileNames[file]);
 		}
 	}
 
-	delete[] rawProcs;
-	delete[] rawErrors;
-	delete[] rawImgs;
-	delete[] displayImage;
+	int numFilesPerThread = ceil(allFiles.size()/ totalThreads);
+	int remainderFiles = allFiles.size() % totalThreads;
+	int usedRemainder = 0;
+	wxMutex mutexLock;
+	wxCondition wait(mutexLock);
+	int threadComplete = 0;
+
+	for(int thread = 0; thread < totalThreads; thread++){
+		
+		// Find indexes of first and last files, based on number of threads
+		int startFileIdx = (thread * numFilesPerThread) + usedRemainder;
+		int endFileIdx = ((thread + 1) * numFilesPerThread) + usedRemainder;
+		if(remainderFiles > 0 && thread < remainderFiles){
+			endFileIdx = (thread + 1) * numFilesPerThread + usedRemainder;
+			usedRemainder += 1;
+		}
+		wxArrayString subFiles;
+
+		// Populate array of files
+		for(int subFile = startFileIdx; subFile < endFileIdx; subFile++){
+			wxString fileName = allFiles[subFile];
+			subFiles.Add(allFiles[subFile]);
+		}
+
+		LoadSubsetImagesThread * imageThread = new LoadSubsetImagesThread(par, subFiles, &mutexLock, &wait, totalThreads, &threadComplete);
+		imageThread->Run();
+	}
+
+	// Wait for all worker threads to complete
+	wait.Wait();
 
 	wxCommandEvent finish(POPULATION_COMPLETE_EVENT, ID_POPULATION_COMPLETE);
 	wxPostEvent(par, finish);
 
 	return 0;
+}
+
+LibraryWindow::LoadSubsetImagesThread::LoadSubsetImagesThread(LibraryWindow * parent, wxArrayString imagesToLoad, wxMutex * mutLockIn, wxCondition * condition, int numThreads, int * threadsComplete) : wxThread(wxTHREAD_DETACHED){
+	par = parent;
+	toLoad = imagesToLoad;
+	canceled = false;
+	mutLock = mutLockIn;
+	cond = condition;
+	threads = numThreads;
+	complete = threadsComplete;
+}
+
+void LibraryWindow::LoadSubsetImagesThread::Cancel() {
+	canceled = true;
+}
+
+wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
+	
+	LibRaw * rawProcessor = new LibRaw();
+	libraw_processed_image_t * rawImage = NULL;
+	int rawError;
+
+	wxImage * displayImage = NULL;
+	int maxSize = 250;
+
+	for (int file = 0; file < toLoad.size(); file++) {
+
+		if (canceled) { break; }
+
+		// Get filename from vector and check if already displayed in library window.  Skip if already displayed
+		wxString fileName = toLoad[file];
+		if (par->CheckIfImageInDisplay(fileName)) { continue; }
+
+		// We have a raw image we can load in
+		if (ImageHandler::CheckRaw(fileName)) {
+			#ifdef __WXMSW__
+				rawProcessor->open_file(fileName.wc_str());
+			#else
+				rawProcessor->open_file(fileName.c_str());
+			#endif
+
+			bool useThumbnail = true;
+
+			// Use embedded thumbnail of raw image
+			if(useThumbnail){
+				rawProcessor->unpack_thumb();
+				rawImage = rawProcessor->dcraw_make_mem_thumb(&rawError);
+			}
+
+			// Create display image from raw image data
+			else{
+				rawProcessor->unpack();
+				rawProcessor->imgdata.params.half_size = 1;
+				rawProcessor->imgdata.params.use_camera_wb = 1;
+				rawProcessor->imgdata.params.use_auto_wb = 0;
+
+				rawProcessor->dcraw_process();
+				rawImage = rawProcessor->dcraw_make_mem_image(&rawError);
+
+			}
+
+			if (rawError == LIBRAW_SUCCESS) {
+
+				// Copy raw image to wxImage for display
+				displayImage = new wxImage(rawImage->width, rawImage->height);
+				ImageHandler::CopyImageFromRaw(rawImage, displayImage);
+			}
+
+			// Free raw image and processor memory
+			rawProcessor->dcraw_clear_mem(rawImage);
+			rawProcessor->recycle();
+		}
+
+		// We have an image we can load in
+		else if (ImageHandler::CheckImage(fileName)) {
+			displayImage = new wxImage(fileName);
+		}
+		else {
+			displayImage = NULL;
+			continue;
+		}
+
+		// Image is loaded at this point!
+
+		// Resize the image to the maximum size for library display
+		if (displayImage != NULL) {
+			// Scale image based on width > height
+			if (displayImage->GetHeight() < displayImage->GetWidth()) {
+				double aspect = (double)displayImage->GetHeight() / (double)displayImage->GetWidth();
+				displayImage->Rescale(maxSize, maxSize * aspect, wxIMAGE_QUALITY_HIGH);
+
+			}
+			// Scale image based on height > width
+			else if (displayImage->GetHeight() > displayImage->GetWidth()) {
+				double aspect = (double)displayImage->GetWidth() / (double)displayImage->GetHeight();
+				displayImage->Rescale(maxSize * aspect, maxSize, wxIMAGE_QUALITY_HIGH);
+			}
+
+			// Image has same width and height, set to max size
+			else {
+				displayImage->Rescale(maxSize, maxSize, wxIMAGE_QUALITY_HIGH);
+			}
+				
+			if(!displayImage->IsOk()){
+				delete displayImage;
+				displayImage = NULL;
+				continue;
+			}
+			// Send the image to the parent to be added to the window
+			wxFileName tempFile(fileName);
+
+			AddLibraryImageEvent libImageEvent(ADD_LIB_IMAGE_EVENT, 0, displayImage, tempFile.GetFullName(), fileName);
+			wxPostEvent(par, libImageEvent);
+		}
+	}
+	
+	mutLock->Lock();
+	*complete += 1;
+	mutLock->Unlock();
+
+	// All worker threads have finished, signal condition to continue
+	if (*complete == threads) {
+		mutLock->Lock();
+		cond->Broadcast();
+	}
+
+	return (wxThread::ExitCode)0;
 }
 
 LibraryWindow::CopyImagesThread::CopyImagesThread(LibraryWindow * parent, wxVector<wxString> filesToCopy, wxString destination, bool deleteAfterCopy) : wxThread(wxTHREAD_DETACHED){

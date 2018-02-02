@@ -30,10 +30,10 @@ enum {
 wxDECLARE_EVENT(GRID_MOVE_EVENT, wxCommandEvent);
 
 struct Grid {
-	int startX;
-	int startY;
-	int width;
-	int height;
+	double startX;
+	double startY;
+	double endX;
+	double endY;
 };
 
 class ZoomImagePanel : public wxPanel {
@@ -71,6 +71,10 @@ public:
 	void SetEnforceGridAspect(bool enforceGridAspect);
 	bool GetEnforceGridAspect();
 
+	void EnableHalfSize();
+	void DisableHalfSize();
+	double GetImageAspect();
+
 private:
 
 	void InitControls();
@@ -106,6 +110,11 @@ private:
 		RIGHT
 	};
 
+	enum GridMoveDirection {
+		GRID_MOVE_WIDTH,
+		GRID_MOVE_HEIGHT
+	};
+
 	wxTimer * reguardScrollCountdown;
 
 	class ImageScroll : public wxScrolledWindow {
@@ -139,6 +148,11 @@ private:
 		void SetEnforceGridAspect(bool enforceGridAspect);
 		bool GetEnforceGridAspect();
 
+		void EnableHalfSize();
+		void DisableHalfSize();
+
+		double GetImageAspect();
+
 	private:
 
 		bool disreguardScroll;
@@ -148,9 +162,7 @@ private:
 		void OnRightDown(wxMouseEvent & evt);
 		bool GetGridMoving();
 		wxBitmap bitmapDraw;
-		int oldWidth;
-		int oldHeight;
-
+	
 		double zoom;
 		bool keepAspect;
 
@@ -165,8 +177,6 @@ private:
 		bool currentlyDrawing;
 		bool gridActive;
 
-		Grid grid;
-		Grid drawGrid;
 		bool gridMoving;
 		int gridOwner;
 
@@ -174,6 +184,11 @@ private:
 		double gridAspect;
 		bool noImage;
 		bool doFit;
+
+		double scalar;
+
+		Grid scaleGrid;
+		Grid drawGrid;
 	};
 
 	ImageScroll * scroller;

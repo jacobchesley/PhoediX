@@ -306,8 +306,8 @@ void ProcessorEdit::SetEditType(int editType) {
 			tag = "ADJUST_LAB";
 			break;
 
-		case EditType::SHIFT_RGB:
-			tag = "SHIFT_RGB";
+		case EditType::ADJUST_RGB:
+			tag = "ADJUST_RGB";
 			break;
 
 		case EditType::SCALE_NEAREST:
@@ -363,7 +363,7 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "ROTATE_CUSTOM_NEAREST") { editInt = EditType::ROTATE_CUSTOM_NEAREST; tag = inTag; }
 	else if (inTag == "ADJUST_HSL") { editInt = EditType::ADJUST_HSL; tag = inTag; }
 	else if (inTag == "ADJUST_LAB") { editInt = EditType::ADJUST_LAB; tag = inTag; }
-	else if (inTag == "SHIFT_RGB") { editInt = EditType::SHIFT_RGB; tag = inTag; }
+	else if (inTag == "ADJUST_RGB") { editInt = EditType::ADJUST_RGB; tag = inTag; }
 	else if (inTag == "ADJUST_BRIGHTNESS") { editInt = EditType::ADJUST_BRIGHTNESS; tag = inTag; }
 	else if (inTag == "SCALE_NEAREST") { editInt = EditType::SCALE_NEAREST; tag = inTag; }
 	else if (inTag == "SCALE_BILINEAR") { editInt = EditType::SCALE_BILINEAR; tag = inTag; }

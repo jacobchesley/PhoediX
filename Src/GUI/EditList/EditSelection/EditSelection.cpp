@@ -1,6 +1,7 @@
 // Copyright 2016 Jacob Chesley
 
 #include "EditSelection.h"
+#include "GUI/AUIManager/AUIManager.h"
 
 wxDEFINE_EVENT(EDIT_ADD_EVENT, wxCommandEvent);
 
@@ -71,5 +72,6 @@ void EditSelection::OnAdd(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void EditSelection::FitEdits() {
-	editList->SetSize(editList->GetBestSize());
+
+	//PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).FloatingSize(editList->GetBestSize());
 }

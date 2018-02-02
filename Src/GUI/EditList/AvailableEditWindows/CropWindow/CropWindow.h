@@ -5,6 +5,7 @@
 
 #include "wx/thread.h"
 #include "wx/tokenzr.h"
+#include "wx/arrstr.h"
 
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
@@ -22,17 +23,20 @@ public:
 	ProcessorEdit * GetParamsAndFlags();
 
 protected:
-	void SetCropBoxUI(int startX, int startY, int width, int height);
+	void SetCropBoxUI(double startX, double startY, double width, double height);
 private:
 
 	void OnCombo(wxCommandEvent& WXUNUSED(evt));
 	void OnEnableBox(wxCommandEvent& WXUNUSED(evt));
 	void OnEnableCrop(wxCommandEvent& WXUNUSED(evt));
+	void EnableCrop(bool enable);
 	void OnResetCrop(wxCommandEvent& WXUNUSED(evt));
-	void OnGridMove(wxCommandEvent& WXUNUSED(evt));
 	void OnText(wxCommandEvent& evt);
+	void FlipAspect(wxCommandEvent& WXUNUSED(evt));
 	void ResetCropValues();
+	void ChangeAspect(bool gridUpdate = true);
 	Grid limitGrid(Grid inGrid);
+	Grid GetNewAspectGrid(double aspect);
 
 	wxWindow * parWindow;
 	Processor * proc;
@@ -40,40 +44,33 @@ private:
 	wxBoxSizer * mainSizer;
 	wxFlexGridSizer * gridSizer;
 	wxBoxSizer * buttonSizer;
+	wxBoxSizer * aspectsSizer;
 
 	wxStaticText * editLabel;
 
 	wxComboBox * defaultAspects;
+	wxButton * flipAspects;
 	wxTextCtrl * customAspectWidth;
 	wxStaticText * customAspectX;
 	wxTextCtrl * customAspectHeight;
 	wxBoxSizer * customAspectSizer;
 
-	wxStaticText * startXLabel;
-	wxStaticText * startYLabel;
-	wxStaticText * widthLabel;
-	wxStaticText * heightLabel;
-
-	wxTextCtrl * startXCtrl;
-	wxTextCtrl * startYCtrl;
-	wxTextCtrl * widthCtrl;
-	wxTextCtrl * heightCtrl;
-
 	wxButton * enableCropBox;
 	wxButton * enableDisableCrop;
 	wxButton * resetCrop;
-
-	Grid lastCropGrid;
 
 	bool boxEnabled;
 	bool cropEnabled;
 	bool forceAspect;
 	double aspect;
+
+	Grid cropGrid;
 	
 	enum {
 		ID_ENABLE_CROP_BOX,
 		ID_ENABLE_CROP,
-		ID_RESET_CROP
+		ID_RESET_CROP,
+		ID_FLIP_ASPECTS
 	};
 
 };

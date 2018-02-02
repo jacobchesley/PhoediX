@@ -104,6 +104,7 @@ void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
 
 void ZoomImagePanel::OnScrollRightDown(wxMouseEvent& evt) {
 	wxMouseEvent newEvent(evt);
+	newEvent.SetId(this->GetId());
 	wxPostEvent(this->GetParent(), newEvent);
 }
 
@@ -228,8 +229,20 @@ bool ZoomImagePanel::GetEnforceGridAspect() {
 	return scroller->GetEnforceGridAspect();
 }
 
+void ZoomImagePanel::EnableHalfSize(){
+	scroller->EnableHalfSize();
+}
+
+void ZoomImagePanel::DisableHalfSize(){
+	scroller->DisableHalfSize();
+}
+
 void ZoomImagePanel::NoImage() {
 	scroller->NoImage();
+}
+
+double ZoomImagePanel::GetImageAspect() {
+	return scroller->GetImageAspect();
 }
 
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(parent) {
@@ -244,18 +257,20 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 
 	gridActive = false;
 	gridOwner = -1;
-	grid.startX = 100;
-	grid.startY = 100;
-	grid.width = 1000;
-	grid.height = 1000;
+	scaleGrid.startX = 0.0;
+	scaleGrid.startY = 0.0;
+	scaleGrid.endX = 1.0;
+	scaleGrid.endY = 1.0;
 	gridAspect = 1.0;
 	enforceGridAspect = false;
 
-	drawGrid.startX = 100;
-	drawGrid.startY = 100;
-	drawGrid.width = 1000;
-	drawGrid.height = 1000;
+	drawGrid.startX = 0.0;
+	drawGrid.startY = 0.0;
+	drawGrid.endX = 0.0;
+	drawGrid.endY= 0.0;
 	gridMoving = false;
+
+	scalar = 1.0;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
@@ -281,18 +296,20 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	
 	gridActive = false;
 	gridOwner = -1;
-	grid.startX = 100;
-	grid.startY = 100;
-	grid.width = 1000;
-	grid.height = 1000;
+	scaleGrid.startX = 0.0;
+	scaleGrid.startY = 0.0;
+	scaleGrid.endX = 1.0;
+	scaleGrid.endY = 1.0;
 	gridAspect = 1.0;
 	enforceGridAspect = false;
 
-	drawGrid.startX = 100;
-	drawGrid.startY = 100;
-	drawGrid.width = 1000;
-	drawGrid.height = 1000;
+	drawGrid.startX = 0.0;
+	drawGrid.startY = 0.0;
+	drawGrid.endX = image->GetWidth();
+	drawGrid.endY = image->GetHeight();
 	gridMoving = false;
+
+	scalar = 1.0;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
@@ -316,18 +333,20 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 
 	gridActive = false;
 	gridOwner = -1;
-	grid.startX = 100;
-	grid.startY = 100;
-	grid.width = 1000;
-	grid.height = 1000;
+	scaleGrid.startX = 0.0;
+	scaleGrid.startY = 0.0;
+	scaleGrid.endX = 1.0;
+	scaleGrid.endY = 1.0;
 	gridAspect = 1.0;
 	enforceGridAspect = false;
 
-	drawGrid.startX = 100;
-	drawGrid.startY = 100;
-	drawGrid.width = 1000;
-	drawGrid.height = 1000;
+	drawGrid.startX = 0.0;
+	drawGrid.startY = 0.0;
+	drawGrid.endX = image->GetWidth();
+	drawGrid.endY = image->GetHeight();
 	gridMoving = false;
+
+	scalar = 1.0;
 
 	SetScrollbars(1, 1, image->GetWidth(), image->GetHeight());
 	
@@ -346,10 +365,14 @@ void ZoomImagePanel::ImageScroll::NoImage() {
 }
 
 void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
-    
+	
+	double tempScalar = 1.0;
+	if(!this->GetFitImage()){
+		tempScalar = scalar;
+	}
 	// Prepare the DC, zoom the correct amount and draw the bitmap
 	this->PrepareDC(dc);
-    dc.SetUserScale(zoom, zoom);
+    dc.SetUserScale(zoom * tempScalar, zoom * tempScalar);
     
 	// Clear and set background color
 	dc.Clear();
@@ -362,8 +385,8 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	}
 
 	// Calculate new width and height based on zoom
-	int imgWidth = bitmapDraw.GetWidth() * zoom;
-	int imgHeight = bitmapDraw.GetHeight() * zoom;
+	int imgWidth = bitmapDraw.GetWidth() * zoom * tempScalar;
+	int imgHeight = bitmapDraw.GetHeight() * zoom * tempScalar;
 	this->SetVirtualSize(imgWidth, imgHeight);
 
 	if (imgWidth < 1 || imgHeight < 1) { return; }
@@ -371,17 +394,22 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	int thisWidth = this->GetClientSize().GetWidth();
 	int thisHeight = this->GetClientSize().GetHeight();
 
+	// Shift image to middle of panel
 	int xShift = 0;
 	int yShift = 0;
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth)/ 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
    
-	dc.DrawBitmap(bitmapDraw, wxPoint(xShift, yShift));
+	dc.DrawBitmap(bitmapDraw, wxPoint(xShift/tempScalar, yShift/tempScalar));
     
 	if (gridActive){
 		
 		int lineWidth = (int) (4.0 / this->GetZoom());
 		if(this->GetZoom() < 1.0){ lineWidth = 2;}
+
+		xShift /= scalar;
+		yShift /= scalar;
+		lineWidth /= scalar;
 
 		wxColour white(255, 255, 255);
 		wxDash dashPattern[2];
@@ -393,29 +421,32 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 		wxColour black(0, 0, 0);
 		wxPen blackPen(black, lineWidth, wxPENSTYLE_SOLID);
 
-		int bottomLineRaise = -1.0 * lineWidth;
-
 		// Draw solid black line
 		dc.SetPen(blackPen);
 
+		int startXShift = (int)drawGrid.startX + xShift;
+		int startYShift = (int)drawGrid.startY + yShift;
+		int endXShift = (int)drawGrid.endX + xShift;
+		int endYShift = (int)drawGrid.endY + yShift;
+
 		// Top Line and Bottom Line (solid black)
-		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift);
-		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift + bottomLineRaise, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY  + drawGrid.height + yShift + bottomLineRaise);
+		dc.DrawLine(startXShift, startYShift, endXShift, startYShift);
+		dc.DrawLine(startXShift, endYShift, endXShift, endYShift);
 
 		// Left Line and Right Line (solid black)
-		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift);
-		dc.DrawLine(drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + drawGrid.height + yShift);
+		dc.DrawLine(startXShift, startYShift, startXShift, endYShift);
+		dc.DrawLine(endXShift, startYShift, endXShift, endYShift);
 
 		// Draw dashed white line on top of solid black line
 		dc.SetPen(dashPen);
 
 		// Top Line and Bottom Line (dashed white)
-		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift);
-		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift + bottomLineRaise, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY  + drawGrid.height + yShift + + bottomLineRaise);
+		dc.DrawLine(startXShift, startYShift, endXShift, startYShift);
+		dc.DrawLine(startXShift, endYShift, endXShift, endYShift);
 
 		// Left Line and Right Line (dashed white)
-		dc.DrawLine(drawGrid.startX + xShift, drawGrid.startY + yShift, drawGrid.startX + xShift, drawGrid.startY + drawGrid.height + yShift);
-		dc.DrawLine(drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + yShift, drawGrid.startX + drawGrid.width + xShift, drawGrid.startY + drawGrid.height + yShift);
+		dc.DrawLine(startXShift, startYShift, startXShift, endYShift);
+		dc.DrawLine(endXShift, startYShift, endXShift, endYShift);
 	}
 }
 
@@ -499,7 +530,7 @@ void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 }
 
 void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
-
+	
 	// First left click before drag
 	dragStartX = evt.GetPosition().x;
 	dragStartY = evt.GetPosition().y;
@@ -513,74 +544,96 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 	this->CalcUnscrolledPosition(dragStartX, dragStartY, &unscrollX, &unscrollY);
 
 	// Scale dragging coordinates
-	int dragStartXScale = unscrollX / this->GetZoom();
-	int dragStartYScale = unscrollY / this->GetZoom();
+	int dragStartXScale = unscrollX / (this->GetZoom() * scalar);
+	int dragStartYScale = unscrollY / (this->GetZoom() * scalar);
 
-	int pixelToleranceGridCorner = 10 / this->GetZoom();
+	int pixelToleranceGridCorner = 10 / (this->GetZoom() * scalar);
 	int hitTarget = -1;  // target = 0 i top left.  target = 1 if top right.  target = 2 if bottom left.  target = 3 if bottom right.
+	int gridMoveDirection = 1;
 
 	// Calculate new width and height based on zoom
-	int imgWidth = bitmapDraw.GetWidth() * zoom;
-	int imgHeight = bitmapDraw.GetHeight() * zoom;
+	int imgWidth = bitmapDraw.GetWidth() * (this->GetZoom() * scalar);
+	int imgHeight = bitmapDraw.GetHeight() * (this->GetZoom() * scalar);
 	if (imgWidth < 1 || imgHeight < 1) { return; }
 
-	// Get shift values
+	// Get shift values (because image is centered in panel)
 	int thisWidth = this->GetClientSize().GetWidth();
 	int thisHeight = this->GetClientSize().GetHeight();
 
+	// Calcualte shift values to center image if it does not take up whole panel
 	int xShift = 0;
 	int yShift = 0;
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth) / 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
+	xShift /= scalar;
+	yShift /= scalar;
 
-	for (int i = -1.0 * pixelToleranceGridCorner; i < pixelToleranceGridCorner; i++) {
-		for (int j = -1.0 * pixelToleranceGridCorner; j < pixelToleranceGridCorner; j++) {
+	int gridStartXShift = (int)drawGrid.startX + xShift;
+	int gridStartYShift = (int)drawGrid.startY + yShift;
+	int gridEndXShift = (int)drawGrid.endX + xShift;
+	int gridEndYShift = (int)drawGrid.endY + yShift;
+
+	Grid lastGoodDrawGrid;
+	lastGoodDrawGrid.startX = drawGrid.startX;
+	lastGoodDrawGrid.endX = drawGrid.endX;
+	lastGoodDrawGrid.startY = drawGrid.startY;
+	lastGoodDrawGrid.endY = drawGrid.endY;
+
+	for (int xCorner = -pixelToleranceGridCorner; xCorner < pixelToleranceGridCorner; xCorner++) {
+		for (int yCorner = -pixelToleranceGridCorner; yCorner < pixelToleranceGridCorner; yCorner++) {
+
+			int checkX = dragStartXScale + xCorner;
+			int checkY = dragStartYScale + yCorner;
 
 			// Check top left for hit
-			if ((grid.startX + xShift) == (dragStartXScale + i) && (grid.startY + yShift) == (dragStartYScale + j)) {
+			if (gridStartXShift == checkX && gridStartYShift  == checkY) {
 				hitTarget = ZoomImagePanel::GridHitTaget::TOP_LEFT_CORNER;
 				break;
 			}
 
 			// Check top right for hit
-			if (((grid.startX + xShift) + grid.width) == (dragStartXScale + i) && (grid.startY + yShift) == (dragStartYScale + j)) {
+			if (gridEndXShift == checkX && gridStartYShift == checkY) {
 				hitTarget = ZoomImagePanel::GridHitTaget::TOP_RIGHT_CORNER;
 				break;
 			}
 
 			// Check bottom left for hit
-			if ((grid.startX + xShift) == (dragStartXScale + i) && ((grid.startY + yShift) + grid.height) == (dragStartYScale + j)) {
+			if (gridStartXShift == checkX && gridEndYShift == checkY) {
 				hitTarget = ZoomImagePanel::GridHitTaget::BOTTOM_LEFT_CORNER;
 				break;
 			}
 
 			// Check bottom right for hit
-			if (((grid.startX + xShift) + grid.width) == (dragStartXScale + i) && ((grid.startY + yShift) + grid.height) == (dragStartYScale + j)) {
+			if (gridEndXShift == checkX && gridEndYShift == checkY) {
 				hitTarget = ZoomImagePanel::GridHitTaget::BOTTOM_RIGHT_CORNER;
 				break;
 			}
 
 			// Check top line for hit
-			if ((grid.startY) == (dragStartYScale + j) && (dragStartXScale > (grid.startX + xShift)) && (dragStartXScale < ((grid.startX + xShift) + grid.width))) {
+			if(gridStartYShift == checkY){
 				hitTarget = ZoomImagePanel::GridHitTaget::TOP;
+				gridMoveDirection = ZoomImagePanel::GridMoveDirection::GRID_MOVE_HEIGHT;
 				break;
 			}
 
 			// Check bottom line for hit
-			if ((grid.startY + grid.height) == (dragStartYScale + j) && (dragStartXScale > (grid.startX + xShift)) && (dragStartXScale < ((grid.startX + xShift) + grid.width))) {
+			if(gridEndYShift == checkY){
 				hitTarget = ZoomImagePanel::GridHitTaget::BOTTOM;
+				gridMoveDirection = ZoomImagePanel::GridMoveDirection::GRID_MOVE_HEIGHT;
 				break;
 			}
 
 			// Check left line for hit
-			if (((grid.startX + xShift)) == (dragStartXScale + j) && (dragStartYScale >(grid.startY + yShift)) && (dragStartYScale < ((grid.startY + yShift) + grid.height))) {
+			if(gridStartXShift == checkX){
 				hitTarget = ZoomImagePanel::GridHitTaget::LEFT;
+				gridMoveDirection = ZoomImagePanel::GridMoveDirection::GRID_MOVE_WIDTH;
 				break;
 			}
 					
 			// Check right line for hit
-			if (((grid.startX + xShift) + grid.width) == (dragStartXScale + j) && (dragStartYScale >(grid.startY + yShift)) && (dragStartYScale < ((grid.startY + yShift) + grid.height))) {
+			if(gridEndXShift == checkX){
 				hitTarget = ZoomImagePanel::GridHitTaget::RIGHT;
+				gridMoveDirection = ZoomImagePanel::GridMoveDirection::GRID_MOVE_WIDTH;
 				break;
 			}
 		}
@@ -598,6 +651,7 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 
 		int x = 0;
 		int y = 0;
+				
 		while (mouse.LeftIsDown()) {
 			
 			// get the local mouse position (relative to the panel)
@@ -612,189 +666,140 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			int dxScale = dx / this->GetZoom();
 			int dyScale = dy / this->GetZoom();
 
+			dxScale /= scalar;
+			dyScale /= scalar;
+
+			int dragScaleShiftX = dragStartXScale + dxScale - xShift;
+			int dragScaleShiftY = dragStartYScale + dyScale - yShift;
+
 			// Move top left corner
 			if (hitTarget == ZoomImagePanel::GridHitTaget::TOP_LEFT_CORNER) {
-
-				drawGrid.startX = dragStartXScale + dxScale;
-				drawGrid.startY = dragStartYScale + dyScale;
-				drawGrid.width = (grid.startX - drawGrid.startX) + grid.width;
-				drawGrid.height = (grid.startY - drawGrid.startY) + grid.height;
+				drawGrid.startX = dragScaleShiftX;
+				drawGrid.startY = dragScaleShiftY;
 			}
 
 			// Move top right corner
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::TOP_RIGHT_CORNER) {
-
-				drawGrid.startY = dragStartYScale + dyScale;
-				drawGrid.width = grid.width + dxScale;
-				drawGrid.height = (grid.startY - drawGrid.startY) + grid.height;
+				drawGrid.startY = dragScaleShiftY;
+				drawGrid.endX = dragScaleShiftX;
 			}
-
+			
 			// Move bottom left corner
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::BOTTOM_LEFT_CORNER) {
-
-				drawGrid.startX = dragStartXScale + dxScale;
-				drawGrid.width = (grid.startX - drawGrid.startX) + grid.width;
-				drawGrid.height = grid.height + dyScale;
+				drawGrid.startX = dragScaleShiftX;
+				drawGrid.endY = dragScaleShiftY;
 			}
 
 			// Move bottom right corner
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::BOTTOM_RIGHT_CORNER) {
-
-				drawGrid.width = grid.width + dxScale;
-				drawGrid.height = grid.height + dyScale;
+				drawGrid.endX = dragScaleShiftX;
+				drawGrid.endY = dragScaleShiftY;
 			}
 
-			//  Move top line
+			// Move top
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::TOP) {
-
-				// Do not move left line if enforce aspect is active and height is max
-				if (enforceGridAspect) {
-
-					// Only move if width is not maxed out, and its moving in bottom ways direction
-					if (drawGrid.width < (drawWidth - 1) || (dragStartYScale + dyScale) > drawGrid.startY) {
-						drawGrid.startY = dragStartYScale + dyScale;
-						drawGrid.height = (grid.startY - drawGrid.startY) + grid.height;
-					}
-				}
-
-				drawGrid.startY = dragStartYScale + dyScale;
-				drawGrid.height = (grid.startY - drawGrid.startY) + grid.height;
+				drawGrid.startY = dragScaleShiftY;
 			}
 
-			//  Move bottom line
+			// Move bottom
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::BOTTOM) {
-				drawGrid.height = grid.height + dyScale;
+				drawGrid.endY = dragScaleShiftY;
 			}
 
-			//  Move left line
+			// Move left
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::LEFT) {
-
-				// Do not move left line if enforce aspect is active and height is max
-				if(enforceGridAspect){
-
-					// Only move if height is not maxed out, and its moving in right ways direction
-					if (drawGrid.height < (drawHeight-1) || (dragStartXScale + dxScale - xShift) > drawGrid.startX) {
-						drawGrid.startX = dragStartXScale + dxScale - xShift;
-						drawGrid.width = (grid.startX - drawGrid.startX) + grid.width;
-					}
-				}
-
-				// Freely draw line, no aspect restrictions
-				else {
-					drawGrid.startX = dragStartXScale + dxScale - xShift;
-					drawGrid.width = (grid.startX - drawGrid.startX) + grid.width;
-				}
+				drawGrid.startX = dragScaleShiftX;
 			}
 
-			//  Move right line
+			// Move right
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::RIGHT) {
-				drawGrid.width = grid.width + dxScale;
-			}
-
-			else {	}
-			// Fix left line crossing over right
-			if (drawGrid.width < 0 && drawGrid.startX > (grid.startX + grid.width)) {
-				drawGrid.startX = grid.startX + grid.width;
-				drawGrid.width *= -1;
-			}
-
-			// Fix right line crossing over left
-			if (drawGrid.width < 0 && drawGrid.startX < (grid.startX + grid.width)) {
-				drawGrid.startX = grid.startX + drawGrid.width;
-				drawGrid.width *= -1;
-			}
-
-			// Fix top line crossing over bottom
-			if (drawGrid.height < 0 && drawGrid.startY > (grid.startY + grid.height)) {
-				drawGrid.startY = grid.startY + grid.height;
-				drawGrid.height *= -1;
-			}
-
-			// Fix bottom line crossing over top
-			if (drawGrid.height < 0 && drawGrid.startY < (grid.startY + grid.height)) {
-				drawGrid.startY = grid.startY + drawGrid.height;
-				drawGrid.height *= -1;
-			}
-
-			// Set starting points in image bounds
-			if (drawGrid.startX < 0) { drawGrid.startX = 0; }
-			if (drawGrid.startY < 0) { drawGrid.startY = 0; }
-
-			// Set width and height in image bounds
-			if (drawGrid.startX + drawGrid.width > drawWidth) {
-				int subAmnt = drawGrid.startX + drawGrid.width - drawWidth;
-				drawGrid.width -= subAmnt;
-			}
-			if (drawGrid.startY + drawGrid.height > drawHeight) {
-				int subAmnt = drawGrid.startY + drawGrid.height - drawHeight;
-				drawGrid.height -= subAmnt;
+				drawGrid.endX = dragScaleShiftX;
 			}
 
 			if (enforceGridAspect) {
-				double newAspecRatio = (double)drawGrid.width / (double)drawGrid.height;
 
-				if (gridAspect == 0.0) { gridAspect = 0.000001; }
+				// Flip start and end x if needed
+				if (drawGrid.startX > drawGrid.endX) {
+					int tempStart = drawGrid.startX;
+					drawGrid.startX = drawGrid.endX;
+					drawGrid.endX = tempStart;
+				}
 
-				// Resize box according to aspect for corners
-				if (hitTarget == ZoomImagePanel::GridHitTaget::TOP_LEFT_CORNER ||
-					hitTarget == ZoomImagePanel::GridHitTaget::TOP_RIGHT_CORNER ||
-					hitTarget == ZoomImagePanel::GridHitTaget::BOTTOM_LEFT_CORNER ||
-					hitTarget == ZoomImagePanel::GridHitTaget::BOTTOM_RIGHT_CORNER) {
+				// Flip start and end y if needed
+				if (drawGrid.startY > drawGrid.endY) {
+					int tempStart = drawGrid.startY;
+					drawGrid.startY = drawGrid.endY;
+					drawGrid.endY = tempStart;
+				}
+
+				// Get current grid aspect ratio
+				double gridWidth = drawGrid.endX - drawGrid.startX;
+				double gridHeight = drawGrid.endY - drawGrid.startY;
+	
+				// Draging width, adjust height
+				if(gridMoveDirection == ZoomImagePanel::GridMoveDirection::GRID_MOVE_WIDTH){
+
+					int newGridHeight = gridWidth / gridAspect;
+					int dGridHeight = newGridHeight - gridHeight;
+					if (dGridHeight % 2 == 0) {
+						drawGrid.startY -= dGridHeight / 2;
+						drawGrid.endY += dGridHeight / 2;
+					}
+					else {
+						drawGrid.startY -= dGridHeight / 2;
+						drawGrid.endY += (dGridHeight / 2) + 1;
+					}
+				}
+
+				// Draging height, adjust width
+				if(gridMoveDirection == ZoomImagePanel::GridMoveDirection::GRID_MOVE_HEIGHT){
 					
-					// Resize width based on height
-					if (newAspecRatio > gridAspect) {
-						drawGrid.width = drawGrid.height  * gridAspect;
+					int newGridWidth = gridHeight * gridAspect;
+					int dGridWidth = newGridWidth - gridWidth;
+					if (dGridWidth % 2 == 0) {
+						drawGrid.startX -= dGridWidth / 2;
+						drawGrid.endX += dGridWidth / 2;
 					}
+					else {
+						drawGrid.startX -= dGridWidth / 2;
+						drawGrid.endX += (dGridWidth / 2) + 1;
+					}
+				}			
 
-					// Resize height based on width
-					else if (newAspecRatio < gridAspect) {
-						drawGrid.height = drawGrid.width / gridAspect;
-					}
+				// Check if new grid is invalid
+				bool newGridInvalid = false;
+				if (drawGrid.startX < 0.0 || drawGrid.startX > drawWidth) { newGridInvalid = true; }
+				if (drawGrid.startY < 0.0 || drawGrid.startY > drawHeight) { newGridInvalid = true; }
+				if (drawGrid.endX < 0.0 || drawGrid.endX > drawWidth) { newGridInvalid = true; }
+				if (drawGrid.endY < 0.0 || drawGrid.endY > drawHeight) { newGridInvalid = true; }
+
+				// Grid is invalid, use last valid grid
+				if(newGridInvalid){
+					drawGrid.startX = lastGoodDrawGrid.startX;
+					drawGrid.startY = lastGoodDrawGrid.startY;
+					drawGrid.endX = lastGoodDrawGrid.endX;
+					drawGrid.endY = lastGoodDrawGrid.endY;
 				}
 
-				// Resize box according to aspect for top and bottom lines
-				if (hitTarget == ZoomImagePanel::GridHitTaget::TOP ||
-					hitTarget == ZoomImagePanel::GridHitTaget::BOTTOM){
-
-					// Resize width based on height (since we are moving top / bottom)
-					drawGrid.width = drawGrid.height * gridAspect;
-
-					// Check to verify grid is in bounds
-					if (drawGrid.startX + drawGrid.width > drawWidth) {
-
-						// Rescale height based on final width
-						int subAmnt = drawGrid.startX + drawGrid.width - drawWidth;
-						drawGrid.width -= subAmnt;
-						drawGrid.height = drawGrid.width / gridAspect;
-
-						if (drawGrid.startX > 0) {
-							drawGrid.startX -= subAmnt;
-						}
-					}
-				}
-				
-				// Resize box according to aspect for left and right lines
-				if (hitTarget == ZoomImagePanel::GridHitTaget::LEFT ||
-					hitTarget == ZoomImagePanel::GridHitTaget::RIGHT) {
-
-					// Resize height based on width (since we are moving left / right)
-					drawGrid.height = drawGrid.width  / gridAspect;	
-
-					// Check to verify grid is in bounds
-					if (drawGrid.startY + drawGrid.height > drawHeight) {
-
-						// Rescale width based on final height
-						int subAmnt = drawGrid.startY + drawGrid.height - drawHeight;
-						drawGrid.height -= subAmnt;
-						drawGrid.width = drawGrid.height * gridAspect;
-
-						if (drawGrid.startY > 0) {
-							drawGrid.startY -= subAmnt;
-						}	
-					}
+				// Grid is valid, set last valid grid to current grid
+				else{
+					lastGoodDrawGrid.startX = drawGrid.startX;
+					lastGoodDrawGrid.startY = drawGrid.startY;
+					lastGoodDrawGrid.endX = drawGrid.endX;
+					lastGoodDrawGrid.endY = drawGrid.endY;
 				}
 			}
 			
+			// Set grid to image bounds
+			if (drawGrid.startX < 0.0) { drawGrid.startX = 0.0; }
+			if (drawGrid.startX > drawWidth) { drawGrid.startX = drawWidth; }
+			if (drawGrid.startY < 0.0) { drawGrid.startY = 0.0; }
+			if (drawGrid.startY > drawHeight) { drawGrid.startY = drawHeight; }
+			if (drawGrid.endX < 0.0) { drawGrid.endX = 0.0; }
+			if (drawGrid.endX > drawWidth) { drawGrid.endX = drawWidth; }
+			if (drawGrid.endY < 0.0) { drawGrid.endY = 0.0; }
+			if (drawGrid.endY > drawHeight) { drawGrid.endY = drawHeight; }
+
 			// Refresh and Update are CRITICAL!  This forces the screen to redraw NOW
 			// so the freshly drawn DC with lines gets drawn to screen immediately.
 			// Provides real time feedback!
@@ -805,10 +810,23 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
             wxSafeYield();
 		}
 
-		grid.startX = drawGrid.startX;
-		grid.startY = drawGrid.startY;
-		grid.width = drawGrid.width;
-		grid.height = drawGrid.height;
+		if(drawGrid.startX > drawGrid.endX){
+			int tempStart = drawGrid.startX;
+			drawGrid.startX = drawGrid.endX;
+			drawGrid.endX = tempStart;
+		}
+
+		if(drawGrid.startY > drawGrid.endY){
+			int tempStart = drawGrid.startY;
+			drawGrid.startY = drawGrid.endY;
+			drawGrid.endY = tempStart;
+		}
+
+		scaleGrid.startX = drawGrid.startX / drawWidth;
+		scaleGrid.endX = drawGrid.endX / drawWidth;
+		scaleGrid.startY = drawGrid.startY / drawHeight;
+		scaleGrid.endY = drawGrid.endY / drawHeight;
+
 		gridMoving = false;
 		wxCommandEvent moveEvt(GRID_MOVE_EVENT, ID_GRID_MOVE_EVENT);
 		wxPostEvent(wxWindow::FindWindowById(this->GetGridOwner()), moveEvt);
@@ -893,6 +911,15 @@ bool ZoomImagePanel::ImageScroll::GetFitImage(){
 	return doFit;
 }
 
+void ZoomImagePanel::ImageScroll::EnableHalfSize(){
+	scalar = 2.0;
+}
+
+void ZoomImagePanel::ImageScroll::DisableHalfSize(){
+
+	scalar = 1.0;
+}
+
 void ZoomImagePanel::ImageScroll::FitImage(bool refresh) {
 
 	int width = this->GetClientSize().GetWidth();
@@ -939,7 +966,7 @@ bool ZoomImagePanel::ImageScroll::GetGridActive() {
 }
 
 Grid ZoomImagePanel::ImageScroll::GetGrid() {
-	return grid;
+	return scaleGrid;
 }
 
 void ZoomImagePanel::ImageScroll::SetGridOwner(int newOwner) {
@@ -952,6 +979,7 @@ int ZoomImagePanel::ImageScroll::GetGridOwner() {
 
 void ZoomImagePanel::ImageScroll::SetGridAspect(double aspect) {
 	gridAspect = aspect;
+
 }
 
 double ZoomImagePanel::ImageScroll::GetGridAspect() {
@@ -960,6 +988,10 @@ double ZoomImagePanel::ImageScroll::GetGridAspect() {
 
 void ZoomImagePanel::ImageScroll::SetEnforceGridAspect(bool enforceAspect) {
 	enforceGridAspect = enforceAspect;
+	if (enforceAspect) {
+		scaleGrid.endY = gridAspect;
+		drawGrid.endY *= gridAspect;
+	}
 }
 
 bool ZoomImagePanel::ImageScroll::GetEnforceGridAspect() {
@@ -971,15 +1003,16 @@ bool ZoomImagePanel::ImageScroll::GetGridMoving() {
 }
 
 void ZoomImagePanel::ImageScroll::SetGrid(Grid newGrid) {
-	grid.width = newGrid.width;
-	grid.height = newGrid.height;
-	grid.startX = newGrid.startX;
-	grid.startY = newGrid.startY;
 
-	drawGrid.width = newGrid.width;
-	drawGrid.height = newGrid.height;
-	drawGrid.startX = newGrid.startX;
-	drawGrid.startY = newGrid.startY;
+	scaleGrid.startX = newGrid.startX;
+	scaleGrid.startY = newGrid.startY;
+	scaleGrid.endX = newGrid.endX;
+	scaleGrid.endY = newGrid.endY;
+
+	drawGrid.startX = newGrid.startX * bitmapDraw.GetWidth();
+	drawGrid.startY = newGrid.startY * bitmapDraw.GetHeight();
+	drawGrid.endX = newGrid.endX * bitmapDraw.GetWidth();
+	drawGrid.endY = newGrid.endY * bitmapDraw.GetHeight();
 
 	this->Refresh();
 	this->Update();
@@ -1010,4 +1043,8 @@ void ZoomImagePanel::ImageScroll::OnRightDown(wxMouseEvent & evt) {
 	newEvent.SetY(newY / zoom);
 
 	wxPostEvent(this->GetParent(), newEvent);
+}
+
+double ZoomImagePanel::ImageScroll::GetImageAspect() {
+	return (double)bitmapDraw.GetWidth() / (double)bitmapDraw.GetHeight();
 }

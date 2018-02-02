@@ -1,7 +1,7 @@
 // Copyright 2016 Jacob Chesley
 
-#ifndef SHIFT_RGB_WINDOW_H
-#define SHIFT_RGB_WINDOW_H
+#ifndef Adjust_RGB_WINDOW_H
+#define Adjust_RGB_WINDOW_H
 
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
@@ -9,10 +9,9 @@
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
 
-class ShiftRGBWindow : public EditWindow {
+class AdjustRGBWindow : public EditWindow {
 public:
-	ShiftRGBWindow(wxWindow * parent, wxString editName, Processor * processor);
-	void AddEditToProcessor();
+	AdjustRGBWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void SetParamsAndFlags(ProcessorEdit * edit);
 	ProcessorEdit * GetParamsAndFlags();
 	bool CheckCopiedParamsAndFlags();

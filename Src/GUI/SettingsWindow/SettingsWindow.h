@@ -76,9 +76,50 @@ private:
 	
 	wxTimer * blankMessageTimer;
 	Settings lastSettings;
+
+
 	enum {
 		ID_APPLY_SETTINGS,
 		ID_CANCEL
+	};
+
+	class GeneralSettingsPane : wxPanel{
+	public:
+		GeneralSettingsPane(wxWindow * parent);
+
+	private:
+		wxBoxSizer * mainSizer;
+		wxFlexGridSizer * gridSizer;
+
+		wxStaticText * generalSettingsLabel;
+
+		wxStaticText * languageLabel;
+		wxComboBox * language;		
+	};
+
+	class PerformanceSettingsPane : wxPanel{
+	public:
+		PerformanceSettingsPane(wxWindow * parent);
+
+	private:
+		wxBoxSizer * mainSizer;
+		wxFlexGridSizer * gridSizer;
+
+		wxStaticText * performanceSettingsLabel;
+
+		wxStaticText * numThreadsLabel;
+		wxSlider * numThreads;
+	};
+
+	class LibrarySettingsPane : wxPanel{
+	public:
+		LibrarySettingsPane(wxWindow * parent);
+
+	private:
+		wxBoxSizer * mainSizer;
+		wxFlexGridSizer * gridSizer;
+
+		wxStaticText * librarySettingsLabel;
 	};
 
 };

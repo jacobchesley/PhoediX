@@ -229,7 +229,16 @@ void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, wxImage
 			
 		}
 	}
+
+	// Convert from JPEG to wxImage
+	if (rawImage->type == LIBRAW_IMAGE_JPEG) {
+
+		wxMemoryInputStream jpegStream(rawImage->data, rawImage->data_size);
+		outImage->LoadFile(jpegStream, wxBITMAP_TYPE_JPEG);
+	}
 }
+
+
 bool ImageHandler::CheckRaw(wxString fileName){
 
 	// Attempt to open file in LibRaw raw processor and get the error code returned

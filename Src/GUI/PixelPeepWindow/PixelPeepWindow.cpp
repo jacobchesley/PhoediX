@@ -99,7 +99,7 @@ void PixelPeepWindow::PixelGrid::SetGridSize(int newSize) {
 		gridSize = newSize;
 	}
 	this->InitGrid();
-	this->PaintNow();
+	this->UpdatePosition(posX, posY);
 }
 
 void PixelPeepWindow::PixelGrid::OnPaint(wxPaintEvent& event) {
@@ -276,34 +276,15 @@ void PixelPeepWindow::PixelGrid::PaintNow() {
 }
 
 void PixelPeepWindow::PixelGrid::UpdatePosition(int x, int y) {
+
+	if(image == NULL){ return; }
+	if (x < 0 || x > image->GetWidth() - 1) { return; }
+	if (y < 0 || y > image->GetHeight() - 1) { return; }
+
 	posX = x;
 	posY = y;
-	this->PaintNow();
-}
 
-void PixelPeepWindow::PixelGrid::Render(wxDC & dc) {
-
-	wxBrush backgroundBrush(wxColor(0,0,0));
-	dc.SetBackground(backgroundBrush);
-	dc.Clear();
-
-	if (image == NULL) {
-		return;
-	}
-	// Get current width and height
-	int width = this->GetSize().GetWidth();
-	int height = this->GetSize().GetHeight();
-
-	// Grid size needs to be at least 1
-	if (gridSize < 1) { gridSize = 1; }
-
-	// Get width and height of each block representing a pixel
-	int pixelWidth = width / gridSize;
-	int pixelHeight = height / gridSize;
-
-	// Grid size over 2 to go left and right of cursor on image
 	int gridSizeOver2 = gridSize / 2.0;
-
 	for (size_t i = 0; i < gridSize; i++) {
 		for (size_t j = 0; j < gridSize; j++) {
 
@@ -366,6 +347,38 @@ void PixelPeepWindow::PixelGrid::Render(wxDC & dc) {
 				colorGrid.at(i).at(j).B_16 = blue;
 				colorGrid.at(i).at(j).HEX_16 = this->GetHex16FromRGB16(red, green, blue); 
 			}
+		}
+	}
+
+	this->PaintNow();
+}
+
+void PixelPeepWindow::PixelGrid::Render(wxDC & dc) {
+
+	wxBrush backgroundBrush(wxColor(0,0,0));
+	dc.SetBackground(backgroundBrush);
+	dc.Clear();
+
+	if (image == NULL) {
+		return;
+	}
+	// Get current width and height
+	int width = this->GetSize().GetWidth();
+	int height = this->GetSize().GetHeight();
+
+	// Grid size needs to be at least 1
+	if (gridSize < 1) { gridSize = 1; }
+
+	// Get width and height of each block representing a pixel
+	int pixelWidth = width / gridSize;
+	int pixelHeight = height / gridSize;
+
+	for (size_t i = 0; i < gridSize; i++) {
+		for (size_t j = 0; j < gridSize; j++) {
+
+			int red8 = colorGrid.at(i).at(j).R_8;
+			int green8 = colorGrid.at(i).at(j).G_8;
+			int blue8 = colorGrid.at(i).at(j).B_8;		
 
 			// Start point  and size of pixel block
 			wxPoint pixelStartPoint(i * pixelWidth, j * pixelHeight);

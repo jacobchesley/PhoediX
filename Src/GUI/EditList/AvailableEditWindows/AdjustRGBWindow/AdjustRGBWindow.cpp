@@ -1,8 +1,8 @@
 // Copyright 2016 Jacob Chesley
 
-#include "ShiftRGBWindow.h"
+#include "AdjustRGBWindow.h"
 
-ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
+AdjustRGBWindow::AdjustRGBWindow(wxWindow * parent, wxString editName, Processor * processor) : EditWindow(parent, editName, processor) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -59,9 +59,8 @@ ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor *
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ShiftRGBWindow::OnUpdate, this);
-	this->Bind(wxEVT_SCROLL_THUMBTRACK, (wxObjectEventFunction)&ShiftRGBWindow::OnUpdate, this);
-	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ShiftRGBWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&AdjustRGBWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&AdjustRGBWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
@@ -72,11 +71,11 @@ ShiftRGBWindow::ShiftRGBWindow(wxWindow * parent, wxString editName, Processor *
 	this->StartWatchdog();
 }
 
-void ShiftRGBWindow::SetParamsAndFlags(ProcessorEdit * edit){
+void AdjustRGBWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 	if(edit == NULL){ return; }
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::SHIFT_RGB) {
+	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
 		allBrightSlider->SetValue(edit->GetParam(0));
 		redBrightSlider->SetValue(edit->GetParam(1));
 		greenBrightSlider->SetValue(edit->GetParam(2));
@@ -84,25 +83,25 @@ void ShiftRGBWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	}
 }
 
-ProcessorEdit * ShiftRGBWindow::GetParamsAndFlags(){
+ProcessorEdit * AdjustRGBWindow::GetParamsAndFlags(){
 
-	ProcessorEdit * shiftRgbEdit = new ProcessorEdit(ProcessorEdit::EditType::SHIFT_RGB);
-	shiftRgbEdit->AddParam(allBrightSlider->GetValue());
-	shiftRgbEdit->AddParam(redBrightSlider->GetValue());
-	shiftRgbEdit->AddParam(greenBrightSlider->GetValue());
-	shiftRgbEdit->AddParam(blueBrightSlider->GetValue());
+	ProcessorEdit * AdjustRgbEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_RGB);
+	AdjustRgbEdit->AddParam(allBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(redBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(greenBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(blueBrightSlider->GetValue());
 
-	shiftRgbEdit->SetDisabled(isDisabled);
+	AdjustRgbEdit->SetDisabled(isDisabled);
 
-	return shiftRgbEdit;
+	return AdjustRgbEdit;
 }
 
-bool ShiftRGBWindow::CheckCopiedParamsAndFlags(){
+bool AdjustRGBWindow::CheckCopiedParamsAndFlags(){
 
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false; }
 
-	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::SHIFT_RGB) {
+	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
 		return true;
 	}
 	return false;

@@ -29,6 +29,7 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustBrightnessWindow\AdjustBrightnessWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustHSLWindow\AdjustHSLWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelMixerWindow\ChannelMixerWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.cpp" />
@@ -41,7 +42,7 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.cpp" />
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustRGBWindow\AdjustRGBWindow.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditListItem\EditListItem.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditSelection\EditSelection.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustBrightnessWindow\AdjustBrightnessWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustHSLWindow\AdjustHSLWindow.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AvailableEditWindows.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ChannelMixerWindow\ChannelMixerWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ContrastWindow\ContrastWindow.h" />
@@ -97,7 +99,7 @@
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RGBCurvesWindow\RGBCurvesWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\RotationWindow\RotationWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.h" />
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.h" />
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\AdjustRGBWindow.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditListItem\EditListItem.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditListPanel\EditListPanel.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditSelection\EditSelection.h" />

@@ -32,7 +32,15 @@ private:
 	wxNotebook * curveTabs;
 	wxBoxSizer * container;
 
-	wxTextCtrl * text;
+	wxGridSizer * gridSizer;
+
+	wxStaticText * rLabel;
+	wxStaticText * gLabel;
+	wxStaticText * bLabel;
+
+	DoubleSlider * rScaleSlider;
+	DoubleSlider * gScaleSlider;
+	DoubleSlider * bScaleSlider;
 
 	Processor * proc;
 };

@@ -17,7 +17,6 @@ class HSLCurvesWindow :public EditWindow {
 public:
 	HSLCurvesWindow(wxWindow * parent, wxString editName, Processor * processor);
 
-	void AddEditToProcessor();
 	void SetParamsAndFlags(ProcessorEdit * edit);
 	ProcessorEdit * GetParamsAndFlags();
 	bool CheckCopiedParamsAndFlags();
@@ -34,7 +33,15 @@ private:
 	wxNotebook * curveTabs;
 	wxBoxSizer * container;
 
-	wxTextCtrl * text;
+	wxGridSizer * gridSizer;
+
+	wxStaticText * rLabel;
+	wxStaticText * gLabel;
+	wxStaticText * bLabel;
+
+	DoubleSlider * rScaleSlider;
+	DoubleSlider * gScaleSlider;
+	DoubleSlider * bScaleSlider;
 
 	Processor * proc;
 };

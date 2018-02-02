@@ -42,10 +42,13 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 	this->FitInside();
 	this->SetScrollRate(5, 5);
 
+	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&MirrorWindow::OnUpdate, this);
+
 	this->SetClientSize(this->GetVirtualSize());
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
+	this->StartWatchdog();
 }
 
 void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {

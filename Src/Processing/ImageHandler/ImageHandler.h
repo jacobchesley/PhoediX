@@ -12,6 +12,7 @@
 #endif
 
 #include "wx/filename.h"
+#include "wx/mstream.h"
 
 #include "Processing/Image/Image.h"
 #include "Debugging/MemoryLeakCheck.h"

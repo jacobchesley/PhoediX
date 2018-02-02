@@ -18,28 +18,31 @@ AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor
 	hueShiftLabel = new wxStaticText(this, -1, "Hue Shift");
 	saturationScaleLabel = new wxStaticText(this, -1, "Saturation Scale");
 	luminaceScaleLabel = new wxStaticText(this, -1, "Luminace Scale");
-	channelLabel = new wxStaticText(this, -1, "Affected Channels");
+	rLabel = new wxStaticText(this, -1, "Red");
+	gLabel = new wxStaticText(this, -1, "Green");
+	bLabel = new wxStaticText(this, -1, "Blue");
+
 	hueShiftLabel->SetForegroundColour(Colors::TextLightGrey);
 	saturationScaleLabel->SetForegroundColour(Colors::TextLightGrey);
 	luminaceScaleLabel->SetForegroundColour(Colors::TextLightGrey);
-	channelLabel->SetForegroundColour(Colors::TextLightGrey);
+	rLabel->SetForegroundColour(Colors::TextLightGrey);
+	gLabel->SetForegroundColour(Colors::TextLightGrey);
+	bLabel->SetForegroundColour(Colors::TextLightGrey);
 
 	hueShiftSlider = new DoubleSlider(this, 0.0, 0.0, 360.0, 100000);
 	saturationScaleSlider = new DoubleSlider(this, 1.0, 0.0, 3.0, 100000);
 	luminaceScaleSlider = new DoubleSlider(this, 1.0, 0.0, 3.0, 100000);
-	channelSelect = new wxComboBox(this, -1);
-	channelSelect->AppendString("All Channels");
-	channelSelect->AppendString("Red");
-	channelSelect->AppendString("Green");
-	channelSelect->AppendString("Blue");
-	channelSelect->AppendString("Cyan");
-	channelSelect->AppendString("Magenta");
-	channelSelect->AppendString("Yellow");
-	channelSelect->SetSelection(0);
+	
+	rScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+	gScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+	bScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
 
 	hueShiftSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	saturationScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	luminaceScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
+	rScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);;
+	gScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
+	bScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
 	hueShiftSlider->SetForegroundColour(Colors::TextLightGrey);
 	hueShiftSlider->SetBackgroundColour(parent->GetBackgroundColour());
@@ -47,8 +50,12 @@ AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor
 	saturationScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
 	luminaceScaleSlider->SetForegroundColour(Colors::TextLightGrey);
 	luminaceScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
-	channelSelect->SetForegroundColour(Colors::TextLightGrey);
-	channelSelect->SetBackgroundColour(parent->GetBackgroundColour());
+	rScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	rScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	gScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	gScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	bScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	bScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
 
 	gridSizer->Add(hueShiftLabel);
 	gridSizer->Add(hueShiftSlider);
@@ -56,8 +63,14 @@ AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor
 	gridSizer->Add(saturationScaleSlider);
 	gridSizer->Add(luminaceScaleLabel);
 	gridSizer->Add(luminaceScaleSlider);
-	gridSizer->Add(channelLabel);
-	gridSizer->Add(channelSelect);
+	gridSizer->AddSpacer(10);
+	gridSizer->AddSpacer(10);
+	gridSizer->Add(rLabel);
+	gridSizer->Add(rScaleSlider);
+	gridSizer->Add(gLabel);
+	gridSizer->Add(gScaleSlider);
+	gridSizer->Add(bLabel);
+	gridSizer->Add(bScaleSlider);
 
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(10);
@@ -68,7 +81,6 @@ AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor
 
 	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&AdjustHSLWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&AdjustHSLWindow::OnUpdate, this);
-	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&AdjustHSLWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
@@ -83,19 +95,13 @@ void AdjustHSLWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Populate sliders based on edit loaded
 	if(edit == NULL){ return;}
 
-	if (edit->GetParamsSize() == 3 && edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
+	if (edit->GetParamsSize() == 6 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
 		hueShiftSlider->SetValue(edit->GetParam(0));
 		saturationScaleSlider->SetValue(edit->GetParam(1));
 		luminaceScaleSlider->SetValue(edit->GetParam(2));
-		RGBChannelENUM channel = (RGBChannelENUM) edit->GetFlag(0);
-
-		if (channel == RGBChannelENUM::RED_GREEN_BLUE) { channelSelect->SetSelection(0); }
-		if (channel == RGBChannelENUM::RED) { channelSelect->SetSelection(1); }
-		if (channel == RGBChannelENUM::GREEN) { channelSelect->SetSelection(2); }
-		if (channel == RGBChannelENUM::BLUE) { channelSelect->SetSelection(3); }
-		if (channel == RGBChannelENUM::GREEN_BLUE) { channelSelect->SetSelection(4); }
-		if (channel == RGBChannelENUM::RED_BLUE) { channelSelect->SetSelection(5); }
-		if (channel == RGBChannelENUM::RED_GREEN) { channelSelect->SetSelection(6); }
+		rScaleSlider->SetValue(edit->GetParam(3));
+		bScaleSlider->SetValue(edit->GetParam(4));
+		gScaleSlider->SetValue(edit->GetParam(5));
 	}
 }
 
@@ -105,17 +111,9 @@ ProcessorEdit * AdjustHSLWindow::GetParamsAndFlags(){
 	hslEdit->AddParam(hueShiftSlider->GetValue());
 	hslEdit->AddParam(saturationScaleSlider->GetValue());
 	hslEdit->AddParam(luminaceScaleSlider->GetValue());
-
-	RGBChannelENUM channels = RGBChannelENUM::RED_GREEN_BLUE;
-	if (channelSelect->GetSelection() == 0) { channels = RGBChannelENUM::RED_GREEN_BLUE; }
-	if (channelSelect->GetSelection() == 1) { channels = RGBChannelENUM::RED; }
-	if (channelSelect->GetSelection() == 2) { channels = RGBChannelENUM::GREEN; }
-	if (channelSelect->GetSelection() == 3) { channels = RGBChannelENUM::BLUE; }
-	if (channelSelect->GetSelection() == 4) { channels = RGBChannelENUM::GREEN_BLUE; }
-	if (channelSelect->GetSelection() == 5) { channels = RGBChannelENUM::RED_BLUE; }
-	if (channelSelect->GetSelection() == 6) { channels = RGBChannelENUM::RED_GREEN; }
-
-	hslEdit->AddFlag((int)channels);
+	hslEdit->AddParam(rScaleSlider->GetValue());
+	hslEdit->AddParam(gScaleSlider->GetValue());
+	hslEdit->AddParam(bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	hslEdit->SetDisabled(isDisabled);

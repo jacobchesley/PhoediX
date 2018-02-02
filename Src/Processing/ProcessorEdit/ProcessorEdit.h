@@ -57,7 +57,7 @@ public :
 	static bool CompareProcessorEdits(ProcessorEdit * editOne, ProcessorEdit * editTwo);
 	enum EditType {
 		UNDEFINED = 0,
-		SHIFT_RGB,
+		ADJUST_RGB,
 		ADJUST_HSL,
 		ADJUST_LAB,
 		ADJUST_CONTRAST,

@@ -13,13 +13,52 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 	sCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
 	lCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
 
+	hCurve->SetMinSize(wxSize(100, 100));
+	sCurve->SetMinSize(wxSize(100, 100));
+	lCurve->SetMinSize(wxSize(100, 100));
+
+	// 2 Columns, 15 pixel vertical gap, 5 pixel horizontal gap
+	gridSizer = new wxFlexGridSizer(2, 15, 5);
+
+	rLabel = new wxStaticText(this, -1, "Red");
+	gLabel = new wxStaticText(this, -1, "Green");
+	bLabel = new wxStaticText(this, -1, "Blue");
+
+	rScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+	gScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+	bScaleSlider = new DoubleSlider(this, 1.0, 0.0, 1.0, 100000);
+
+	rLabel->SetForegroundColour(Colors::TextLightGrey);
+	gLabel->SetForegroundColour(Colors::TextLightGrey);
+	bLabel->SetForegroundColour(Colors::TextLightGrey);
+
+	rScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	rScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	gScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	gScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+	bScaleSlider->SetForegroundColour(Colors::TextLightGrey);
+	bScaleSlider->SetBackgroundColour(parent->GetBackgroundColour());
+
+	rScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);;
+	gScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
+	bScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
+
 	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
 	curveTabs->AddPage(hCurve, "H Channel", true);
 	curveTabs->AddPage(sCurve, "S Channel", false);
 	curveTabs->AddPage(lCurve, "L Channel", false);
 
+	gridSizer->Add(rLabel);
+	gridSizer->Add(rScaleSlider);
+	gridSizer->Add(gLabel);
+	gridSizer->Add(gScaleSlider);
+	gridSizer->Add(bLabel);
+	gridSizer->Add(bScaleSlider);
+
 	container = new wxBoxSizer(wxVERTICAL);
 	container->Add(curveTabs, 1, wxEXPAND);
+	container->AddSpacer(10);
+	container->Add(gridSizer);
 
 	this->SetSizerAndFit(container);
 	container->Layout();
@@ -27,6 +66,8 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 	proc = processor;
 
 	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
+	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
 	this->StartWatchdog();
 }
 
@@ -113,7 +154,9 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	hCurve->SetControlPoints(hControlPoints);
 	sCurve->SetControlPoints(sControlPoints);
 	lCurve->SetControlPoints(lControlPoints);
-	
+	rScaleSlider->SetValue(edit->GetParam(0));
+	bScaleSlider->SetValue(edit->GetParam(1));
+	gScaleSlider->SetValue(edit->GetParam(2));
 }
 
 ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
@@ -182,6 +225,9 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 	HSLCurveEdit->AddDoubleArray(hPoints, hControlPoints.size() * 2);
 	HSLCurveEdit->AddDoubleArray(sPoints, sControlPoints.size() * 2);
 	HSLCurveEdit->AddDoubleArray(lPoints, lControlPoints.size() * 2);
+	HSLCurveEdit->AddParam(rScaleSlider->GetValue());
+	HSLCurveEdit->AddParam(gScaleSlider->GetValue());
+	HSLCurveEdit->AddParam(bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	HSLCurveEdit->SetDisabled(isDisabled);
@@ -197,7 +243,7 @@ bool HSLCurvesWindow::CheckCopiedParamsAndFlags(){
 	if(edit->GetEditType() != ProcessorEdit::EditType::HSL_CURVES){ return false; }
 
 	// Need 3 double arrars (H, S and L)
-	if(edit->GetNumDoubleArrays() != 3){
+	if(edit->GetNumDoubleArrays() != 3 && edit->GetParamsSize() != 3){
 		return false;
 	}
 

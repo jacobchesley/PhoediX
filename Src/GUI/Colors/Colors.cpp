@@ -3,13 +3,13 @@
 #include "Colors.h"
 
 wxColor Colors::BackBlack = wxColor(0, 0, 0);
-wxColor Colors::BackDarkDarkDarkGrey = wxColor(24, 24, 24);
-wxColor Colors::BackDarkDarkGrey = wxColor(35, 35, 35);
-wxColor Colors::BackDarkGrey = wxColor(50, 50, 50);
-wxColor Colors::BackMedDarkGrey = wxColor(68, 68, 68);
-wxColor Colors::BackGrey = wxColor(95, 95, 95);
-wxColor Colors::BackLightGrey = wxColor(135, 135, 135);
-wxColor Colors::BackLightLightGrey = wxColor(170, 170, 170);
+wxColor Colors::BackDarkDarkDarkGrey = wxColor(20, 20, 20);
+wxColor Colors::BackDarkDarkGrey = wxColor(30, 30, 30);
+wxColor Colors::BackDarkGrey = wxColor(40, 40, 40);
+wxColor Colors::BackMedDarkGrey = wxColor(50, 50, 50);
+wxColor Colors::BackGrey = wxColor(70, 70, 70);
+wxColor Colors::BackLightGrey = wxColor(115, 115, 115);
+wxColor Colors::BackLightLightGrey = wxColor(150, 150, 150);
 wxColor Colors::BackWhite = wxColor(255, 255, 255);
 
 wxColor Colors::TextBlack = wxColor(0, 0, 0);

@@ -16,6 +16,7 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	editLabel->SetForegroundColour(Colors::TextWhite);
 	editLabel->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
+	aspectsSizer = new wxBoxSizer(wxHORIZONTAL);
 	customAspectSizer = new wxBoxSizer(wxHORIZONTAL);
 	defaultAspects = new wxComboBox(this, -1);
 	defaultAspects->AppendString("No Aspect Constraint");
@@ -37,6 +38,15 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	defaultAspects->SetForegroundColour(Colors::TextLightGrey);
 	defaultAspects->SetBackgroundColour(this->GetBackgroundColour());
 	defaultAspects->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
+	flipAspects = new wxButton(this, CropWindow::ID_FLIP_ASPECTS, "Flip Aspect", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	flipAspects->SetForegroundColour(Colors::TextLightGrey);
+	flipAspects->SetBackgroundColour(Colors::BackGrey);
+	flipAspects->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
+	aspectsSizer->Add(defaultAspects);
+	aspectsSizer->AddSpacer(10);
+	aspectsSizer->Add(flipAspects);
 
 	customAspectWidth = new wxTextCtrl(this, -1, "1.0");
 	customAspectX = new wxStaticText(this, -1, "X");
@@ -63,35 +73,6 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	customAspectX->Hide();
 	customAspectHeight->Hide();
 
-	startXLabel = new wxStaticText(this, -1, "Starting X Position");
-	startYLabel = new wxStaticText(this, -1, "Starting Y Position");
-	widthLabel = new wxStaticText(this, -1, "Width");
-	heightLabel = new wxStaticText(this, -1, "Height");
-
-	startXLabel->SetForegroundColour(Colors::TextLightGrey);
-	startYLabel->SetForegroundColour(Colors::TextLightGrey);
-	widthLabel ->SetForegroundColour(Colors::TextLightGrey);
-	heightLabel->SetForegroundColour(Colors::TextLightGrey);
-
-	startXCtrl = new wxTextCtrl(this, -1, "0",  wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	startYCtrl = new wxTextCtrl(this, -1, "0",  wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-
-	int curProcesseedWidth = 0;
-	int curProcesseedHeight = 0;
-	this->GetProcessor()->CalcualteWidthHeightEdits(this->GetPreviousEdits(), &curProcesseedWidth, &curProcesseedHeight);
-	widthCtrl = new wxTextCtrl(this, -1, wxString::Format(wxT("%i"), curProcesseedWidth),  wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	heightCtrl = new wxTextCtrl(this, -1, wxString::Format(wxT("%i"), curProcesseedHeight),  wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	
-	startXCtrl->SetForegroundColour(Colors::TextLightGrey);
-	startYCtrl->SetForegroundColour(Colors::TextLightGrey);
-	widthCtrl->SetForegroundColour(Colors::TextLightGrey);
-	heightCtrl->SetForegroundColour(Colors::TextLightGrey);
-
-	startXCtrl->SetBackgroundColour(this->GetBackgroundColour());
-	startYCtrl->SetBackgroundColour(this->GetBackgroundColour());
-	widthCtrl->SetBackgroundColour(this->GetBackgroundColour());
-	heightCtrl->SetBackgroundColour(this->GetBackgroundColour());
-
 	enableCropBox = new wxButton(this, CropWindow::ID_ENABLE_CROP_BOX, "Enable Grid Lines", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	enableCropBox->SetForegroundColour(Colors::TextLightGrey);
 	enableCropBox->SetBackgroundColour(Colors::BackGrey);
@@ -109,15 +90,6 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	resetCrop->SetBackgroundColour(Colors::BackGrey);
 	resetCrop->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	gridSizer->Add(startXLabel);
-	gridSizer->Add(startXCtrl);
-	gridSizer->Add(startYLabel);
-	gridSizer->Add(startYCtrl);
-	gridSizer->Add(widthLabel);
-	gridSizer->Add(widthCtrl);
-	gridSizer->Add(heightLabel);
-	gridSizer->Add(heightCtrl);
-
 	buttonSizer->Add(enableCropBox);
 	buttonSizer->AddSpacer(20);
 	buttonSizer->Add(enableDisableCrop);
@@ -126,7 +98,7 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 
 	mainSizer->Add(editLabel);
 	mainSizer->AddSpacer(20);
-	mainSizer->Add(defaultAspects);
+	mainSizer->Add(aspectsSizer);
 	mainSizer->AddSpacer(10);
 	mainSizer->Add(customAspectSizer);
 	mainSizer->AddSpacer(20);
@@ -143,7 +115,7 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnEnableBox, this, CropWindow::ID_ENABLE_CROP_BOX);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnEnableCrop, this, CropWindow::ID_ENABLE_CROP);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnResetCrop, this, CropWindow::ID_RESET_CROP);
-	this->Bind(GRID_MOVE_EVENT, (wxObjectEventFunction)&CropWindow::OnGridMove, this, ID_GRID_MOVE_EVENT);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::FlipAspect, this, CropWindow::ID_FLIP_ASPECTS);
 	this->SetSizer(mainSizer);
 	this->FitInside();
 	this->SetScrollRate(5, 5);
@@ -153,9 +125,18 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 
 	cropEnabled = false;
 	forceAspect = false;
+	cropGrid.startX = 0.0;
+	cropGrid.endX = 1.0;
+	cropGrid.startY = 0.0;
+	cropGrid.endY = 1.0;
 }
 
-void CropWindow::OnCombo(wxCommandEvent& WXUNUSED(evt)) {
+void CropWindow::ChangeAspect(bool gridUpdate){
+
+	cropGrid.startX = this->GetZoomImagePanel()->GetGrid().startX;
+	cropGrid.startY = this->GetZoomImagePanel()->GetGrid().startY;
+	cropGrid.endX = this->GetZoomImagePanel()->GetGrid().endX;
+	cropGrid.endY = this->GetZoomImagePanel()->GetGrid().endY;
 
 	// No aspect constraint
 	if (defaultAspects->GetSelection() == 0) {
@@ -189,6 +170,9 @@ void CropWindow::OnCombo(wxCommandEvent& WXUNUSED(evt)) {
 
 		this->GetZoomImagePanel()->SetGridAspect(aspect);
 		this->GetZoomImagePanel()->SetEnforceGridAspect(true);
+		if(gridUpdate){
+			this->GetZoomImagePanel()->SetGrid(this->GetNewAspectGrid(aspect));	
+		}
 	}
 
 	// Default aspect constraint
@@ -219,46 +203,103 @@ void CropWindow::OnCombo(wxCommandEvent& WXUNUSED(evt)) {
 
 			this->GetZoomImagePanel()->SetGridAspect(aspect);
 			this->GetZoomImagePanel()->SetEnforceGridAspect(true);
+			if(gridUpdate){
+				this->GetZoomImagePanel()->SetGrid(this->GetNewAspectGrid(aspect));
+			}
+		}
+	}
+}
+
+Grid CropWindow::GetNewAspectGrid(double aspect) {
+	Grid retGrid;
+	retGrid.startX = cropGrid.startX;
+	retGrid.startY = cropGrid.startY;
+	retGrid.endX = cropGrid.endX;
+	retGrid.endY = cropGrid.endY;
+
+	double currentWidth = cropGrid.endX - cropGrid.startX;
+	double currentHeight = cropGrid.endY - cropGrid.startY;
+
+	double imgAspect = this->GetZoomImagePanel()->GetImageAspect();
+
+	if (aspect < 1.0) {
+		retGrid.endX = (currentHeight * aspect / imgAspect) + retGrid.startX;
+	}
+	else {
+		retGrid.endY = (currentWidth / aspect * imgAspect) + retGrid.startY;
+	}
+
+	return retGrid;
+}
+
+void CropWindow::OnCombo(wxCommandEvent& WXUNUSED(evt)) {
+	this->ChangeAspect();	
+}
+
+void CropWindow::FlipAspect(wxCommandEvent& WXUNUSED(evt)){
+
+	wxArrayString values = defaultAspects->GetStrings();
+
+	// Flip all values in the default aspect constraints
+	for(int i = 0; i < values.size(); i++){
+
+		// Flip left and right strings of X
+		if(values[i].Contains(" X ")){
+			size_t xLocation = values[i].find("X");
+			wxString leftString = values[i].substr(0, xLocation - 1);
+			wxString rightString = values[i].substr(xLocation + 2, values[i].length());
+			defaultAspects->SetString(i, rightString + " X " + leftString);
 		}
 	}
 
-	this->FitInside();
+	// Flip values on custom aspect control
+	wxString currentCustomWidth = customAspectWidth->GetValue();
+	customAspectWidth->SetValue(customAspectHeight->GetValue());
+	customAspectHeight->SetValue(currentCustomWidth);
+
+	this->ChangeAspect();	
 }
 
 void CropWindow::OnEnableBox(wxCommandEvent& WXUNUSED(evt)) {
 
-	if (cropEnabled) { return; }
-
+	if(cropEnabled) { return; }
 	boxEnabled = !boxEnabled;
 
-	if (boxEnabled) {
-		Grid cropGrid;
-		cropGrid.startX = wxAtoi(startXCtrl->GetValue());
-		cropGrid.startY = wxAtoi(startYCtrl->GetValue());
-		cropGrid.width = wxAtoi(widthCtrl->GetValue());
-		cropGrid.height = wxAtoi(heightCtrl->GetValue());
-
+	if(boxEnabled) {
 		this->GetZoomImagePanel()->SetGridOwner((int)this->GetId());
 		this->GetZoomImagePanel()->SetGrid(cropGrid);
 		this->GetZoomImagePanel()->ActivateGrid();
 		enableCropBox->SetLabel("Disable Grid Lines");
 	}
-	else {
+	else{
+		cropGrid.startX = this->GetZoomImagePanel()->GetGrid().startX;
+		cropGrid.startY = this->GetZoomImagePanel()->GetGrid().startY;
+		cropGrid.endX = this->GetZoomImagePanel()->GetGrid().endX;
+		cropGrid.endY = this->GetZoomImagePanel()->GetGrid().endY;
 		this->GetZoomImagePanel()->SetGridOwner(-1);
 		this->GetZoomImagePanel()->DeactivateGrid();
 		enableCropBox->SetLabel("Enable Grid Lines");
-	}
+	}	
 }
 
 void CropWindow::OnEnableCrop(wxCommandEvent& WXUNUSED(evt)) {
-	cropEnabled = !cropEnabled;
 
-	if (cropEnabled) {
+	this->EnableCrop(!cropEnabled);
+}
+
+void CropWindow::EnableCrop(bool enable) {
+
+	cropEnabled = enable;
+	if(this->GetZoomImagePanel()->GetGridOwner() == this->GetId()){
+		cropGrid = this->GetZoomImagePanel()->GetGrid();
+	}
+	if(enable) {
 
 		// Grey out text for grid lines, can not enable while cropping
 		enableDisableCrop->SetLabel("Disable Crop");
 		enableCropBox->SetForegroundColour(Colors::TextGrey);
-		if (boxEnabled) {
+		enableCropBox->Disable();
+		if(boxEnabled) {
 
 			// Deactive grid lines
 			this->GetZoomImagePanel()->SetGridOwner(-1);
@@ -266,92 +307,88 @@ void CropWindow::OnEnableCrop(wxCommandEvent& WXUNUSED(evt)) {
 			boxEnabled = false;
 			enableCropBox->SetLabel("Enable Grid Lines");
 		}
-
-		// Disable text boxes, cannot edit crop params while cropping
-		startXCtrl->SetForegroundColour(Colors::TextGrey);
-		startYCtrl->SetForegroundColour(Colors::TextGrey);
-		widthCtrl->SetForegroundColour(Colors::TextGrey);
-		heightCtrl->SetForegroundColour(Colors::TextGrey);
-
-		startXCtrl->Refresh(); 
-		startYCtrl->Refresh();
-		widthCtrl->Refresh();
-		heightCtrl->Refresh();
 	}
 	else {
-		// Set label of crop edit and restore grid lines text color
 		enableDisableCrop->SetLabel("Enable Crop");
 		enableCropBox->SetForegroundColour(Colors::TextLightGrey);
-
-		// Show text boxes can be edited again
-		startXCtrl->SetForegroundColour(Colors::TextLightGrey);
-		startYCtrl->SetForegroundColour(Colors::TextLightGrey);
-		widthCtrl->SetForegroundColour(Colors::TextLightGrey);
-		heightCtrl->SetForegroundColour(Colors::TextLightGrey);
-
-		startXCtrl->Refresh();
-		startYCtrl->Refresh();
-		widthCtrl->Refresh();
-		heightCtrl->Refresh();
+		enableCropBox->Enable();
 	}
+
 	this->SetUpdated(true);
 }
 
 void CropWindow::OnResetCrop(wxCommandEvent& WXUNUSED(evt)) {
-	this->ResetCropValues();
+	cropGrid.startX = 0.0;
+	cropGrid.endX = 1.0;
+	cropGrid.startY = 0.0;
+	cropGrid.endY = 1.0;
+	this->GetZoomImagePanel()->SetGrid(cropGrid);
 	this->SetUpdated(true);
 }
 
 void CropWindow::ResetCropValues() {
 
-	int curProcesseedWidth = 0;
-	int curProcesseedHeight = 0;
-	this->GetProcessor()->CalcualteWidthHeightEdits(this->GetPreviousEdits(), &curProcesseedWidth, &curProcesseedHeight);
-
-	startXCtrl->SetValue(wxString::Format(wxT("%i"), 0));
-	startYCtrl->SetValue(wxString::Format(wxT("%i"), 0));
-	widthCtrl->SetValue(wxString::Format(wxT("%i"), curProcesseedWidth));
-	heightCtrl->SetValue(wxString::Format(wxT("%i"), curProcesseedHeight));
-
-	// Set grid size of image panel 
-	if (boxEnabled) {
-		Grid cropGrid;
-		cropGrid.startX = wxAtoi(startXCtrl->GetValue());
-		cropGrid.startY = wxAtoi(startYCtrl->GetValue());
-		cropGrid.width = wxAtoi(widthCtrl->GetValue());
-		cropGrid.height = wxAtoi(heightCtrl->GetValue());
-
-		if (this->GetId() == this->GetZoomImagePanel()->GetGridOwner()) {
-			this->GetZoomImagePanel()->SetGrid(cropGrid);
-		}
-	}
 }
 
 void CropWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 	if(edit == NULL){ return;}
-	if(edit->GetEditType() == ProcessorEdit::EditType::CROP && edit->GetParamsSize() == 4){
+	if(edit->GetEditType() == ProcessorEdit::EditType::CROP && edit->GetParamsSize() == 6){
 
-		// Populate text box values
-		this->SetCropBoxUI((int) edit->GetParam(0), (int)edit->GetParam(1), (int)edit->GetParam(2), (int)edit->GetParam(3));
+		// Get start and end positions
+		cropGrid.startX = edit->GetParam(0);
+		cropGrid.startY = edit->GetParam(1);
+		cropGrid.endX = edit->GetParam(2) + cropGrid.startX;
+		cropGrid.endY = edit->GetParam(3) + cropGrid.startY;
+
+		// Get previous grid info
+		int oldOwner = this->GetZoomImagePanel()->GetGridOwner();
+		Grid oldGrid = this->GetZoomImagePanel()->GetGrid();
+
+		// Set crop grid temporarly
+		this->GetZoomImagePanel()->SetGridOwner((int)this->GetId());
+		this->GetZoomImagePanel()->SetGrid(cropGrid);
+
+		customAspectWidth->SetValue(wxString::Format(wxT("%f"), edit->GetParam(4)));
+		customAspectHeight->SetValue(wxString::Format(wxT("%f"), edit->GetParam(5)));
+
+		defaultAspects->SetSelection(edit->GetFlag(0));
+		this->ChangeAspect(false);
+
+		if(edit->GetFlag(1) == 0){ this->EnableCrop(false); }
+		if(edit->GetFlag(1) == 1){ this->EnableCrop(true); }
+
+		this->SetUpdated(true);
+
+		// Set grid back to previous info incase it's not this windows
+		if(oldOwner != this->GetId()){
+			this->GetZoomImagePanel()->SetGridOwner(oldOwner);
+			this->GetZoomImagePanel()->SetGrid(oldGrid);
+		}
 	}
 }
 
 ProcessorEdit * CropWindow::GetParamsAndFlags(){
 
+	double numerator = 0.0;
+	double denominator = 0.0;
+	customAspectWidth->GetValue().ToDouble(&numerator);
+	customAspectHeight->GetValue().ToDouble(&denominator);
+
 	if (cropEnabled) {
 
 		// Create crop edit with crop parameters
 		ProcessorEdit * cropEdit = new ProcessorEdit(ProcessorEdit::EditType::CROP);
-		cropEdit->AddParam((double)wxAtoi(startXCtrl->GetValue()));
-		cropEdit->AddParam((double)wxAtoi(startYCtrl->GetValue()));
-		cropEdit->AddParam((double)wxAtoi(widthCtrl->GetValue()));
-		cropEdit->AddParam((double)wxAtoi(heightCtrl->GetValue()));
-			
-		lastCropGrid.startX = (int)cropEdit->GetParam(0);
-		lastCropGrid.startY = (int)cropEdit->GetParam(1);
-		lastCropGrid.width = (int)cropEdit->GetParam(2);
-		lastCropGrid.height = (int)cropEdit->GetParam(3);
+
+		cropEdit->AddParam(cropGrid.startX);
+		cropEdit->AddParam(cropGrid.startY);
+		cropEdit->AddParam(cropGrid.endX - cropGrid.startX);
+		cropEdit->AddParam(cropGrid.endY - cropGrid.startY);
+		cropEdit->AddParam(numerator);
+		cropEdit->AddParam(denominator);
+
+		cropEdit->AddFlag(defaultAspects->GetSelection());
+		cropEdit->AddFlag((int)cropEnabled);
 
 		// Set enabled / disabled
 		cropEdit->SetDisabled(isDisabled);
@@ -363,11 +400,13 @@ ProcessorEdit * CropWindow::GetParamsAndFlags(){
 		ProcessorEdit * cropEdit = new ProcessorEdit(ProcessorEdit::EditType::CROP);
 		cropEdit->AddParam((double)0.0);
 		cropEdit->AddParam((double)0.0);
-		int curProcesseedWidth = 0;
-		int curProcesseedHeight = 0;
-		this->GetProcessor()->CalcualteWidthHeightEdits(this->GetPreviousEdits(), &curProcesseedWidth, &curProcesseedHeight);
-		cropEdit->AddParam((double)curProcesseedWidth);
-		cropEdit->AddParam((double)curProcesseedHeight);
+		cropEdit->AddParam((double)1.0);
+		cropEdit->AddParam((double)1.0);
+		cropEdit->AddParam(numerator);
+		cropEdit->AddParam(denominator);
+
+		cropEdit->AddFlag(defaultAspects->GetSelection());
+		cropEdit->AddFlag((int)cropEnabled);
 
 		// Set enabled / disabled
 		cropEdit->SetDisabled(isDisabled);
@@ -380,126 +419,17 @@ bool CropWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false;}
 
-	if(edit->GetEditType() == ProcessorEdit::EditType::CROP && edit->GetParamsSize() == 4){
+	if(edit->GetEditType() == ProcessorEdit::EditType::CROP && edit->GetParamsSize() == 6){
 		return true;
 	}
 	return false;
 }
 
-void CropWindow::SetCropBoxUI(int startX, int startY, int width, int height) {
-
-	// Set crop box values
-	startXCtrl->SetValue(wxString::Format(wxT("%i"), startX));
-	startYCtrl->SetValue(wxString::Format(wxT("%i"), startY));
-	widthCtrl->SetValue(wxString::Format(wxT("%i"), width));
-	heightCtrl->SetValue(wxString::Format(wxT("%i"), height));
-}
-
-void CropWindow::OnGridMove(wxCommandEvent& WXUNUSED(evt)) {
-
-	// Set text box text based on image panel grid
-	if (this->GetId() == this->GetZoomImagePanel()->GetGridOwner()) {
-
-		Grid cropGrid = this->GetZoomImagePanel()->GetGrid();
-		{wxEventBlocker blocker(this);
-			this->SetCropBoxUI(cropGrid.startX, cropGrid.startY, cropGrid.width, cropGrid.height);
-		}
-	}
-}
-
-void CropWindow::OnText(wxCommandEvent& evt) {
-
-	if (cropEnabled) {
-
-		// Block text event and set values of text boxes of edit size.  
-		// Disables editing of text boxes while cropping.  Using 
-		// Disable method changes color of text and background
-		{wxEventBlocker blocker(this);
-			this->SetCropBoxUI(lastCropGrid.startX, lastCropGrid.startY, lastCropGrid.width, lastCropGrid.height);
-		}
-	}
-
-	// Get crop values
-	Grid cropGrid;
-	cropGrid.startX = wxAtoi(startXCtrl->GetValue());
-	cropGrid.startY = wxAtoi(startYCtrl->GetValue());
-	cropGrid.width = wxAtoi(widthCtrl->GetValue());
-	cropGrid.height= wxAtoi(heightCtrl->GetValue());
-
-	// Handle aspect constraints
-	if (defaultAspects->GetSelection() != 0) {
-
-		// Width control changed, update height based on width
-		if (evt.GetId() == widthCtrl->GetId()) {
-
-			cropGrid.height = cropGrid.width / aspect;
-			{wxEventBlocker blocker(this);
-				heightCtrl->SetValue(wxString::Format(wxT("%i"), cropGrid.height));
-			}
-		}
-
-		// Height control changed, update width based on height
-		if (evt.GetId() == heightCtrl->GetId()) {
-
-			cropGrid.width = cropGrid.height * aspect;
-			{wxEventBlocker blocker(this);
-				widthCtrl->SetValue(wxString::Format(wxT("%i"), cropGrid.width));
-			}
-		}
-	}
-
-	Grid limitGrid = this->limitGrid(cropGrid);
-
-	// Block text event and set values of text boxes of limit size
-	{wxEventBlocker blocker(this);
-		this->SetCropBoxUI(limitGrid.startX, limitGrid.startY, limitGrid.width, limitGrid.height);
-	}
-
-	// Set grid size if crop edit owns it
-	if (this->GetId() == this->GetZoomImagePanel()->GetGridOwner()) {
-		this->GetZoomImagePanel()->SetGrid(limitGrid);
-	}
-	
+void CropWindow::OnText(wxCommandEvent& WXUNUSED(evt)) {
+	this->ChangeAspect();
 }
 
 Grid CropWindow::limitGrid(Grid inGrid) {
-
-	// Calculate width and height of image with edits so far
-	int curProcesseedWidth = 0;
-	int curProcesseedHeight = 0;
-	this->GetProcessor()->CalcualteWidthHeightEdits(this->GetPreviousEdits(), &curProcesseedWidth, &curProcesseedHeight);
-
-	// Set crop params to proper values if they are not already
-	if (inGrid.startX < 0) { inGrid.startX = 0; }
-	if (inGrid.startY < 0) { inGrid.startY = 0; }
-	if (inGrid.width < 1) { inGrid.width = 1; }
-	if (inGrid.height < 1) { inGrid.height = 1; }
-
-	// Set crop start X and Y to be inside image size
-	if (inGrid.startX > curProcesseedWidth) { inGrid.startX = curProcesseedWidth - 1; }
-	if (inGrid.startY > curProcesseedHeight) { inGrid.startY = curProcesseedHeight - 1; }
-
-	// Set width and height to valid values
-	if ((inGrid.startX + inGrid.width) > curProcesseedWidth) { 
-
-		inGrid.width = curProcesseedWidth - inGrid.startX; 
-		
-		// Adjust height based on new width if needed
-		if (defaultAspects->GetSelection() != 0) {
-			inGrid.height = inGrid.width / aspect;
-		}
-	}
-	if ((inGrid.startY + inGrid.height) > curProcesseedHeight) { 
-
-		inGrid.height = curProcesseedHeight - inGrid.startY;
-
-		// Adjust width based on new height if needed
-		if (defaultAspects->GetSelection() != 0) {
-			inGrid.width = inGrid.height * aspect;
-		}
-	}
-	if (inGrid.width < 1) { inGrid.width = 1; }
-	if (inGrid.height < 1) { inGrid.height = 1; }
 
 	return inGrid;
 }

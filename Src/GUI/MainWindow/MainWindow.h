@@ -34,12 +34,6 @@
 #include "Session/Session.h"
 #include "Debugging/MemoryLeakCheck.h"
 
-enum {
-	ID_UPDATE_IMAGE
-};
-
-wxDECLARE_EVENT(UPDATE_IMAGE_EVENT, wxCommandEvent);
-
 /**
 	Main Window is the main display window of PhoediX.
 */
@@ -69,6 +63,7 @@ private:
 	void ShowLibrary(wxCommandEvent& WXUNUSED(event));
 	void ShowOriginal(wxCommandEvent& WXUNUSED(event));
 	void ShowOriginalWindow(wxCommandEvent& WXUNUSED(event));
+	void OnEnableFastEdit(wxCommandEvent& evt);
 	void ShowSettings(wxCommandEvent& WXUNUSED(event));
 	void ShowAbout(wxCommandEvent& WXUNUSED(event));
 	void ShowSupportedCameras(wxCommandEvent& WXUNUSED(event));
@@ -146,24 +141,33 @@ private:
 	wxApp * app;
 
 	enum MenuBar {
+
+		// File
 		ID_NEW_PROJECT = 1,
 		ID_SHOW_LOAD_PROJECT,
-		ID_SHOW_SAVE_PROJECT,
 		ID_QUICK_SAVE_PROJECT,
+		ID_SHOW_SAVE_PROJECT,
+		ID_CLOSE_CURRENT_PROJECT,
+		ID_CLOSE_ALL_PROJECTS,
 		ID_SHOW_LOAD_FILE,
 		ID_SHOW_EXPORT,
+		ID_SHOW_SETTINGS,
 		ID_EXIT,
+
+		// View
 		ID_SHOW_IMAGE,
 		ID_SHOW_EDIT_LIST,
 		ID_SHOW_HISTOGRAMS,
-		ID_SHOW_SETTINGS,
+
+		// Tools
+		ID_ENABLE_FAST_EDIT,
 		ID_SHOW_ORIGINAL,
 		ID_SHOW_ORIGINAL_WINDOW,
+		ID_SHOW_SNAPSHOTS,
 		ID_SHOW_PIXEL_PEEP,
 		ID_SHOW_LIBRARY,
-		ID_SHOW_SNAPSHOTS,
-		ID_CLOSE_CURRENT_PROJECT,
-		ID_CLOSE_ALL_PROJECTS,
+
+		// Help
 		ID_SHOW_SUPPORTED_CAMERAS,
 		ID_ABOUT
 	};
@@ -172,27 +176,19 @@ private:
 		EVT_CLEAR_STATUS_TIMER = 1
 	};
 
-
-	class ImagePanelUpdateThread : public wxThread {
+	class ChangeImageThread : public wxThread {
 
 		public:
-			ImagePanelUpdateThread(MainWindow * mainWin, ZoomImagePanel * imagePanel, PixelPeepWindow * pixelPeepWindow, Processor * processor, HistogramDisplay * histogramDisplay, ExportWindow * exportWindow);
+			ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor);
 			void StopWatching();
 
 		protected:
 			virtual wxThread::ExitCode Entry();
 
 		private:
-			bool continueWatch;
 			ZoomImagePanel * imgPanel;
-			HistogramDisplay * histogramDisp;
 			Processor * proc;
-			ExportWindow * exportWin;
-			PixelPeepWindow * pixelPeep;
-			MainWindow * parent;
 	};
-
-	ImagePanelUpdateThread * imgPanelThread;
 
 };		
 #endif

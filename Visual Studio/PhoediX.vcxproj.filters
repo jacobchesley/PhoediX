@@ -121,9 +121,6 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Adjust HSL">
       <UniqueIdentifier>{8dc6b330-1550-4cda-b9cf-e8ac49f79d50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB">
-      <UniqueIdentifier>{212613a4-d050-4c78-8bba-a13bfee5ca6b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Scale">
       <UniqueIdentifier>{cd57c266-5eae-44cf-8f66-90f3d5875b75}</UniqueIdentifier>
     </Filter>
@@ -183,6 +180,12 @@
     </Filter>
     <Filter Include="Settings">
       <UniqueIdentifier>{81b6c7e5-f2a9-46d2-ac46-4869dfb38201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Adjust RGB">
+      <UniqueIdentifier>{212613a4-d050-4c78-8bba-a13bfee5ca6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB">
+      <UniqueIdentifier>{9764147b-f381-48bd-a1c2-4cadbf414925}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -285,9 +288,6 @@
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustHSLWindow\AdjustHSLWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust HSL</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.cpp">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\ScaleWindow\ScaleWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Scale</Filter>
     </ClCompile>
@@ -344,6 +344,12 @@
     </ClCompile>
     <ClCompile Include="..\Src\Settings\Settings.cpp">
       <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustRGBWindow\AdjustRGBWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust RGB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.cpp">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -461,9 +467,6 @@
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustHSLWindow\AdjustHSLWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust HSL</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\ShiftRGBWindow.h">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Shift RGB</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\GUI\Icons\Splash.h">
       <Filter>GUI\Icons</Filter>
     </ClInclude>
@@ -529,6 +532,12 @@
     </ClInclude>
     <ClInclude Include="..\Src\Settings\Settings.h">
       <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\AdjustRGBWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust RGB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

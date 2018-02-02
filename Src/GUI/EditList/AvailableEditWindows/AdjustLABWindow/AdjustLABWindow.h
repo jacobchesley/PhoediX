@@ -1,7 +1,7 @@
 // Copyright 2016 Jacob Chesley
 
-#ifndef ADJUST_HSL_WINDOW_H
-#define ADJUST_HSL_WINDOW_H
+#ifndef ADJUST_LAB_WINDOW_H
+#define ADJUST_LAB_WINDOW_H
 
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
@@ -9,10 +9,9 @@
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
 
-class AdjustHSLWindow : public EditWindow {
+class AdjustLABWindow : public EditWindow {
 public:
-	AdjustHSLWindow(wxWindow * parent, wxString editName, Processor * processor);
-	void AddEditToProcessor();
+	AdjustLABWindow(wxWindow * parent, wxString editName, Processor * processor);
 	void SetParamsAndFlags(ProcessorEdit * edit);
 	bool CheckCopiedParamsAndFlags();
 	ProcessorEdit * GetParamsAndFlags();
@@ -26,17 +25,17 @@ private:
 
 	wxStaticText * editLabel;
 
-	wxStaticText * hueShiftLabel;
-	wxStaticText * saturationScaleLabel;
 	wxStaticText * luminaceScaleLabel;
-	wxStaticText * rLabel;
-	wxStaticText * gLabel;
+	wxStaticText * aLabel;
 	wxStaticText * bLabel;
+	wxStaticText * redLabel;
+	wxStaticText * greenLabel;
+	wxStaticText * blueLabel;
 
 
-	DoubleSlider * hueShiftSlider;
-	DoubleSlider * saturationScaleSlider;
-	DoubleSlider * luminaceScaleSlider;
+	DoubleSlider * lSlider;
+	DoubleSlider * aSlider;
+	DoubleSlider * bSlider;
 
 	DoubleSlider * rScaleSlider;
 	DoubleSlider * gScaleSlider;
