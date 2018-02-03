@@ -60,7 +60,7 @@ private:
 			wxString HEX_16;
 		};
 		enum {
-			ID_COPY_R8,
+			ID_COPY_R8 = 1,
 			ID_COPY_G8,
 			ID_COPY_B8,
 			ID_COPY_R16,
