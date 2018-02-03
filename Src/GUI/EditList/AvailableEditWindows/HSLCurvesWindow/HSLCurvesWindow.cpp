@@ -66,7 +66,7 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 	proc = processor;
 
 	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&HSLCurvesWindow::OnUpdate, this);
 	this->StartWatchdog();
 }

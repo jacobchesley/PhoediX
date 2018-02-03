@@ -79,7 +79,7 @@ AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&AdjustHSLWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&AdjustHSLWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&AdjustHSLWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);

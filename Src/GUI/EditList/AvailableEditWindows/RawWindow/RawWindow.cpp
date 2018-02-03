@@ -339,7 +339,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->SetScrollRate(5, 5);
 	this->SetClientSize(this->GetVirtualSize());
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&RawWindow::OnSlide, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&RawWindow::OnSlide, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&RawWindow::OnSlide, this);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RawWindow::OnCombo, this);
 	this->Bind(wxEVT_CHECKBOX, (wxObjectEventFunction)&RawWindow::OnCheck, this);

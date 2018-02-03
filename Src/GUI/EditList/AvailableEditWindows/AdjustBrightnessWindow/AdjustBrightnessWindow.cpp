@@ -62,7 +62,7 @@ AdjustBrightnessWindow::AdjustBrightnessWindow(wxWindow * parent, wxString editN
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&AdjustBrightnessWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&AdjustBrightnessWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&AdjustBrightnessWindow::OnUpdate, this);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&AdjustBrightnessWindow::OnUpdate, this);
 

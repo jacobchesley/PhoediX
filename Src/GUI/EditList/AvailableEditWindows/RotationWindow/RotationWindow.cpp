@@ -74,7 +74,7 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&RotationWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&RotationWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&RotationWindow::OnUpdate, this);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RotationWindow::OnCombo, this);
 

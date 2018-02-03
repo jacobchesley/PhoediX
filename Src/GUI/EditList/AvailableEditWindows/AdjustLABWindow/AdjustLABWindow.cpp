@@ -80,7 +80,7 @@ AdjustLABWindow::AdjustLABWindow(wxWindow * parent, wxString editName, Processor
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&AdjustLABWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&AdjustLABWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&AdjustLABWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);

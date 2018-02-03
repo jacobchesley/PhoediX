@@ -128,7 +128,7 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ChannelMixerWindow::OnSlide, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&ChannelMixerWindow::OnSlide, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ChannelMixerWindow::OnSlide, this);
 
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ChannelMixerWindow::PresetChange, this);

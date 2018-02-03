@@ -59,7 +59,7 @@ AdjustRGBWindow::AdjustRGBWindow(wxWindow * parent, wxString editName, Processor
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&AdjustRGBWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&AdjustRGBWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&AdjustRGBWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);

@@ -84,7 +84,7 @@ ScaleWindow::ScaleWindow(wxWindow * parent, wxString editName, Processor * proce
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ScaleWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&ScaleWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ScaleWindow::OnUpdate, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ScaleWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ScaleWindow::OnCombo, this);

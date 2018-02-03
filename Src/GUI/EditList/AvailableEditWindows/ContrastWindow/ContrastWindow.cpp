@@ -104,7 +104,7 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 	proc = processor;
 	parWindow = parent;
 
-	this->Bind(wxEVT_SCROLL_CHANGED, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);
