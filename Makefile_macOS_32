@@ -1,8 +1,10 @@
-WX_BUILD_PATH = /Users/jacob/Development/wxWidgets-master/build-release/
-LIBRAW_PATH = /Users/jacob/Development/LibRaw-0.18.2
-LIBTIFF_PATH = /Users/jacob/Development/tiff-4.0.7
+WX_PATH = /Users/jacob/Development/wxWidgets-3.1.0
+LIBRAW_PATH = /Users/jacob/Development/LibRaw-0.18.7
+LIBTIFF_PATH = /Users/jacob/Development/tiff-4.0.9
 
 # No need to modify any lines below.
+
+LIB_BUILD_PATH = build-release_32
 
 APP_NAME = PhoediX.app
 RESOURCES = $(PWD)/macOSResources
@@ -10,29 +12,30 @@ RESOURCES = $(PWD)/macOSResources
 LIBRAW_INCLUDE_PATH = $(LIBRAW_PATH)/libraw
 LIBTIFF_INCLUDE_PATH = $(LIBTIFF_PATH)/libtiff
 
-LIBRAW_LINK_PATH = $(LIBRAW_PATH)/lib/.libs
-LIBTIFF_LINK_PATH = $(LIBTIFF_PATH)/libtiff/.libs
+LIBRAW_LINK_PATH = $(LIBRAW_PATH)/$(LIB_BUILD_PATH)/lib/.libs
+LIBTIFF_LINK_PATH = $(LIBTIFF_PATH)/$(LIB_BUILD_PATH)/libtiff/.libs
 
-CC = g++
-COMPILE_FLAG = -w -c -mmacosx-version-min=10.7 -g
+CC = clang++
+COMPILE_FLAG = -w -c -O2 -arch i386 -mmacosx-version-min=10.7
 
-WX_CXXFLAGS = $(shell $(WX_BUILD_PATH)./wx-config --cxxflags)
-WX_LFALGS = $(shell $(WX_BUILD_PATH)./wx-config --libs all)
-BUILD_DIR = ./Build
+WX_CXXFLAGS = $(shell $(WX_PATH)/$(LIB_BUILD_PATH)/./wx-config --cxxflags)
+WX_LFALGS = $(shell $(WX_PATH)/$(LIB_BUILD_PATH)/./wx-config --libs all)
+BUILD_DIR = ./Build/Release_32
 OUT_DIR = $(BUILD_DIR)/Objects
 INCLUDE_ALL = -I$(SRC) $(WX_CXXFLAGS) -I$(LIBRAW_INCLUDE_PATH) -I$(LIBTIFF_INCLUDE_PATH)
 
-LL = g++
-LINK_FLAG = -o
-LINK_ALL = $(WX_LFALGS)	$(LIBRAW_LINK_PATH)/libraw.dylib $(LIBTIFF_LINK_PATH)/libtiff.dylib -mmacosx-version-min=10.7
+LL = clang++
+LINK_FLAG = -arch i386 -o
+LIB_PATH = $(BUILD_DIR)/lib
+LINK_ALL = $(WX_LFALGS)	$(LIB_PATH)/libraw_r.16.dylib $(LIB_PATH)/libtiff.5.dylib -mmacosx-version-min=10.7
 
 SRC=./Src
 
 All:
-	$(MAKE) -f Makefile_macOS Clean
-	$(MAKE) -f Makefile_macOS -j 4 AllObjects
-	$(MAKE) -f Makefile_macOS Link
-	$(MAKE) -f Makefile_macOS MacApp
+	$(MAKE) -f Makefile_macOS_32 Clean
+	$(MAKE) -f Makefile_macOS_32 -j 4 AllObjects
+	$(MAKE) -f Makefile_macOS_32 Link
+	$(MAKE) -f Makefile_macOS_32 MacApp
 
 #App
 AppObjects = PhoediX.o
@@ -339,24 +342,44 @@ AllObjects : $(AllObjectsStr)
 AllObjectsOutStr = $(AppObjectsOut) $(AllGUIObjectsOut) $(ProcessingObjectsOut) $(SessionObjectsOut) $(SplineObjectsOut) $(SettingsObjectsOut) $(LoggerObjectsOut)
 
 Link:
-	$(LL) $(LINK_FLAG) $(BUILD_DIR)/PhoediX $(AllObjectsOutStr) $(LINK_ALL)
+	rm -rf $(LIB_PATH)
+	rm -rf $(BUILD_DIR)/App/
+	mkdir $(LIB_PATH)
+	mkdir $(BUILD_DIR)/App/
+
+	cp $(LIBRAW_LINK_PATH)/libraw_r.16.dylib $(LIB_PATH)
+	cp $(LIBTIFF_LINK_PATH)/libtiff.5.dylib $(LIB_PATH)
+
+	install_name_tool -id @loader_path/../lib/libraw_r.16.dylib $(LIB_PATH)/libraw_r.16.dylib
+	install_name_tool -id @loader_path/../lib/libtiff.5.dylib $(LIB_PATH)/libtiff.5.dylib
+
+	$(LL) $(LINK_FLAG) $(BUILD_DIR)/App/PhoediX $(AllObjectsOutStr) $(LINK_ALL)
+	
+	install_name_tool -change $(LIB_PATH)/libraw_r.16.dylib @loader_path/../lib/libraw_r.16.dylib $(BUILD_DIR)/App/PhoediX
+	install_name_tool -change $(LIB_PATH)/libtiff.5.dylib @loader_path/../lib/libtiff.5.dylib $(BUILD_DIR)/App/PhoediX
+	#install_name_tool -add_rpath “@executable_path/lib/“ $(BUILD_DIR)/App/PhoediX
 
 Clean:
 	rm -rf $(BUILD_DIR)
 	mkdir $(BUILD_DIR)
+	mkdir $(BUILD_DIR)/App
 	mkdir $(OUT_DIR)
 
 MacApp:
-	SetFile -t APPL $(BUILD_DIR)/PhoediX
+	SetFile -t APPL $(BUILD_DIR)/App/PhoediX
 	rm -rf $(BUILD_DIR)/$(APP_NAME)
 	mkdir $(BUILD_DIR)/$(APP_NAME)
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents
+	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/lib
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/Resources
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/Resources/English.lproj
 	
+	cp $(LIB_PATH)/libraw_r.16.dylib $(BUILD_DIR)/$(APP_NAME)/Contents/lib
+	cp $(LIB_PATH)/libtiff.5.dylib $(BUILD_DIR)/$(APP_NAME)/Contents/lib
+
+
 	cp $(RESOURCES)/Info.plist $(BUILD_DIR)/$(APP_NAME)/Contents
 	echo -n ‘APPL????’ > $(BUILD_DIR)/$(APP_NAME)/Contents/PkgInfo
-	cp $(BUILD_DIR)/PhoediX $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS/PhoediX
-	#cp $(LIBRAW_LINK_PATH)/libraw.dylib $(BUILD_DIR)/$(APP_NAME)/Contents/Frameworks
-	#cp $(LIBTIFF_LINK_PATH)/libtiff.dylib $(BUILD_DIR)/$(APP_NAME)/Contents/Frameworks
+	cp $(BUILD_DIR)/App/PhoediX $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS/
+	
