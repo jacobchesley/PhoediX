@@ -136,6 +136,11 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 		// used to detect changes in mouse position
 		OldX = x;
 		OldY = y;
+        
+        this->Refresh();
+        this->Update();
+        
+        wxSafeYield();
 	}
 	evt.Skip(false);
 }
