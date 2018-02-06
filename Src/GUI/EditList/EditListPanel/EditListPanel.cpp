@@ -117,18 +117,26 @@ void EditListPanel::OnPopupMenuClick(wxCommandEvent& inEvt) {
 
 void EditListPanel::ReprocessImageEvt(wxCommandEvent& WXUNUSED(event)) {
 	this->ReprocessImage();
+	this->InformParentReprocess();
 }
 
 void EditListPanel::ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
 
 	// Reprocess raw with no unpacking
 	this->ReprocessImageRaw(false);
+	this->InformParentReprocess();
 }
 
 void EditListPanel::ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
 
 	// Reprocess raw with unpack
 	this->ReprocessImageRaw(true);
+	this->InformParentReprocess();
+}
+
+void EditListPanel::InformParentReprocess(){
+	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
+	wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
 }
 
 void EditListPanel::AddEditsToProcessor() {
@@ -457,7 +465,6 @@ void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 	// Mark raw processor top edits as permenant.  Cannot move any edits above this one.
 	scroller->SetNumTopEdits(1);
 	hasRaw = true;
-
 }
 
 void EditListPanel::RemoveRawWindow() {
@@ -467,6 +474,10 @@ void EditListPanel::RemoveRawWindow() {
 		scroller->SetNumTopEdits(0);
 		hasRaw = false;
 	}
+}
+
+bool EditListPanel::GetRawWindowOpen(){
+	return hasRaw;
 }
 
 EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWindow(parent) {

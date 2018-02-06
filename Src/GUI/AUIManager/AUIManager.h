@@ -20,11 +20,11 @@ class PhoedixAUIManager {
 	public:
 		static wxAuiManager * GetPhoedixAUIManager();
 		static void SetPhoedixAUIManager(wxAuiManager * manager);
-		static wxWindow * GetMainWindow();
-		static void SetMainWindow(wxWindow * window);
+		static wxFrame * GetMainWindow();
+		static void SetMainWindow(wxFrame * window);
 
 	private:
 		static wxAuiManager * auiManager;
-		static wxWindow * mainWindow;
+		static wxFrame * mainWindow;
 };
 #endif

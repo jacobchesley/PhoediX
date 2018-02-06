@@ -24,10 +24,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuWindow = new wxMenu();
 	menuHelp = new wxMenu();
 
-	menuFile->Append(MainWindow::MenuBar::ID_NEW_PROJECT, _("New PhoediX Project\tCtrl+N"));
-	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT, _("Open PhoediX Project\tCtrl+O"));
-	menuFile->Append(MainWindow::MenuBar::ID_QUICK_SAVE_PROJECT, _("Save PhoediX Project\tCtrl+S"));
-	menuFile->Append(MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT, _("Save PhoediX Project As..."));
 	menuCloseProjects->Append(MainWindow::MenuBar::ID_CLOSE_CURRENT_PROJECT, _("Close Current Project"));
 	menuCloseProjects->Append(MainWindow::MenuBar::ID_CLOSE_ALL_PROJECTS, _("Close All Projects"));
 	menuFile->AppendSubMenu(menuCloseProjects, _("Close Project..."));
@@ -199,13 +195,9 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	aboutWindow = new AboutWindow(this);
 	supportedCamerasWindow = new SupportedCamerasWindow(this);
 
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnNewProject, this, MainWindow::MenuBar::ID_NEW_PROJECT);
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadProject, this, MainWindow::MenuBar::ID_SHOW_LOAD_PROJECT);
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::QuickSaveProject, this, MainWindow::MenuBar::ID_QUICK_SAVE_PROJECT);
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSaveProject, this, MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::CloseCurrentProject, this, MainWindow::MenuBar::ID_CLOSE_CURRENT_PROJECT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::CloseAllProjects, this, MainWindow::MenuBar::ID_CLOSE_ALL_PROJECTS);
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadFile, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLoadImage, this, MainWindow::MenuBar::ID_SHOW_LOAD_FILE);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowExport, this, MainWindow::MenuBar::ID_SHOW_EXPORT);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSettings, this, MainWindow::MenuBar::ID_SHOW_SETTINGS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnClose, this, MainWindow::MenuBar::ID_EXIT);
@@ -230,6 +222,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(wxEVT_AUI_PANE_CLOSE, (wxObjectEventFunction)&MainWindow::OnPaneClose, this);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::ClearStatusbarText, this, EVT_CLEAR_STATUS_TIMER);
 	this->Bind(UPDATE_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnUpdateImage, this, ID_UPDATE_IMAGE);
+	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnReprocess, this, ID_REPROCESS_IMAGE);
 
 	emptyImage = new wxImage(0, 0);
 	emptyPhxImage = new Image();
@@ -262,14 +255,10 @@ void MainWindow::OpenFiles(wxArrayString files) {
 			this->LoadProject(files.Item(i));
 		}
 		else{
-			this->CreateNewProject();
+			//this->CreateNewProject();
 			this->OpenImage(files.Item(i));
 		}
 	}
-}
-
-void MainWindow::OnNewProject(wxCommandEvent& WXUNUSED(event)) {
-	this->CreateNewProject();
 }
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
@@ -365,15 +354,17 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 	}
 }
 
-void MainWindow::CreateNewProject(){
-
+void MainWindow::CreateNewProject(wxString projectFile){
 
 	// Save the current session
 	this->SaveCurrentSession();
+
 	PhoediXSession newSession;
 	this->SetUniqueID(&newSession);
-	newSession.SetName("Untitled - " + wxString::Format(wxT("%i"), numnUnnamedProjectsOpen + 1));
-	numnUnnamedProjectsOpen += 1;
+
+	wxFileName phoedixProject(projectFile);
+	newSession.SetName(phoedixProject.GetName());
+	newSession.SetProjectPath(projectFile);
 
 	menuWindow->AppendCheckItem(newSession.GetID(), _(newSession.GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession.GetID());
@@ -400,6 +391,7 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 			this->SaveCurrentSession();
 			this->OpenSession(&allSessions[i]);
 			currentSession = allSessions[i];
+			this->OpenImage(currentSession.GetImageFilePath(), false);
 			return;
 		}
 	}
@@ -411,8 +403,6 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	imagePanel->ChangeImage(emptyImage);
 	histogramDisplay->ZeroOutHistograms();
 	
-	// Set the new image
-	this->OpenImage(session->GetImageFilePath());
 	if(session->GetImageScrollWidth() > 0 && session->GetImageScrollHeight() > 0) {
 		wxImage * tempImage = new wxImage(session->GetImageScrollWidth(), session->GetImageScrollHeight());
 		imagePanel->ChangeImage(tempImage);
@@ -483,72 +473,10 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 }
 
 
-void MainWindow::ShowSaveProject(wxCommandEvent& WXUNUSED(event)) {
+void MainWindow::SaveProject(wxCommandEvent & WXUNUSED(evt)) {
 
-	wxFileDialog saveFileDialog(this, _("Save PhoediX Project"), "", "", "PhoediX Project Files (*.phx)|*.phx", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-	if (saveFileDialog.ShowModal() == wxID_CANCEL) {
-		return;
-	}
-	
-	if(currentSession.GetName().Contains("Untitled -") && !currentSession.GetName().Contains(".phx")){
-		numnUnnamedProjectsOpen -= 1;
-	}
 	this->SaveCurrentSession();
-	currentSession.SaveSessionToFile(saveFileDialog.GetPath());
-	currentSession.SetName(saveFileDialog.GetFilename());
-	currentSession.SetProjectPath(saveFileDialog.GetPath());
-
-	// Change name on menu object
-	size_t numWindowMenuItems = menuWindow->GetMenuItems().size();
-	for(size_t i = 0; i < numWindowMenuItems; i++){
-		if(currentSession.GetID() == menuWindow->GetMenuItems()[i]->GetId()){
-			menuWindow->GetMenuItems()[i]->SetItemLabel(currentSession.GetName());
-		}
-	}
-
-	// Replace existing session in saved sessions
-	bool sessionSavedBefore = false;
-	for (size_t i = 0; i < savedSessions.size(); i++) {
-		if (savedSessions[i].GetID() == currentSession.GetID()) {
-			savedSessions[i] = currentSession;
-			sessionSavedBefore = true;
-		}
-	}
-	if (!sessionSavedBefore) {
-		savedSessions.push_back(currentSession);
-	}
-	this->SetStatusbarText(currentSession.GetName() + " Saved");
-	clearStatusTimer->StartOnce(1000);
-}
-
-void MainWindow::QuickSaveProject(wxCommandEvent & WXUNUSED(evt)) {
-
-	// If current project has not been saved to disk (has untilted and does not have a .phx extension
-	// Open a full save dialog
-	if (currentSession.GetName().Contains("Untitled -") && !currentSession.GetName().Contains(".phx")) {
-		wxCommandEvent saveEvt(wxEVT_COMMAND_MENU_SELECTED, ID_SHOW_SAVE_PROJECT);
-		wxPostEvent(this, saveEvt);
-	}
-
-	// Save project to loaded location
-	else {
-		this->SaveCurrentSession();
-		currentSession.SaveSessionToFile(currentSession.GetProjectPath());
-		this->SetStatusbarText(currentSession.GetName() + " Saved");
-		clearStatusTimer->StartOnce(1000);
-	}
-
-	// Replace existing session in saved sessions
-	bool sessionSavedBefore = false;
-	for (size_t i = 0; i < savedSessions.size(); i++) {
-		if (savedSessions[i].GetID() == currentSession.GetID()) {
-			savedSessions[i] = currentSession;
-			sessionSavedBefore = true;
-		}
-	}
-	if (!sessionSavedBefore) {
-		savedSessions.push_back(currentSession);
-	}
+	currentSession.SaveSessionToFile(currentSession.GetProjectPath());
 }
 
 void MainWindow::SaveCurrentSession() {
@@ -580,16 +508,6 @@ void MainWindow::SaveCurrentSession() {
 	}
 }
 
-void MainWindow::ShowLoadProject(wxCommandEvent& WXUNUSED(event)){
-
-	// Display load phoedix project dialog
-	wxFileDialog openFileDialog(this, _("Open PhoediX Project"), "", "", "PhoediX Project Files (*.phx)|*.phx", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
-	if (openFileDialog.ShowModal() == wxID_CANCEL) {
-		return;
-	}
-	this->LoadProject(openFileDialog.GetPath());
-}
-
 void MainWindow::LoadProject(wxString projectPath) {
 
 	// Save the current session
@@ -617,7 +535,7 @@ void MainWindow::LoadProject(wxString projectPath) {
 
 void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {
 
-	this->CreateNewProject();
+	//this->CreateNewProject();
 	this->OpenImage(evt.GetString());
 }
 
@@ -656,61 +574,24 @@ void MainWindow::SetUniqueID(PhoediXSession * session) {
 	}
 }
 
-void MainWindow::ShowLoadFile(wxCommandEvent& WXUNUSED(event)) {
+void MainWindow::ShowLoadImage(wxCommandEvent& WXUNUSED(event)) {
    
 	wxFileDialog openFileDialog(this, _("Open Image"), "", "", ImageHandler::imageOpenDialogList, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (openFileDialog.ShowModal() == wxID_CANCEL) {
 		return;
 	}
-
-	processor->SetDoFitImage(true);
-
-	// If no sessions exist, create a new project and open image to the new project
-	if (allSessions.size() <= 0) {
-        
-		this->CreateNewProject();
-		this->OpenImage(openFileDialog.GetPath());
-		this->ShowImageRelatedWindows();
-		//reprocessCountdown->Start(500, true);
-	}
-
-	// Ask to import to current project, or to new project if sessions already exists
-	else {
-		ImportImageDialog * importDialog = new ImportImageDialog(this);
-		int importReturn = importDialog->ShowModal();
-
-		if (importReturn == ImportImageDialog::ID_IMPORT_CURRENT_PROJECT) {
-			this->OpenImage(openFileDialog.GetPath());
-			this->ShowImageRelatedWindows();
-			//reprocessCountdown->Start(500, true);
-		}
-		else if (importReturn == ImportImageDialog::ID_IMPORT_NEW_PROJECT) {
-			this->CreateNewProject();
-			this->OpenImage(openFileDialog.GetPath());
-			this->ShowImageRelatedWindows();
-			//reprocessCountdown->Start(500, true);
-		}
-	}
+	this->OpenImage(openFileDialog.GetPath());	
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
-
-	this->OpenImage(currentSession.GetImageFilePath(), true);
+	this->OpenImage(currentSession.GetImageFilePath());
 }
 
-void MainWindow::OpenImage(wxString imagePath, bool rawWindowOpen){
+void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 
 	// Make sure file name is correct and exists
-	emptyPhxImage->Destroy();
 	wxFileName imageFile(imagePath);
-	if(!imageFile.IsOk()){ 
-		imagePanel->NoImage();
-		processor->SetOriginalImage(emptyPhxImage);
-		processor->SetFilePath("");
-		this->SetTitle("PhoediX");
-		return; 
-	}
-	if(!imageFile.FileExists()){ 
+	if(!imageFile.FileExists() || !imageFile.IsOk()){ 
 		imagePanel->NoImage();
 		processor->SetOriginalImage(emptyPhxImage);
 		processor->SetFilePath("");
@@ -718,56 +599,50 @@ void MainWindow::OpenImage(wxString imagePath, bool rawWindowOpen){
 		return; 
 	}
 
-	if (!rawWindowOpen) { editList->RemoveRawWindow(); }
+	emptyPhxImage->Destroy();
+	if (editList->GetRawWindowOpen()) { editList->RemoveRawWindow(); }
+	
+	if(checkForProject){
+		wxString pathSep = imageFile.GetPathSeparator();
+		wxFileName phoedixProject(imageFile.GetPath() + pathSep+ ".PhoediX" + pathSep + imageFile.GetFullName() + ".phx");
+		if(phoedixProject.FileExists() && phoedixProject.IsOk()){
+			this->LoadProject(phoedixProject.GetFullPath());
+		}
+		else{
+			this->CreateNewProject(phoedixProject.GetFullPath());
+		}
+	}
+
+	currentSession.SetImageFilePath(imagePath);
+	processor->SetFilePath(imagePath);
+	processor->SetFileName(imageFile.GetFullName());
+	this->SetTitle("PhoediX - " + imageFile.GetFullName());
 
 	// Handle Raw Image
 	if(ImageHandler::CheckRaw(imagePath)){
-
-		currentSession.SetImageFilePath(imagePath);
-		processor->SetFilePath(imagePath);
-		processor->SetFileName(imageFile.GetFullName());
-		this->SetTitle("PhoediX - " + imageFile.GetFullName());
 		exportWindow->RawImageLoaded(true);
-		if (!rawWindowOpen) { editList->AddRawWindow(); }
-		//processor->SetDoFitImage(true);
-
-		this->ShowImageRelatedWindows();
+		if (!editList->GetRawWindowOpen()) { editList->AddRawWindow(); }
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images
+	else if(ImageHandler::CheckImage(imagePath)){
+		processor->Lock();
+		ImageHandler::LoadImageFromFile(imagePath, processor->GetImage());
+		processor->SetOriginalImage(processor->GetImage());
+		originalImagePanel->ChangeImage(processor->GetOriginalImage());
+		processor->SetUpdated(true);
+		processor->Unlock();
+	}
+
 	else{
-
-		exportWindow->RawImageLoaded(false);
-		// Verify image is okay
-		if(ImageHandler::CheckImage(imagePath)){
-
-			processor->Lock();
-			ImageHandler::LoadImageFromFile(imagePath, processor->GetImage());
-			processor->SetOriginalImage(processor->GetImage());
-			originalImagePanel->ChangeImage(processor->GetOriginalImage());
-			processor->SetUpdated(true);
-			//processor->SetDoFitImage(true);
-			processor->Unlock();
-
-			// Write image path to current session
-			currentSession.SetImageFilePath(imagePath);
-			processor->SetFilePath(imagePath);
-			processor->SetFileName(imageFile.GetFullName());
-			this->SetTitle("PhoediX - " + imageFile.GetFullName());
-
-			this->ShowImageRelatedWindows();
-		}
-		else{
-			wxMessageDialog imageErrorDialog(this, "Error opening image: " + imagePath, "Error Opening Image", wxICON_ERROR);
-			imageErrorDialog.ShowModal();
-		}
+		wxMessageDialog imageErrorDialog(this, "Error opening image: " + imagePath, "Error Opening Image", wxICON_ERROR);
+		imageErrorDialog.ShowModal();
 	}
-	if (currentSession.GetPerspective().IsEmpty()) {
-		this->ShowImageRelatedWindows();
-	}
+	this->ShowImageRelatedWindows();
 
 	wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
 	wxPostEvent(this, evt);
+
 }
 
 void MainWindow::RecieveRawComplete(wxCommandEvent & WXUNUSED(evt)) {
@@ -785,6 +660,11 @@ void MainWindow::ShowImageRelatedWindows(){
 
 void MainWindow::OnReprocessTimer(wxTimerEvent& WXUNUSED(event)){
 	editList->ReprocessImageRaw();
+}
+
+void MainWindow::OnReprocess(wxCommandEvent& WXUNUSED(event)){
+	this->SaveCurrentSession();
+	currentSession.SaveSessionToFile(currentSession.GetProjectPath());
 }
 
 void MainWindow::ShowSettings(wxCommandEvent& WXUNUSED(evt)) {
@@ -981,8 +861,6 @@ void MainWindow::OnEnableFastEdit(wxCommandEvent& evt) {
 
 void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 
-	menuFile->FindItem(MainWindow::MenuBar::ID_SHOW_SAVE_PROJECT)->Enable(enable);
-	menuFile->FindItem(MainWindow::MenuBar::ID_QUICK_SAVE_PROJECT)->Enable(enable);
 	menuFile->FindItem(MainWindow::MenuBar::ID_SHOW_EXPORT)->Enable(enable);
 	menuFile->FindItem(MainWindow::MenuBar::ID_CLOSE_ALL_PROJECTS)->Enable(enable);
 	menuFile->FindItem(MainWindow::MenuBar::ID_CLOSE_CURRENT_PROJECT)->Enable(enable);

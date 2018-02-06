@@ -46,16 +46,14 @@ public:
 	MainWindow(wxApp * application);
 	bool OriginalImageDispalyed();
 	void OpenFiles(wxArrayString files);
-
+	void OnOpenWindow(wxCommandEvent& evt);
 private:
 
 	void OnNewProject(wxCommandEvent& WXUNUSED(event));
-	void ShowLoadProject(wxCommandEvent& WXUNUSED(event));
-	void ShowSaveProject(wxCommandEvent& WXUNUSED(event));
-	void QuickSaveProject(wxCommandEvent& WXUNUSED(event));
+	void SaveProject(wxCommandEvent& WXUNUSED(event));
 	void CloseCurrentProject(wxCommandEvent& WXUNUSED(event));
 	void CloseAllProjects(wxCommandEvent& WXUNUSED(event));
-	void ShowLoadFile(wxCommandEvent& WXUNUSED(event));
+	void ShowLoadImage(wxCommandEvent& WXUNUSED(event));
 	void ShowExport(wxCommandEvent& WXUNUSED(event));
 	void ShowImage(wxCommandEvent& WXUNUSED(event));
 	void ShowPixelPeep(wxCommandEvent& WXUNUSED(event));
@@ -71,15 +69,15 @@ private:
 	void ShowHistograms(wxCommandEvent& evt);
 	void OnReprocessTimer(wxTimerEvent& evt);
 	void OnImagePanelMouse(wxMouseEvent & evt);
+	void OnReprocess(wxCommandEvent& WXUNUSED(event));
 
-	void CreateNewProject();
-	void OpenImage(wxString imagePath, bool rawWindowOpen = false);
+	void CreateNewProject(wxString projectFile);
+	void OpenImage(wxString imagePath, bool checkForProject = true);
 	void ShowImageRelatedWindows();
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
 	void LoadProject(wxString projectPath);
 	void OnImportImageNewProject(wxCommandEvent& evt);
 
-	void OnOpenWindow(wxCommandEvent& evt);
 	void OpenSession(PhoediXSession * session);
 	void SaveCurrentSession();
 	void CloseSession(PhoediXSession * session);

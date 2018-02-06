@@ -37,6 +37,7 @@ public:
 	void AddRawWindow();
 	void AddRawWindow(ProcessorEdit* editForParams);
 	void RemoveRawWindow();
+	bool GetRawWindowOpen();
 	void RemoveAllWindows();
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
@@ -67,6 +68,7 @@ private:
 	void PasteEdit(wxCommandEvent& pasteEvt);
 
 	void StartEditsComplete();
+	void InformParentReprocess();
 
 	wxStaticText * titleText;
 	wxBoxSizer * mainSizer;

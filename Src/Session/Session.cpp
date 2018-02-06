@@ -272,6 +272,12 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 		snapshotEditList.SaveSessionEditList(snapshot);
 	}
 
+	wxFileName sessionFile(filePath);
+	wxFileName sessionDir(sessionFile.GetPath());
+
+	if(!sessionDir.IsDir()){
+		wxMkDir(sessionFile.GetPath());
+	}
 	session.Save(filePath);
 }
 

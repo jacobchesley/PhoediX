@@ -3,7 +3,7 @@
 #include "AUIManager.h"
 
 wxAuiManager* PhoedixAUIManager::auiManager = NULL;
-wxWindow* PhoedixAUIManager::mainWindow = NULL;
+wxFrame* PhoedixAUIManager::mainWindow = NULL;
 
 wxAuiManager* PhoedixAUIManager::GetPhoedixAUIManager() {
 	return auiManager;
@@ -13,10 +13,10 @@ void PhoedixAUIManager::SetPhoedixAUIManager(wxAuiManager * manager) {
 	auiManager = manager;
 }
 
-wxWindow * PhoedixAUIManager::GetMainWindow() {
+wxFrame * PhoedixAUIManager::GetMainWindow() {
 	return mainWindow;
 }
 
-void PhoedixAUIManager::SetMainWindow(wxWindow * main) {
+void PhoedixAUIManager::SetMainWindow(wxFrame * main) {
 	mainWindow = main;
 }
