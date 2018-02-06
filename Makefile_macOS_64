@@ -21,6 +21,7 @@ COMPILE_FLAG = -w -c -O2 -arch x86_64 -mmacosx-version-min=10.7
 WX_CXXFLAGS = $(shell $(WX_PATH)/$(LIB_BUILD_PATH)/./wx-config --cxxflags)
 WX_LFALGS = $(shell $(WX_PATH)/$(LIB_BUILD_PATH)/./wx-config --libs all)
 BUILD_DIR = ./Build/Release_64
+ICONS_DIR = ./Icon
 OUT_DIR = $(BUILD_DIR)/Objects
 INCLUDE_ALL = -I$(SRC) $(WX_CXXFLAGS) -I$(LIBRAW_INCLUDE_PATH) -I$(LIBTIFF_INCLUDE_PATH)
 
@@ -381,4 +382,5 @@ MacApp:
 	cp $(RESOURCES)/Info.plist $(BUILD_DIR)/$(APP_NAME)/Contents
 	echo -n ‘APPL????’ > $(BUILD_DIR)/$(APP_NAME)/Contents/PkgInfo
 	cp $(BUILD_DIR)/App/PhoediX $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS/
+	cp $(ICONS_DIR)/px.icns $(BUILD_DIR)/$(APP_NAME)/Contents/Resources/
 	

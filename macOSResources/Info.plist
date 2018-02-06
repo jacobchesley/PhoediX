@@ -9,7 +9,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>PhoediX version 0.1.0, (c) 2016-2018 Jacob Chesley</string>
 	<key>CFBundleIconFile</key>
-	<string>PhoediX.icns</string>
+	<string>px.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.JacobChesley.PhoediX</string>
 	<key>CFBundleInfoDictionaryVersion</key>
