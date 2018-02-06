@@ -187,6 +187,9 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB">
       <UniqueIdentifier>{9764147b-f381-48bd-a1c2-4cadbf414925}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debugging\Logger">
+      <UniqueIdentifier>{586c3ec5-96d2-4f83-a0a7-dc24d571c183}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -350,6 +353,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\Debugging\Logger\Logger.cpp">
+      <Filter>Debugging\Logger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -538,6 +544,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Debugging\Logger\Logger.h">
+      <Filter>Debugging\Logger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\App\PhoediX.cpp" />
+    <ClCompile Include="..\Src\Debugging\Logger\Logger.cpp" />
     <ClCompile Include="..\Src\GUI\AboutWindow\AboutWindow.cpp" />
     <ClCompile Include="..\Src\GUI\AUIManager\AUIManager.cpp" />
     <ClCompile Include="..\Src\GUI\Colors\Colors.cpp" />
@@ -76,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\App\PhoediX.h" />
+    <ClInclude Include="..\Src\Debugging\Logger\Logger.h" />
     <ClInclude Include="..\Src\Debugging\MemoryLeakCheck.h" />
     <ClInclude Include="..\Src\GUI\AboutWindow\AboutWindow.h" />
     <ClInclude Include="..\Src\GUI\AUIManager\AUIManager.h" />
