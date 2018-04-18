@@ -2,6 +2,8 @@
 
 #include "PhoediX.h"
 
+//#define COMMAND_LOG
+
 IMPLEMENT_APP(PhoediX)
 
 // 'Main program' equivalent: the program execution "starts" here
@@ -14,13 +16,14 @@ bool PhoediX::OnInit(){
     if (!wxApp::OnInit()){
 		return false;
 	}
-	
+
+#ifdef COMMAND_LOG
 	Logger::SetApp(this);
 	Logger::SetLogFileName();
 	Logger::SetLogLevel(Logger::LogLevel::LOG_VERBOSE);
 	Logger::LogToConsole(true);
 	Logger::LogToFile(true);
-
+#endif
 	wxInitAllImageHandlers();
    
     // Create and show the main window
