@@ -42,7 +42,6 @@ double Spline::CalculateTangentCardinalY(Point Left, Point Right, double Tension
 
 wxVector <Point> Spline::GetHermiteSpline(double Tension, bool NoXOverlap) {
 
-	Point LeftPoint, RightPoint;
 	double LeftTangentY, RightTangentY, LeftTangentX, RightTangentX;
 
 	LeftTangentY = 0;
@@ -57,9 +56,6 @@ wxVector <Point> Spline::GetHermiteSpline(double Tension, bool NoXOverlap) {
 	double CurMaxX = 0.0;
 
 	for (int i = 0; i < NumControlPoint - 1; i++) {
-
-		LeftPoint = ControlPoints.at(i);
-		RightPoint = ControlPoints.at(i);
 
 		// 2 Control points, this will be treated as a line
 		if (i == 0 && NumControlPoint == 2) {
