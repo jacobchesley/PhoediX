@@ -22,6 +22,7 @@ class PhoediXSession{
 
 public:
 	PhoediXSession();
+	~PhoediXSession();
 	void Destroy();
 
 	void LoadSessionFromFile(wxString filePath);

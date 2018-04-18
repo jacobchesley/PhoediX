@@ -58,6 +58,15 @@ Processor::~Processor() {
 	}
 }
 
+void Processor::DestroyAll(){
+
+	this->KillRawProcessing();
+	this->KillCurrentProcessing();
+	img->Destroy();
+	originalImg->Destroy();
+	this->DeleteEdits();
+}
+
 inline double Processor::FastTanH(double x){
 	if(x < -3.0) { return -0.99999999; }
 	if(x > 3.0){ return 0.99999999; }
@@ -7061,7 +7070,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	// Create the raw image
 	processor->SendMessageToParent("Creating RAW Image for display");
 	processor->rawImage = processor->rawPrcoessor.dcraw_make_mem_image(&processor->rawErrorCode);
-
+	processor->rawPrcoessor.recycle();
 	// Set rawImageGood on processor if success
 	if(processor->rawErrorCode == LIBRAW_SUCCESS){
 

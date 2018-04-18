@@ -9,6 +9,7 @@ PhoediXSessionEditList::PhoediXSessionEditList() {
 }
 
 PhoediXSessionEditList::~PhoediXSessionEditList() {
+
 	for (size_t i = 0; i < editList.size(); i++) {
 		delete editList[i];
 	}
@@ -16,6 +17,10 @@ PhoediXSessionEditList::~PhoediXSessionEditList() {
 }
 
 void PhoediXSessionEditList::SetSessionEditList(wxVector<ProcessorEdit*> newEditList) {
+
+	for (size_t i = 0; i < editList.size(); i++) {
+		delete editList[i];
+	}
 
 	editList.clear();
 	for (size_t i = 0; i < newEditList.size(); i++) {

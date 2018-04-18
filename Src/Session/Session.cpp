@@ -20,6 +20,10 @@ PhoediXSession::PhoediXSession(){
 	histogramDisplaySelect = 0;
 }
 
+PhoediXSession::~PhoediXSession() {
+	this->Destroy();
+}
+
 void PhoediXSession::Destroy(){
 	if (editList != NULL) {
 		delete editList;
@@ -47,14 +51,6 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 	wxXmlNode * sessionInfo = session.GetRoot()->GetChildren();
 
 	while (sessionInfo) {
-
-		// Get ImagePath node
-		if (sessionInfo->GetName() == "ImagePath") {
-			// Get first child (the actual content)
-			if(sessionInfo->GetChildren() != NULL){
-				imgFile = sessionInfo->GetChildren()[0].GetContent();
-			}
-		}
 
 		// Get Histogram display selection
 		if (sessionInfo->GetName() == "HistogramDisplay") {
@@ -208,10 +204,6 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	wxXmlNode * sessionInfo = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "PhoediXProject");
 	sessionInfo->AddAttribute("PhoediX_Version", PHOEDIX_VERSION_STRING);
 	session.SetRoot(sessionInfo);
-
-	// Write the image file path to XML Doc
-	wxXmlNode * imagePath = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ImagePath");
-	imagePath->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", imgFile));
 
 	// Write hisotgram display selection to XML Doc
 	wxXmlNode * histSelect = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "HistogramDisplay");

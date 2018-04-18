@@ -145,6 +145,8 @@ public:
 	void SetParentWindow(wxWindow * parent);
 	wxWindow * GetParentWindow();
 
+	void ResetForceStop();
+	void DestroyAll();
 
 	enum RotationCropping{
 		KEEP_SIZE,
@@ -165,8 +167,6 @@ public:
 	static int rawExpected;
 
 	libraw_processed_image_t * rawImage;
-
-	void ResetForceStop();
 	
 protected:
 
