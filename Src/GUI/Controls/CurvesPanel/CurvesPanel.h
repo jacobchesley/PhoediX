@@ -32,7 +32,7 @@ class CurvePanel : public wxPanel {
 
 public:
 	CurvePanel(wxWindow * Parent, int Channel);
-	wxVector<int> GetColorCurveMap(int numSteps, float scale);
+	void GetColorCurveMap(int numSteps, int * outCurve, float scale);
 	void SetControlPoints(wxVector<Point> newPoints);
 	wxVector<Point> GetControlPoints();
 	~CurvePanel();

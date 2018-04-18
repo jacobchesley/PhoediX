@@ -136,11 +136,12 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 		// used to detect changes in mouse position
 		OldX = x;
 		OldY = y;
-        
-        this->Refresh();
-        this->Update();
-        
-        wxSafeYield();
+
+       // this->Refresh();
+       // this->Update();
+       // wxSafeYield();
+
+
 	}
 	evt.Skip(false);
 }
@@ -391,7 +392,7 @@ wxVector<Point> CurvePanel::ClipCurve(wxVector<Point> Points) {
 	}
 	return Points;
 }
-wxVector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
+void CurvePanel::GetColorCurveMap(int numSteps, int * outCurve, float scale) {
 
 
 	wxVector<Point> controlPoints = displayCurve->GetControlPoints();
@@ -414,9 +415,6 @@ wxVector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 		}
 	}
 
-	wxVector<int> colorCurveMap = wxVector<int>();
-	colorCurveMap.resize(numSteps);
-
 	int SplinePos = 0;
 	float Bright = 0.0;
 
@@ -424,14 +422,13 @@ wxVector<int> CurvePanel::GetColorCurveMap(int numSteps, float scale) {
 
 		while (SplinePoints[SplinePos].x >= Bright && SplinePoints[SplinePos].x < Bright + 1.0) {
 
-			colorCurveMap[i] = SplinePoints[SplinePos].y;
+			outCurve[i] = SplinePoints[SplinePos].y;
 			SplinePos += 1;
 		}
 		Bright += 1.0;
 	}
 
 	delete splineCurve;
-	return colorCurveMap;
 }
 
 wxVector<Point> CurvePanel::GetControlPoints() {
