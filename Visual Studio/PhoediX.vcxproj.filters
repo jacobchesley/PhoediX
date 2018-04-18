@@ -190,6 +190,9 @@
     <Filter Include="Debugging\Logger">
       <UniqueIdentifier>{586c3ec5-96d2-4f83-a0a7-dc24d571c183}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Controls\PhoediX Button">
+      <UniqueIdentifier>{3aa5377e-392d-4e57-9ee6-3ad3d5ac86b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -356,6 +359,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\Debugging\Logger\Logger.cpp">
       <Filter>Debugging\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Controls\PhoediXButton\PhoediXButton.cpp">
+      <Filter>GUI\Controls\PhoediX Button</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -547,6 +553,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\Debugging\Logger\Logger.h">
       <Filter>Debugging\Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Controls\PhoediXButton\PhoediXButton.h">
+      <Filter>GUI\Controls\PhoediX Button</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

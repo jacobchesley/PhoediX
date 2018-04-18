@@ -20,7 +20,7 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 	textSizer = new wxBoxSizer(wxVERTICAL);
 
 	// Add title text
-	titleText = new wxButton(this, EditListItem::Buttons::OPEN_EDIT_BUTTON, title, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	titleText = new PhoediXButton(this, EditListItem::Buttons::OPEN_EDIT_BUTTON, title);
 	titleText->SetBackgroundColour(this->GetBackgroundColour());
 	titleText->SetForegroundColour(Colors::TextWhite);
 	titleText->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));

@@ -13,6 +13,7 @@
 
 #include "GUI/Colors/Colors.h"
 #include "GUI/AUIManager/AUIManager.h"
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Icons/Icons.h"
 #include "Debugging/MemoryLeakCheck.h"
@@ -67,7 +68,7 @@ private:
 	wxBoxSizer * upDownButtonSizer;
 
 	wxButton * disableButton;
-	wxButton * titleText;
+	PhoediXButton * titleText;
 	wxButton * upButton;
 	wxButton * downButton;
 	wxButton * deleteButton;
