@@ -9,6 +9,10 @@
 #define PHOEDIX_AUTHOR_STRING "Jacob Chesley"
 #define PHOEDIX_WEBSITE_STRING "www.phoedix.com"
 
+#define WXWIDGETS_WEBSITE_STRING "www.wxwidgets.org"
+#define LIBRAW_WEBSITE_STRING "www.libraw.org"
+#define LIBTIFF_WEBSITE_STRING "www.simplesystems.org/libtiff"
+
 // for compilers that support precompilation, includes "wx/wx.h"
 #include "wx/wxprec.h"
 
