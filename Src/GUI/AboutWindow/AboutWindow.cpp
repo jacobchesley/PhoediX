@@ -52,7 +52,9 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	websiteTitle->SetForegroundColour(Colors::TextLightGrey);
 	websiteValue->SetForegroundColour(Colors::TextLightGrey);
 	websiteValue->SetFont(wxFont(websiteValue->GetFont().GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, true));
-	websiteValue->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(AboutWindow::OnWebsiteClick), NULL, this);
+	websiteValue->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(AboutWindow::OnPhoediXWebsiteClick), NULL, this);
+	websiteValue->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseEnter), NULL, this);
+	websiteValue->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseLeave), NULL, this);
 
 	aboutSizer->Add(versionTitle);
 	aboutSizer->Add(versionValue);
@@ -74,16 +76,28 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	wxWidgetsVersionValue = new wxStaticText(this, -1, wxVERSION_STRING);
 	wxWidgetsVersionTitle->SetForegroundColour(Colors::TextLightGrey);
 	wxWidgetsVersionValue->SetForegroundColour(Colors::TextLightGrey);
+	wxWidgetsVersionValue->SetFont(wxFont(wxWidgetsVersionValue->GetFont().GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, true));
+	wxWidgetsVersionValue->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(AboutWindow::OnwxWidgetsWebsiteClick), NULL, this);
+	wxWidgetsVersionValue->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseEnter), NULL, this);
+	wxWidgetsVersionValue->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseLeave), NULL, this);
 
 	librawVersionTitle = new wxStaticText(this, -1, "LibRaw Version");
 	librawVersionValue = new wxStaticText(this, -1, LibRaw::version());
 	librawVersionTitle->SetForegroundColour(Colors::TextLightGrey);
 	librawVersionValue->SetForegroundColour(Colors::TextLightGrey);
+	librawVersionValue->SetFont(wxFont(librawVersionValue->GetFont().GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, true));
+	librawVersionValue->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(AboutWindow::OnLibRawWebsiteClick), NULL, this);
+	librawVersionValue->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseEnter), NULL, this);
+	librawVersionValue->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseLeave), NULL, this);
 
 	libtiffVersionTitle = new wxStaticText(this, -1, "Libtiff Version");
 	libtiffVersionValue = new wxStaticText(this, -1, TIFFGetVersion());
 	libtiffVersionTitle->SetForegroundColour(Colors::TextLightGrey);
 	libtiffVersionValue->SetForegroundColour(Colors::TextLightGrey);
+	libtiffVersionValue->SetFont(wxFont(libtiffVersionValue->GetFont().GetPointSize(), wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, true));
+	libtiffVersionValue->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(AboutWindow::OnLibTiffWebsiteClick), NULL, this);
+	libtiffVersionValue->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseEnter), NULL, this);
+	libtiffVersionValue->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(AboutWindow::OnWebsiteMouseLeave), NULL, this);
 
 	libraryAboutSizer->Add(wxWidgetsVersionTitle);
 	libraryAboutSizer->Add(wxWidgetsVersionValue);
@@ -116,8 +130,27 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	this->CentreOnParent();
 }
 
-void AboutWindow::OnWebsiteClick(wxMouseEvent& WXUNUSED(evt)){
+void AboutWindow::OnPhoediXWebsiteClick(wxMouseEvent& WXUNUSED(evt)){
 	wxLaunchDefaultBrowser(PHOEDIX_WEBSITE_STRING);
+}
+
+void AboutWindow::OnwxWidgetsWebsiteClick(wxMouseEvent& WXUNUSED(evt)){
+	wxLaunchDefaultBrowser(WXWIDGETS_WEBSITE_STRING);
+}
+
+void AboutWindow::OnLibRawWebsiteClick(wxMouseEvent& WXUNUSED(evt)){
+	wxLaunchDefaultBrowser(LIBRAW_WEBSITE_STRING);
+}
+
+void AboutWindow::OnLibTiffWebsiteClick(wxMouseEvent& WXUNUSED(evt)){
+	wxLaunchDefaultBrowser(LIBTIFF_WEBSITE_STRING);
+}
+
+void AboutWindow::OnWebsiteMouseEnter(wxMouseEvent& WXUNUSED(evt)){
+	SetCursor(wxCURSOR_HAND);
+}
+void AboutWindow::OnWebsiteMouseLeave(wxMouseEvent& WXUNUSED(evt)){
+	SetCursor(wxCURSOR_ARROW);
 }
 
 void AboutWindow::OnClose(wxCloseEvent& WXUNUSED(evt)){

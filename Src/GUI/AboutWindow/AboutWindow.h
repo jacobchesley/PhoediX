@@ -22,7 +22,13 @@ private:
 
 	void OnClose(wxCloseEvent& WXUNUSED(evt));
 	void OnOkay(wxCommandEvent& WXUNUSED(evt));
-	void OnWebsiteClick(wxMouseEvent& WXUNUSED(evt));
+	void OnWebsiteMouseEnter(wxMouseEvent& WXUNUSED(evt));
+	void OnWebsiteMouseLeave(wxMouseEvent& WXUNUSED(evt));
+
+	void OnPhoediXWebsiteClick(wxMouseEvent& WXUNUSED(evt));
+	void OnwxWidgetsWebsiteClick(wxMouseEvent& WXUNUSED(evt));
+	void OnLibRawWebsiteClick(wxMouseEvent& WXUNUSED(evt));
+	void OnLibTiffWebsiteClick(wxMouseEvent& WXUNUSED(evt));
 
 	wxBoxSizer * mainSizer;
 	wxFlexGridSizer * aboutSizer;
