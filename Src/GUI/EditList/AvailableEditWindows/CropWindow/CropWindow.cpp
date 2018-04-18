@@ -210,7 +210,7 @@ void CropWindow::ChangeAspect(bool gridUpdate){
 	}
 }
 
-Grid CropWindow::GetNewAspectGrid(double aspect) {
+Grid CropWindow::GetNewAspectGrid(double aspectRatio) {
 	Grid retGrid;
 	retGrid.startX = cropGrid.startX;
 	retGrid.startY = cropGrid.startY;
@@ -222,11 +222,11 @@ Grid CropWindow::GetNewAspectGrid(double aspect) {
 
 	double imgAspect = this->GetZoomImagePanel()->GetImageAspect();
 
-	if (aspect < 1.0) {
-		retGrid.endX = (currentHeight * aspect / imgAspect) + retGrid.startX;
+	if (aspectRatio < 1.0) {
+		retGrid.endX = (currentHeight * aspectRatio / imgAspect) + retGrid.startX;
 	}
 	else {
-		retGrid.endY = (currentWidth / aspect * imgAspect) + retGrid.startY;
+		retGrid.endY = (currentWidth / aspectRatio * imgAspect) + retGrid.startY;
 	}
 
 	return retGrid;

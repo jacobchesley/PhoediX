@@ -36,7 +36,7 @@ private:
 	void ResetCropValues();
 	void ChangeAspect(bool gridUpdate = true);
 	Grid limitGrid(Grid inGrid);
-	Grid GetNewAspectGrid(double aspect);
+	Grid GetNewAspectGrid(double aspectRatio);
 
 	wxWindow * parWindow;
 	Processor * proc;
