@@ -29,6 +29,7 @@ EditSelection::EditSelection(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditSelection::OnAdd, this, EditSelection::Buttons::ADD_EDIT);
 	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&EditSelection::OnClose, this);
+	this->Bind(wxEVT_LIST_ITEM_ACTIVATED, (wxObjectEventFunction)&EditSelection::OnAdd, this);
 
 	this->FitInside();
 	this->SetScrollRate(5, 5);
