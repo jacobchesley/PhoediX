@@ -71,7 +71,7 @@ private:
 	void OnImagePanelMouse(wxMouseEvent & evt);
 	void OnReprocess(wxCommandEvent& WXUNUSED(event));
 
-	void CreateNewProject(wxString projectFile);
+	void CreateNewProject(wxString projectFile, bool rawProject);
 	void OpenImage(wxString imagePath, bool checkForProject = true);
 	void ShowImageRelatedWindows();
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
@@ -129,9 +129,8 @@ private:
 	Image * emptyPhxImage;
 	HistogramDisplay * histogramDisplay;
 
-	PhoediXSession currentSession;
-	wxVector<PhoediXSession> allSessions;
-	wxVector<PhoediXSession> savedSessions;
+	PhoediXSession * currentSession;
+	wxVector<PhoediXSession*> allSessions;
 
 	int numnUnnamedProjectsOpen;
 

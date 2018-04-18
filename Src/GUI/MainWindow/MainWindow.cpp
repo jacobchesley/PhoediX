@@ -24,11 +24,11 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuWindow = new wxMenu();
 	menuHelp = new wxMenu();
 
+	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_FILE, _("Open Image\tCtrl+O"));
+	menuFile->AppendSeparator();
 	menuCloseProjects->Append(MainWindow::MenuBar::ID_CLOSE_CURRENT_PROJECT, _("Close Current Project"));
 	menuCloseProjects->Append(MainWindow::MenuBar::ID_CLOSE_ALL_PROJECTS, _("Close All Projects"));
 	menuFile->AppendSubMenu(menuCloseProjects, _("Close Project..."));
-	menuFile->AppendSeparator();
-	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_FILE, _("Open Image\tCtrl+Shift+O"));
 	menuFile->AppendSeparator();
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_EXPORT, _("Export Image\tCtrl+E"));
 	menuFile->AppendSeparator();
@@ -232,6 +232,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->SetMenuChecks();
 
 	numnUnnamedProjectsOpen = 0;
+	currentSession = NULL;
 
 	clearStatusTimer = new wxTimer(this, EVT_CLEAR_STATUS_TIMER);
 
@@ -252,10 +253,17 @@ void MainWindow::OpenFiles(wxArrayString files) {
 
 		// Check if PhoediX project
 		if (PhoediXSession::CheckIfSession(files.Item(i))) {
-			this->LoadProject(files.Item(i));
+
+			// Get project name and path
+			wxString projectName = wxFileName(files.Item(i)).GetName();
+			wxString projectPath = wxFileName(files.Item(i)).GetPath();
+
+			// Get image path from project path and name (image is one directory above)
+			wxString imagePath = projectPath + wxFileName::GetPathSeparator() + "..";
+			wxString fullImagePath = imagePath + wxFileName::GetPathSeparator() + projectName;
+			this->OpenImage(fullImagePath);
 		}
 		else{
-			//this->CreateNewProject();
 			this->OpenImage(files.Item(i));
 		}
 	}
@@ -263,27 +271,20 @@ void MainWindow::OpenFiles(wxArrayString files) {
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 
-	this->SaveCurrentSession();
-	if (this->CheckSessionNeedsSaved(&currentSession)) {
-		
-		wxString message = currentSession.GetName() + " project is not saved to disk.  Are you sure you want to continue closing this project?";
-		wxMessageDialog msg(this, message, "Close Project?", wxYES_NO | wxNO_DEFAULT);
-		if (msg.ShowModal() == wxID_NO) { return; }
-	}
-
+	processor->DestroyAll();
 	imagePanel->ChangeImage(emptyImage);
 
 	// Close current session in UI
 	if (allSessions.size() > 0) {
-		this->CloseSession(&currentSession);
+		this->CloseSession(currentSession);
 	}
 
 	// Itterate over all sessions and look for current session
 	for (size_t i = 0; i < allSessions.size(); i++) {
 
 		// Remove current session from all session and break once complete
-		if (currentSession.GetID() == allSessions.at(i).GetID()) {
-			allSessions.at(i).Destroy();
+		if (currentSession->GetID() == allSessions.at(i)->GetID()) {
+			allSessions.at(i)->Destroy();
 			allSessions.erase(allSessions.begin() + i);
 			break;
 		}
@@ -292,12 +293,14 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 	// Set current session to last opened session (if any sessions are open)
 	if (allSessions.size() > 0) {
 		currentSession = allSessions.at(allSessions.size() - 1);
-		this->OpenSession(&currentSession);
+		// Open the image, then open the session to go along with image
+		this->OpenImage(currentSession->GetImageFilePath(), false);
+		this->OpenSession(currentSession);
 	}
 
 	// No sessions opened, disable menu items related to sessions
 	else{
-		currentSession = PhoediXSession();
+		currentSession = NULL;
 		this->EnableDisableMenuItemsNoProject(false);
 		this->SetTitle("PhoediX");
 	}
@@ -309,18 +312,18 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 	for (size_t i = 0; i < allSessions.size(); i++) {
 
 		// Ask if needs saving, then close if okay
-		if (this->CheckSessionNeedsSaved(&allSessions.at(i))) {
+		if (this->CheckSessionNeedsSaved(allSessions.at(i))) {
 
-			wxString message = allSessions.at(i).GetName() + " project is not saved to disk.  Are you sure you want to continue closing this project?";
+			wxString message = allSessions.at(i)->GetName() + " project is not saved to disk.  Are you sure you want to continue closing this project?";
 			wxMessageDialog msg(this, message, "Close Project?", wxYES_NO | wxNO_DEFAULT);
 			if (msg.ShowModal() == wxID_YES) { 
-				sessionsToClose.push_back(&allSessions.at(i)); 
+				sessionsToClose.push_back(allSessions.at(i)); 
 			}
 		}
 
 		// Session does not need saved, close
 		else {
-			sessionsToClose.push_back(&allSessions.at(i));
+			sessionsToClose.push_back(allSessions.at(i));
 		}
 	}
 
@@ -334,7 +337,7 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
 	size_t numRemoved = 0;
 	for (size_t i = 0; i < allSessions.size(); i++) {
-		if (allSessions.at(i).GetID() < 0) {
+		if (allSessions.at(i)->GetID() < 0) {
 			allSessions.erase(allSessions.begin() + i - numRemoved);
 			numRemoved += 1;
 		}
@@ -343,58 +346,39 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 	// Set current session to last opened session (if any sessions are open)
 	if (allSessions.size() > 0) {
 		currentSession = allSessions.at(allSessions.size() - 1);
-		this->OpenSession(&currentSession);
+		this->OpenSession(currentSession);
 	}
 
 	// No sessions opened, disable menu items related to sessions
 	else {
-		currentSession = PhoediXSession();
+		currentSession = NULL;
 		this->EnableDisableMenuItemsNoProject(false);
 		this->SetTitle("PhoediX");
 	}
 }
 
-void MainWindow::CreateNewProject(wxString projectFile){
+void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 
-	// Save the current session
-	this->SaveCurrentSession();
-
-	PhoediXSession newSession;
-	this->SetUniqueID(&newSession);
+	PhoediXSession * newSession = new PhoediXSession();
+	this->SetUniqueID(newSession);
 
 	wxFileName phoedixProject(projectFile);
-	newSession.SetName(phoedixProject.GetName());
-	newSession.SetProjectPath(projectFile);
+	newSession->SetName(phoedixProject.GetName());
+	newSession->SetProjectPath(projectFile);
 
-	menuWindow->AppendCheckItem(newSession.GetID(), _(newSession.GetName()));
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession.GetID());
+	if(rawProject){
+		wxVector<ProcessorEdit*>  rawEditList;
+		rawEditList.push_back(new ProcessorEdit(ProcessorEdit::EditType::RAW));
+		newSession->GetEditList()->SetSessionEditList(rawEditList);
+	}
+
+	menuWindow->AppendCheckItem(newSession->GetID(), _(newSession->GetName()));
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession->GetID());
     
 	allSessions.push_back(newSession);
 	currentSession = newSession;
-	this->OpenSession(&currentSession);
-}
-
-void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
-	
-	// If the session to open is the same as the one currently opened, keep open
-	if (evt.GetId() == currentSession.GetID()) {
-		menuWindow->FindChildItem(evt.GetId())->Check();
-		return;
-	}
-
-	// Find the session to open
-	for (size_t i = 0; i < allSessions.size(); i++) {
-
-		if (allSessions[i].GetID() == evt.GetId() && currentSession.GetID() != allSessions[i].GetID()) {
-
-			// Save the current session, open, and set current session
-			this->SaveCurrentSession();
-			this->OpenSession(&allSessions[i]);
-			currentSession = allSessions[i];
-			this->OpenImage(currentSession.GetImageFilePath(), false);
-			return;
-		}
-	}
+	processor->SetDoFitImage(true);
+	this->OpenSession(currentSession);	
 }
 
 void MainWindow::OpenSession(PhoediXSession * session) {
@@ -416,8 +400,8 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	histogramDisplay->SetHistogramDisplay(session->GetHistogramDisplaySelect());
 	
 	// Populate the panel with the edits
-
 	if(session->GetEditList() != NULL){
+
 		wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
 		editList->AddEditWindows(editLayers);
 	}
@@ -450,7 +434,7 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 	}
 
 	// Remove all edits from panel and snapshots
-	if (session->GetID() == currentSession.GetID()) {
+	if (session->GetID() == currentSession->GetID()) {
 		editList->RemoveAllWindows();
 		snapshotWindow->DeleteAllSnapshots();
 
@@ -459,6 +443,7 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 
 		histogramDisplay->ZeroOutHistograms();
 		pixelPeepWindow->UpdateImage(NULL);
+
 	}
 
 	if (allSessions.size() > 0) {
@@ -469,40 +454,59 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 		// No sessions exists now, disable menu items related to sessions
 		this->EnableDisableMenuItemsNoProject(false);
 	}
-	//reprocessCountdown->Start(500, true);
 }
 
+void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
+	
+	// If the session to open is the same as the one currently opened, keep open
+	if (evt.GetId() == currentSession->GetID()) {
+		menuWindow->FindChildItem(evt.GetId())->Check();
+		return;
+	}
+
+	// Find the session to open
+	for (size_t i = 0; i < allSessions.size(); i++) {
+
+		if (allSessions[i]->GetID() == evt.GetId() && currentSession->GetID() != allSessions[i]->GetID()) {
+
+			// Open the image, then open the session to go along with image
+			this->OpenImage(allSessions[i]->GetImageFilePath(), false);
+			this->OpenSession(allSessions[i]);
+			currentSession = allSessions[i];
+			return;
+		}
+	}
+}
 
 void MainWindow::SaveProject(wxCommandEvent & WXUNUSED(evt)) {
 
 	this->SaveCurrentSession();
-	currentSession.SaveSessionToFile(currentSession.GetProjectPath());
+	currentSession->SaveSessionToFile(currentSession->GetProjectPath());
 }
 
 void MainWindow::SaveCurrentSession() {
 
-	if(currentSession.GetID() < 0){
+	if(currentSession == NULL){
 		return;
 	}
 	// Save all infomation about the current session
-	editList->AddEditsToProcessor();
-	currentSession.SetImageFilePath(processor->GetFilePath());
-	currentSession.GetEditList()->SetSessionEditList(processor->GetEditVector());
-	currentSession.SetHistogramDisplaySelect(histogramDisplay->GetHistogramDisplay());
-	currentSession.SetImageZoomLevel(imagePanel->GetZoom());
-	currentSession.SetImageScrollX(imagePanel->GetDragX());
-	currentSession.SetImageScrollY(imagePanel->GetDragY());
-	currentSession.SetFitImage(imagePanel->GetFitImage());
+	currentSession->SetImageFilePath(processor->GetFilePath());
+	currentSession->GetEditList()->SetSessionEditList(processor->GetEditVector());
+	currentSession->SetHistogramDisplaySelect(histogramDisplay->GetHistogramDisplay());
+	currentSession->SetImageZoomLevel(imagePanel->GetZoom());
+	currentSession->SetImageScrollX(imagePanel->GetDragX());
+	currentSession->SetImageScrollY(imagePanel->GetDragY());
+	currentSession->SetFitImage(imagePanel->GetFitImage());
 	if(processor->GetImage() != NULL){
-		currentSession.SetImageScrollWidth(processor->GetImage()->GetWidth());
-		currentSession.SetImageScrollHeight(processor->GetImage()->GetHeight());
+		currentSession->SetImageScrollWidth(processor->GetImage()->GetWidth());
+		currentSession->SetImageScrollHeight(processor->GetImage()->GetHeight());
 	}
-	currentSession.SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
-	currentSession.SetSnapshots(snapshotWindow->GetSnapshots());
+	currentSession->SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
+	currentSession->SetSnapshots(snapshotWindow->GetSnapshots());
 
 	// Replace existing session in all sessions, with updated session
 	for(size_t i = 0; i < allSessions.size(); i++){
-		if(allSessions[i].GetID() == currentSession.GetID()){
+		if(allSessions[i]->GetID() == currentSession->GetID()){
 			allSessions[i] = currentSession;
 		}
 	}
@@ -510,27 +514,23 @@ void MainWindow::SaveCurrentSession() {
 
 void MainWindow::LoadProject(wxString projectPath) {
 
-	// Save the current session
-	this->SaveCurrentSession();
-
 	// Load the new session from file
-	PhoediXSession session;
-	session.LoadSessionFromFile(projectPath);
+	PhoediXSession * session = new PhoediXSession();
+	session->LoadSessionFromFile(projectPath);
 
 	wxFileName projectFile(projectPath);
-	session.SetName(projectFile.GetFullName());
-	session.SetProjectPath(projectFile.GetFullPath());
-	this->SetUniqueID(&session);
+	session->SetName(projectFile.GetFullName());
+	session->SetProjectPath(projectFile.GetFullPath());
+	this->SetUniqueID(session);
 
 	// Append the session to the menu bar
-	menuWindow->AppendCheckItem(session.GetID(), _(session.GetName()));
-	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, session.GetID());
+	menuWindow->AppendCheckItem(session->GetID(), _(session->GetName()));
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, session->GetID());
 
 	// Add new session to all session vector, set current session and open
 	allSessions.push_back(session);
-	savedSessions.push_back(session);
 	currentSession = session;
-	this->OpenSession(&session);
+	this->OpenSession(currentSession);
 }
 
 void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {
@@ -564,7 +564,7 @@ void MainWindow::SetUniqueID(PhoediXSession * session) {
 		for (size_t i = 0; i < allSessions.size(); i++) {
 
 			// If there is a match, generate a new ID and recheck
-			if (allSessions[i].GetID() == session->GetID()) {
+			if (allSessions[i]->GetID() == session->GetID()) {
 
 				session->GenerateID();
 				cont = true;
@@ -584,10 +584,13 @@ void MainWindow::ShowLoadImage(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
-	this->OpenImage(currentSession.GetImageFilePath());
+	this->OpenImage(currentSession->GetImageFilePath());
 }
 
 void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
+
+	processor->GetImage()->Destroy();
+	processor->GetOriginalImage()->Destroy();
 
 	// Make sure file name is correct and exists
 	wxFileName imageFile(imagePath);
@@ -602,26 +605,15 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 	emptyPhxImage->Destroy();
 	if (editList->GetRawWindowOpen()) { editList->RemoveRawWindow(); }
 	
-	if(checkForProject){
-		wxString pathSep = imageFile.GetPathSeparator();
-		wxFileName phoedixProject(imageFile.GetPath() + pathSep+ ".PhoediX" + pathSep + imageFile.GetFullName() + ".phx");
-		if(phoedixProject.FileExists() && phoedixProject.IsOk()){
-			this->LoadProject(phoedixProject.GetFullPath());
-		}
-		else{
-			this->CreateNewProject(phoedixProject.GetFullPath());
-		}
-	}
-
-	currentSession.SetImageFilePath(imagePath);
 	processor->SetFilePath(imagePath);
 	processor->SetFileName(imageFile.GetFullName());
 	this->SetTitle("PhoediX - " + imageFile.GetFullName());
 
+	bool rawProject = false;
 	// Handle Raw Image
 	if(ImageHandler::CheckRaw(imagePath)){
 		exportWindow->RawImageLoaded(true);
-		if (!editList->GetRawWindowOpen()) { editList->AddRawWindow(); }
+		rawProject = true;
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images
@@ -639,6 +631,17 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 		imageErrorDialog.ShowModal();
 	}
 	this->ShowImageRelatedWindows();
+
+	if(checkForProject){
+		wxString pathSep = imageFile.GetPathSeparator();
+		wxFileName phoedixProject(imageFile.GetPath() + pathSep+ ".PhoediX" + pathSep + imageFile.GetFullName() + ".phx");
+		if(phoedixProject.FileExists() && phoedixProject.IsOk()){
+			this->LoadProject(phoedixProject.GetFullPath());
+		}
+		else{
+			this->CreateNewProject(phoedixProject.GetFullPath(), rawProject);
+		}
+	}
 
 	wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
 	wxPostEvent(this, evt);
@@ -663,8 +666,11 @@ void MainWindow::OnReprocessTimer(wxTimerEvent& WXUNUSED(event)){
 }
 
 void MainWindow::OnReprocess(wxCommandEvent& WXUNUSED(event)){
+	if (currentSession == NULL) { return; }
 	this->SaveCurrentSession();
-	currentSession.SaveSessionToFile(currentSession.GetProjectPath());
+	if(currentSession->GetProjectPath() != ""){
+		currentSession->SaveSessionToFile(currentSession->GetProjectPath());
+	}
 }
 
 void MainWindow::ShowSettings(wxCommandEvent& WXUNUSED(evt)) {
@@ -962,6 +968,8 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 	histogramDisplay->UpdateHistograms();
 	if (processor->GetDoFitImage()) {
 		imagePanel->FitImage();
+		currentSession->SetImageZoomLevel(imagePanel->GetZoom());
+		this->SaveCurrentSession();
 	}
 	processor->Unlock();
 	imagePanel->Redraw();
@@ -1000,19 +1008,13 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	imagePanel->DestroyTimer();
 	originalImagePanel->DestroyTimer();
 
-	int currentSessionID = currentSession.GetID();
-	currentSession.Destroy();
-
 	// Remove all sessions from menu window
 	for (size_t i = 0; i < allSessions.size(); i++) {
 
-		// Destroy session if it is not current session. (Current session already destroyed)
-		if (allSessions.at(i).GetID() != currentSessionID) {
-			allSessions.at(i).Destroy();
-		}
+		// Destroy the session
+		delete allSessions.at(i);
 	}
 
-	// Clear all sessions
 	allSessions.clear();
 
 	// Delete histogram display resources
@@ -1028,6 +1030,7 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	delete processor;
 	delete emptyImage;
 	delete emptyPhxImage;
+	delete clearStatusTimer;
 
 	this->Destroy();
 }
