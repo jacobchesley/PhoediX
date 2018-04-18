@@ -326,7 +326,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->GetSizer()->Add(exposurePanelCollapse, 0, wxGROW | wxALL, 5);
 	this->GetSizer()->Add(colorPanelCollapse, 0, wxGROW | wxALL, 5);
 	this->GetSizer()->Add(noisePanelCollapse, 0, wxGROW | wxALL, 5);
-	this->GetSizer()->Add(infoPanelCollapse, 1, wxEXPAND | wxALL, 5);
+	this->GetSizer()->Add(infoPanelCollapse, 1, wxEXPAND | wxBOTTOM, 5);
 
 	// Collapse all panes for clean look
 	settingsPanelCollapse->Collapse();
