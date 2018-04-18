@@ -19,7 +19,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	scroller->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(EditListPanel::OnRightClick), NULL, this);
 
 	Icons icons;
-	addEditButton = new wxButton(this, EditListPanel::Buttons::ADD_EDIT_BUTTON, "Add Edit", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	addEditButton = new PhoediXButton(this, EditListPanel::Buttons::ADD_EDIT_BUTTON, "Add Edit");
 	addEditButton->SetForegroundColour(Colors::TextLightGrey);
 	addEditButton->SetBackgroundColour(Colors::BackGrey);
 	addEditButton->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
@@ -88,10 +88,20 @@ void EditListPanel::OnRightClick(wxMouseEvent& WXUNUSED(event)){
 	// Display a popup menu of options
 	wxMenu popupMenu;
 	popupMenu.Append(EditListPanel::PopupMenuActions::COPY_EDIT_LIST, "Copy Edit List");
+	popupMenu.Append(EditListPanel::PopupMenuActions::PASTE_EDIT_LIST, "Paste Edit List");
+	popupMenu.AppendSeparator();
+	popupMenu.Append(EditListPanel::PopupMenuActions::ENABLE_ALL_EDITS, "Enable All Edits");
+	popupMenu.Append(EditListPanel::PopupMenuActions::DISABLE_ALL_EDITS, "Disable All Edits");
 
-	if(proc->GetEditListForCopyPaste().size() > 0){
-		popupMenu.Append(EditListPanel::PopupMenuActions::PASTE_EDIT_LIST, "Paste Edit List");
+	// No copied edit list, disable paste action
+	if(proc->GetEditListForCopyPaste().size() <= 0){ popupMenu.GetMenuItems()[1]->Enable(false); }
+	
+	// No edits that can be enabled/disabled, disable enable/disable all action
+	if((scroller->GetEditList().size() - scroller->GetNumTopEdits()) <= 0){
+		popupMenu.GetMenuItems()[3]->Enable(false);
+		popupMenu.GetMenuItems()[4]->Enable(false);
 	}
+
 	popupMenu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(EditListPanel::OnPopupMenuClick), NULL, this);
 	this->PopupMenu(&popupMenu);
 }
@@ -109,8 +119,21 @@ void EditListPanel::OnPopupMenuClick(wxCommandEvent& inEvt) {
 			break;
 		}
 
+		// Paste stored edit parameters														
 		case EditListPanel::PopupMenuActions::PASTE_EDIT_LIST:{
 			this->AddEditWindows(proc->GetEditListForCopyPaste());
+			break;
+		}
+
+		// Enable all edits
+		case EditListPanel::PopupMenuActions::ENABLE_ALL_EDITS:{
+			this->EnableAllEdits();
+			break;
+		}
+
+		case EditListPanel::PopupMenuActions::DISABLE_ALL_EDITS:{
+			this->DisableAllEdits();
+			break;
 		}
 	}
 }
@@ -146,18 +169,14 @@ void EditListPanel::AddEditsToProcessor() {
 
 	// Create a vector of Edit list Items that are displayed on the panel
 	wxVector<EditListItem*> editList = scroller->GetEditList();
-	wxVector<ProcessorEdit*> runningEditList;
 
 	for (size_t i = 0; i < editList.size(); i++) {
 
 		// Add each edit from the edit window, to the processor
 		if (editList.at(i)->GetEditWindow() != NULL) {
 
-			editList.at(i)->GetEditWindow()->DestroyPreviousEdits();
-			editList.at(i)->GetEditWindow()->SetPreviousEdits(runningEditList);
 			editList.at(i)->GetEditWindow()->SetDisabled(editList.at(i)->GetDisabled());
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
-			runningEditList.push_back(editList.at(i)->GetEditWindow()->GetParamsAndFlags());
 		}
 	}
 }
@@ -181,6 +200,7 @@ void EditListPanel::ReprocessImage() {
 		startEdits = new StartEditsThread(this, proc, false);
 		startEdits->Run();
 	}
+	this->InformParentReprocess();
 }
 
 void EditListPanel::ReprocessImageRaw(bool unpack) {
@@ -214,21 +234,7 @@ void EditListPanel::ReprocessImageRaw(bool unpack) {
 	else {
 		this->ReprocessImage();
 	}
-}
-
-void EditListPanel::PopulatePreviousEdits() {
-
-	// Create a vector of Edit list Items that are displayed on the panel
-	wxVector<EditListItem*> editList = scroller->GetEditList();
-	wxVector<ProcessorEdit*> runningEditList = wxVector<ProcessorEdit*>();
-
-	for (size_t i = 0; i < editList.size(); i++) {
-
-		if (editList.at(i)->GetEditWindow() != NULL) {
-			runningEditList.push_back(editList.at(i)->GetEditWindow()->GetParamsAndFlags());
-			editList.at(i)->GetEditWindow()->SetPreviousEdits(runningEditList);
-		}
-	}
+	this->InformParentReprocess();
 }
 
 void EditListPanel::StartEditsComplete() {
@@ -270,7 +276,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 			// Add the correct type of window, and set parameter for window based on edit
 			else{
 				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc, imagePanel);
-				
+				//newEditWindow->Hide();
 				if (newEditWindow != NULL) {
 					this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled(), false);
 					newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
@@ -324,12 +330,15 @@ void EditListPanel::AddEditWindowToPanel(EditWindow * window, int editID, bool d
 		editWindowInfo.Caption(window->GetName());
 		editWindowInfo.Float();
 		editWindowInfo.Show();
+		editWindowInfo.Hide();
 		editWindowInfo.BestSize(window->GetClientSize());
 		editWindowInfo.Name(window->GetName() + idStr);
 
 		// Add new edit window to AUI manager
 		PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(window, editWindowInfo);
-				
+		PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(window).Show();	
+		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+
 		// Add a new Edit List Item to the Edit List scroll panel
 		// Add special panel that will disable buttons if it is raw.  Keep raw panel at top
 		if(editID == AvailableEditIDS::EDIT_ID_RAW){
@@ -399,6 +408,23 @@ void EditListPanel::PasteEdit(wxCommandEvent& pasteEvt) {
 	// Grab the params and flags of the edit in the processor and paste in to the edit window
 	ProcessorEdit * copiedEdit = proc->GetEditForCopyPaste();
 	scroller->GetEditList()[editNum]->GetEditWindow()->SetParamsAndFlags(copiedEdit);
+	this->ReprocessImage();
+}
+
+void EditListPanel::EnableAllEdits(){
+
+	for(int i = 0; i < scroller->GetEditList().size(); i++){
+		scroller->GetEditList().at(i)->SetDisabled(false);
+	}
+	this->ReprocessImage();
+}
+
+void EditListPanel::DisableAllEdits(){
+
+	for(int i = 0; i < scroller->GetEditList().size(); i++){
+		scroller->GetEditList().at(i)->SetDisabled(true);
+	}
+	this->ReprocessImage();
 }
 
 void EditListPanel::DisableEdit(wxCommandEvent& WXUNUSED(event)) {

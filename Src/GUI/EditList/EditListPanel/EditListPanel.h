@@ -19,6 +19,7 @@
 #include "GUI/EditList/EditSelection/EditSelection.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Colors/Colors.h"
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
 
@@ -43,6 +44,8 @@ public:
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
 	void ReprocessImage();
 	void ReprocessImageRaw(bool unpack = false);
+	void EnableAllEdits();
+	void DisableAllEdits();
 
 private:
 
@@ -55,7 +58,6 @@ private:
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
 	void ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event));
 	void ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event));
-	void PopulatePreviousEdits();
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
 	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActviate);
@@ -73,7 +75,7 @@ private:
 	wxStaticText * titleText;
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * bottomButtonsSizer;
-	wxButton * addEditButton;
+	PhoediXButton * addEditButton;
 
 	EditSelection * editSelection;
 
@@ -89,8 +91,9 @@ private:
 
 	enum PopupMenuActions{
 		COPY_EDIT_LIST,
-		PASTE_EDIT_LIST
-
+		PASTE_EDIT_LIST,
+		ENABLE_ALL_EDITS,
+		DISABLE_ALL_EDITS
 	};
 
 	class EditListScroll : public wxScrolledWindow {
