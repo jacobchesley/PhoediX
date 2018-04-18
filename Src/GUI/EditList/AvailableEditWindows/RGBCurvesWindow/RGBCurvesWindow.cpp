@@ -185,11 +185,14 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 
 	// Get 8 bit color map
 	if (!isDisabled) {
+
 		int numSteps8 = 256;
-		wxVector<int> brightVector8 = brightCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
-		wxVector<int> redVector8 = redCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
-		wxVector<int> greenVector8 = greenCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
-		wxVector<int> blueVector8 = blueCurve->GetColorCurveMap(numSteps8, (float)numSteps8);
+		int numSteps16 = 65536;
+
+		int numCurves = 4;
+		int curveComplete = 0;
+		wxMutex mutexLock;
+		wxCondition wait(mutexLock);
 
 		// Create 8 bit int arrays
 		int * brightCurve8 = new int[numSteps8];
@@ -197,35 +200,25 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		int * greenCurve8 = new int[numSteps8];
 		int * blueCurve8 = new int[numSteps8];
 
-		// Fill 8 bit int array from map
-		for (int i = 0; i < numSteps8; i++) {
-			brightCurve8[i] = brightVector8[i];
-			redCurve8[i] = redVector8[i];
-			greenCurve8[i] = greenVector8[i];
-			blueCurve8[i] = blueVector8[i];
-		}
-
-		// Get 16 bit color map
-		int numSteps16 = 65536;
-		wxVector<int> brightVector16 = brightCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		wxVector<int> redVector16 = redCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		wxVector<int> greenVector16 = greenCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		wxVector<int> blueVector16 = blueCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-
 		// Create 16 bit int arrays
 		int * brightCurve16 = new int[numSteps16];
 		int * redCurve16 = new int[numSteps16];
 		int * greenCurve16 = new int[numSteps16];
 		int * blueCurve16 = new int[numSteps16];
 
-		// Fill 16 bit int array from map
-		for (int i = 0; i < numSteps16; i++) {
-			brightCurve16[i] = brightVector16[i];
-			redCurve16[i] = redVector16[i];
-			greenCurve16[i] = greenVector16[i];
-			blueCurve16[i] = blueVector16[i];
-		}
-		
+		GetCurveThread * lCurveThread8 = new GetCurveThread(brightCurve, numSteps8, brightCurve8, numCurves, &curveComplete, &mutexLock, &wait); lCurveThread8->Run();
+		GetCurveThread * rCurveThread8 = new GetCurveThread(redCurve, numSteps8, redCurve8 , numCurves, &curveComplete, &mutexLock, &wait); rCurveThread8->Run();
+		GetCurveThread * gCurveThread8 = new GetCurveThread(greenCurve, numSteps8, greenCurve8, numCurves, &curveComplete, &mutexLock, &wait); gCurveThread8->Run();
+		GetCurveThread * bCurveThread8 = new GetCurveThread(blueCurve, numSteps8, blueCurve8, numCurves, &curveComplete, &mutexLock, &wait); bCurveThread8->Run();
+		wait.Wait();
+
+		curveComplete = 0;
+		GetCurveThread * lCurveThread16 = new GetCurveThread(brightCurve, numSteps16, brightCurve16, numCurves, &curveComplete, &mutexLock, &wait); lCurveThread16->Run();
+		GetCurveThread * rCurveThread16 = new GetCurveThread(redCurve, numSteps16, redCurve16 , numCurves, &curveComplete, &mutexLock, &wait); rCurveThread16->Run();
+		GetCurveThread * gCurveThread16 = new GetCurveThread(greenCurve, numSteps16, greenCurve16, numCurves, &curveComplete, &mutexLock, &wait); gCurveThread16->Run();
+		GetCurveThread * bCurveThread16 = new GetCurveThread(blueCurve, numSteps16, blueCurve16, numCurves, &curveComplete, &mutexLock, &wait); bCurveThread16->Run();
+		wait.Wait();
+
 		// Add 8 bit map
 		rgbCurveEdit->AddIntArray(brightCurve8, numSteps8);
 		rgbCurveEdit->AddIntArray(redCurve8, numSteps8);
@@ -273,4 +266,30 @@ bool RGBCurvesWindow::CheckCopiedParamsAndFlags(){
 	}
 
 	return true;
+}
+
+RGBCurvesWindow::GetCurveThread::GetCurveThread(CurvePanel * curvePanelIn, int curveSize, int * curveOut, int numCurves, int * numCurveComplete, wxMutex * mutLockIn, wxCondition * condition) : wxThread(wxTHREAD_DETACHED){
+	curvePanel = curvePanelIn;
+	numPoints = curveSize;
+	curve = curveOut;
+
+	threads = numCurves;
+	complete = numCurveComplete;
+	mutLock = mutLockIn;
+	cond = condition;
+}
+
+wxThread::ExitCode RGBCurvesWindow::GetCurveThread::Entry(){
+
+	curvePanel->GetColorCurveMap(numPoints, curve, (float) numPoints);
+
+	mutLock->Lock();
+	*complete += 1;
+	
+	// All worker threads have finished, signal condition to continue
+	if (*complete == threads) {
+		cond->Broadcast();
+	}
+	mutLock->Unlock();
+	return (wxThread::ExitCode) 0;
 }

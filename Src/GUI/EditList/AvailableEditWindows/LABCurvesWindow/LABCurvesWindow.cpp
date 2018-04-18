@@ -198,19 +198,21 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 
 	if (!isDisabled) {
 		int numSteps16 = 65536;
-		wxVector<int> lVector16 = lCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		wxVector<int> aVector16 = aCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
-		wxVector<int> bVector16 = bCurve->GetColorCurveMap(numSteps16, (float)numSteps16);
+
+		int numCurves = 3;
+		int curveComplete = 0;
+		wxMutex mutexLock;
+		wxCondition wait(mutexLock);
 
 		int * lCurve16 = new int[numSteps16];
 		int * aCurve16 = new int[numSteps16];
 		int * bCurve16 = new int[numSteps16];
 
-		for (int i = 0; i < numSteps16; i++) {
-			lCurve16[i] = lVector16[i];
-			aCurve16[i] = aVector16[i];
-			bCurve16[i] = bVector16[i];
-		}
+		GetCurveThread * lCurveThread = new GetCurveThread(lCurve, numSteps16, lCurve16, numCurves, &curveComplete, &mutexLock, &wait); lCurveThread->Run();
+		GetCurveThread * aCurveThread = new GetCurveThread(aCurve, numSteps16, aCurve16, numCurves, &curveComplete, &mutexLock, &wait); aCurveThread->Run();
+		GetCurveThread * bCurveThread = new GetCurveThread(bCurve, numSteps16, bCurve16, numCurves, &curveComplete, &mutexLock, &wait); bCurveThread->Run();
+
+		wait.Wait();
 
 		labCurveEdit->AddIntArray(lCurve16, numSteps16);
 		labCurveEdit->AddIntArray(aCurve16, numSteps16);
@@ -253,4 +255,31 @@ bool LABCurvesWindow::CheckCopiedParamsAndFlags(){
 	}
 
 	return true;
+}
+
+LABCurvesWindow::GetCurveThread::GetCurveThread(CurvePanel * curvePanelIn, int curveSize, int * curveOut, int numCurves, int * numCurveComplete, wxMutex * mutLockIn, wxCondition * condition) : wxThread(wxTHREAD_DETACHED){
+	curvePanel = curvePanelIn;
+	numPoints = curveSize;
+	curve = curveOut;
+
+	threads = numCurves;
+	complete = numCurveComplete;
+	mutLock = mutLockIn;
+	cond = condition;
+}
+
+wxThread::ExitCode LABCurvesWindow::GetCurveThread::Entry(){
+
+	curvePanel->GetColorCurveMap(numPoints, curve, (float) numPoints);
+
+	mutLock->Lock();
+	*complete += 1;
+
+	// All worker threads have finished, signal condition to continue
+	if (*complete == threads) {
+		cond->Broadcast();
+	}
+	
+	mutLock->Unlock();
+	return (wxThread::ExitCode) 0;
 }
