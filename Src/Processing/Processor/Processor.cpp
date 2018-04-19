@@ -7070,7 +7070,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	// Create the raw image
 	processor->SendMessageToParent("Creating RAW Image for display");
 	processor->rawImage = processor->rawPrcoessor.dcraw_make_mem_image(&processor->rawErrorCode);
-	processor->rawPrcoessor.recycle();
+
 	// Set rawImageGood on processor if success
 	if(processor->rawErrorCode == LIBRAW_SUCCESS){
 
