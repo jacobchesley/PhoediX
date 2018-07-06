@@ -1,6 +1,6 @@
 @echo off
 
-SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
+SET VCVARSALL="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
 
 REM -----------------------------------------------------------
 REM           DO NOT MODIFY ANYTHING BELOW THIS POINT
