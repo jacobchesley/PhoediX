@@ -584,6 +584,8 @@ void MainWindow::ShowLoadImage(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
+
+	if(currentSession == NULL){return;}
 	this->OpenImage(currentSession->GetImageFilePath());
 }
 
