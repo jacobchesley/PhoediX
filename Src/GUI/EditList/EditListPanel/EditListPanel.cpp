@@ -413,7 +413,7 @@ void EditListPanel::PasteEdit(wxCommandEvent& pasteEvt) {
 
 void EditListPanel::EnableAllEdits(){
 
-	for(int i = scroller->GetNumTopEdits(); i < scroller->GetEditList().size(); i++){
+	for(int i = 0; i < scroller->GetEditList().size(); i++){
 		scroller->GetEditList().at(i)->SetDisabled(false);
 	}
 	this->ReprocessImage();
@@ -421,8 +421,11 @@ void EditListPanel::EnableAllEdits(){
 
 void EditListPanel::DisableAllEdits(){
 
-	for(int i = scroller->GetNumTopEdits(); i < scroller->GetEditList().size(); i++){
-		scroller->GetEditList().at(i)->SetDisabled(true);
+	for(int i = 0; i < scroller->GetEditList().size(); i++){
+
+		if(!(scroller->GetEditList().at(i)->GetEditWindow()->GetParamsAndFlags()->GetEditType() == ProcessorEdit::EditType::RAW)){
+			scroller->GetEditList().at(i)->SetDisabled(true);
+		}
 	}
 	this->ReprocessImage();
 }
