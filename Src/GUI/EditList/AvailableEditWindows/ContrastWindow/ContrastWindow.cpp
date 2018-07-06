@@ -106,6 +106,7 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 
 	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
+	this->Bind(wxEVT_CHECKBOX, (wxObjectEventFunction)&ContrastWindow::OnUpdate, this);
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
