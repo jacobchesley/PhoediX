@@ -271,11 +271,13 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	gridMoving = false;
 
 	scalar = 1.0;
+	quality = wxINTERPOLATION_FAST;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
+	this->Bind(wxEVT_SCROLLBAR, (wxObjectEventFunction)&ImageScroll::OnScroll, this);
 
 	#if defined(__WXMSW__) || defined(__WXGTK__)
 		this->SetDoubleBuffered(true);
@@ -310,11 +312,13 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	gridMoving = false;
 
 	scalar = 1.0;
+	quality = wxINTERPOLATION_FAST;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
+	this->Bind(wxEVT_SCROLLBAR, (wxObjectEventFunction)&ImageScroll::OnScroll, this);
 
 	#if defined(__WXMSW__) || defined(__WXGTK__)
 		this->SetDoubleBuffered(true);
@@ -347,6 +351,7 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	gridMoving = false;
 
 	scalar = 1.0;
+	quality = wxINTERPOLATION_FAST;
 
 	SetScrollbars(1, 1, image->GetWidth(), image->GetHeight());
 	
@@ -354,7 +359,8 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	this->Bind(wxEVT_PAINT, (wxObjectEventFunction)&ImageScroll::OnPaint, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&ImageScroll::OnDragStart, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ImageScroll::OnRightDown, this);
-	
+	this->Bind(wxEVT_SCROLLBAR, (wxObjectEventFunction)&ImageScroll::OnScroll, this);
+
 	#if defined(__WXMSW__) || defined(__WXGTK__)
 		this->SetDoubleBuffered(true);
 	#endif
@@ -364,7 +370,7 @@ void ZoomImagePanel::ImageScroll::NoImage() {
 	noImage = true;
 }
 
-void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
+void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 	
 	double tempScalar = 1.0;
 	if(!this->GetFitImage()){
@@ -399,9 +405,10 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 	int yShift = 0;
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth)/ 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
-   
+
+	dc.GetGraphicsContext()->SetInterpolationQuality(quality);
 	dc.DrawBitmap(bitmapDraw, wxPoint(xShift/tempScalar, yShift/tempScalar));
-    
+
 	if (gridActive){
 		
 		int lineWidth = (int) (4.0 / this->GetZoom());
@@ -452,12 +459,16 @@ void ZoomImagePanel::ImageScroll::Render(wxDC& dc) {
 
 void ZoomImagePanel::ImageScroll::Redraw() {
 
+	quality = wxINTERPOLATION_FAST;
 	currentlyDrawing = true;
 	// Render a buffered DC from the client DC
 	wxClientDC dc(this);
 	if(!dc.IsOk()){ return; }
 	wxBufferedDC dcBuffer(&dc);
-	this->Render(dcBuffer);
+	dcBuffer.Clear();
+	dcBuffer.SetBackground(wxBrush(this->GetBackgroundColour()));
+	wxGCDC gc(dcBuffer);
+	this->Render(gc);
 	currentlyDrawing = false;
 }
 
@@ -527,6 +538,11 @@ void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 		// Just need to set zoom factor
 		this->FitImage(false); 
 	}
+}
+
+void ZoomImagePanel::ImageScroll::OnScroll(wxCommandEvent& evt){
+	quality = wxINTERPOLATION_NONE;
+
 }
 
 void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
@@ -858,12 +874,14 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			int newScrollPosY = (-dy / scrollScaleY) + (scrollStartY / scrollScaleY);
 
 			// Scroll to new calculated position
+			quality = wxINTERPOLATION_NONE;
 			this->Scroll(newScrollPosX, newScrollPosY);
             this->Refresh();
             this->Update();
 			mouse.SetState(wxGetMouseState());
             wxSafeYield();
 		}
+		this->Redraw();
 	}
 }
 
@@ -879,15 +897,22 @@ void ZoomImagePanel::ImageScroll::OnPaint(wxPaintEvent& evt) {
     if(this->IsDoubleBuffered()){
         wxBufferedPaintDC paintDC(this);
         if(!paintDC.IsOk()){ return; }
-        this->Render(paintDC);
+		paintDC.Clear();
+		paintDC.SetBackground(wxBrush(this->GetBackgroundColour()));
+		wxGCDC gc(paintDC);
+        this->Render(gc);
     }
     else{
         wxPaintDC paintDC(this);
         if(!paintDC.IsOk()){ return; }
-        this->Render(paintDC);
+		paintDC.Clear();
+		paintDC.SetBackground(wxBrush(this->GetBackgroundColour()));
+		wxGCDC gc(paintDC);
+        this->Render(gc);
     }
 	evt.Skip(false);
 	currentlyDrawing = false;
+	quality = wxINTERPOLATION_FAST;
 }
 
 void ZoomImagePanel::ImageScroll::SetZoom(double zoomFactor, bool refresh) {

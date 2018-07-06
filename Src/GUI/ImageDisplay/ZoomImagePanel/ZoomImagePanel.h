@@ -12,6 +12,7 @@
 #endif
 
 #include "wx/dc.h"
+#include "wx/dcgraph.h"
 #include "wx/dcbuffer.h"
 #include "wx/graphics.h"
 #include "wx/rawbmp.h"
@@ -158,9 +159,10 @@ private:
 		bool disreguardScroll;
 		void OnDragStart(wxMouseEvent & evt);
 		void OnPaint(wxPaintEvent & evt);
-		void Render(wxDC& dc);
+		void Render(wxGCDC& dc);
 		void OnRightDown(wxMouseEvent & evt);
 		bool GetGridMoving();
+		void OnScroll(wxCommandEvent & evt);
 		wxBitmap bitmapDraw;
 	
 		double zoom;
@@ -189,6 +191,8 @@ private:
 
 		Grid scaleGrid;
 		Grid drawGrid;
+
+		wxInterpolationQuality quality;
 	};
 
 	ImageScroll * scroller;
