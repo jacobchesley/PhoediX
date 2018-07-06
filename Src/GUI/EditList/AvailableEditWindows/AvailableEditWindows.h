@@ -20,6 +20,7 @@
 #include "AdjustHSLWindow/AdjustHSLWindow.h"
 #include "AdjustLABWindow/AdjustLABWindow.h"
 #include "AdjustRGBWindow/AdjustRGBWindow.h"
+#include "BlurWindow/BlurWindow.h"
 #include "ChannelMixerWindow/ChannelMixerWindow.h"
 #include "ContrastWindow/ContrastWindow.h"
 #include "ConvertGreyscaleWindow/ConvertGreyscaleWindow.h"

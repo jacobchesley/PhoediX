@@ -30,7 +30,8 @@ enum AvailableEditIDS {
 	EDIT_ID_HSL_CURVES,
 	EDIT_ID_RAW,
 	EDIT_ID_SCALE,
-	EDIT_ID_CROP
+	EDIT_ID_CROP,
+	EDIT_ID_BLUR
 };
 
 class Edit {

@@ -30,7 +30,6 @@ ProcessorEdit::ProcessorEdit(int editType) {
 	flags.clear();
 }
 
-
 ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 
 	isDisabled = false;
@@ -226,6 +225,10 @@ void ProcessorEdit::SetEditType(int editType) {
 			tag = "ADJUST_CONTRAST";
 			break;
 
+		case EditType::ADJUST_CONTRAST_CURVE:
+			tag = "ADJUST_CONTRAST_CURVE";
+			break;
+
 		case EditType::ADJUST_BRIGHTNESS:
 			tag = "ADJUST_BRIGHTNESS";
 			break;
@@ -326,6 +329,18 @@ void ProcessorEdit::SetEditType(int editType) {
 			tag = "CROP";
 			break;
 
+		case EditType::BLUR:
+			tag = "BLUR";
+			break;
+
+		case EditType::HORIZONTAL_BLUR:
+			tag = "HORIZONTAL_BLUR";
+			break;
+
+		case EditType::VERTICAL_BLUR:
+			tag = "VERTICAL_BLUR";
+			break;
+
 		case EditType::RAW:
 			tag = "RAW";
 			break;
@@ -344,6 +359,7 @@ void ProcessorEdit::SetEditType(int editType) {
 void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 
 	     if (inTag == "ADJUST_CONTRAST") { editInt = EditType::ADJUST_CONTRAST; tag = inTag; }
+	else if (inTag == "ADJUST_CONTRAST_CURVE") { editInt = EditType::ADJUST_CONTRAST_CURVE; tag = inTag; }
 	else if (inTag == "CHANNEL_MIXER") { editInt = EditType::CHANNEL_MIXER; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_AVG") { editInt = EditType::CONVERT_GREYSCALE_AVG; tag = inTag; }
 	else if (inTag == "CONVERT_GREYSCALE_CUSTOM") { editInt = EditType::CONVERT_GREYSCALE_CUSTOM; tag = inTag; }
@@ -369,6 +385,9 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "SCALE_BILINEAR") { editInt = EditType::SCALE_BILINEAR; tag = inTag; }
 	else if (inTag == "SCALE_BICUBIC") { editInt = EditType::SCALE_BICUBIC; tag = inTag; }
 	else if (inTag == "CROP") { editInt = EditType::CROP; tag = inTag; }
+	else if (inTag == "BLUR") { editInt = EditType::BLUR; tag = inTag; }
+	else if (inTag == "HORIZONTAL_BLUR") { editInt = EditType::HORIZONTAL_BLUR; tag = inTag; }
+	else if (inTag == "VERTICAL_BLUR") { editInt = EditType::VERTICAL_BLUR; tag = inTag; }
 	else if (inTag == "RAW") { editInt = EditType::RAW; tag = inTag; }
 	else{ editInt = EditType::UNDEFINED; tag = "UNDEFINED"; }
 }

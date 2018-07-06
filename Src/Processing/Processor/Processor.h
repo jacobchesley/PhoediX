@@ -240,6 +240,7 @@ private:
 	void CleanupRotation(int editID);
 	void Rotate90CW(int dataStart = -1, int dataEnd = -1);
 	void Rotate180(int dataStart = -1, int dataEnd = -1);
+	void Rotate270CW(int dataStart = -1, int dataEnd = -1);
 	void RotateCustom(double angleDegrees, int dataStart = -1, int dataEnd = -1);
 	void RotateCustomBilinear(double angleDegrees, int dataStart = -1, int dataEnd = -1);
 	void RotateCustomBicubic(double angleDegrees, int dataStart = -1, int dataEnd = -1);
@@ -263,8 +264,9 @@ private:
 
 	void SetupBlur();
 	void CleanupBlur();
-	void BoxBlurHorizontal(int pixelBlurSize, int dataStart = -1, int dataEnd = -1);
-	void BoxBlurVertical(int pixelBlurSize, int dataStart = -1, int dataEnd = -1);
+	double CalculateBlurSize(double inputBlurSize);
+	void BoxBlurHorizontal(double blurSize, int dataStart = -1, int dataEnd = -1);
+	void BoxBlurVertical(double blurSize, int dataStart = -1, int dataEnd = -1);
 
 	void RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpaceToUse);
 	void XYZtoRGB(XYZ * xyz, RGB * rgb, int colorSpaceToUse);

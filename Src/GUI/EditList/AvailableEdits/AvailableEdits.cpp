@@ -37,6 +37,7 @@ AvailableEdits::AvailableEdits() {
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_MIRROR, "Mirror Image", "Mirror image horizontally or vertically"));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_SCALE, "Scale Image", "Resize image to any size"));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CROP, "Crop Image", "Crop image with a starting point, along with width and height"));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_BLUR, "Blur Image", "Blur image horiztontally, vertically, or all directions"));
 }
 
 wxVector<Edit> AvailableEdits::GetAvailableEdits() {

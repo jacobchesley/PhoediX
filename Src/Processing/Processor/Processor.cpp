@@ -523,8 +523,7 @@ void Processor::Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * out
 
 
 void Processor::AdjustRGB(double all, double red, double green, double blue, int dataStart, int dataEnd) {
-
-
+	
 	// Get number of pixels for the image
 	int dataSize = img->GetWidth() * img->GetHeight();
 	if (dataStart < 0 || dataEnd < 0) {
@@ -2534,6 +2533,8 @@ void Processor::CleanupRotation(int editID){
 		tempImage = NULL;
 	}
 }
+
+
 void Processor::Rotate90CW(int dataStart, int dataEnd) {
 
 	int width = img->GetWidth();
@@ -2549,7 +2550,7 @@ void Processor::Rotate90CW(int dataStart, int dataEnd) {
 	int x = 0;
 	int y = 0;
 	int offset = 0;
-
+	int newOffset = 0;
 
 	// Process 8 bit data
 	if(img->GetColorDepth() == 8){
@@ -2571,10 +2572,11 @@ void Processor::Rotate90CW(int dataStart, int dataEnd) {
 			x = i % width;
 			y = i / width;
 			offset = height * x + y;
+			newOffset = width * (height - 1 - y) + x;
 
-			redData8[offset] = redData8Dup[width * (height - 1 - y) + x];
-			greenData8[offset] = greenData8Dup[width * (height - 1 - y) + x];
-			blueData8[offset] = blueData8Dup[width * (height - 1 - y) + x];
+			redData8[offset] = redData8Dup[newOffset];
+			greenData8[offset] = greenData8Dup[newOffset];
+			blueData8[offset] = blueData8Dup[newOffset];
 		}
 	}
 
@@ -2598,10 +2600,11 @@ void Processor::Rotate90CW(int dataStart, int dataEnd) {
 			x = i % width;
 			y = i / width;
 			offset = height * x + y;
+			newOffset = width * (height - 1 - y) + x;
 
-			redData16[offset] = redData16Dup[width * (height - 1 - y) + x];
-			greenData16[offset] = greenData16Dup[width * (height - 1 - y) + x];
-			blueData16[offset] = blueData16Dup[width * (height - 1 - y) + x];
+			redData16[offset] = redData16Dup[newOffset];
+			greenData16[offset] = greenData16Dup[newOffset];
+			blueData16[offset] = blueData16Dup[newOffset];
 		}
 	}
 }
@@ -2614,6 +2617,8 @@ void Processor::Rotate180(int dataStart, int dataEnd) {
 		dataStart = 0;
 		dataEnd = dataSize;
 	}
+
+	int newOffset = 0;
 
 	// Process 8 bit data
 	if(img->GetColorDepth() == 8){
@@ -2631,9 +2636,10 @@ void Processor::Rotate180(int dataStart, int dataEnd) {
 
 			if(forceStop) { return; }
 
-			redData8[i] = redData8Dup[dataSize - i - 1];
-			greenData8[i] = greenData8Dup[dataSize - i - 1];
-			blueData8[i] = blueData8Dup[dataSize - i - 1];
+			newOffset = dataSize - i - 1;
+			redData8[i] = redData8Dup[newOffset];
+			greenData8[i] = greenData8Dup[newOffset];
+			blueData8[i] = blueData8Dup[newOffset];
 		}
 	}
 	
@@ -2653,9 +2659,90 @@ void Processor::Rotate180(int dataStart, int dataEnd) {
 
 			if(forceStop) { return; }
 
-			redData16[i] = redData16Dup[dataSize - i - 1];
-			greenData16[i] = greenData16Dup[dataSize - i - 1];
-			blueData16[i] = blueData16Dup[dataSize - i - 1];
+			newOffset = dataSize - i - 1;
+			redData16[i] = redData16Dup[newOffset];
+			greenData16[i] = greenData16Dup[newOffset];
+			blueData16[i] = blueData16Dup[newOffset];
+		}
+	}
+}
+void Processor::Rotate270CW(int dataStart, int dataEnd) {
+
+	int width = img->GetWidth();
+	int height = img->GetHeight();
+
+	// Get number of pixels for the image
+	int dataSize = img->GetWidth() * img->GetHeight();
+	if (dataStart < 0 || dataEnd < 0) {
+		dataStart = 0;
+		dataEnd = dataSize;
+	}
+
+	int x = 0;
+	int y = 0;
+	int newOffset = 0;
+
+	// Process 8 bit data
+	if(img->GetColorDepth() == 8){
+
+		// Get pointers to 8 bit data
+		uint8_t * redData8 = img->Get8BitDataRed();
+		uint8_t * greenData8 = img->Get8BitDataGreen();
+		uint8_t * blueData8 = img->Get8BitDataBlue();
+
+		uint8_t * redData8Dup = tempImage->Get8BitDataRed();
+		uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
+		uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if(forceStop) { return; }
+
+			// Get x and y coordinates from current index of data
+			x = i % width;
+			y = i / width;
+
+			newOffset = dataSize - i - 1;
+
+			x = newOffset % height;
+			y = newOffset / height;
+			newOffset = height * (width - 1 - x) + y;
+
+			redData8[i] = redData8Dup[newOffset];
+			greenData8[i] = greenData8Dup[newOffset];
+			blueData8[i] = blueData8Dup[newOffset];
+		}
+	}
+
+	// Process 16 bit data
+	else {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		uint16_t * redData16Dup = tempImage->Get16BitDataRed();
+		uint16_t * greenData16Dup = tempImage->Get16BitDataGreen();
+		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if(forceStop) { return; }
+
+			// Get x and y coordinates from current index of data
+			x = i % width;
+			y = i / width;
+
+			newOffset = dataSize - i - 1;
+
+			x = newOffset % height;
+			y = newOffset / height;
+			newOffset = height * (width - 1 - x) + y;
+		
+			redData16[i] = redData16Dup[newOffset];
+			greenData16[i] = greenData16Dup[newOffset];
+			blueData16[i] = blueData16Dup[newOffset];
 		}
 	}
 }
@@ -5332,12 +5419,53 @@ void Processor::MirrorVertical(int dataStart, int dataEnd) {
 	}
 }
 
-void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd) {
+void Processor::SetupBlur(){
+
+	// Create temp image with same size as current image
+	tempImage = new Image();
+	tempImage->SetWidth(img->GetWidth());
+	tempImage->SetHeight(img->GetHeight());
+	if (this->GetImage()->GetColorDepth() == 16) { tempImage->Enable16Bit(); }
+	tempImage->InitImage();
+}
+
+void Processor::CleanupBlur(){
+	// Copy temp image to image
+	delete img;
+	img = new Image(*tempImage);
+
+	// Cleanup temp image
+	if(tempImage != NULL){
+		delete tempImage;
+		tempImage = NULL;
+	}
+}
+
+double Processor::CalculateBlurSize(double inputBlurSize){
+
+	if(img->GetWidth() > img->GetHeight()){
+		return inputBlurSize * (double)img->GetWidth();
+	}
+	else{
+		return inputBlurSize * (double)img->GetHeight();
+	}
+}
+void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 
 	int width = img->GetWidth();
 
+	int pixelBlurSize = blurSize;
+	
+	if(pixelBlurSize > img->GetWidth()/2.0){
+		pixelBlurSize = img->GetWidth()/2.0;
+	}
+	if(pixelBlurSize < 1){
+		pixelBlurSize = 1;
+	}
+
 	// Get number of pixels for the image
 	int dataSize = img->GetWidth() * img->GetHeight();
+
 	if (dataStart < 0 || dataEnd < 0) {
 		dataStart = 0;
 		dataEnd = dataSize;
@@ -5346,19 +5474,20 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 	int64_t tempRed = 0;
 	int64_t tempGreen = 0;
 	int64_t tempBlue = 0;
+	int64_t tempRedScale = 0;
+	int64_t tempGreenScale = 0;
+	int64_t tempBlueScale = 0;
 
 	int x = 0;
 	int y = 0;
+	int idx = 0;
 
-	int16_t redAdd = 0;
-	int16_t greenAdd = 0;
-	int16_t blueAdd = 0;
+	int xPlus = 0;
+	int xMin = 0;
+	int iMapPlus = 0;
+	int iMapMin = 0;
 
-	int16_t redSub = 0;
-	int16_t greenSub = 0;
-	int16_t blueSub = 0;
-
-	bool doBox = false;
+	double scalar = 1.0/((2.0 * (pixelBlurSize))+1.0);
 
 	// Process 8 bit data
 	if (img->GetColorDepth() == 8) {
@@ -5374,25 +5503,256 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if (forceStop) { return; }
+			if(forceStop) { return; }
 
 			x = i % width;
 			y = i / width;
 
-			if(doBox){
+			// First pixel in row
+			// First pixel in row
+			if(x == 0){
 
+				tempRed = 0;
+				tempGreen = 0;
+				tempBlue = 0;
+
+				for(int j = 0; j < (pixelBlurSize * 2) + 1; j++){
+
+					idx = (width * y) + j;
+					tempRed += redData8[idx];
+					tempGreen += greenData8[idx];
+					tempBlue += blueData8[idx];
+				}
 			}
 
-			// Calculate first pixel value
+			// Standard box blur
 			else{
-				for(int j = -1 * pixelBlurSize; j < pixelBlurSize; j++){
-					tempRed += redData8[i + pixelBlurSize];
-					tempGreen += greenData8[i + pixelBlurSize];
-					tempBlue += blueData8[i + pixelBlurSize];
+				xPlus = x + pixelBlurSize + 1;
+				xMin = x - pixelBlurSize;
+
+				if(xPlus <= width - 1 && xMin >= 0){
+
+					iMapPlus = (y * width) + xPlus;
+					iMapMin = (y * width) + xMin;
+
+					tempRed += redData8[iMapPlus];
+					tempRed -= redData8[iMapMin];
+					tempGreen+= greenData8[iMapPlus];
+					tempGreen -= greenData8[iMapMin];
+					tempBlue += blueData8[iMapPlus];
+					tempBlue -= blueData8[iMapMin];
 				}
-				redData8Dup[i] = tempRed / ((pixelBlurSize * 2) + 1);
-				greenData8Dup[i] = tempGreen / ((pixelBlurSize * 2) + 1);
-				blueData8Dup[i] = tempBlue / ((pixelBlurSize * 2) + 1);
+			}
+						
+			// Scale values
+			tempRedScale = tempRed * scalar;
+			tempGreenScale = tempGreen * scalar;
+			tempBlueScale = tempBlue * scalar;
+
+			// handle overflow or underflow
+			tempRedScale = (tempRedScale > 255) ? 255 : tempRedScale;
+			tempGreenScale = (tempGreenScale > 255) ? 255 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  > 255) ? 255 : tempBlueScale;
+
+			tempRedScale = (tempRedScale  < 0) ? 0 : tempRedScale;
+			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
+				
+			redData8Dup[i] = tempRedScale;
+			greenData8Dup[i] = tempGreenScale;
+			blueData8Dup[i] = tempBlueScale;
+		}
+	}
+
+	// Process 16 bit data
+	else {
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = img->Get16BitDataRed();
+		uint16_t * greenData16 = img->Get16BitDataGreen();
+		uint16_t * blueData16 = img->Get16BitDataBlue();
+
+		uint16_t * redData16Dup = tempImage->Get16BitDataRed();
+		uint16_t * greenData16Dup = tempImage->Get16BitDataGreen();
+		uint16_t * blueData16Dup = tempImage->Get16BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if(forceStop) { return; }
+
+			x = i % width;
+			y = i / width;
+
+			// First pixel in row
+			if(x == 0){
+
+				tempRed = 0;
+				tempGreen = 0;
+				tempBlue = 0;
+
+				for(int j = 0; j < (pixelBlurSize * 2) + 1; j++){
+
+					idx = (width * y) + j;
+					tempRed += redData16[idx];
+					tempGreen += greenData16[idx];
+					tempBlue += blueData16[idx];
+				}
+			}
+
+			// Standard box blur
+			else{
+				xPlus = x + pixelBlurSize + 1;
+				xMin = x - pixelBlurSize;
+
+				if(xPlus <= width - 1 && xMin >= 0){
+
+					iMapPlus = (y * width) + xPlus;
+					iMapMin = (y * width) + xMin;
+
+					tempRed += redData16[iMapPlus];
+					tempRed -= redData16[iMapMin];
+					tempGreen+= greenData16[iMapPlus];
+					tempGreen -= greenData16[iMapMin];
+					tempBlue += blueData16[iMapPlus];
+					tempBlue -= blueData16[iMapMin];
+				}
+			}
+
+			// Scale values
+			tempRedScale = tempRed * scalar;
+			tempGreenScale = tempGreen * scalar;
+			tempBlueScale = tempBlue* scalar;
+
+			// handle overflow or underflow
+			tempRedScale = (tempRedScale > 65535) ? 65535 : tempRedScale;
+			tempGreenScale = (tempGreenScale  > 65535) ? 65535 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  > 65535) ? 65535 : tempBlueScale;
+
+			tempRedScale = (tempRedScale  < 0) ? 0 : tempRedScale;
+			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
+
+			redData16Dup[i] = tempRedScale;
+			greenData16Dup[i] = tempGreenScale;
+			blueData16Dup[i] = tempBlueScale;
+
+		}
+	}
+}
+
+void Processor::BoxBlurVertical(double blurSize, int dataStart, int dataEnd) {
+
+	int width = img->GetWidth();
+	int height = img->GetHeight();
+
+	int pixelBlurSize = blurSize;
+	if(pixelBlurSize > img->GetHeight()){
+		pixelBlurSize = img->GetHeight();
+	}
+	if(pixelBlurSize < 1){
+		pixelBlurSize = 1;
+	}
+
+	// Get number of pixels for the image
+	int dataSize = img->GetWidth() * img->GetHeight();
+
+	if (dataStart < 0 || dataEnd < 0) {
+		dataStart = 0;
+		dataEnd = dataSize;
+	}
+
+	int64_t tempRed = 0;
+	int64_t tempGreen = 0;
+	int64_t tempBlue = 0;
+	int64_t tempRedScale = 0;
+	int64_t tempGreenScale = 0;
+	int64_t tempBlueScale = 0;
+
+	int x = dataStart % width;
+	int y = dataStart / width;
+
+	int idx = 0;
+	int iMapPlus = 0;
+	int iMapMin = 0;
+	int yPlus = 0;
+	int yMin = 0;
+
+	double scalar = 1.0/((2.0 * pixelBlurSize)+1.0);
+
+	// Process 8 bit data
+	if (img->GetColorDepth() == 8) {
+
+		// Get pointers to 8 bit data
+		uint8_t * redData8 = img->Get8BitDataRed();
+		uint8_t * greenData8 = img->Get8BitDataGreen();
+		uint8_t * blueData8 = img->Get8BitDataBlue();
+
+		uint8_t * redData8Dup = tempImage->Get8BitDataRed();
+		uint8_t * greenData8Dup = tempImage->Get8BitDataGreen();
+		uint8_t * blueData8Dup = tempImage->Get8BitDataBlue();
+
+		for (int i = dataStart; i < dataEnd; i++) {
+
+			if(forceStop) { return; }
+
+			// First pixel in column
+			if(y == 0){
+
+				tempRed = 0;
+				tempGreen = 0;
+				tempBlue = 0;
+
+				// Blur first pixel in column
+				for(int j = 0; j < pixelBlurSize * 2 + 1; j++){
+
+					idx = (width * j) + x;
+					tempRed += redData8[idx];
+					tempGreen += greenData8[idx];
+					tempBlue += blueData8[idx];
+				}
+			}
+
+			else{
+				yPlus = y + pixelBlurSize + 1;
+				yMin = y - pixelBlurSize;
+
+				if(yPlus <= height - 1 && yMin >= 0){
+			
+					iMapPlus = (yPlus * width) + x;
+					iMapMin = (yMin * width) + x;
+
+					tempRed += redData8[iMapPlus];
+					tempRed -= redData8[iMapMin];
+					tempGreen += greenData8[iMapPlus];
+					tempGreen -= greenData8[iMapMin];
+					tempBlue += blueData8[iMapPlus];
+					tempBlue -= blueData8[iMapMin];
+				}
+			}
+
+			// Scale values
+			tempRedScale = tempRed * scalar;
+			tempGreenScale = tempGreen * scalar;
+			tempBlueScale = tempBlue* scalar;
+		
+			// handle overflow or underflow
+			tempRedScale = (tempRedScale > 255) ? 255 : tempRedScale;
+			tempGreenScale = (tempGreenScale > 255) ? 255 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  > 255) ? 255 : tempBlueScale;
+
+			tempRedScale = (tempRedScale  < 0) ? 0 : tempRedScale;
+			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
+
+			idx = (width * y) + x;
+			redData8Dup[idx] = tempRedScale;
+			greenData8Dup[idx] = tempGreenScale;
+			blueData8Dup[idx] = tempBlueScale;
+
+			y += 1;
+			if(y % height == 0){
+				y = 0;
+				x += 1;
 			}
 		}
 	}
@@ -5411,32 +5771,69 @@ void Processor::BoxBlurHorizontal(int pixelBlurSize, int dataStart, int dataEnd)
 
 		for (int i = dataStart; i < dataEnd; i++) {
 
-			if (forceStop) { return; }
+			if(forceStop) { return; }
 
-			x = i % width;
-			y = i / width;
+			// First pixel in column
+			if(y == 0){
 
-			if(doBox){
+				tempRed = 0;
+				tempGreen = 0;
+				tempBlue = 0;
 
+				// Blur first pixel in column
+				for(int j = 0; j < pixelBlurSize * 2 + 1; j++){
+
+					idx = (width * j) + x;
+					tempRed += redData16[idx];
+					tempGreen += greenData16[idx];
+					tempBlue += blueData16[idx];
+				}
 			}
 
-			// Calculate first pixel value
 			else{
-				for(int j = -1 * pixelBlurSize; j < pixelBlurSize; j++){
-					tempRed += redData16[i + pixelBlurSize];
-					tempGreen += greenData16[i + pixelBlurSize];
-					tempBlue += blueData16[i + pixelBlurSize];
+				yPlus = y + pixelBlurSize + 1;
+				yMin = y - pixelBlurSize;
+
+				if(yPlus <= height - 1 && yMin >= 0){
+			
+					iMapPlus = (yPlus * width) + x;
+					iMapMin = (yMin * width) + x;
+
+					tempRed += redData16[iMapPlus];
+					tempRed -= redData16[iMapMin];
+					tempGreen += greenData16[iMapPlus];
+					tempGreen -= greenData16[iMapMin];
+					tempBlue += blueData16[iMapPlus];
+					tempBlue -= blueData16[iMapMin];
 				}
-				redData16Dup[i] = tempRed / ((pixelBlurSize * 2) + 1);
-				greenData16Dup[i] = tempGreen / ((pixelBlurSize * 2) + 1);
-				blueData16Dup[i] = tempBlue / ((pixelBlurSize * 2) + 1);
+			}
+
+			// Scale values
+			tempRedScale = tempRed * scalar;
+			tempGreenScale = tempGreen * scalar;
+			tempBlueScale = tempBlue* scalar;
+		
+			// handle overflow or underflow
+			tempRedScale = (tempRedScale > 65535) ? 65535 : tempRedScale;
+			tempGreenScale = (tempGreenScale > 65535) ? 65535 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  > 65535) ? 65535 : tempBlueScale;
+
+			tempRedScale = (tempRedScale  < 0) ? 0 : tempRedScale;
+			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
+			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
+
+			idx = (width * y) + x;
+			redData16Dup[idx] = tempRedScale;
+			greenData16Dup[idx] = tempGreenScale;
+			blueData16Dup[idx] = tempBlueScale;
+
+			y += 1;
+			if(y % height == 0){
+				y = 0;
+				x += 1;
 			}
 		}
 	}
-}
-
-void Processor::BoxBlurVertical(int pixelBlurSize, int dataStart, int dataEnd) {
-
 }
 
 void Processor::RGBtoXYZ(RGB * rgb, XYZ * xyz, int colorSpaceToUse) {
@@ -5762,21 +6159,49 @@ void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize
 	wxCondition wait(mutexLock);
 	int threadComplete = 0;
 
-	for (int thread = 0; thread < numThreads; thread++) {
+	// Horizontal blur must have data seperated into full rows
+	if(edit->GetEditType()== ProcessorEdit::HORIZONTAL_BLUR){
 
-		// Process current chunk of data
-		if (thread != numThreads - 1) {
-			EditThread * editWorker = new EditThread(processor, edit, chunkSize * thread, chunkSize * (thread + 1), &mutexLock, &wait, numThreads, &threadComplete);
-			editWorker->Run();
-		}
+		if(chunkSize % processor->GetImage()->GetWidth() != 0){
 
-		// Go all the way to end of data (incase of rounding error)
-		else {
-			EditThread * editWorker = new EditThread(processor, edit, chunkSize * thread, dataSize, &mutexLock, &wait, numThreads, &threadComplete);
-			editWorker->Run();
+			for(int i = 0; i < processor->GetImage()->GetWidth(); i++){
+
+				chunkSize += 1;
+				if(chunkSize % processor->GetImage()->GetWidth() == 0){ break;}
+			}
 		}
 	}
 
+	// Vertical blur must have data seperated into full columns
+	if(edit->GetEditType()== ProcessorEdit::VERTICAL_BLUR){
+
+		// Get Chunk Size
+		chunkSize = (processor->GetImage()->GetWidth() / numThreads) * processor->GetImage()->GetHeight();
+		int chunkStart = 0;
+		for (int thread = 0; thread < numThreads; thread++) {
+			EditThread * editWorker = new EditThread(processor, edit, chunkStart, chunkSize + chunkStart, &mutexLock, &wait, numThreads, &threadComplete);
+			editWorker->Run();
+			chunkStart += (processor->GetImage()->GetWidth() / numThreads);
+		}
+	}
+
+	// Multithreaded chunks split into horizontal rows (almost all edits except vertical blur).
+	else{
+		for (int thread = 0; thread < numThreads; thread++) {
+
+			// Process current chunk of data
+			if (thread != numThreads - 1) {
+				EditThread * editWorker = new EditThread(processor, edit, chunkSize * thread, chunkSize * (thread + 1), &mutexLock, &wait, numThreads, &threadComplete);
+				editWorker->Run();
+			}
+
+			// Go all the way to end of data (incase of rounding error)
+			else {
+				EditThread * editWorker = new EditThread(processor, edit, chunkSize * thread, dataSize, &mutexLock, &wait, numThreads, &threadComplete);
+				editWorker->Run();
+			}
+		}
+	}
 	// Wait for all worker threads to complete
 	wait.Wait();
 	processor->SetUpdated(true);
@@ -6176,48 +6601,24 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			// Peform a 90 degree clockwise roctation
 			case ProcessorEdit::EditType::ROTATE_90_CW: {
 
-				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
-			
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					processor->SetupRotation(editToComplete, 90.0, 0);
-
-					if (processor->GetTempImage()->GetWidth() < 1 || processor->GetTempImage()->GetHeight() < 1) {
-						processor->SendMessageToParent("Image rotation failure: " + processor->GetTempImage()->GetErrorStr());
-						this->DeleteEditVector();
-						return 0;
-					}
-
-					this->Multithread(curEdit);
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					processor->SetupRotation(editToComplete, 90.0, 0);
-
-					if(processor->GetTempImage()->GetWidth() < 1 || processor->GetTempImage()->GetHeight() < 1 ){ 
-						processor->SendMessageToParent("Image rotation failure: " + processor->GetTempImage()->GetErrorStr());
-						this->DeleteEditVector();
-						return 0;
-					}
-
-					processor->Rotate90CW();
-					processor->CleanupRotation(editToComplete);
-				}
+				// Perform an edit on the data through the processor
+				processor->SetupRotation(editToComplete, 90.0, 0);
+				processor->Rotate90CW();
+				processor->CleanupRotation(editToComplete);
+				
 				processor->SetUpdated(true);
 			}
 			break;
 
 
 			// Peform a 180 degree clockwise roctation
+			// Peform a 90 degree clockwise roctation
 			case ProcessorEdit::EditType::ROTATE_180: {
 
 				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
-
+			
 				// Perform an edit on the data through the processor
-				// No multithreading for performance reasons.
-				if(!processor->SetupRotation(editToComplete, 180.0, 0)) { break; }
+				processor->SetupRotation(editToComplete, 180.0, 0);
 				processor->Rotate180();
 				processor->CleanupRotation(editToComplete);
 				processor->SetUpdated(true);
@@ -6226,19 +6627,11 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 			// Peform a 270 degree clockwise roctation (90 counter clockwise)
 			case ProcessorEdit::EditType::ROTATE_270_CW: {
-
-				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
-
+				
 				// Perform an edit on the data through the processor
-				// No multithreading for performance reasons.
-				if (!processor->SetupRotation(ProcessorEdit::EditType::ROTATE_180, 180.0, 0)) { break; }
-				processor->Rotate180();
-				processor->CleanupRotation(ProcessorEdit::EditType::ROTATE_180);
-
-				if (!processor->SetupRotation(ProcessorEdit::EditType::ROTATE_90_CW, 90.0, 0)) { break; }
-				processor->Rotate90CW();
-				processor->CleanupRotation(ProcessorEdit::EditType::ROTATE_90_CW);
-
+				processor->SetupRotation(editToComplete, 270.0, 0);
+				processor->Rotate270CW();
+				processor->CleanupRotation(editToComplete);
 				processor->SetUpdated(true);
 			}
 			break;
@@ -6603,6 +6996,139 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				}				
 			}
 			break;
+
+			// Peform Blur edit
+			case ProcessorEdit::EditType::BLUR: {
+			
+				processor->SendMessageToParent("Processing blur" + fullEditNumStr);
+				
+				double blurSize = curEdit->GetParam(0);
+				int numPasses = (int) curEdit->GetParam(1);
+
+				// No blur, radius too small
+				if(blurSize == 0.0){ break;}
+							
+				// Multithread if needed
+				if(processor->GetMultithread()){
+					for(int i = 0; i < numPasses; i++){
+						
+						// Setup temporary edits to break down blur into horizontal and vertical blur edits
+						ProcessorEdit * horizontalBlur = new ProcessorEdit(ProcessorEdit::HORIZONTAL_BLUR);
+						ProcessorEdit * verticalBlur = new ProcessorEdit(ProcessorEdit::VERTICAL_BLUR);
+						horizontalBlur->AddParam(blurSize);
+						verticalBlur->AddParam(blurSize);
+
+						// Blur horiztonally 
+						processor->SetupBlur();
+						this->Multithread(horizontalBlur);
+						processor->CleanupBlur();
+
+						// Blur vertically
+						processor->SetupBlur();
+						this->Multithread(verticalBlur);
+						processor->CleanupBlur();
+				
+						delete horizontalBlur;
+						delete verticalBlur;
+					}
+				}
+
+				// Single thread
+				else{
+
+					// Perform an edit on the data through the processor
+
+					for(int i = 0; i < numPasses; i++){
+
+						// Blur horizontally
+						processor->SetupBlur();
+						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+
+						// Blur vertically
+						processor->SetupBlur();
+						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+					}
+				}				
+			}
+			break;
+
+			// Peform Blur edit
+			case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
+			
+				processor->SendMessageToParent("Processing horizontal blur" + fullEditNumStr);
+				
+				double blurSize = curEdit->GetParam(0);
+				int numPasses = (int) curEdit->GetParam(1);
+
+				// No blur, radius too small
+				if(blurSize * processor->GetImage()->GetWidth() < 1.0){ break; }
+
+				if(processor->GetMultithread()){
+				// Multithread if needed
+
+					for(int i = 0; i < numPasses; i++){
+						processor->SetupBlur();
+						this->Multithread(curEdit);
+						processor->CleanupBlur();
+					}
+				}
+
+				// Single thread
+				else{
+
+					// Blur Horizontally
+					for(int i = 0; i < numPasses; i++){
+						processor->SetupBlur();
+						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+					}
+				}				
+			}
+			break;
+
+			// Peform Blur edit
+			case ProcessorEdit::EditType::VERTICAL_BLUR: {
+			
+				processor->SendMessageToParent("Processing vertical blur" + fullEditNumStr);
+				
+				double blurSize = curEdit->GetParam(0);
+				int numPasses = (int) curEdit->GetParam(1);
+
+				// No blur, radius too small
+				if(blurSize * processor->GetImage()->GetHeight() < 1.0){ break; }
+
+				// Multithread if needed
+				if(processor->GetMultithread()){
+
+					// Perform an edit on the data through the processor
+					for(int i = 0; i < numPasses; i++){
+
+						// Blur image vertically
+						processor->SetupBlur();
+						this->Multithread(curEdit);
+						processor->CleanupBlur();
+					}
+				}
+
+				// Single thread
+				else{
+
+					// Perform an edit on the data through the processor
+					for(int i = 0; i < numPasses; i++){
+
+						// Blur rotated image horizontally
+						processor->SetupBlur();
+						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+					}
+
+					processor->SetUpdated(true);
+
+				}				
+			}
+			break;
 		}
 		processor->SendProcessorEditNumToParent(editIndex + 1);
 	}
@@ -6784,7 +7310,6 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 
 		// Peform a 90 degree clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_90_CW: {
-
 			processor->Rotate90CW(start, end);
 		}
 		break;
@@ -6792,14 +7317,13 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 
 		// Peform a 180 degree clockwise roctation (not multithreaded)
 		case ProcessorEdit::EditType::ROTATE_180: {
-			return (wxThread::ExitCode) 0;
+			processor->Rotate180(start, end);
 		}
 		break;
 
 		// Peform a 270 degree clockwise roctation (not multithreaded)
 		case ProcessorEdit::EditType::ROTATE_270_CW: {
-
-			return (wxThread::ExitCode) 0;
+			processor->Rotate270CW(start, end);
 		}
 		break;
 
@@ -6940,6 +7464,15 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		// Peform Horizontal Blur edit
 		case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
 
+			double blurSize = procEdit->GetParam(0);
+			processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize), start, end);
+		}
+		break;
+
+		// Peform Vertical Blur edit
+		case ProcessorEdit::EditType::VERTICAL_BLUR: {
+			double blurSize = procEdit->GetParam(0);
+			processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize), start, end);
 		}
 		break;
 	}

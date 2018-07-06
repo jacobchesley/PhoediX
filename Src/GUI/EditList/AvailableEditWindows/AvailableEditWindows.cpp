@@ -65,6 +65,10 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			newEditWindow = new CropWindow(parent, "Crop Image", processor, imgPanel);
 			break;
 
+		case AvailableEditIDS::EDIT_ID_BLUR:
+			newEditWindow = new BlurWindow(parent, "Blur Image", processor);
+			break;
+
 		case AvailableEditIDS::EDIT_ID_RAW:
 			newEditWindow = new RawWindow(parent, "Raw Processor", processor, imgPanel);
 			break;
@@ -164,6 +168,15 @@ int AvailableEditWindows::GetEditIDFromEdit(ProcessorEdit * edit) {
 
 	case ProcessorEdit::EditType::CROP:
 		return AvailableEditIDS::EDIT_ID_CROP;
+
+	case ProcessorEdit::EditType::BLUR:
+		return AvailableEditIDS::EDIT_ID_BLUR;
+
+	case ProcessorEdit::EditType::HORIZONTAL_BLUR:
+		return AvailableEditIDS::EDIT_ID_BLUR;
+
+	case ProcessorEdit::EditType::VERTICAL_BLUR:
+		return AvailableEditIDS::EDIT_ID_BLUR;
 
 	case ProcessorEdit::EditType::RAW:
 		return AvailableEditIDS::EDIT_ID_RAW;
