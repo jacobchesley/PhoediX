@@ -69,6 +69,7 @@ private:
 		wxTextCtrl * directoryText;
 		PhoediXButton * directoryButton;
 		wxCheckBox * subDirectoriesCheck;
+		wxStaticText * subDirectoriesLabel;
 		wxButton * deleteButton;
 		enum {
 			ID_SHOW_DIRECTORY,

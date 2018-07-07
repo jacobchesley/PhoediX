@@ -20,11 +20,15 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 	directoryButton->SetBackgroundColour(Colors::BackDarkGrey);
 	directoryButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	subDirectoriesCheck = new wxCheckBox(this, -1, "Sub Directories");
+	subDirectoriesCheck = new wxCheckBox(this, -1, "");
 	subDirectoriesCheck->SetForegroundColour(Colors::TextLightGrey);
 	subDirectoriesCheck->SetBackgroundColour(this->GetBackgroundColour());
 
-	deleteButton = new wxButton(this, DirectorySelections::DirectoryDisplayItem::ID_DELETE, "");
+	subDirectoriesLabel = new wxStaticText(this, -1, "Sub Directories");
+	subDirectoriesLabel->SetForegroundColour(Colors::TextLightGrey);
+	subDirectoriesLabel->SetBackgroundColour(this->GetBackgroundColour());
+
+	deleteButton = new wxButton(this, DirectorySelections::DirectoryDisplayItem::ID_DELETE, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	deleteButton->SetBackgroundColour(this->GetBackgroundColour());
 
 	Icons icons;
@@ -35,6 +39,7 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 	this->GetSizer()->Add(directoryButton);
 	this->GetSizer()->AddSpacer(15);
 	this->GetSizer()->Add(subDirectoriesCheck);
+	this->GetSizer()->Add(subDirectoriesLabel);
 	this->GetSizer()->AddSpacer(15);
 	this->GetSizer()->Add(deleteButton);
 
