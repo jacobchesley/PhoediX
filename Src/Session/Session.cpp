@@ -268,7 +268,7 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	wxFileName sessionDir(sessionFile.GetPath());
 
 	if(!sessionDir.IsDir()){
-		wxMkDir(sessionFile.GetPath());
+		wxMkDir(sessionFile.GetPath(), wxS_DIR_DEFAULT);
 	}
 	session.Save(filePath);
 }
