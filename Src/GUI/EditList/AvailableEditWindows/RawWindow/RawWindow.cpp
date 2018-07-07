@@ -305,7 +305,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	cfaCleanLineControl->Hide();
 	
 	// ---------------------------  RAW info labels and controls --------------------------- 
-	infoPanelCollapse = new CollapsiblePane(this, "RAW Information");
+	infoPanelCollapse = new CollapsiblePane(this, " RAW Information");
 	infoPanelCollapse->SetTextBackgroundColour(this->GetBackgroundColour());
 	infoPanelCollapse->SetTextForegroundColour(Colors::TextLightGrey);
 	infoPanelCollapse->SetTextFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
