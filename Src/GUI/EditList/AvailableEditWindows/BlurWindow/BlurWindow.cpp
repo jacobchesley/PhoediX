@@ -125,7 +125,6 @@ ProcessorEdit * BlurWindow::GetParamsAndFlags(){
 		blurEdit->AddParam(wxRound(numPassesSlider->GetValue()));
 		blurEdit->SetDisabled(isDisabled);
 
-		int numPasses = numPassesSlider->GetValue();
 		return blurEdit;
 	}
 	return NULL;
