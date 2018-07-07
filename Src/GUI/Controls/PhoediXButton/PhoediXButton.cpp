@@ -34,6 +34,10 @@ void PhoediXButton::SetBackgroundColour(wxColor newColor) {
 	text->Refresh();
 }
 
+wxString PhoediXButton::GetLabel() {
+	return text->GetLabel();
+}
+
 void PhoediXButton::SetForegroundColour(wxColor newColor) {
 	text->SetForegroundColour(newColor);
 	text->Update();

@@ -20,6 +20,8 @@ public:
 	void SetBackgroundColour(wxColor newColor);
 	void SetForegroundColour(wxColor newColor);
 	bool SetFont(const wxFont &font);
+	wxString GetLabel();
+
 
 private:
 
