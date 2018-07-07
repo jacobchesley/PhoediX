@@ -519,7 +519,6 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 
 	// All worker threads have finished, signal condition to continue
 	if (*complete == threads) {
-		mutLock->Lock();
 		cond->Broadcast();
 	}
 
