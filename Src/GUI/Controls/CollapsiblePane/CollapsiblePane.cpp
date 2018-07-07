@@ -15,10 +15,11 @@ CollapsiblePane::CollapsiblePane(wxWindow * parent, wxString name) : wxPanel(par
 	this->SetSizer(mainSizer);
 
 	collapseButton = new PhoediXButton(this, CollapsiblePane::Button::COLLAPSE, name);
+	collapseButton->SetBorder(10, 2);
 	arrow = new CollapseArrow(this);
 	arrow->SetBackgroundColour(this->GetBackgroundColour());
 	arrow->SetArrowSize(10);
-	arrow->SetOffset(0, 12);
+	arrow->SetOffset(0, 4);
 
 	buttonSizer->Add(collapseButton);
 	buttonSizer->AddSpacer(8);
@@ -93,13 +94,6 @@ void CollapsiblePane::SetTextFont(wxFont font) {
 
 	// Set button font
 	collapseButton->SetFont(font);
-
-	// Size button to fit text exactly
-	wxStaticText * tempStaticText = new wxStaticText(this, -1, collapseButton->GetLabel());
-	tempStaticText->SetFont(font);
-	wxSize size = tempStaticText->GetTextExtent(collapseButton->GetLabel());
-	collapseButton->SetMinSize(wxSize(size.x + 16, size.y + 30));
-	tempStaticText->Destroy();
 }
 
 void CollapsiblePane::AttachWindow(wxWindow * attach) {
@@ -115,9 +109,9 @@ CollapsiblePane::CollapseArrow::CollapseArrow(wxWindow * parent) : wxPanel(paren
 	xOffset = 0;
 	yOffset = 0;
 
-	this->SetSize(wxSize(arrowSize * 2, arrowSize * 2));
-	this->SetMinSize(wxSize(arrowSize * 2, arrowSize * 2));
-	this->SetMaxSize(wxSize(arrowSize * 2, arrowSize * 2));
+	this->SetSize(wxSize(arrowSize * 1.5, arrowSize * 1.5));
+	this->SetMinSize(wxSize(arrowSize * 1.5, arrowSize * 1.5));
+	this->SetMaxSize(wxSize(arrowSize * 1.5, arrowSize * 1.5));
 }
 
 void CollapsiblePane::CollapseArrow::Expand(){
@@ -144,9 +138,9 @@ void CollapsiblePane::CollapseArrow::PaintNow(){
 void CollapsiblePane::CollapseArrow::SetArrowSize(int size){
 	arrowSize = size;
 
-	this->SetSize(wxSize(arrowSize * 2.5, arrowSize * 2.5));
-	this->SetMinSize(wxSize(arrowSize * 2.5, arrowSize * 2.5));
-	this->SetMaxSize(wxSize(arrowSize * 2.5, arrowSize * 2.5));
+	this->SetSize(wxSize(arrowSize * 1.5, arrowSize * 1.5));
+	this->SetMinSize(wxSize(arrowSize * 1.5, arrowSize * 1.5));
+	this->SetMaxSize(wxSize(arrowSize * 1.5, arrowSize * 1.5));
 }
 
 void CollapsiblePane::CollapseArrow::SetOffset(int x, int y){
@@ -159,33 +153,38 @@ void CollapsiblePane::CollapseArrow::Render(wxDC& dc){
 	wxPen outline;
 	wxBrush fill;
 	
+	wxPoint p0;
+	wxPoint p1;
+	wxPoint p2;
+	wxPoint p3;
+	
 	// Draw hollow triangle pointing to the right
 	if(isCollapsed){
-		wxPoint p1(0,0);
-		wxPoint p2(0,arrowSize);
-		wxPoint p3(arrowSize, arrowSize/2);
-		wxPoint p4(0,0);
-		trianglePoints.Append(&p1); 
-		trianglePoints.Append(&p2); 
-		trianglePoints.Append(&p3);
-		trianglePoints.Append(&p4);
+		p0 = wxPoint(0,0);
+		p1 = wxPoint(0,arrowSize);
+		p2 = wxPoint(arrowSize, arrowSize/2);
+		p3 = wxPoint(0,0);
+
 		outline.SetColour(Colors::TextLightGrey);
 		fill.SetColour(this->GetBackgroundColour());
 	}
 
 	// Draw solid triangle pointing down
 	else{
-		wxPoint p1(0,0);
-		wxPoint p2(arrowSize,0);
-		wxPoint p3(arrowSize/2, arrowSize);
-		wxPoint p4(0,0);
-		trianglePoints.Append(&p1); 
-		trianglePoints.Append(&p2); 
-		trianglePoints.Append(&p3);
-		trianglePoints.Append(&p4);
+		p0 = wxPoint(0,0);
+		p1 = wxPoint(arrowSize,0);
+		p2 = wxPoint(arrowSize/2, arrowSize);
+		p3 = wxPoint(0,0);
+		
 		outline.SetColour(Colors::TextLightGrey);
 		fill.SetColour(Colors::TextLightGrey);
 	}
+
+	// Create list of points to draw polygon
+	trianglePoints.Append(&p0);
+	trianglePoints.Append(&p1);
+	trianglePoints.Append(&p2);
+	trianglePoints.Append(&p3);
 
 	// Clear DC, set brushes and draw triangle
 	dc.Clear();
