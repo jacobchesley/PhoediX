@@ -53,7 +53,7 @@ private:
 	wxString path;
 
 	enum PopupMenuActions {
-		OPEN_IN_NEW_PROJECT,
+		OPEN_IN_NEW_PROJECT = 1,
 		VIEW_IMAGE_DETAILS
 	};
 };

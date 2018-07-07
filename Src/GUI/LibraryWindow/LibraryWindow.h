@@ -86,7 +86,7 @@ private:
 	bool populationCanceled;
 
 	enum MenuBar{
-		ID_SHOW_DIRECTORY_LIST,
+		ID_SHOW_DIRECTORY_LIST = 1,
 		ID_IMPORT,
 		ID_CLEAR_ALL,
 		ID_CLEAR_SELECTED,
