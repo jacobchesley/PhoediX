@@ -700,12 +700,12 @@ void RawWindow::Process() {
 	proc->rawPrcoessor.imgdata.params.user_mul[1] = greenMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[2] = blueMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[3] = greenMultiplierControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.cfa_clean = (int)cfaCleanControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.lclean = (float)cfaCleanLControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.cclean = (float)cfaCleanCControl->GetValue();
+	//oc->rawPrcoessor.imgdata.params.cfa_clean = (int)cfaCleanControl->GetValue();
+	//proc->rawPrcoessor.imgdata.params.lclean = (float)cfaCleanLControl->GetValue();
+	//proc->rawPrcoessor.imgdata.params.cclean = (float)cfaCleanCControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.threshold = (float)waveletNoiseControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.cfaline = (int)cfaCleanLineEnableControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.linenoise = (float)cfaCleanLineControl->GetValue();
+	//proc->rawPrcoessor.imgdata.params.cfaline = (int)cfaCleanLineEnableControl->GetValue();
+	//proc->rawPrcoessor.imgdata.params.linenoise = (float)cfaCleanLineControl->GetValue();
 
 	// Get bit depth of processor image, and set output bps to this
 	if(proc->GetImage() != NULL && proc->GetImage()->GetWidth() > 0 && proc->GetImage()->GetHeight() > 0){
