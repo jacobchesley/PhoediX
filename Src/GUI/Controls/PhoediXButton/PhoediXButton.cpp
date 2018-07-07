@@ -38,6 +38,25 @@ wxString PhoediXButton::GetLabel() {
 	return text->GetLabel();
 }
 
+void PhoediXButton::SetBorder(int xBorder, int yBorder) {
+	sizer->Clear();
+	outerSizer->Clear();
+
+	sizer = new wxBoxSizer(wxVERTICAL);
+	outerSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	sizer->AddSpacer(yBorder);
+	sizer->Add(text);
+	sizer->AddSpacer(yBorder);
+
+	outerSizer->AddSpacer(xBorder);
+	outerSizer->Add(sizer);
+	outerSizer->AddSpacer(xBorder);
+
+	this->SetSizer(outerSizer);
+	this->Layout();
+}
+
 void PhoediXButton::SetForegroundColour(wxColor newColor) {
 	text->SetForegroundColour(newColor);
 	text->Update();
