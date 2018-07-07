@@ -137,9 +137,9 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 		OldX = x;
 		OldY = y;
 
-       // this->Refresh();
-       // this->Update();
-       // wxSafeYield();
+		this->Refresh();
+		this->Update();
+		wxSafeYield();
 
 
 	}
