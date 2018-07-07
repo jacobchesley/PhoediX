@@ -22,7 +22,7 @@ CollapsiblePane::CollapsiblePane(wxWindow * parent, wxString name) : wxPanel(par
 	arrow->SetOffset(0, 4);
 
 	buttonSizer->Add(collapseButton);
-	buttonSizer->AddSpacer(8);
+	buttonSizer->AddSpacer(4);
 	buttonSizer->Add(arrow, 1, wxEXPAND);
 
 	this->GetSizer()->Add(buttonSizer, 0, wxALIGN_LEFT);
