@@ -242,14 +242,16 @@ void ImageHandler::CopyImageFromRaw(libraw_processed_image_t * rawImage, wxImage
 bool ImageHandler::CheckRaw(wxString fileName){
 
 	// Attempt to open file in LibRaw raw processor and get the error code returned
-	LibRaw tempRawProc;
+	LibRaw  * tempRawProc = new LibRaw();
 	int result = -1;
 	#ifdef __WXMSW__
-		result = tempRawProc.open_file(fileName.wc_str());
+		result = tempRawProc->open_file(fileName.wc_str());
 	#else
-		result = tempRawProc.open_file(fileName.c_str());
+		result = tempRawProc->open_file(fileName.c_str());
 	#endif
 	// Return true / false based on error code
+
+	delete tempRawProc;
 	if(result == LIBRAW_SUCCESS){ return true; }
 	else{ return false; }
 }
