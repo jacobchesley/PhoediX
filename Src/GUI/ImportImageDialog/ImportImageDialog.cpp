@@ -13,11 +13,11 @@ ImportImageDialog::ImportImageDialog(wxWindow * parent) : wxDialog(parent, -1, "
 
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	currentButton = new wxButton(this, ImportImageDialog::ID_IMPORT_CURRENT_PROJECT, "Current Project", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	currentButton = new PhoediXButton(this, ImportImageDialog::ID_IMPORT_CURRENT_PROJECT, "Current Project");
 	currentButton->SetForegroundColour(Colors::TextLightGrey);
 	currentButton->SetBackgroundColour(Colors::BackGrey);
 
-	newButton = new wxButton(this, ImportImageDialog::ID_IMPORT_NEW_PROJECT, "New Project", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	newButton = new PhoediXButton(this, ImportImageDialog::ID_IMPORT_NEW_PROJECT, "New Project");
 	newButton->SetForegroundColour(Colors::TextLightGrey);
 	newButton->SetBackgroundColour(Colors::BackGrey);
 

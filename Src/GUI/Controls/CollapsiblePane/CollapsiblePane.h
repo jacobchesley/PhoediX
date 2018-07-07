@@ -9,6 +9,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "wx/dc.h"
 #include "wx/dcbuffer.h"
 
@@ -30,7 +31,7 @@ private:
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * buttonSizer;
 	wxBoxSizer * indentAndWindowSizer;
-	wxButton * collapseButton;
+	PhoediXButton * collapseButton;
 	wxWindow * attachedWindow;
 	wxWindow * parentWindow;
 

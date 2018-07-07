@@ -13,6 +13,7 @@
 
 #include "wx/dir.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Icons/Icons.h"
@@ -34,7 +35,7 @@ public:
 private:
 	wxBoxSizer * mainLayout;
 	
-	wxButton * addDirectory;
+	PhoediXButton * addDirectory;
 	
 	void OnAddDirectory(wxCommandEvent& WXUNUSED(evt));
 	void AddDirectoryDisplayItem();
@@ -66,7 +67,7 @@ private:
 		wxWindow * parWindow;
 		wxBoxSizer * mainLayout;
 		wxTextCtrl * directoryText;
-		wxButton * directoryButton;
+		PhoediXButton * directoryButton;
 		wxCheckBox * subDirectoriesCheck;
 		wxButton * deleteButton;
 		enum {

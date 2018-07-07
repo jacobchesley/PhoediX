@@ -5,6 +5,7 @@
 
 #include "wx/notebook.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
 #include "GUI/Controls/CurvesPanel/CurvesPanel.h"
@@ -24,7 +25,7 @@ public:
 private:
 
 	wxWindow * parWindow;
-	wxButton * resetCurveButton;
+	PhoediXButton * resetCurveButton;
 	
 	CurvePanel * hCurve;
 	CurvePanel * sCurve;

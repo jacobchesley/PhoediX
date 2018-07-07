@@ -11,6 +11,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Controls/PhoediXButton/PhoediXButton.h"

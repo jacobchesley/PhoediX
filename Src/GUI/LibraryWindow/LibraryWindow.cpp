@@ -18,27 +18,27 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 
 	toolbarLayout = new wxWrapSizer();
 
-	showDirectoriesButton = new wxButton(this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST, "Import Directories", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	showDirectoriesButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST, "Import Directories");
 	showDirectoriesButton->SetForegroundColour(Colors::TextLightGrey);
 	showDirectoriesButton->SetBackgroundColour(Colors::BackGrey);
 	showDirectoriesButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	importButton = new wxButton(this, LibraryWindow::MenuBar::ID_IMPORT, "Populate Library", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	importButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_IMPORT, "Populate Library");
 	importButton->SetForegroundColour(Colors::TextLightGrey);
 	importButton->SetBackgroundColour(Colors::BackGrey);
 	importButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	copyButton = new wxButton(this, LibraryWindow::MenuBar::ID_COPY_TO, "Copy Selected", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	copyButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_COPY_TO, "Copy Selected");
 	copyButton->SetForegroundColour(Colors::TextLightGrey);
 	copyButton->SetBackgroundColour(Colors::BackGrey);
 	copyButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	moveButton = new wxButton(this, LibraryWindow::MenuBar::ID_MOVE_TO, "Move Selected", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	moveButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_MOVE_TO, "Move Selected");
 	moveButton->SetForegroundColour(Colors::TextLightGrey);
 	moveButton->SetBackgroundColour(Colors::BackGrey);
 	moveButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	clearButton = new wxButton(this, -1, "Clear Library", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	clearButton = new PhoediXButton(this, -1, "Clear Library");
 	clearButton->SetForegroundColour(Colors::TextLightGrey);
 	clearButton->SetBackgroundColour(Colors::BackGrey);
 	clearButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));

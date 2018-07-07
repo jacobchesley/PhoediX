@@ -45,11 +45,11 @@ void ZoomImagePanel::InitControls(){
 	zoomSlider->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	zoomSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
-	fullImageView = new wxButton(this, ZoomImagePanel::Buttons::ZOOM_FIT, "Fit Image", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	fullImageView = new PhoediXButton(this, ZoomImagePanel::Buttons::ZOOM_FIT, "Fit Image");
 	fullImageView->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	fullImageView->SetForegroundColour(Colors::TextLightGrey);
 
-	viewImage100 = new wxButton(this, ZoomImagePanel::Buttons::ZOOM_100, "100% Zoom", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	viewImage100 = new PhoediXButton(this, ZoomImagePanel::Buttons::ZOOM_100, "100% Zoom");
 	viewImage100->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	viewImage100->SetForegroundColour(Colors::TextLightGrey);
 
@@ -540,7 +540,7 @@ void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 	}
 }
 
-void ZoomImagePanel::ImageScroll::OnScroll(wxCommandEvent& evt){
+void ZoomImagePanel::ImageScroll::OnScroll(wxCommandEvent & WXUNUSED(evt)){
 	quality = wxINTERPOLATION_NONE;
 
 }

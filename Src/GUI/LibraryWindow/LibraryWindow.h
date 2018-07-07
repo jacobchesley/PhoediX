@@ -16,6 +16,7 @@
 #include "wx/wrapsizer.h"
 #include "wx/progdlg.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/LibraryWindow/DirectorySelections/DirectorySelections.h"
 #include "GUI/Colors/Colors.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
@@ -66,11 +67,11 @@ private:
 	wxBoxSizer * mainLayout;
 
 	wxWrapSizer * toolbarLayout;
-	wxButton * showDirectoriesButton;
-	wxButton * importButton;
-	wxButton * clearButton;
-	wxButton * copyButton;
-	wxButton * moveButton;
+	PhoediXButton * showDirectoriesButton;
+	PhoediXButton * importButton;
+	PhoediXButton * clearButton;
+	PhoediXButton * copyButton;
+	PhoediXButton * moveButton;
 
 	wxWrapSizer * imagesLayout;
 	wxSortedArrayString imagePaths;

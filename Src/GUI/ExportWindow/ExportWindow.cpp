@@ -50,7 +50,7 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 	outputFolderText->SetBackgroundColour(this->GetBackgroundColour());
 	outputFolderText->SetForegroundColour(Colors::TextLightGrey);
 
-	outputFolderButton = new wxButton(this, ExportWindow::ExportActions::ID_BROWSE, "Browse", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	outputFolderButton = new PhoediXButton(this, ExportWindow::ExportActions::ID_BROWSE, "Browse");
 	outputFolderButton->SetForegroundColour(Colors::TextLightGrey);
 	outputFolderButton->SetBackgroundColour(Colors::BackGrey);
 	this->GetSizer()->Add(outputFolderLabel);
@@ -66,7 +66,7 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 	this->GetSizer()->Add(outputNameText,0, wxEXPAND);
 	this->GetSizer()->Add(new wxPanel(this));
 
-	exportButton = new wxButton(this, ExportWindow::ExportActions::ID_EXPORT, "Export", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	exportButton = new PhoediXButton(this, ExportWindow::ExportActions::ID_EXPORT, "Export");
 	exportButton->SetForegroundColour(Colors::TextLightGrey);
 	exportButton->SetBackgroundColour(Colors::BackGrey);
 	exportButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));

@@ -11,6 +11,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Icons/Icons.h"
 #include "GUI/Colors/Colors.h"
 
@@ -59,7 +60,7 @@ private:
 	wxStaticText * libtiffVersionTitle;
 	wxStaticText * libtiffVersionValue;
 
-	wxButton * okayButton;
+	PhoediXButton * okayButton;
 
 	enum{
 		ID_OKAY

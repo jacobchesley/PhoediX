@@ -50,12 +50,12 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	numThreads->SetForegroundColour(Colors::TextLightGrey);
 	
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
-	applySettingsButton = new wxButton(this, SettingsWindow::ID_APPLY_SETTINGS, "Apply Settings", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	applySettingsButton = new PhoediXButton(this, SettingsWindow::ID_APPLY_SETTINGS, "Apply Settings");
 	applySettingsButton->SetForegroundColour(Colors::TextLightGrey);
 	applySettingsButton->SetBackgroundColour(Colors::BackGrey);
 	applySettingsButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	cancelButton = new wxButton(this, SettingsWindow::ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	cancelButton = new PhoediXButton(this, SettingsWindow::ID_CANCEL, "Cancel");
 	cancelButton->SetForegroundColour(Colors::TextGrey);
 	cancelButton->SetBackgroundColour(Colors::BackGrey);
 	cancelButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));

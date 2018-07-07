@@ -39,10 +39,10 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 		//                                  [Up Button]
 		// [disable button]  [TitleText]                 [Delete Button]
 		//                                 [Down Button]
-		disableButton = new wxButton(this, EditListItem::Buttons::DISABLE_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 		upButton = new wxButton(this, EditListItem::Buttons::UP_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 		downButton = new wxButton(this, EditListItem::Buttons::DOWN_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 		deleteButton = new wxButton(this, EditListItem::Buttons::DELETE_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+		disableButton = new wxButton(this, EditListItem::Buttons::DISABLE_BUTTON, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 
 		// Background of buttons
 		upButton->SetBackgroundColour(this->GetBackgroundColour());

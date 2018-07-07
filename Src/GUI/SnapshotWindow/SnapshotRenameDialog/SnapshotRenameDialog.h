@@ -11,6 +11,7 @@
 	#include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"
 
 class SnapshotRenameDialog : public wxDialog{
@@ -25,8 +26,8 @@ private:
 	wxTextCtrl * newName;
 
 	wxBoxSizer * buttonSizer;
-	wxButton * cancelButton;
-	wxButton * okayButton;
+	PhoediXButton * cancelButton;
+	PhoediXButton * okayButton;
 
 };
 

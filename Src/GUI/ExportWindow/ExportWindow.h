@@ -13,6 +13,7 @@
 #include "wx/progdlg.h"
 #include "wx/filename.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"
 #include "GUI/Icons/Icons.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
@@ -66,12 +67,12 @@ private:
 
 	wxStaticText * outputFolderLabel;
 	wxTextCtrl * outputFolderText;
-	wxButton * outputFolderButton;
+	PhoediXButton * outputFolderButton;
 
 	wxStaticText * outputNameLabel;
 	wxTextCtrl * outputNameText;
 
-	wxButton * exportButton;
+	PhoediXButton * exportButton;
 
 	wxGenericProgressDialog * progress;
 	wxCriticalSection locker;

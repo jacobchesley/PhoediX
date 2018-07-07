@@ -11,6 +11,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "wx/listctrl.h"
 #include "GUI/EditList/AvailableEdits/AvailableEdits.h"
 #include "GUI/Colors/Colors.h"
@@ -35,7 +36,7 @@ private:
 
 	wxBoxSizer * mainSizer;
 	wxListCtrl * editList;
-	wxButton * addButton;
+	PhoediXButton * addButton;
 
 	wxWindow * parWindow;
 

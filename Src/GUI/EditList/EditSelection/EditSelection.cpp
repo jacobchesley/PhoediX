@@ -15,7 +15,7 @@ EditSelection::EditSelection(wxWindow * parent) : wxScrolledWindow(parent) {
 	editList->InsertColumn(0, "Edit Name");
 	editList->InsertColumn(1, "Edit Description");
 
-	addButton = new wxButton(this, EditSelection::Buttons::ADD_EDIT, "Add Edit", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	addButton = new PhoediXButton(this, EditSelection::Buttons::ADD_EDIT, "Add Edit");
 
 	this->SetBackgroundColour(Colors::BackDarkGrey);
 	editList->SetBackgroundColour(Colors::BackDarkGrey);

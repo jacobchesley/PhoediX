@@ -16,6 +16,7 @@
 #include "wx/stdpaths.h"
 #include "wx/textfile.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Image/Image.h"
@@ -68,8 +69,8 @@ private:
 	wxSlider * numThreads;
 
 	wxBoxSizer * buttonSizer;
-	wxButton * applySettingsButton;
-	wxButton * cancelButton;
+	PhoediXButton * applySettingsButton;
+	PhoediXButton * cancelButton;
 
 	Processor * proc;
 	EditListPanel * editList;

@@ -39,7 +39,7 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	defaultAspects->SetBackgroundColour(this->GetBackgroundColour());
 	defaultAspects->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
-	flipAspects = new wxButton(this, CropWindow::ID_FLIP_ASPECTS, "Flip Aspect", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	flipAspects = new PhoediXButton(this, CropWindow::ID_FLIP_ASPECTS, "Flip Aspect");
 	flipAspects->SetForegroundColour(Colors::TextLightGrey);
 	flipAspects->SetBackgroundColour(Colors::BackGrey);
 	flipAspects->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
@@ -73,19 +73,19 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	customAspectX->Hide();
 	customAspectHeight->Hide();
 
-	enableCropBox = new wxButton(this, CropWindow::ID_ENABLE_CROP_BOX, "Enable Grid Lines", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	enableCropBox = new PhoediXButton(this, CropWindow::ID_ENABLE_CROP_BOX, "Enable Grid Lines");
 	enableCropBox->SetForegroundColour(Colors::TextLightGrey);
 	enableCropBox->SetBackgroundColour(Colors::BackGrey);
 	enableCropBox->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	boxEnabled = false;
 
-	enableDisableCrop = new wxButton(this, CropWindow::ID_ENABLE_CROP, "Enable Crop", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	enableDisableCrop = new PhoediXButton(this, CropWindow::ID_ENABLE_CROP, "Enable Crop");
 	enableDisableCrop->SetForegroundColour(Colors::TextLightGrey);
 	enableDisableCrop->SetBackgroundColour(Colors::BackGrey);
 	enableDisableCrop->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	cropEnabled = false;
 
-	resetCrop = new wxButton(this, CropWindow::ID_RESET_CROP, "Reset Crop", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	resetCrop = new PhoediXButton(this, CropWindow::ID_RESET_CROP, "Reset Crop");
 	resetCrop->SetForegroundColour(Colors::TextLightGrey);
 	resetCrop->SetBackgroundColour(Colors::BackGrey);
 	resetCrop->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));

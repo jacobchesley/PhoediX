@@ -14,6 +14,7 @@
 #include "wx/tokenzr.h"
 #include "wx/treectrl.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Icons/Icons.h"
 #include "GUI/Colors/Colors.h"
 
@@ -40,7 +41,7 @@ private:
 	wxBoxSizer * mainSizer;
 	wxStaticText * librawVersionTitle;
 	wxTreeCtrl * supportedCameras;
-	wxButton * okayButton;
+	PhoediXButton * okayButton;
 
 	enum {
 		ID_OKAY

@@ -21,19 +21,19 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 
 	buttonSizer = new wxWrapSizer();
 
-	removeSnapshot = new wxButton(this, SnapshotWindow::Buttons::ID_REMOVE_SNAPSHOT, "Remove", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	removeSnapshot = new PhoediXButton(this, SnapshotWindow::Buttons::ID_REMOVE_SNAPSHOT, "Remove");
 	removeSnapshot->SetForegroundColour(Colors::TextLightGrey);
 	removeSnapshot->SetBackgroundColour(Colors::BackGrey);
 
-	renameSnapshot = new wxButton(this, SnapshotWindow::Buttons::ID_RENAME_SNAPSHOT, "Rename", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	renameSnapshot = new PhoediXButton(this, SnapshotWindow::Buttons::ID_RENAME_SNAPSHOT, "Rename");
 	renameSnapshot->SetForegroundColour(Colors::TextLightGrey);
 	renameSnapshot->SetBackgroundColour(Colors::BackGrey);
 
-	restoreSnapshot = new wxButton(this, SnapshotWindow::Buttons::ID_RESTORE_SNAPSHOT, "Restore Snapshot", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	restoreSnapshot = new PhoediXButton(this, SnapshotWindow::Buttons::ID_RESTORE_SNAPSHOT, "Restore Snapshot");
 	restoreSnapshot->SetForegroundColour(Colors::TextLightGrey);
 	restoreSnapshot->SetBackgroundColour(Colors::BackGrey);
 
-	takeSnapshot = new wxButton(this, SnapshotWindow::Buttons::ID_TAKE_SNAPSHOT, "Take Snapshot", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	takeSnapshot = new PhoediXButton(this, SnapshotWindow::Buttons::ID_TAKE_SNAPSHOT, "Take Snapshot");
 	takeSnapshot->SetForegroundColour(Colors::TextLightGrey);
 	takeSnapshot->SetBackgroundColour(Colors::BackGrey);
 

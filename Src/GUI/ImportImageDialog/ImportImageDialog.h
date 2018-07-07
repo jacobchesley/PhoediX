@@ -11,6 +11,7 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"
 
 class ImportImageDialog : public wxDialog {
@@ -29,8 +30,8 @@ private:
 	wxStaticText * message;
 
 	wxBoxSizer * buttonSizer;
-	wxButton * currentButton;
-	wxButton * newButton;
+	PhoediXButton * currentButton;
+	PhoediXButton * newButton;
 };
 
 #endif

@@ -15,7 +15,7 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 	directoryText->SetForegroundColour(Colors::TextLightGrey);
 	directoryText->SetBackgroundColour(Colors::BackDarkGrey);
 
-	directoryButton = new wxButton(this, DirectorySelections::DirectoryDisplayItem::ID_SHOW_DIRECTORY, "Browse", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	directoryButton = new PhoediXButton(this, DirectorySelections::DirectoryDisplayItem::ID_SHOW_DIRECTORY, "Browse");
 	directoryButton->SetForegroundColour(Colors::TextLightGrey);
 	directoryButton->SetBackgroundColour(Colors::BackDarkGrey);
 	directoryButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
@@ -24,7 +24,7 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 	subDirectoriesCheck->SetForegroundColour(Colors::TextLightGrey);
 	subDirectoriesCheck->SetBackgroundColour(this->GetBackgroundColour());
 
-	deleteButton = new wxButton(this, DirectorySelections::DirectoryDisplayItem::ID_DELETE, "", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	deleteButton = new wxButton(this, DirectorySelections::DirectoryDisplayItem::ID_DELETE, "");
 	deleteButton->SetBackgroundColour(this->GetBackgroundColour());
 
 	Icons icons;
@@ -97,7 +97,7 @@ DirectorySelections::DirectorySelections(wxWindow * parent) : wxScrolledWindow(p
 	mainLayout = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainLayout);
 
-	addDirectory = new wxButton(this, DirectorySelections::ID_ADD_DIRECTORY, "Add Directory", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	addDirectory = new PhoediXButton(this, DirectorySelections::ID_ADD_DIRECTORY, "Add Directory");
 	addDirectory->SetForegroundColour(Colors::TextLightGrey);
 	addDirectory->SetBackgroundColour(Colors::BackGrey);
 	addDirectory->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));

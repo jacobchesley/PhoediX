@@ -11,12 +11,14 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "wx/dc.h"
 #include "wx/dcgraph.h"
 #include "wx/dcbuffer.h"
 #include "wx/graphics.h"
 #include "wx/rawbmp.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
 #include "Processing/Image/Image.h"
@@ -89,8 +91,8 @@ private:
 	wxBoxSizer * mainSizer;
 	wxBoxSizer * controlSizer;
 	DoubleSlider * zoomSlider;
-	wxButton * fullImageView;
-	wxButton * viewImage100;
+	PhoediXButton * fullImageView;
+	PhoediXButton * viewImage100;
 
 	int lastDragX;
 	int lastDragY;

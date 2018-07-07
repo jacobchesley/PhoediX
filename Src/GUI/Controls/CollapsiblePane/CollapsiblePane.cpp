@@ -14,22 +14,18 @@ CollapsiblePane::CollapsiblePane(wxWindow * parent, wxString name) : wxPanel(par
 
 	this->SetSizer(mainSizer);
 
-	collapseButton = new wxButton(this, CollapsiblePane::Button::COLLAPSE, name, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	collapseButton = new PhoediXButton(this, CollapsiblePane::Button::COLLAPSE, name);
 	arrow = new CollapseArrow(this);
 	arrow->SetBackgroundColour(this->GetBackgroundColour());
 	arrow->SetArrowSize(10);
-	arrow->SetOffset(0, 5);
+	arrow->SetOffset(0, 12);
 
-	wxCoord textWidth = 0;
-	wxCoord textHeight = 0;
-	collapseButton->GetTextExtent(name, &textWidth, &textHeight);
-	collapseButton->SetMinSize(wxSize(textWidth, textHeight));
 	buttonSizer->Add(collapseButton);
 	buttonSizer->AddSpacer(8);
 	buttonSizer->Add(arrow, 1, wxEXPAND);
 
 	this->GetSizer()->Add(buttonSizer, 0, wxALIGN_LEFT);
-	this->GetSizer()->AddSpacer(8);
+	this->GetSizer()->AddSpacer(4);
 	this->GetSizer()->Add(indentAndWindowSizer, 1, wxEXPAND);
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CollapsiblePane::OnCollapse, this, CollapsiblePane::Button::COLLAPSE);
@@ -99,10 +95,11 @@ void CollapsiblePane::SetTextFont(wxFont font) {
 	collapseButton->SetFont(font);
 
 	// Size button to fit text exactly
-	wxCoord textWidth = 0;
-	wxCoord textHeight = 0;
-	collapseButton->GetTextExtent(collapseButton->GetLabel(), &textWidth, &textHeight);
-	collapseButton->SetMinSize(wxSize(textWidth, textHeight));
+	wxStaticText * tempStaticText = new wxStaticText(this, -1, collapseButton->GetLabel());
+	tempStaticText->SetFont(font);
+	wxSize size = tempStaticText->GetTextExtent(collapseButton->GetLabel());
+	collapseButton->SetMinSize(wxSize(size.x + 16, size.y + 30));
+	tempStaticText->Destroy();
 }
 
 void CollapsiblePane::AttachWindow(wxWindow * attach) {
@@ -147,9 +144,9 @@ void CollapsiblePane::CollapseArrow::PaintNow(){
 void CollapsiblePane::CollapseArrow::SetArrowSize(int size){
 	arrowSize = size;
 
-	this->SetSize(wxSize(arrowSize * 2, arrowSize * 2));
-	this->SetMinSize(wxSize(arrowSize * 2, arrowSize * 2));
-	this->SetMaxSize(wxSize(arrowSize * 2, arrowSize * 2));
+	this->SetSize(wxSize(arrowSize * 2.5, arrowSize * 2.5));
+	this->SetMinSize(wxSize(arrowSize * 2.5, arrowSize * 2.5));
+	this->SetMaxSize(wxSize(arrowSize * 2.5, arrowSize * 2.5));
 }
 
 void CollapsiblePane::CollapseArrow::SetOffset(int x, int y){

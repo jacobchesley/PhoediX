@@ -7,6 +7,7 @@
 #include "wx/tokenzr.h"
 #include "wx/arrstr.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
 #include "GUI/ImageDisplay/ZoomImagePanel/ZoomImagePanel.h"
@@ -49,15 +50,15 @@ private:
 	wxStaticText * editLabel;
 
 	wxComboBox * defaultAspects;
-	wxButton * flipAspects;
+	PhoediXButton * flipAspects;
 	wxTextCtrl * customAspectWidth;
 	wxStaticText * customAspectX;
 	wxTextCtrl * customAspectHeight;
 	wxBoxSizer * customAspectSizer;
 
-	wxButton * enableCropBox;
-	wxButton * enableDisableCrop;
-	wxButton * resetCrop;
+	PhoediXButton * enableCropBox;
+	PhoediXButton * enableDisableCrop;
+	PhoediXButton * resetCrop;
 
 	bool boxEnabled;
 	bool cropEnabled;

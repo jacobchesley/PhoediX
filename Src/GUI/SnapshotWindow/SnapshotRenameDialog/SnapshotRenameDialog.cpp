@@ -17,11 +17,11 @@ SnapshotRenameDialog::SnapshotRenameDialog(wxWindow * parent, wxString oldSnapsh
 
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	cancelButton = new wxButton(this, wxID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	cancelButton = new PhoediXButton(this, wxID_CANCEL, "Cancel");
 	cancelButton->SetForegroundColour(Colors::TextLightGrey);
 	cancelButton->SetBackgroundColour(Colors::BackGrey);
 
-	okayButton = new wxButton(this, wxID_OK, "OK", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	okayButton = new PhoediXButton(this, wxID_OK, "OK");
 	okayButton->SetForegroundColour(Colors::TextLightGrey);
 	okayButton->SetBackgroundColour(Colors::BackGrey);
 

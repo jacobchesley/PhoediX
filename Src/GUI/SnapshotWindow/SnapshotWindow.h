@@ -14,6 +14,7 @@
 #include "wx/dataview.h"
 #include "wx/wrapsizer.h"
 
+#include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "Processing/Snapshot/Snapshot.h"
 #include "Processing/Snapshot/Snapshot.h"
 #include "GUI/AUIManager/AUIManager.h"
@@ -47,10 +48,10 @@ private:
 
 	wxWrapSizer * buttonSizer;
 
-	wxButton * removeSnapshot;
-	wxButton * renameSnapshot;
-	wxButton * restoreSnapshot;
-	wxButton * takeSnapshot;
+	PhoediXButton * removeSnapshot;
+	PhoediXButton * renameSnapshot;
+	PhoediXButton * restoreSnapshot;
+	PhoediXButton * takeSnapshot;
 
 	int curID;
 

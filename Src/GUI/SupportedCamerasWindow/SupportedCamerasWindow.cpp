@@ -24,7 +24,7 @@ SupportedCamerasWindow::SupportedCamerasWindow(wxWindow * parent) : wxFrame(pare
 	this->PopulateCameras();
 	supportedCameras->Expand(rootId);
 
-	okayButton = new wxButton(this, ID_OKAY, "OK", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	okayButton = new PhoediXButton(this, ID_OKAY, "OK");
 	okayButton->SetForegroundColour(Colors::TextLightGrey);
 	okayButton->SetBackgroundColour(Colors::BackGrey);
 	okayButton->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
