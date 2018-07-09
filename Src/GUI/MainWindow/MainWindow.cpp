@@ -514,12 +514,27 @@ void MainWindow::SaveCurrentSession() {
 
 void MainWindow::LoadProject(wxString projectPath) {
 
+	// Check for already loaded images in session
+	for(int i = 0; i < allSessions.size(); i++){
+
+		// Open existing session (if it is not already the active session)
+		if(allSessions[i]->GetProjectPath() == projectPath){
+
+			// Open the image, then open the session to go along with image
+			this->OpenImage(allSessions[i]->GetImageFilePath(), false);
+			this->OpenSession(allSessions[i]);
+			currentSession = allSessions[i];
+			return;
+		
+		}
+	}
+
 	// Load the new session from file
 	PhoediXSession * session = new PhoediXSession();
 	session->LoadSessionFromFile(projectPath);
 
 	wxFileName projectFile(projectPath);
-	session->SetName(projectFile.GetFullName());
+	session->SetName(projectFile.GetName());
 	session->SetProjectPath(projectFile.GetFullPath());
 	this->SetUniqueID(session);
 
@@ -535,7 +550,6 @@ void MainWindow::LoadProject(wxString projectPath) {
 
 void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {
 
-	//this->CreateNewProject();
 	this->OpenImage(evt.GetString());
 }
 
@@ -813,7 +827,7 @@ void MainWindow::ShowOriginalWindow(wxCommandEvent& evt) {
 }
 
 bool MainWindow::OriginalImageDispalyed() {
-	return menuTools->GetMenuItems()[2]->IsChecked();
+	return menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->IsChecked();
 }
 
 void MainWindow::ShowLibrary(wxCommandEvent& evt) {
@@ -905,7 +919,9 @@ void MainWindow::OnImagePanelMouse(wxMouseEvent & evt) {
 	int x = evt.GetPosition().x;
 	int y = evt.GetPosition().y;
 
-	if(evt.GetId() == imagePanel->GetId()){
+	bool originalShown = menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL)->IsChecked();
+	// Modified image pixel peep
+	if(evt.GetId() == imagePanel->GetId() && !originalShown){
 
 		processor->Lock();
 		pixelPeepWindow->UpdateImage(processor->GetImage());
@@ -913,13 +929,15 @@ void MainWindow::OnImagePanelMouse(wxMouseEvent & evt) {
 		processor->Unlock();
 	}
 
-	if(evt.GetId() == originalImagePanel->GetId()){
+	// Original image pixel peep
+	else if(evt.GetId() == originalImagePanel->GetId() || originalShown){
 
 		processor->Lock();
 		pixelPeepWindow->UpdateImage(processor->GetOriginalImage());
 		pixelPeepWindow->UpdatePosition(x, y);
 		processor->Unlock();
 	}
+	else{}
 }
 
 void MainWindow::ShowExport(wxCommandEvent& WXUNUSED(event)) {
