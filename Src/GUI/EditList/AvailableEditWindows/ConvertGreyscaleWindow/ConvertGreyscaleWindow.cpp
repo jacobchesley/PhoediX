@@ -106,12 +106,9 @@ void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	if(edit == NULL){ return; }
 
 	// Choose method based on edit loaded
-	if (edit->GetFlagsSize() == 1 && (
-		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||
-		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE || 
-		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM)) {
+	if (edit->CheckForFlag(PHOEDIX_FLAG_GREYTYPE)) {
 
-		greyscaleMethod->SetSelection(edit->GetFlag(0));
+		greyscaleMethod->SetSelection(edit->GetFlag(PHOEDIX_FLAG_GREYTYPE));
 
 		// Fire combo box event to show / hide sliders
 		wxCommandEvent comboEvt(wxEVT_COMBOBOX);
@@ -119,51 +116,40 @@ void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	}
 
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 3 && edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM){
-		redBrightSlider->SetValue(edit->GetParam(0));
-		greenBrightSlider->SetValue(edit->GetParam(1));
-		blueBrightSlider->SetValue(edit->GetParam(2));
+	if (edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM){
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { redBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { greenBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { blueBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
 	}
 }
 
 ProcessorEdit * ConvertGreyscaleWindow::GetParamsAndFlags(){
 
 	int greyscaleSelection = greyscaleMethod->GetSelection();
+	ProcessorEdit * greyEdit;
 
 	if (greyscaleSelection == 0) {
-		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE);
-		greyEdit->AddFlag(greyscaleSelection);
-
-		// Set enabled / disabled
-		greyEdit->SetDisabled(isDisabled);
-
-		return greyEdit;
+		greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE);
 	}
 
 	else if (greyscaleSelection == 1) {
-		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG);
-		greyEdit->AddFlag(greyscaleSelection);
-
-		// Set enabled / disabled
-		greyEdit->SetDisabled(isDisabled);
-
-		return greyEdit;
+		greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG);
 	}
 
 	else if (greyscaleSelection == 2) {
-		ProcessorEdit * greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM);
-		greyEdit->AddParam(redBrightSlider->GetValue());
-		greyEdit->AddParam(greenBrightSlider->GetValue());
-		greyEdit->AddParam(blueBrightSlider->GetValue());
-
-		// Set enabled / disabled
-		greyEdit->SetDisabled(isDisabled);
-
-		greyEdit->AddFlag(greyscaleSelection);
-		return greyEdit;
+		greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM);
+		greyEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, redBrightSlider->GetValue());
+		greyEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, greenBrightSlider->GetValue());
+		greyEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, blueBrightSlider->GetValue());
 	}
+	else {
+		return NULL;
+	}
+	// Set enabled / disabled
+	greyEdit->SetDisabled(isDisabled);
 
-	return NULL;
+	greyEdit->AddFlag(PHOEDIX_FLAG_GREYTYPE, greyscaleSelection);
+	return greyEdit;
 }
 
 bool ConvertGreyscaleWindow::CheckCopiedParamsAndFlags(){
@@ -171,20 +157,11 @@ bool ConvertGreyscaleWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false; }
 
-	if (edit->GetFlagsSize() == 1 && (
-		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||
+	if (edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||
 		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE || 
-		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM)) {
+		edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM) {
 
-		if(edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM && edit->GetParamsSize() == 3){
-			return true;
-		}
-		else if(edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_AVG ||edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_EYE){
-			return true;
-		}
-		else{
-			return false;
-		}
+		return true;
 	}
 	return false;
 }

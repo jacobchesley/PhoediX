@@ -6,206 +6,252 @@ ProcessorEdit::ProcessorEdit() {
 
 	isDisabled = false;
 	this->SetEditType(EditType::UNDEFINED);
-	intArrays = wxVector<int*>();
-	intArrays.clear();
-	doubleArrays = wxVector<double*>();
-	doubleArrays.clear();
-	params = wxVector<double>();
-	params.clear();
-	flags = wxVector<int>();
-	flags.clear();
 }
 
 ProcessorEdit::ProcessorEdit(int editType) {
 
 	this->SetEditType(editType);
 	isDisabled = false;
-	intArrays = wxVector<int*>();
-	intArrays.clear();
-	doubleArrays = wxVector<double*>();
-	doubleArrays.clear();
-	params = wxVector<double>();
-	params.clear();
-	flags = wxVector<int>();
-	flags.clear();
 }
 
 ProcessorEdit::ProcessorEdit(ProcessorEdit &edit) {
 
 	isDisabled = false;
-	intArrays = wxVector<int*>();
-	intArrays.clear();
-	doubleArrays = wxVector<double*>();
-	doubleArrays.clear();
-	params = wxVector<double>();
-	params.clear();
-	flags = wxVector<int>();
-	flags.clear();
 
 	if(edit.GetEditType() < 0 ){
 		this->SetEditType(ProcessorEdit::UNDEFINED);
 		return;
 	}
 	this->SetEditType(edit.GetEditType());
-
-	isDisabled = edit.GetDisabled();
-
-	intArrays = wxVector<int*>();
-	intArrays.clear();
-	doubleArrays = wxVector<double*>();
-	doubleArrays.clear();
-	params = wxVector<double>();
-	params.clear();
-	flags = wxVector<int>();
-	flags.clear();
+	this->SetDisabled(edit.GetDisabled());
 
 	// Copy Params
-	for (size_t i = 0; i < edit.GetParamsSize(); i++) {
-		this->AddParam(edit.GetParam(i));
+	for (std::map<wxString, double>::const_iterator it = edit.paramMap.begin(); it != edit.paramMap.end(); it++) {
+		paramMap[it->first] = it->second;
 	}
 
 	// Copy Flags
-	for (size_t i = 0; i < edit.GetFlagsSize(); i++) {
-		this->AddFlag(edit.GetFlag(i));
+	for (std::map<wxString, int>::const_iterator it = edit.flagMap.begin(); it != edit.flagMap.end(); it++) {
+		flagMap[it->first] = it->second;
 	}
 
 	// Copy Int Arrays
-	for(size_t intArrayIdx = 0; intArrayIdx < edit.GetNumIntArrays(); intArrayIdx ++){
-
-
-		// Allocate new int array
-		size_t intArraySize = edit.GetIntArraySize(intArrayIdx);
-		int * newIntArray = new int[edit.GetIntArraySize(intArrayIdx)];
-
-		// Copy int array
-		for(size_t i = 0; i < intArraySize; i++){
-			newIntArray[i] = edit.GetIntArray(intArrayIdx)[i];
-		}
-
-		// Add new int array
-		this->AddIntArray(newIntArray, intArraySize);
-	}
-
-	// Copy Double Arrays
-	for(size_t doubleArrayIdx = 0; doubleArrayIdx < edit.GetNumDoubleArrays(); doubleArrayIdx ++){
+	for (std::map<wxString, int*>::const_iterator it = edit.intArrayMap.begin(); it != edit.intArrayMap.end(); it++) {
 		
 		// Allocate new int array
-		size_t doubleArraySize = edit.GetDoubleArraySize(doubleArrayIdx);
-		double* newDoubleArray = new double[edit.GetDoubleArraySize(doubleArrayIdx)];
+		int intArraySize = edit.intArraySizeMap[it->first];
+		int * newIntArray = new int[edit.GetIntArraySize(it->first)];
+		int * oldIntArray = edit.GetIntArray(it->first);
 
 		// Copy int array
-		for(size_t i = 0; i < doubleArraySize; i++){
-			newDoubleArray[i] = edit.GetDoubleArray(doubleArrayIdx)[i];
+		for (size_t i = 0; i < intArraySize; i++) {
+			newIntArray[i] = oldIntArray[i];
 		}
 
 		// Add new int array
-		this->AddDoubleArray(newDoubleArray, doubleArraySize);
+		this->AddIntArray(it->first, newIntArray, intArraySize);
 	}
 
+
+
+	// Copy Double Arrays
+	for (std::map<wxString, double*>::const_iterator it = edit.doubleArrayMap.begin(); it != edit.doubleArrayMap.end(); it++) {
+
+		// Allocate new int array
+		int doubleArraySize = edit.doubleArraySizeMap[it->first];
+		double * newDoubleArray = new double[edit.GetDoubleArraySize(it->first)];
+		double * oldDoubleArray = edit.GetDoubleArray(it->first);
+
+		// Copy int array
+		for (size_t i = 0; i < doubleArraySize; i++) {
+			newDoubleArray[i] = oldDoubleArray[i];
+		}
+
+		// Add new int array
+		this->AddDoubleArray(it->first, newDoubleArray, doubleArraySize);
+	}
 }
 
 ProcessorEdit::~ProcessorEdit() {
-	for (size_t i = 0; i < intArrays.size(); i++) {
-		delete[] intArrays.at(i);
-	}
-
-	for (size_t i = 0; i < doubleArrays.size(); i++) {
-		delete[] doubleArrays.at(i);
-	}
+	
+	this->ClearIntArray();
+	this->ClearDoubleArray();
+	this->ClearParams();
+	this->ClearFlags();
 }
 
-void ProcessorEdit::AddParam(double param) {
-	params.push_back(param);
+void ProcessorEdit::AddParam(wxString parameterName, double parameterValue) {
+	paramMap[parameterName] = parameterValue;
 }
 
-void ProcessorEdit::AddIntArray(int * newArray, int arraySize) {
-	intArrays.push_back(newArray);
-	intArraySizes.push_back(arraySize);
+void ProcessorEdit::AddFlag(wxString flagName, int flag) {
+	flagMap[flagName] = flag;
 }
 
-void ProcessorEdit::AddDoubleArray(double * newArray, int arraySize) {
-	doubleArrays.push_back(newArray);
-	doubleArraySizes.push_back(arraySize);
+void ProcessorEdit::AddIntArray(wxString arrayName, int * newArray, int arraySize) {
+
+	intArrayMap[arrayName] = newArray;
+	intArraySizeMap[arrayName] = arraySize;
+}
+
+void ProcessorEdit::AddDoubleArray(wxString arrayName, double * newArray, int arraySize) {
+
+	doubleArrayMap[arrayName] = newArray;
+	doubleArraySizeMap[arrayName] = arraySize;
 }
 
 void ProcessorEdit::ClearParams() {
-	params.clear();
-}
-
-void ProcessorEdit::ClearIntArray() {
-	for (size_t i = 0; i < intArrays.size(); i++) {
-		delete[] intArrays[i];
-	}
-	
-	intArrays.resize(0);
-	intArraySizes.resize(0);
-}
-
-void ProcessorEdit::ClearDoubleArray() {
-	for (size_t i = 0; i < doubleArrays.size(); i++) {
-		delete[] doubleArrays[i];
-	}
-	
-	doubleArrays.resize(0);
-	doubleArraySizes.resize(0);
-}
-
-size_t ProcessorEdit::GetParamsSize() {
-	return params.size();
-}
-
-size_t ProcessorEdit::GetNumDoubleArrays() {
-	return doubleArrays.size();
-}
-
-double ProcessorEdit::GetParam(size_t index) {
-	if(index >= params.size()){ return 0.0f; }
-	return params.at(index);
-}
-
-int * ProcessorEdit::GetIntArray(size_t index) {
-	if(index >= intArrays.size()){ return NULL; }
-	return intArrays.at(index);
-}
-
-double * ProcessorEdit::GetDoubleArray(size_t index) {
-	if(index >= doubleArrays.size()){ return NULL; }
-	return doubleArrays.at(index);
-}
-
-size_t ProcessorEdit::GetIntArraySize(size_t index) {
-	if (index >= intArraySizes.size()) { return 0; }
-	return intArraySizes.at(index);
-}
-
-size_t ProcessorEdit::GetDoubleArraySize(size_t index) {
-	if(index >= doubleArraySizes.size()) { return 0; }
-	return doubleArraySizes.at(index);
-}
-
-size_t ProcessorEdit::GetNumIntArrays() {
-	return intArraySizes.size();
-}
-
-void ProcessorEdit::AddFlag(int flag) {
-	flags.push_back(flag);
+	paramMap.clear();
 }
 
 void ProcessorEdit::ClearFlags() {
-	flags.clear();
+	flagMap.clear();
+}
+
+void ProcessorEdit::ClearIntArray() {
+
+	for (std::map<wxString, int*>::const_iterator it = intArrayMap.begin(); it != intArrayMap.end(); it++) {
+		delete[] it->second;
+	}
+	
+	intArrayMap.clear();
+	intArraySizeMap.clear();
+}
+
+void ProcessorEdit::ClearDoubleArray() {
+
+	for (std::map<wxString, double*>::const_iterator it = doubleArrayMap.begin(); it != doubleArrayMap.end(); it++) {
+		delete[] it->second;
+	}
+	
+	doubleArrayMap.clear();
+	doubleArraySizeMap.clear();
+}
+
+size_t ProcessorEdit::GetParamsSize() {
+	return paramMap.size();
+}
+
+size_t ProcessorEdit::GetNumDoubleArrays() {
+	return doubleArrayMap.size();
+}
+
+double ProcessorEdit::GetParam(wxString parameterName) {
+
+	if(paramMap.count(parameterName) > 0){ return paramMap[parameterName]; }
+	else { return 0.0; }
+}
+
+int ProcessorEdit::GetFlag(wxString flagName) {
+
+	if (flagMap.count(flagName) > 0) { return flagMap[flagName]; }
+	else { return 0; }
+}
+
+int * ProcessorEdit::GetIntArray(wxString arrayName) {
+	
+	if (intArrayMap.count(arrayName) > 0) { return intArrayMap[arrayName]; }
+	else { return NULL; }
+}
+
+double * ProcessorEdit::GetDoubleArray(wxString arrayName) {
+
+	if (doubleArrayMap.count(arrayName) > 0) { return doubleArrayMap[arrayName]; }
+	else { return NULL; }
+}
+
+size_t ProcessorEdit::GetIntArraySize(wxString arrayName) {
+
+	if (intArraySizeMap.count(arrayName) > 0) { return intArraySizeMap[arrayName]; }
+	else { return 0; }
+}
+
+size_t ProcessorEdit::GetDoubleArraySize(wxString arrayName) {
+
+	if (doubleArraySizeMap.count(arrayName) > 0) { return doubleArraySizeMap[arrayName]; }
+	else { return 0; }
+
+}
+
+bool ProcessorEdit::CheckForParameter(wxString parameterName){
+
+	if (paramMap.count(parameterName) > 0) { return true; }
+	else { return false; }
+}
+
+bool ProcessorEdit::CheckForFlag(wxString flagName) {
+
+	if (flagMap.count(flagName) > 0) { return true; }
+	else { return false; }
+}
+
+
+bool ProcessorEdit::CheckForIntArray(wxString arrayName) {
+
+	if (intArrayMap.count(arrayName) > 0) { return true; }
+	else { return false; }
+}
+
+bool ProcessorEdit::CheckForDoubleArray(wxString arrayName) {
+
+	if (doubleArrayMap.count(arrayName) > 0) { return true; }
+	else { return false; }
+}
+
+wxVector<wxString> ProcessorEdit::GetParamterNames() {
+
+	wxVector<wxString> paramNames;
+
+	for (std::map<wxString, double>::const_iterator it = paramMap.begin(); it != paramMap.end(); it++) {
+		paramNames.push_back(it->first);
+	}
+	return paramNames;
+}
+
+wxVector<wxString> ProcessorEdit::GetFlagNames() {
+
+	wxVector<wxString> flagNames;
+
+	for (std::map<wxString, int>::const_iterator it = flagMap.begin(); it != flagMap.end(); it++) {
+		flagNames.push_back(it->first);
+	}
+	return flagNames;
+}
+
+wxVector<wxString> ProcessorEdit::GetIntArrayNames() {
+
+	wxVector<wxString> arrayNames;
+
+	for (std::map<wxString, int*>::const_iterator it = intArrayMap.begin(); it != intArrayMap.end(); it++) {
+		arrayNames.push_back(it->first);
+	}
+	return arrayNames;
+}
+
+wxVector<wxString> ProcessorEdit::GetDoubleArrayNames() {
+
+	wxVector<wxString> arrayNames;
+
+	for (std::map<wxString, double*>::const_iterator it = doubleArrayMap.begin(); it != doubleArrayMap.end(); it++) {
+		arrayNames.push_back(it->first);
+	}
+	return arrayNames;
+}
+
+size_t ProcessorEdit::GetNumIntArrays() {
+	return intArrayMap.size();
 }
 
 size_t ProcessorEdit::GetFlagsSize() {
-	return flags.size();
-}
-
-int ProcessorEdit::GetFlag(size_t index) {
-	if(index >= flags.size()){ return 0; }
-	return flags.at(index);
+	return flagMap.size();
 }
 
 int ProcessorEdit::GetEditType() {
 	return editInt;
+}
+
+wxString ProcessorEdit::GetEditTag() {
+	return tag;
 }
 
 void ProcessorEdit::SetDisabled(bool disable) {
@@ -214,6 +260,60 @@ void ProcessorEdit::SetDisabled(bool disable) {
 
 bool ProcessorEdit::GetDisabled() {
 	return isDisabled;
+}
+
+bool ProcessorEdit::CompareProcessorEdits(ProcessorEdit * editOne, ProcessorEdit * editTwo) {
+
+	// Compare edit types and disabled param
+	if (editOne->GetEditType() != editTwo->GetEditType()) { return false; }
+	if (editOne->GetDisabled() != editTwo->GetDisabled()) { return false; }
+
+	// Compare params
+	if (editOne->GetParamsSize() != editTwo->GetParamsSize()) { return false; }
+	for (std::map<wxString, double>::const_iterator it = editOne->paramMap.begin(); it != editOne->paramMap.end(); it++) {
+		if (editOne->GetParam(it->first) != editTwo->GetParam(it->first)) { return false; }
+	}
+
+	// Compare Flags
+	if (editOne->GetFlagsSize() != editTwo->GetFlagsSize()) { return false; }
+	for (std::map<wxString, int>::const_iterator it = editOne->flagMap.begin(); it != editOne->flagMap.end(); it++) {
+		if (editOne->GetFlag(it->first) != editTwo->GetFlag(it->first)) { return false; }
+	}
+
+	// Compare Int Arrays
+	if (editOne->GetNumIntArrays() != editTwo->GetNumIntArrays()) { return false; }
+
+	for (std::map<wxString, int*>::const_iterator it = editOne->intArrayMap.begin(); it != editOne->intArrayMap.end(); it++) {
+
+		int * intArrayOne = editOne->GetIntArray(it->first);
+		int * intArrayTwo = editTwo->GetIntArray(it->first);
+
+		if (intArrayOne != NULL && intArrayTwo == NULL) { return false; }
+		if (editOne->GetIntArraySize(it->first) != editTwo->GetIntArraySize(it->first)) { return false; }
+
+		for (size_t i = 0; i < editOne->GetIntArraySize(it->first); i++) {
+
+			if (editOne->GetIntArray(it->first)[i] != editTwo->GetIntArray(it->first)[i]) { return false; }
+		}
+	}
+
+	// Compare Double Arrays
+	if (editOne->GetNumDoubleArrays() != editTwo->GetNumDoubleArrays()) { return false; }
+
+	for (std::map<wxString, double*>::const_iterator it = editOne->doubleArrayMap.begin(); it != editOne->doubleArrayMap.end(); it++) {
+
+		double * intArrayOne = editOne->GetDoubleArray(it->first);
+		double * intArrayTwo = editTwo->GetDoubleArray(it->first);
+
+		if (intArrayOne != NULL && intArrayTwo == NULL) { return false; }
+		if (editOne->GetDoubleArraySize(it->first) != editTwo->GetDoubleArraySize(it->first)) { return false; }
+
+		for (size_t i = 0; i < editOne->GetDoubleArraySize(it->first); i++) {
+
+			if (editOne->GetDoubleArray(it->first)[i] != editTwo->GetDoubleArray(it->first)[i]) { return false; }
+		}
+	}
+	return true;
 }
 
 void ProcessorEdit::SetEditType(int editType) {
@@ -390,51 +490,4 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "VERTICAL_BLUR") { editInt = EditType::VERTICAL_BLUR; tag = inTag; }
 	else if (inTag == "RAW") { editInt = EditType::RAW; tag = inTag; }
 	else{ editInt = EditType::UNDEFINED; tag = "UNDEFINED"; }
-}
-
-wxString ProcessorEdit::GetEditTag() {
-	return tag;
-}
-
-bool ProcessorEdit::CompareProcessorEdits(ProcessorEdit * editOne, ProcessorEdit * editTwo) {
-
-	// Compare edit types and disabled param
-	if (editOne->GetEditType() != editTwo->GetEditType()) { return false; }
-	if (editOne->GetDisabled() != editTwo->GetDisabled()) { return false; }
-
-	// Compare params
-	if (editOne->GetParamsSize() != editTwo->GetParamsSize()) { return false; }
-	for (size_t i = 0; i < editOne->GetParamsSize(); i++) {
-		if (editOne->GetParam(i) != editTwo->GetParam(i)) { return false; }
-	}
-
-	// Compare Flags
-	if (editOne->GetFlagsSize() != editTwo->GetFlagsSize()) { return false; }
-	for (size_t i = 0; i < editOne->GetFlagsSize(); i++) {
-		if (editOne->GetFlag(i) != editTwo->GetFlag(i)) { return false; }
-	}
-
-	// Compare Int Arrays
-	if (editOne->GetNumIntArrays() != editTwo->GetNumIntArrays()) { return false; }
-	for (size_t i = 0; i < editOne->GetNumIntArrays(); i++) {
-
-		if (editOne->GetIntArraySize(i) != editTwo->GetIntArraySize(i)) { return false; }
-		for (size_t j = 0; j < editOne->GetIntArraySize(i); j++) {
-
-			if (editOne->GetIntArray(i)[j] != editTwo->GetIntArray(i)[j]) { return false; }
-		}
-	}
-
-	// Compare Double Arrays
-	if (editOne->GetNumDoubleArrays() != editTwo->GetNumDoubleArrays()) { return false; }
-	for (size_t i = 0; i < editOne->GetNumDoubleArrays(); i++) {
-
-		if (editOne->GetDoubleArraySize(i) != editTwo->GetDoubleArraySize(i)) { return false; }
-		for (size_t j = 0; j < editOne->GetDoubleArraySize(i); j++) {
-
-			if (editOne->GetDoubleArray(i)[j] != editTwo->GetDoubleArray(i)[j]) { return false; }
-		}
-	}
-
-	return true;
 }

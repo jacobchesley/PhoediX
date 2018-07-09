@@ -6034,9 +6034,9 @@ void Processor::CalculateWidthHeightRotation(ProcessorEdit * rotationEdit, int o
 		rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
 		rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST) {
 
-		if (rotationEdit->GetParamsSize() != 1 || rotationEdit->GetFlagsSize() != 3) { return; }
-		double angleDegrees = rotationEdit->GetParam(0);
-		int cropFlag = rotationEdit->GetFlag(2);
+		if (!rotationEdit->CheckForParameter(PHOEDIX_PARAMETER_ROTATE_ANGLE) || !rotationEdit->CheckForFlag(PHOEDIX_FLAG_ROTATE_CROP)) { return; }
+		double angleDegrees = rotationEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+		int cropFlag = rotationEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
 
 		// Set width and height to maximum size needed to fit whole image in rotation (with black surrounding borders)
 		if (cropFlag == Processor::RotationCropping::EXPAND) {
@@ -6074,9 +6074,9 @@ void Processor::CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * 
 			curEdit->GetEditType() == ProcessorEdit::EditType::SCALE_BICUBIC) {
 
 			// Set width and height to scale width and height
-			if (curEdit->GetParamsSize() == 2) {
-				*width = (int)curEdit->GetParam(0);
-				*height = (int)curEdit->GetParam(1);
+				if (curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT) ) {
+				*width = (int)curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				*height = (int)curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
 			}
 		}
 
@@ -6095,11 +6095,11 @@ void Processor::CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * 
 		if (curEdit->GetEditType() == ProcessorEdit::EditType::CROP) {
 			
 			// Set width and height to crop width and height
-			if (curEdit->GetParamsSize() == 4) {
+			if (curEdit->CheckForParameter(PHOEDIX_PARAMETER_CROP_WIDTH) && curEdit->CheckForParameter(PHOEDIX_PARAMETER_CROP_WIDTH)) {
 
 				// Params 0 and 1 are x and y start points
-				*width = (int)(curEdit->GetParam(2) * (double)*width);
-				*height = (int)(curEdit->GetParam(3) * (double)*height);
+				*width = (int)(curEdit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH) * (double)*width);
+				*height = (int)(curEdit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH) * (double)*height);
 			}			
 		}
 	}
@@ -6276,8 +6276,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 		if(halfWidth > 0 && halfHeight > 0.0){
 			
 			ProcessorEdit halfSizeEdit(ProcessorEdit::EditType::SCALE_NEAREST);
-			halfSizeEdit.AddParam(halfWidth);
-			halfSizeEdit.AddParam(halfHeight);
+			halfSizeEdit.AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, halfWidth);
+			halfSizeEdit.AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, halfHeight);
 
 			// Multithread if needed
 			if(processor->GetMultithread()){
@@ -6346,11 +6346,11 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust Brightness Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double brighnessAmount = curEdit->GetParam(0);
-				double detailsPreservation = curEdit->GetParam(1);
-				double toneSetting = curEdit->GetParam(2);
+				double brighnessAmount = curEdit->GetParam(PHOEDIX_PARAMETER_BRIGHTNESS);
+				double detailsPreservation = curEdit->GetParam(PHOEDIX_PARAMETER_PRESERVATION);
+				double toneSetting = curEdit->GetParam(PHOEDIX_PARAMETER_TONE);
 
-				int toneFlag = curEdit->GetFlag(0);
+				int toneFlag = curEdit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6366,43 +6366,18 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			}
 			break;
 
-			// Peform a Shift RGB edit
-			case ProcessorEdit::EditType::ADJUST_RGB: {
-
-				processor->SendMessageToParent("Processing Shift RGB Edit" + fullEditNumStr);
-
-				// Get all parameters from the edit
-				double allBrightShift = curEdit->GetParam(0);
-				double redBrightShift = curEdit->GetParam(1);
-				double greenBrightShift = curEdit->GetParam(2);
-				double blueBrightShift = curEdit->GetParam(3);
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					this->Multithread(curEdit);
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					processor->AdjustRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift);
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-
 			// Peform an HSL adjustment
 			case ProcessorEdit::EditType::ADJUST_HSL: {
 
 				processor->SendMessageToParent("Processing Adjust HSL Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double hueShift = curEdit->GetParam(0);
-				double saturationScale = curEdit->GetParam(1);
-				double luminaceScale = curEdit->GetParam(2);
-				double rScale = curEdit->GetParam(3);
-				double gScale = curEdit->GetParam(4);
-				double bScale = curEdit->GetParam(5);
+				double hueShift = curEdit->GetParam(PHOEDIX_PARAMETER_HUE);
+				double saturationScale = curEdit->GetParam(PHOEDIX_PARAMETER_SATURATION);
+				double luminaceScale = curEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
+				double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+				double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6424,13 +6399,12 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust LAB Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double luminaceScale = curEdit->GetParam(0);
-				double aShift = curEdit->GetParam(1);
-				double bShift = curEdit->GetParam(2);
-
-				double rScale = curEdit->GetParam(3);
-				double gScale = curEdit->GetParam(4);
-				double bScale = curEdit->GetParam(5);
+				double luminaceScale = curEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
+				double aShift = curEdit->GetParam(PHOEDIX_PARAMETER_A);
+				double bShift = curEdit->GetParam(PHOEDIX_PARAMETER_B);
+				double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+				double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6446,20 +6420,208 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			}
 			break;
 
+			// Peform a Shift RGB edit
+			case ProcessorEdit::EditType::ADJUST_RGB: {
+
+				processor->SendMessageToParent("Processing Shift RGB Edit" + fullEditNumStr);
+
+				// Get all parameters from the edit
+				double allBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_ALL);
+				double redBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_RED);
+				double greenBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
+				double blueBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE);
+
+				// Multithread if needed
+				if (processor->GetMultithread()) {
+					this->Multithread(curEdit);
+				}
+
+				// Single thread
+				else {
+					// Perform an edit on the data through the processor
+					processor->AdjustRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift);
+				}
+				processor->SetUpdated(true);
+			}
+			break;
+
+			// Peform Blur edit
+			case ProcessorEdit::EditType::BLUR: {
+
+				processor->SendMessageToParent("Processing blur" + fullEditNumStr);
+
+				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
+
+				// No blur, radius too small
+				if (blurSize == 0.0) { break; }
+
+				// Multithread if needed
+				if (processor->GetMultithread()) {
+					for (int i = 0; i < numPasses; i++) {
+
+						// Setup temporary edits to break down blur into horizontal and vertical blur edits
+						ProcessorEdit * horizontalBlur = new ProcessorEdit(ProcessorEdit::HORIZONTAL_BLUR);
+						ProcessorEdit * verticalBlur = new ProcessorEdit(ProcessorEdit::VERTICAL_BLUR);
+						horizontalBlur->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSize);
+						verticalBlur->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSize);
+
+						// Blur horiztonally 
+						processor->SetupBlur();
+						this->Multithread(horizontalBlur);
+						processor->CleanupBlur();
+
+						// Blur vertically
+						processor->SetupBlur();
+						this->Multithread(verticalBlur);
+						processor->CleanupBlur();
+
+						delete horizontalBlur;
+						delete verticalBlur;
+					}
+				}
+
+				// Single thread
+				else {
+
+					// Perform an edit on the data through the processor
+
+					for (int i = 0; i < numPasses; i++) {
+
+						// Blur horizontally
+						processor->SetupBlur();
+						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+
+						// Blur vertically
+						processor->SetupBlur();
+						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+					}
+				}
+			}
+			break;
+
+			// Peform Horizontal Blur edit
+			case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
+
+				processor->SendMessageToParent("Processing horizontal blur" + fullEditNumStr);
+
+				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
+
+				// No blur, radius too small
+				if (blurSize * processor->GetImage()->GetWidth() < 1.0) { break; }
+
+				if (processor->GetMultithread()) {
+					// Multithread if needed
+
+					for (int i = 0; i < numPasses; i++) {
+						processor->SetupBlur();
+						this->Multithread(curEdit);
+						processor->CleanupBlur();
+					}
+				}
+
+				// Single thread
+				else {
+
+					// Blur Horizontally
+					for (int i = 0; i < numPasses; i++) {
+						processor->SetupBlur();
+						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+					}
+				}
+			}
+			break;
+
+			// Peform Blur edit
+			case ProcessorEdit::EditType::VERTICAL_BLUR: {
+
+				processor->SendMessageToParent("Processing vertical blur" + fullEditNumStr);
+
+				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
+
+				// No blur, radius too small
+				if (blurSize * processor->GetImage()->GetHeight() < 1.0) { break; }
+
+				// Multithread if needed
+				if (processor->GetMultithread()) {
+
+					// Perform an edit on the data through the processor
+					for (int i = 0; i < numPasses; i++) {
+
+						// Blur image vertically
+						processor->SetupBlur();
+						this->Multithread(curEdit);
+						processor->CleanupBlur();
+					}
+				}
+
+				// Single thread
+				else {
+
+					// Perform an edit on the data through the processor
+					for (int i = 0; i < numPasses; i++) {
+
+						// Blur rotated image horizontally
+						processor->SetupBlur();
+						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
+						processor->CleanupBlur();
+					}
+
+					processor->SetUpdated(true);
+				}
+			}
+			break;
+
+			// Peform a channel scale
+			case ProcessorEdit::EditType::CHANNEL_MIXER: {
+
+				processor->SendMessageToParent("Processing Channel Mixer Edit" + fullEditNumStr);
+
+				// Get all parameters from the edit
+				double redRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_RED);
+				double redGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
+				double redBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_BLUE);
+				double greenRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_RED);
+				double greenGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN);
+				double greenBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_BLUE);
+				double blueRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_RED);
+				double blueGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_GREEN);
+				double blueBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_BLUE);
+
+				// Multithread if needed
+				if (processor->GetMultithread()) {
+					this->Multithread(curEdit);
+				}
+				// Single thread
+				else {
+					// Perform an edit on the data through the processor
+					processor->ChannelScale(redRedScale, redGreenScale, redBlueScale,
+						greenRedScale, greenGreenScale, greenBlueScale,
+						blueRedScale, blueGreenScale, blueBlueScale);
+				}
+				processor->SetUpdated(true);
+			}
+			break;
+
 			// Peform an Adjust Contrast edit
 			case ProcessorEdit::EditType::ADJUST_CONTRAST: {
 
 				processor->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double allContrast = curEdit->GetParam(0);
-				double redContrast = curEdit->GetParam(1);
-				double greenContrast = curEdit->GetParam(2);
-				double blueContrast = curEdit->GetParam(3);
-				double allCenter = curEdit->GetParam(4);
-				double redCenter = curEdit->GetParam(5);
-				double greenCenter = curEdit->GetParam(6);
-				double blueCenter = curEdit->GetParam(7);
+				double allContrast = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
+				double redContrast = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
+				double greenContrast = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
+				double blueContrast = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
+				double allCenter = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+				double redCenter = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+				double greenCenter = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+				double blueCenter = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6481,14 +6643,14 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double allContrast = curEdit->GetParam(0);
-				double redContrast = curEdit->GetParam(1);
-				double greenContrast = curEdit->GetParam(2);
-				double blueContrast = curEdit->GetParam(3);
-				double allCenter = curEdit->GetParam(4);
-				double redCenter = curEdit->GetParam(5);
-				double greenCenter = curEdit->GetParam(6);
-				double blueCenter = curEdit->GetParam(7);
+				double allContrast = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
+				double redContrast = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
+				double greenContrast = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
+				double blueContrast = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
+				double allCenter = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+				double redCenter = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+				double greenCenter = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+				double blueCenter = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6502,6 +6664,34 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						allCenter, redCenter, greenCenter, blueCenter);
 				}
 				processor->SetUpdated(true);
+			}
+			break;
+
+			// Peform Crop edit
+			case ProcessorEdit::EditType::CROP: {
+
+				processor->SendMessageToParent("Processing crop" + fullEditNumStr);
+
+				// Get crop dimmensions
+				double startX = curEdit->GetParam(PHOEDIX_PARAMETER_STARTX);
+				double startY = curEdit->GetParam(PHOEDIX_PARAMETER_STARTY);
+				double newWidth = curEdit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH);
+				double newHeight = curEdit->GetParam(PHOEDIX_PARAMETER_CROP_HEIGHT);
+
+				// Multithread if needed
+				if (processor->GetMultithread()) {
+					processor->SetupCrop(newWidth, newHeight);
+					this->Multithread(curEdit);
+					processor->CleanupCrop();
+				}
+
+				// Single thread
+				else {
+					// Perform an edit on the data through the processor
+					processor->SetupCrop(newWidth, newHeight);
+					processor->Crop(startX, startY);
+					processor->CleanupCrop();
+				}
 			}
 			break;
 
@@ -6549,9 +6739,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Greyscale (Custom) Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double redScale = curEdit->GetParam(0);
-				double greenScale = curEdit->GetParam(1);
-				double blueScale = curEdit->GetParam(2);
+				double redScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+				double greenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+				double blueScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6567,271 +6757,65 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			}
 			break;
 
-			// Peform a greyscale conversion, using custom scalars
-			case ProcessorEdit::EditType::CHANNEL_MIXER: {
-
-				processor->SendMessageToParent("Processing Channel Mixer Edit" + fullEditNumStr);
-
-				// Get all parameters from the edit
-				double redRedScale = curEdit->GetParam(0);
-				double redGreenScale = curEdit->GetParam(1);
-				double redBlueScale = curEdit->GetParam(2);
-				double greenRedScale = curEdit->GetParam(3);
-				double greenGreenScale = curEdit->GetParam(4);
-				double greenBlueScale = curEdit->GetParam(5);
-				double blueRedScale = curEdit->GetParam(6);
-				double blueGreenScale = curEdit->GetParam(7);
-				double blueBlueScale = curEdit->GetParam(8);
-
-				// Multithread if needed
-				if (processor->GetMultithread()) {
-					this->Multithread(curEdit);
-				}
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					processor->ChannelScale(redRedScale, redGreenScale, redBlueScale,
-					greenRedScale, greenGreenScale, greenBlueScale,
-					blueRedScale, blueGreenScale, blueBlueScale);
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-
-			// Peform a 90 degree clockwise roctation
-			case ProcessorEdit::EditType::ROTATE_90_CW: {
-
-				// Perform an edit on the data through the processor
-				processor->SetupRotation(editToComplete, 90.0, 0);
-				processor->Rotate90CW();
-				processor->CleanupRotation(editToComplete);
-				
-				processor->SetUpdated(true);
-			}
-			break;
-
-
-			// Peform a 180 degree clockwise roctation
-			// Peform a 90 degree clockwise roctation
-			case ProcessorEdit::EditType::ROTATE_180: {
-
-				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+			// Peform HSL Curves edit
+			case ProcessorEdit::EditType::HSL_CURVES: {
 			
-				// Perform an edit on the data through the processor
-				processor->SetupRotation(editToComplete, 180.0, 0);
-				processor->Rotate180();
-				processor->CleanupRotation(editToComplete);
-				processor->SetUpdated(true);
+				if (curEdit->GetNumIntArrays() == 3 && curEdit->GetParamsSize() == 3) {
+					processor->SendMessageToParent("Processing HSL Curves Edit" + fullEditNumStr);
+
+					// Get LAB curve data
+					int * hCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_H_CURVE);
+					int * sCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_S_CURVE);
+					int * lCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
+
+					double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+					double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+					double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+
+					// Multithread if needed
+					if(processor->GetMultithread()){
+						this->Multithread(curEdit);
+					}
+
+					// Single thread
+					else{
+						// Perform an edit on the data through the processor
+						processor->HSLCurves(hCurve16, sCurve16, lCurve16, rScale, gScale, bScale);
+					}
+					processor->SetUpdated(true);
+			
+				}
 			}
 			break;
 
-			// Peform a 270 degree clockwise roctation (90 counter clockwise)
-			case ProcessorEdit::EditType::ROTATE_270_CW: {
-				
-				// Perform an edit on the data through the processor
-				processor->SetupRotation(editToComplete, 270.0, 0);
-				processor->Rotate270CW();
-				processor->CleanupRotation(editToComplete);
-				processor->SetUpdated(true);
-			}
-			break;
+			// Peform LAB Curves edit
+			case ProcessorEdit::EditType::LAB_CURVES: {
+			
+				if (curEdit->GetNumIntArrays() == 3) {
+					processor->SendMessageToParent("Processing LAB Curves Edit" + fullEditNumStr);
 
-			// Peform a custom angle clockwise roctation
-			case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
+					// Get LAB curve data
+					int * lCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
+					int * aCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_A_CURVE);
+					int * bCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
 
-				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+					double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+					double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+					double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
-				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(0);
-				int cropFlag = curEdit->GetFlag(2);
+					// Multithread if needed
+					if(processor->GetMultithread()){
+						this->Multithread(curEdit);
+					}
 
-				if(angle == 0.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupRotation(editToComplete);
+					// Single thread
+					else{
+						// Perform an edit on the data through the processor
+						processor->LABCurves(lCurve16, aCurve16, bCurve16, rScale, gScale, bScale);
+					}
+					processor->SetUpdated(true);
+			
 				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-					processor->RotateCustom(angle);
-					processor->CleanupRotation(editToComplete);
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-
-			// Peform a custom angle clockwise roctation using bilinear interpolation
-			case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
-
-				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
-
-				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(0);
-				int cropFlag = curEdit->GetFlag(2);
-
-				if(angle == 0.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupRotation(editToComplete);
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-					processor->RotateCustomBilinear(angle);
-					processor->CleanupRotation(editToComplete);
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-
-			// Peform a custom angle clockwise roctation using bicubic interpolation
-			case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
-
-				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
-
-				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(0);
-				int cropFlag = curEdit->GetFlag(2);
-
-				if(angle == 0.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupRotation(editToComplete);
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
-					processor->RotateCustomBicubic(angle);
-					processor->CleanupRotation(editToComplete);
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-	
-			// Peform a sclaing of the image using nearest neighbor
-			case ProcessorEdit::EditType::SCALE_NEAREST: {
-
-				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
-
-				// Perform an edit on the data through the processor
-				int width = (int) curEdit->GetParam(0);
-				int height = (int) curEdit->GetParam(1);
-				
-				// Fast edit, half size
-				if(processor->GetFastEdit()){
-					width/= 2.0;
-					height /= 2.0;
-				}
-
-				if(width < 0 || height < 0.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					if (!processor->SetupScale(width, height)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupScale();
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					if (!processor->SetupScale(width, height)) { break; }
-					processor->ScaleNearest();
-					processor->CleanupScale();
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-
-			// Peform a sclaing of the image using bilinear interpolation
-			case ProcessorEdit::EditType::SCALE_BILINEAR: {
-
-				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
-
-				// Perform an edit on the data through the processor
-				int width = (int) curEdit->GetParam(0);
-				int height = (int) curEdit->GetParam(1);
-				
-				// Fast edit, half size
-				if(processor->GetFastEdit()){
-					width/= 2.0;
-					height /= 2.0;
-				}
-
-				if(width < 0 || height < 0.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					if (!processor->SetupScale(width, height)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupScale();
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					if (!processor->SetupScale(width, height)) { break; }
-					processor->ScaleBilinear();
-					processor->CleanupScale();
-				}
-				processor->SetUpdated(true);
-			}
-			break;
-
-			// Peform a sclaing of the image using bicubic interpolation
-			case ProcessorEdit::EditType::SCALE_BICUBIC: {
-
-				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
-
-				// Perform an edit on the data through the processor
-				int width = (int) curEdit->GetParam(0);
-				int height = (int) curEdit->GetParam(1);
-				
-				// Fast edit, half size
-				if(processor->GetFastEdit()){
-					width/= 2.0;
-					height /= 2.0;
-				}
-
-				if(width < 0 || height < 0.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-					if (!processor->SetupScale(width, height)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupScale();
-				}
-
-				// Single thread
-				else{
-					// Perform an edit on the data through the processor
-					if (!processor->SetupScale(width, height)) { break; }
-					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
-					this->Multithread(curEdit, dataSize);
-					processor->CleanupScale();
-				}
-				processor->SetUpdated(true);
 			}
 			break;
 
@@ -6880,16 +6864,16 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 					processor->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
 
 					// Get 8 bit curve data
-					int * brightCurve8 = curEdit->GetIntArray(0);
-					int * redCurve8 = curEdit->GetIntArray(1);
-					int * greenCurve8 = curEdit->GetIntArray(2);
-					int * blueCurve8 = curEdit->GetIntArray(3);
+					int * brightCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE);
+					int * redCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE);
+					int * greenCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE);
+					int * blueCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
 
 					// Get 16 bit curve data
-					int * brightCurve16 = curEdit->GetIntArray(4);
-					int * redCurve16 = curEdit->GetIntArray(5);
-					int * greenCurve16 = curEdit->GetIntArray(6);
-					int * blueCurve16 = curEdit->GetIntArray(7);
+					int * brightCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE_16);
+					int * redCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE_16);
+					int * greenCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE_16);
+					int * blueCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE_16);
 
 					// Multithread if needed
 					if(processor->GetMultithread()){
@@ -6907,226 +6891,240 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			}
 			break;
 
-			// Peform LAB Curves edit
-			case ProcessorEdit::EditType::LAB_CURVES: {
-			
-				if (curEdit->GetNumIntArrays() == 3) {
-					processor->SendMessageToParent("Processing LAB Curves Edit" + fullEditNumStr);
+			// Peform a 90 degree clockwise roctation
+			case ProcessorEdit::EditType::ROTATE_90_CW: {
 
-					// Get LAB curve data
-					int * lCurve16 = curEdit->GetIntArray(0);
-					int * aCurve16 = curEdit->GetIntArray(1);
-					int * bCurve16 = curEdit->GetIntArray(2);
-
-					double rScale = curEdit->GetParam(0);
-					double gScale = curEdit->GetParam(1);
-					double bScale = curEdit->GetParam(2);
-
-					// Multithread if needed
-					if(processor->GetMultithread()){
-						this->Multithread(curEdit);
-					}
-
-					// Single thread
-					else{
-						// Perform an edit on the data through the processor
-						processor->LABCurves(lCurve16, aCurve16, bCurve16, rScale, gScale, bScale);
-					}
-					processor->SetUpdated(true);
-			
-				}
+				// Perform an edit on the data through the processor
+				processor->SetupRotation(editToComplete, 90.0, 0);
+				processor->Rotate90CW();
+				processor->CleanupRotation(editToComplete);
+				
+				processor->SetUpdated(true);
 			}
 			break;
 
-			// Peform HSL Curves edit
-			case ProcessorEdit::EditType::HSL_CURVES: {
+
+			// Peform a 180 degree clockwise roctation
+			// Peform a 90 degree clockwise roctation
+			case ProcessorEdit::EditType::ROTATE_180: {
+
+				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 			
-				if (curEdit->GetNumIntArrays() == 3 && curEdit->GetParamsSize() == 3) {
-					processor->SendMessageToParent("Processing HSL Curves Edit" + fullEditNumStr);
-
-					// Get LAB curve data
-					int * hCurve16 = curEdit->GetIntArray(0);
-					int * sCurve16 = curEdit->GetIntArray(1);
-					int * lCurve16 = curEdit->GetIntArray(2);
-
-					double rScale = curEdit->GetParam(0);
-					double gScale = curEdit->GetParam(1);
-					double bScale = curEdit->GetParam(2);
-
-					// Multithread if needed
-					if(processor->GetMultithread()){
-						this->Multithread(curEdit);
-					}
-
-					// Single thread
-					else{
-						// Perform an edit on the data through the processor
-						processor->HSLCurves(hCurve16, sCurve16, lCurve16, rScale, gScale, bScale);
-					}
-					processor->SetUpdated(true);
-			
-				}
+				// Perform an edit on the data through the processor
+				processor->SetupRotation(editToComplete, 180.0, 0);
+				processor->Rotate180();
+				processor->CleanupRotation(editToComplete);
+				processor->SetUpdated(true);
 			}
 			break;
 
-			// Peform Crop edit
-			case ProcessorEdit::EditType::CROP: {
-			
-				processor->SendMessageToParent("Processing crop" + fullEditNumStr);
+			// Peform a 270 degree clockwise roctation (90 counter clockwise)
+			case ProcessorEdit::EditType::ROTATE_270_CW: {
+				
+				// Perform an edit on the data through the processor
+				processor->SetupRotation(editToComplete, 270.0, 0);
+				processor->Rotate270CW();
+				processor->CleanupRotation(editToComplete);
+				processor->SetUpdated(true);
+			}
+			break;
 
-				// Get crop dimmensions
-				double startX = curEdit->GetParam(0);
-				double startY = curEdit->GetParam(1);
-				double newWidth = curEdit->GetParam(2);
-				double newHeight = curEdit->GetParam(3);
+			// Peform a custom angle clockwise roctation
+			case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
+
+				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				double angle = curEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+				int cropFlag = curEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+
+				if(angle == 0.0){ break; }
+
+				// Multithread if needed
+				if(processor->GetMultithread()){
+					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupRotation(editToComplete);
+				}
+
+				// Single thread
+				else{
+					// Perform an edit on the data through the processor
+					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					processor->RotateCustom(angle);
+					processor->CleanupRotation(editToComplete);
+				}
+				processor->SetUpdated(true);
+			}
+			break;
+
+			// Peform a custom angle clockwise roctation using bilinear interpolation
+			case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
+
+				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				double angle = curEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+				int cropFlag = curEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+
+				if(angle == 0.0){ break; }
+
+				// Multithread if needed
+				if(processor->GetMultithread()){
+					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupRotation(editToComplete);
+				}
+
+				// Single thread
+				else{
+					// Perform an edit on the data through the processor
+					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					processor->RotateCustomBilinear(angle);
+					processor->CleanupRotation(editToComplete);
+				}
+				processor->SetUpdated(true);
+			}
+			break;
+
+			// Peform a custom angle clockwise roctation using bicubic interpolation
+			case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
+
+				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				double angle = curEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+				int cropFlag = curEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+
+				if(angle == 0.0){ break; }
+
+				// Multithread if needed
+				if(processor->GetMultithread()){
+					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupRotation(editToComplete);
+				}
+
+				// Single thread
+				else{
+					// Perform an edit on the data through the processor
+					if (!processor->SetupRotation(editToComplete, angle, cropFlag)) { break; }
+					processor->RotateCustomBicubic(angle);
+					processor->CleanupRotation(editToComplete);
+				}
+				processor->SetUpdated(true);
+			}
+			break;
 	
+			// Peform a sclaing of the image using nearest neighbor
+			case ProcessorEdit::EditType::SCALE_NEAREST: {
+
+				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				int width = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				int height = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
+				
+				// Fast edit, half size
+				if(processor->GetFastEdit()){
+					width/= 2.0;
+					height /= 2.0;
+				}
+
+				if(width < 0 || height < 0.0){ break; }
+
 				// Multithread if needed
 				if(processor->GetMultithread()){
-					processor->SetupCrop(newWidth, newHeight);
-					this->Multithread(curEdit);
-					processor->CleanupCrop();
+					if (!processor->SetupScale(width, height)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupScale();
 				}
 
 				// Single thread
 				else{
 					// Perform an edit on the data through the processor
-					processor->SetupCrop(newWidth, newHeight);
-					processor->Crop(startX, startY);
-					processor->CleanupCrop();
-				}				
+					if (!processor->SetupScale(width, height)) { break; }
+					processor->ScaleNearest();
+					processor->CleanupScale();
+				}
+				processor->SetUpdated(true);
 			}
 			break;
 
-			// Peform Blur edit
-			case ProcessorEdit::EditType::BLUR: {
-			
-				processor->SendMessageToParent("Processing blur" + fullEditNumStr);
-				
-				double blurSize = curEdit->GetParam(0);
-				int numPasses = (int) curEdit->GetParam(1);
+			// Peform a sclaing of the image using bilinear interpolation
+			case ProcessorEdit::EditType::SCALE_BILINEAR: {
 
-				// No blur, radius too small
-				if(blurSize == 0.0){ break;}
-							
+				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				int width = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				int height = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
+				
+				// Fast edit, half size
+				if(processor->GetFastEdit()){
+					width/= 2.0;
+					height /= 2.0;
+				}
+
+				if(width < 0 || height < 0.0){ break; }
+
 				// Multithread if needed
 				if(processor->GetMultithread()){
-					for(int i = 0; i < numPasses; i++){
-						
-						// Setup temporary edits to break down blur into horizontal and vertical blur edits
-						ProcessorEdit * horizontalBlur = new ProcessorEdit(ProcessorEdit::HORIZONTAL_BLUR);
-						ProcessorEdit * verticalBlur = new ProcessorEdit(ProcessorEdit::VERTICAL_BLUR);
-						horizontalBlur->AddParam(blurSize);
-						verticalBlur->AddParam(blurSize);
-
-						// Blur horiztonally 
-						processor->SetupBlur();
-						this->Multithread(horizontalBlur);
-						processor->CleanupBlur();
-
-						// Blur vertically
-						processor->SetupBlur();
-						this->Multithread(verticalBlur);
-						processor->CleanupBlur();
-				
-						delete horizontalBlur;
-						delete verticalBlur;
-					}
+					if (!processor->SetupScale(width, height)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupScale();
 				}
 
 				// Single thread
 				else{
-
 					// Perform an edit on the data through the processor
-
-					for(int i = 0; i < numPasses; i++){
-
-						// Blur horizontally
-						processor->SetupBlur();
-						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
-						processor->CleanupBlur();
-
-						// Blur vertically
-						processor->SetupBlur();
-						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
-						processor->CleanupBlur();
-					}
-				}				
+					if (!processor->SetupScale(width, height)) { break; }
+					processor->ScaleBilinear();
+					processor->CleanupScale();
+				}
+				processor->SetUpdated(true);
 			}
 			break;
 
-			// Peform Blur edit
-			case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
-			
-				processor->SendMessageToParent("Processing horizontal blur" + fullEditNumStr);
+			// Peform a sclaing of the image using bicubic interpolation
+			case ProcessorEdit::EditType::SCALE_BICUBIC: {
+
+				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
+
+				// Perform an edit on the data through the processor
+				int width = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				int height = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
 				
-				double blurSize = curEdit->GetParam(0);
-				int numPasses = (int) curEdit->GetParam(1);
+				// Fast edit, half size
+				if(processor->GetFastEdit()){
+					width/= 2.0;
+					height /= 2.0;
+				}
 
-				// No blur, radius too small
-				if(blurSize * processor->GetImage()->GetWidth() < 1.0){ break; }
+				if(width < 0 || height < 0.0){ break; }
 
-				if(processor->GetMultithread()){
 				// Multithread if needed
-
-					for(int i = 0; i < numPasses; i++){
-						processor->SetupBlur();
-						this->Multithread(curEdit);
-						processor->CleanupBlur();
-					}
+				if(processor->GetMultithread()){
+					if (!processor->SetupScale(width, height)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupScale();
 				}
 
 				// Single thread
 				else{
-
-					// Blur Horizontally
-					for(int i = 0; i < numPasses; i++){
-						processor->SetupBlur();
-						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
-						processor->CleanupBlur();
-					}
-				}				
-			}
-			break;
-
-			// Peform Blur edit
-			case ProcessorEdit::EditType::VERTICAL_BLUR: {
-			
-				processor->SendMessageToParent("Processing vertical blur" + fullEditNumStr);
-				
-				double blurSize = curEdit->GetParam(0);
-				int numPasses = (int) curEdit->GetParam(1);
-
-				// No blur, radius too small
-				if(blurSize * processor->GetImage()->GetHeight() < 1.0){ break; }
-
-				// Multithread if needed
-				if(processor->GetMultithread()){
-
 					// Perform an edit on the data through the processor
-					for(int i = 0; i < numPasses; i++){
-
-						// Blur image vertically
-						processor->SetupBlur();
-						this->Multithread(curEdit);
-						processor->CleanupBlur();
-					}
+					if (!processor->SetupScale(width, height)) { break; }
+					int dataSize = processor->GetTempImage()->GetWidth() * processor->GetTempImage()->GetHeight();
+					this->Multithread(curEdit, dataSize);
+					processor->CleanupScale();
 				}
-
-				// Single thread
-				else{
-
-					// Perform an edit on the data through the processor
-					for(int i = 0; i < numPasses; i++){
-
-						// Blur rotated image horizontally
-						processor->SetupBlur();
-						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
-						processor->CleanupBlur();
-					}
-
-					processor->SetUpdated(true);
-
-				}				
+				processor->SetUpdated(true);
 			}
 			break;
 		}
@@ -7170,25 +7168,12 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_BRIGHTNESS: {
 
 			// Get all parameters from the edit
-			double brighnessAmount = procEdit->GetParam(0);
-			double detailsPreservation = procEdit->GetParam(1);
-			double toneSetting = procEdit->GetParam(2);
+			double brighnessAmount = procEdit->GetParam(PHOEDIX_PARAMETER_BRIGHTNESS);
+			double detailsPreservation = procEdit->GetParam(PHOEDIX_PARAMETER_PRESERVATION);
+			double toneSetting = procEdit->GetParam(PHOEDIX_PARAMETER_TONE);
 
-			int toneFlag = procEdit->GetFlag(0);
+			int toneFlag = procEdit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE);
 			processor->AdjustBrightness(brighnessAmount, detailsPreservation, toneSetting, toneFlag, start, end);
-		}
-		 break;
-
-		// Peform a Shift RGB edit
-		case ProcessorEdit::EditType::ADJUST_RGB: {
-
-			// Get all parameters from the edit
-			double allBrightShift = procEdit->GetParam(0);
-			double redBrightShift = procEdit->GetParam(1);
-			double greenBrightShift = procEdit->GetParam(2);
-			double blueBrightShift = procEdit->GetParam(3);
-
-			processor->AdjustRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift, start, end);
 		}
 		 break;
 
@@ -7196,12 +7181,12 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_HSL: {
 
 			// Get all parameters from the edit
-			double hueShift = procEdit->GetParam(0);
-			double saturationScale = procEdit->GetParam(1);
-			double luminaceScale = procEdit->GetParam(2);
-			double rScale = procEdit->GetParam(3);
-			double gScale = procEdit->GetParam(4);
-			double bScale = procEdit->GetParam(5);
+			double hueShift = procEdit->GetParam(PHOEDIX_PARAMETER_HUE);
+			double saturationScale = procEdit->GetParam(PHOEDIX_PARAMETER_SATURATION);
+			double luminaceScale = procEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
+			double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+			double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+			double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
 			processor->AdjustHSL(hueShift, saturationScale, luminaceScale, rScale, gScale, bScale, start, end);
 
@@ -7212,16 +7197,63 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_LAB: {
 
 			// Get all parameters from the edit
-			double luminaceScale = procEdit->GetParam(0);
-			double aShift = procEdit->GetParam(1);
-			double bShift = procEdit->GetParam(2);
-
-			double rScale = procEdit->GetParam(3);
-			double gScale = procEdit->GetParam(4);
-			double bScale = procEdit->GetParam(5);
+			double luminaceScale = procEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
+			double aShift = procEdit->GetParam(PHOEDIX_PARAMETER_A);
+			double bShift = procEdit->GetParam(PHOEDIX_PARAMETER_B);
+			double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+			double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+			double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
 			processor->AdjustLAB(luminaceScale, aShift, bShift, rScale, gScale, bScale, start, end);
 
+		}
+		break;
+
+		// Peform a Shift RGB edit
+		case ProcessorEdit::EditType::ADJUST_RGB: {
+
+			// Get all parameters from the edit
+			double allBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_ALL);
+			double redBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_RED);
+			double greenBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
+			double blueBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE);
+
+			processor->AdjustRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift, start, end);
+		}
+		break;
+
+		// Peform Horizontal Blur edit
+		case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
+
+			double blurSize = procEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+			processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize), start, end);
+		}
+		break;
+
+		// Peform Vertical Blur edit
+		case ProcessorEdit::EditType::VERTICAL_BLUR: {
+			double blurSize = procEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+			processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize), start, end);
+		}
+		break;
+
+		// Peform a channel scale
+		case ProcessorEdit::EditType::CHANNEL_MIXER: {
+
+			// Get all parameters from the edit
+			double redRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_RED);
+			double redGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
+			double redBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_BLUE);
+			double greenRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_RED);
+			double greenGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN);
+			double greenBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_BLUE);
+			double blueRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_RED);
+			double blueGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_GREEN);
+			double blueBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_BLUE);
+
+			processor->ChannelScale(redRedScale, redGreenScale, redBlueScale,
+				greenRedScale, greenGreenScale, greenBlueScale,
+				blueRedScale, blueGreenScale, blueBlueScale, start, end);
 		}
 		break;
 
@@ -7229,14 +7261,14 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_CONTRAST: {
 
 			// Get all parameters from the edit
-			double allContrast = procEdit->GetParam(0);
-			double redContrast = procEdit->GetParam(1);
-			double greenContrast = procEdit->GetParam(2);
-			double blueContrast = procEdit->GetParam(3);
-			double allCenter = procEdit->GetParam(4);
-			double redCenter = procEdit->GetParam(5);
-			double greenCenter = procEdit->GetParam(6);
-			double blueCenter = procEdit->GetParam(7);
+			double allContrast = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
+			double redContrast = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
+			double greenContrast = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
+			double blueContrast = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
+			double allCenter = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+			double redCenter = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+			double greenCenter = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+			double blueCenter = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 
 			processor->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast,
@@ -7248,17 +7280,28 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE: {
 
 			// Get all parameters from the edit
-			double allContrast = procEdit->GetParam(0);
-			double redContrast = procEdit->GetParam(1);
-			double greenContrast = procEdit->GetParam(2);
-			double blueContrast = procEdit->GetParam(3);
-			double allCenter = procEdit->GetParam(4);
-			double redCenter = procEdit->GetParam(5);
-			double greenCenter = procEdit->GetParam(6);
-			double blueCenter = procEdit->GetParam(7);
+			double allContrast = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
+			double redContrast = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
+			double greenContrast = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
+			double blueContrast = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
+			double allCenter = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+			double redCenter = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+			double greenCenter = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+			double blueCenter = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 			processor->AdjustContrastCurve(allContrast, redContrast, greenContrast, blueContrast,
 				allCenter, redCenter, greenCenter, blueCenter, start, end);
+		}
+		break;
+
+		// Peform Crop edit
+		case ProcessorEdit::EditType::CROP: {
+
+			// Get crop dimmensions
+			double startX = procEdit->GetParam(PHOEDIX_PARAMETER_STARTX);
+			double startY = procEdit->GetParam(PHOEDIX_PARAMETER_STARTY);
+
+			processor->Crop(startX, startY, start, end);
 		}
 		break;
 
@@ -7280,33 +7323,66 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM: {
 
 			// Get all parameters from the edit
-			double redScale = procEdit->GetParam(0);
-			double greenScale = procEdit->GetParam(1);
-			double blueScale = procEdit->GetParam(2);
+			double redScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+			double greenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
+			double blueScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
 
 			processor->ConvertGreyscale(redScale, greenScale, blueScale, start, end);
 		}
 		break;
 
-		// Peform a greyscale conversion, using custom scalars
-		case ProcessorEdit::EditType::CHANNEL_MIXER: {
+		// Peform HSL Curves edit
+		case ProcessorEdit::EditType::HSL_CURVES: {
 
-			// Get all parameters from the edit
-			double redRedScale = procEdit->GetParam(0);
-			double redGreenScale = procEdit->GetParam(1);
-			double redBlueScale = procEdit->GetParam(2);
-			double greenRedScale = procEdit->GetParam(3);
-			double greenGreenScale = procEdit->GetParam(4);
-			double greenBlueScale = procEdit->GetParam(5);
-			double blueRedScale = procEdit->GetParam(6);
-			double blueGreenScale = procEdit->GetParam(7);
-			double blueBlueScale = procEdit->GetParam(8);
+			if (procEdit->GetNumIntArrays() == 3 && procEdit->GetParamsSize() == 3) {
 
-			processor->ChannelScale(redRedScale, redGreenScale, redBlueScale,
-				greenRedScale, greenGreenScale, greenBlueScale,
-				blueRedScale, blueGreenScale, blueBlueScale, start, end);
+				// Get LAB curve data
+				int * hCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_H_CURVE);
+				int * sCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_S_CURVE);
+				int * lCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
+
+				double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE );
+				double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+
+				processor->HSLCurves(hCurve16, sCurve16, lCurve16, rScale, gScale, bScale, start, end);
+			}
 		}
-		 break;
+		break;
+
+		// Peform LAB Curves edit
+		case ProcessorEdit::EditType::LAB_CURVES: {
+
+			if (procEdit->GetNumIntArrays() == 3 && procEdit->GetParamsSize() == 3) {
+
+				// Get LAB curve data
+				int * lCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
+				int * aCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_A_CURVE);
+				int * bCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
+
+				double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE );
+				double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+
+				processor->LABCurves(lCurve16, aCurve16, bCurve16, rScale, gScale, bScale, start, end);
+			}
+		}
+		break;
+
+		// Peform a horizontal image flip
+		case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
+
+			processor->MirrorHorizontal(start, end);
+		}
+		break;
+
+		// Peform a vertical image flip
+		case ProcessorEdit::EditType::MIRROR_VERTICAL: {
+
+			processor->MirrorVertical(start, end);
+
+		}
+		break;
 
 		// Peform a 90 degree clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_90_CW: {
@@ -7330,7 +7406,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		// Peform a custom angle clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
 
-			double angle = procEdit->GetParam(0);
+			double angle = procEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
 			processor->RotateCustom(angle, start, end);
 		}
 		break;
@@ -7338,7 +7414,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		// Peform a custom angle clockwise roctation using bilinear interpolation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
 
-			double angle = procEdit->GetParam(0);
+			double angle = procEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
 			processor->RotateCustomBilinear(angle, start, end);
 		}
 		break;
@@ -7347,7 +7423,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
 
 			// Perform an edit on the data through the processor
-			double angle = procEdit->GetParam(0);
+			double angle = procEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
 			processor->RotateCustomBicubic(angle, start, end);
 
 		}
@@ -7374,105 +7450,26 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		}
 		break;
 
-		// Peform a horizontal image flip
-		case ProcessorEdit::EditType::MIRROR_HORIZONTAL: {
-
-			processor->MirrorHorizontal(start, end);
-		}
-		break;
-
-		// Peform a vertical image flip
-		case ProcessorEdit::EditType::MIRROR_VERTICAL: {
-
-			processor->MirrorVertical(start, end);
-
-		}
-		break;
-
 		// Peform RGB Curves edit
 		case ProcessorEdit::EditType::RGB_CURVES: {
 
 			if (procEdit->GetNumIntArrays() == 8) {
 
 				// Get 8 bit curve data
-				int * brightCurve8 = procEdit->GetIntArray(0);
-				int * redCurve8 = procEdit->GetIntArray(1);
-				int * greenCurve8 = procEdit->GetIntArray(2);
-				int * blueCurve8 = procEdit->GetIntArray(3);
+				int * brightCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE);
+				int * redCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE);
+				int * greenCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE);
+				int * blueCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
 
 				// Get 16 bit curve data
-				int * brightCurve16 = procEdit->GetIntArray(4);
-				int * redCurve16 = procEdit->GetIntArray(5);
-				int * greenCurve16 = procEdit->GetIntArray(6);
-				int * blueCurve16 = procEdit->GetIntArray(7);
+				int * brightCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE_16);
+				int * redCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE_16);
+				int * greenCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE_16);
+				int * blueCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE_16);
 
 				processor->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
 					brightCurve16, redCurve16, greenCurve16, blueCurve16, start, end);
 			}
-		}
-		break;
-
-		// Peform LAB Curves edit
-		case ProcessorEdit::EditType::LAB_CURVES: {
-
-			if (procEdit->GetNumIntArrays() == 3 && procEdit->GetParamsSize() == 3) {
-
-				// Get LAB curve data
-				int * lCurve16 = procEdit->GetIntArray(0);
-				int * aCurve16 = procEdit->GetIntArray(1);
-				int * bCurve16 = procEdit->GetIntArray(2);
-
-				double rScale = procEdit->GetParam(0);
-				double gScale = procEdit->GetParam(1);
-				double bScale = procEdit->GetParam(2);
-
-				processor->LABCurves(lCurve16, aCurve16, bCurve16, rScale, gScale, bScale, start, end);
-			}
-		}
-		break;
-
-		// Peform HSL Curves edit
-		case ProcessorEdit::EditType::HSL_CURVES: {
-
-			if (procEdit->GetNumIntArrays() == 3 && procEdit->GetParamsSize() == 3) {
-
-				// Get LAB curve data
-				int * hCurve16 = procEdit->GetIntArray(0);
-				int * sCurve16 = procEdit->GetIntArray(1);
-				int * lCurve16 = procEdit->GetIntArray(2);
-
-				double rScale = procEdit->GetParam(0);
-				double gScale = procEdit->GetParam(1);
-				double bScale = procEdit->GetParam(2);
-
-				processor->HSLCurves(hCurve16, sCurve16, lCurve16, rScale, gScale, bScale, start, end);
-			}
-		}
-		break;
-
-		// Peform Crop edit
-		case ProcessorEdit::EditType::CROP: {
-
-			// Get crop dimmensions
-			double startX = procEdit->GetParam(0);
-			double startY = procEdit->GetParam(1);
-
-			processor->Crop(startX, startY, start, end);
-		}
-		break;
-
-		// Peform Horizontal Blur edit
-		case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
-
-			double blurSize = procEdit->GetParam(0);
-			processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize), start, end);
-		}
-		break;
-
-		// Peform Vertical Blur edit
-		case ProcessorEdit::EditType::VERTICAL_BLUR: {
-			double blurSize = procEdit->GetParam(0);
-			processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize), start, end);
 		}
 		break;
 	}

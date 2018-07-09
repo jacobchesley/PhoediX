@@ -75,21 +75,21 @@ void AdjustRGBWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 	if(edit == NULL){ return; }
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
-		allBrightSlider->SetValue(edit->GetParam(0));
-		redBrightSlider->SetValue(edit->GetParam(1));
-		greenBrightSlider->SetValue(edit->GetParam(2));
-		blueBrightSlider->SetValue(edit->GetParam(3));
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_ALL)) { allBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ALL)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED)) { redBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN)) { greenBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE)) { blueBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE)); }
 	}
 }
 
 ProcessorEdit * AdjustRGBWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * AdjustRgbEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_RGB);
-	AdjustRgbEdit->AddParam(allBrightSlider->GetValue());
-	AdjustRgbEdit->AddParam(redBrightSlider->GetValue());
-	AdjustRgbEdit->AddParam(greenBrightSlider->GetValue());
-	AdjustRgbEdit->AddParam(blueBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_ALL, allBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_RED, redBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_GREEN, greenBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_BLUE, blueBrightSlider->GetValue());
 
 	AdjustRgbEdit->SetDisabled(isDisabled);
 
@@ -101,7 +101,7 @@ bool AdjustRGBWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false; }
 
-	if (edit->GetParamsSize() == 4 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
 		return true;
 	}
 	return false;

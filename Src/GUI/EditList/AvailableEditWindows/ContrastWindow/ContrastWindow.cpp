@@ -122,65 +122,47 @@ void ContrastWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	if(edit == NULL){ return;}
 
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 8 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST) {
-		allContrastSlider->SetValue(edit->GetParam(0));
-		redContrastSlider->SetValue(edit->GetParam(1));
-		greenContrastSlider->SetValue(edit->GetParam(2));
-		blueContrastSlider->SetValue(edit->GetParam(3));
-		allContrastCenterSlider->SetValue(edit->GetParam(4));
-		redContrastCenterSlider->SetValue(edit->GetParam(5));
-		greenContrastCenterSlider->SetValue(edit->GetParam(6));
-		blueContrastCenterSlider->SetValue(edit->GetParam(7));
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST) {
 		curveSelection->SetValue(0);
-
 	}
-	if (edit->GetParamsSize() == 8 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE) {
-		allContrastSlider->SetValue(edit->GetParam(0));
-		redContrastSlider->SetValue(edit->GetParam(1));
-		greenContrastSlider->SetValue(edit->GetParam(2));
-		blueContrastSlider->SetValue(edit->GetParam(3));
-		allContrastCenterSlider->SetValue(edit->GetParam(4));
-		redContrastCenterSlider->SetValue(edit->GetParam(5));
-		greenContrastCenterSlider->SetValue(edit->GetParam(6));
-		blueContrastCenterSlider->SetValue(edit->GetParam(7));
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE) {
 		curveSelection->SetValue(1);
 	}
+
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_ALL_CONTRAST)) { allContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_CONTRAST)) { redContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_CONTRAST)) { greenContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_CONTRAST)) { blueContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER)) { allContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER)) { redContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER)) { greenContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER)) { blueContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER)); }
 }
 
 ProcessorEdit * ContrastWindow::GetParamsAndFlags(){
 
+	ProcessorEdit * contrastEdit;
+	
 	if (!curveSelection->GetValue()) {
-		ProcessorEdit * contrastEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_CONTRAST);
-		contrastEdit->AddParam(allContrastSlider->GetValue());
-		contrastEdit->AddParam(redContrastSlider->GetValue());
-		contrastEdit->AddParam(greenContrastSlider->GetValue());
-		contrastEdit->AddParam(blueContrastSlider->GetValue());
-		contrastEdit->AddParam(allContrastCenterSlider->GetValue());
-		contrastEdit->AddParam(redContrastCenterSlider->GetValue());
-		contrastEdit->AddParam(greenContrastCenterSlider->GetValue());
-		contrastEdit->AddParam(blueContrastCenterSlider->GetValue());
-
-		// Set enabled / disabled
-		contrastEdit->SetDisabled(isDisabled);
-
-		return contrastEdit;
+		contrastEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_CONTRAST);
 	}
 	else {
-		ProcessorEdit * contrastEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE);
-		contrastEdit->AddParam(allContrastSlider->GetValue());
-		contrastEdit->AddParam(redContrastSlider->GetValue());
-		contrastEdit->AddParam(greenContrastSlider->GetValue());
-		contrastEdit->AddParam(blueContrastSlider->GetValue());
-		contrastEdit->AddParam(allContrastCenterSlider->GetValue());
-		contrastEdit->AddParam(redContrastCenterSlider->GetValue());
-		contrastEdit->AddParam(greenContrastCenterSlider->GetValue());
-		contrastEdit->AddParam(blueContrastCenterSlider->GetValue());
-
-		// Set enabled / disabled
-		contrastEdit->SetDisabled(isDisabled);
-
-		return contrastEdit;
+		contrastEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE);
 	}
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_ALL_CONTRAST, allContrastSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_RED_CONTRAST, redContrastSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_GREEN_CONTRAST, greenContrastSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_BLUE_CONTRAST, blueContrastSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER, allContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER, redContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER, greenContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER, blueContrastCenterSlider->GetValue());
+
+	// Set enabled / disabled
+	contrastEdit->SetDisabled(isDisabled);
+
+	return contrastEdit;
+	
 }
 
 bool ContrastWindow::CheckCopiedParamsAndFlags(){
@@ -188,11 +170,8 @@ bool ContrastWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false;}
 
-	if (edit->GetParamsSize() == 8 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST){
-		return true;
-	}
-
-	if(edit->GetParamsSize() == 8 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE) {
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST ||
+		edit->GetEditType() == ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE){
 		return true;
 	}
 	return false;

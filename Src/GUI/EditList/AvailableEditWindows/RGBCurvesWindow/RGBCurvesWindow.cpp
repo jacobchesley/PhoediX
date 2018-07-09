@@ -43,87 +43,126 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	wxVector<Point> greenControlPoints;
 	wxVector<Point> blueControlPoints;
 
-	// Must have 4 double arrays (bright, red, green, and blue curves)
-	if(edit->GetNumDoubleArrays() != 4){ return; }
+	double * brightArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_BRIGHT_CURVE);
+	double * rArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_R_CURVE);
+	double * gArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_G_CURVE);
+	double * bArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_B_CURVE);
 
-	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
-	int doubleArrSize = 0;
-	for(int i = 0; i < 4; i++){
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return;
-		}
-	}
+	int brightArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_BRIGHT_CURVE);
+	int rArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_R_CURVE);
+	int gArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_G_CURVE);
+	int bArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_B_CURVE);
 
-	// Verify all point values are between 0 and 1
-	doubleArrSize = 0;
-	for(int i = 0; i < 4; i++){
+	// Bright Array has at least 4 points and is an even number (each point has x and y)
+	if(brightArraySize >= 4 || brightArraySize %2 == 0){
 
-		// Get size of current array and array
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		double * arr = edit->GetDoubleArray(i);
+		bool brightArrayValid = true;
 
 		// Check each element in array to verify it is between 0 and 1
-		for(int j = 0; j < doubleArrSize; j++){
-			if(arr[j] < 0.0 || arr[j] > 1.0){
-				return;
+		for(int i = 0; i < brightArraySize; i++){
+			if(brightArray[i] < 0.0 || brightArray[i] > 1.0){
+				brightArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(brightArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < brightArraySize; i+=2){
+
+				Point brightPoint;
+				brightPoint.x = brightArray[i];
+				brightPoint.y = brightArray[i + 1];
+				brightPoint.id = curID;
+				brightControlPoints.push_back(brightPoint);
+				curID += 1;
 			}
 		}
 	}
 
-	// Set brightness control points
-	double * brightArray = edit->GetDoubleArray(0);
-	int curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(0); i+=2){
+	// R Array has at least 4 points and is an even number (each point has x and y)
+	if(rArraySize >= 4 || rArraySize %2 == 0){
 
-		Point brightPoint;
-		brightPoint.x = brightArray[i];
-		brightPoint.y = brightArray[i + 1];
-		brightPoint.id = curID;
-		brightControlPoints.push_back(brightPoint);
-		curID += 1;
+		bool rArrayValid = true;
+
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < rArraySize; i++){
+			if(rArray[i] < 0.0 || rArray[i] > 1.0){
+				rArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(rArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < rArraySize; i+=2){
+
+				Point rPoint;
+				rPoint.x = rArray[i];
+				rPoint.y = rArray[i + 1];
+				rPoint.id = curID;
+				redControlPoints.push_back(rPoint);
+				curID += 1;
+			}
+		}
 	}
 
-	// Set red control points
-	double * redArray = edit->GetDoubleArray(1);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(1); i+=2){
+	// G Array has at least 4 points and is an even number (each point has x and y)
+	if(gArraySize >= 4 || gArraySize %2 == 0){
 
-		Point redPoint;
-		redPoint.x = redArray[i];
-		redPoint.y = redArray[i + 1];
-		redPoint.id = curID;
-		redControlPoints.push_back(redPoint);
+		bool gArrayValid = true;
 
-		curID += 1;
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < gArraySize; i++){
+			if(gArray[i] < 0.0 || gArray[i] > 1.0){
+				gArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(gArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < gArraySize; i+=2){
+
+				Point gPoint;
+				gPoint.x = gArray[i];
+				gPoint.y = gArray[i + 1];
+				gPoint.id = curID;
+				blueControlPoints.push_back(gPoint);
+				curID += 1;
+			}
+		}
 	}
 
-	// Set green control points
-	double * greenArray = edit->GetDoubleArray(2);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(2); i+=2){
+	// B Array has at least 4 points and is an even number (each point has x and y)
+	if(bArraySize >= 4 || bArraySize %2 == 0){
 
-		Point greenPoint;
-		greenPoint.x = greenArray[i];
-		greenPoint.y = greenArray[i + 1];
-		greenPoint.id = curID;
-		greenControlPoints.push_back(greenPoint);
+		bool bArrayValid = true;
 
-		curID += 1;
-	}
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < bArraySize; i++){
+			if(bArray[i] < 0.0 || bArray[i] > 1.0){
+				bArrayValid = false;
+				break;
+			}
+		}
 
-	// Set blue control points
-	double * blueArray = edit->GetDoubleArray(3);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(3); i+=2){
+		// Push points from array to control point vector
+		if(bArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < bArraySize; i+=2){
 
-		Point bluePoint;
-		bluePoint.x = blueArray[i];
-		bluePoint.y = blueArray[i + 1];
-		bluePoint.id = curID;
-		blueControlPoints.push_back(bluePoint);
-
-		curID += 1;
+				Point bPoint;
+				bPoint.x = bArray[i];
+				bPoint.y = bArray[i + 1];
+				bPoint.id = curID;
+				blueControlPoints.push_back(bPoint);
+				curID += 1;
+			}
+		}
 	}
 
 	// Set curves
@@ -220,23 +259,23 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		wait.Wait();
 
 		// Add 8 bit map
-		rgbCurveEdit->AddIntArray(brightCurve8, numSteps8);
-		rgbCurveEdit->AddIntArray(redCurve8, numSteps8);
-		rgbCurveEdit->AddIntArray(greenCurve8, numSteps8);
-		rgbCurveEdit->AddIntArray(blueCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE, brightCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_R_CURVE, redCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_G_CURVE, greenCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_B_CURVE, blueCurve8, numSteps8);
 
 		// Add 16 bit map
-		rgbCurveEdit->AddIntArray(brightCurve16, numSteps16);
-		rgbCurveEdit->AddIntArray(redCurve16, numSteps16);
-		rgbCurveEdit->AddIntArray(greenCurve16, numSteps16);
-		rgbCurveEdit->AddIntArray(blueCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE_16, brightCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_R_CURVE_16, redCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_G_CURVE_16, greenCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_B_CURVE_16, blueCurve16, numSteps16);
 	}
 
 	// Add control points double arrays to edit
-	rgbCurveEdit->AddDoubleArray(brightPoints, brightControlPoints.size() * 2);
-	rgbCurveEdit->AddDoubleArray(redPoints, redControlPoints.size() * 2);
-	rgbCurveEdit->AddDoubleArray(greenPoints, greenControlPoints.size() * 2);
-	rgbCurveEdit->AddDoubleArray(bluePoints, blueControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_BRIGHT_CURVE, brightPoints, brightControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_R_CURVE, redPoints, redControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_G_CURVE, greenPoints, greenControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_B_CURVE, bluePoints, blueControlPoints.size() * 2);
 
 	// Set enabled / disabled
 	rgbCurveEdit->SetDisabled(isDisabled);
@@ -250,20 +289,6 @@ bool RGBCurvesWindow::CheckCopiedParamsAndFlags(){
 	if(edit == NULL){ return false; }
 
 	if(edit->GetEditType() != ProcessorEdit::EditType::RGB_CURVES){ return false; }
-
-	// Need 4 double arrars (W, R, G and B)
-	if(edit->GetNumDoubleArrays() != 4){
-		return false;
-	}
-
-	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
-	int doubleArrSize = 0;
-	for(int i = 0; i < 4; i++){
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return false;
-		}
-	}
 
 	return true;
 }

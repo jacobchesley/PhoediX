@@ -96,25 +96,25 @@ void AdjustLABWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Populate sliders based on edit loaded
 	if(edit == NULL){ return;}
 
-	if (edit->GetParamsSize() == 6 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_LAB) {
-		lSlider->SetValue(edit->GetParam(0));
-		aSlider->SetValue(edit->GetParam(1));
-		bSlider->SetValue(edit->GetParam(2));
-		rScaleSlider->SetValue(edit->GetParam(3));
-		bScaleSlider->SetValue(edit->GetParam(4));
-		gScaleSlider->SetValue(edit->GetParam(5));
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_LAB) {
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_LUMINACE)) { lSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_LUMINACE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_A)) { aSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_A)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_B)) { bSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_B)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
 	}
 }
 
 ProcessorEdit * AdjustLABWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * LABEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_LAB);
-	LABEdit->AddParam(lSlider->GetValue());
-	LABEdit->AddParam(aSlider->GetValue());
-	LABEdit->AddParam(bSlider->GetValue());
-	LABEdit->AddParam(rScaleSlider->GetValue());
-	LABEdit->AddParam(gScaleSlider->GetValue());
-	LABEdit->AddParam(bScaleSlider->GetValue());
+	LABEdit->AddParam(PHOEDIX_PARAMETER_LUMINACE, lSlider->GetValue());
+	LABEdit->AddParam(PHOEDIX_PARAMETER_A, aSlider->GetValue());
+	LABEdit->AddParam(PHOEDIX_PARAMETER_B, bSlider->GetValue());
+	LABEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	LABEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	LABEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	LABEdit->SetDisabled(isDisabled);

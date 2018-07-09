@@ -56,50 +56,36 @@ void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	if(edit == NULL){ return; }
 
 	// Choose method based on edit loaded
-	if (edit->GetFlagsSize() == 1 && 
-		(edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
+	if (edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
 		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_VERTICAL ||
-		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE)) {
+		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE) {
 
-		mirrorMethod->SetSelection(edit->GetFlag(0));
+		if (edit->CheckForFlag(PHOEDIX_PARAMETER_MIRROR_SELECT)) { mirrorMethod->SetSelection(edit->GetFlag(PHOEDIX_PARAMETER_MIRROR_SELECT)); }
 	}
 }
 
 ProcessorEdit * MirrorWindow::GetParamsAndFlags(){
 
+	ProcessorEdit * mirrorEdit;
 	int mirrorSelection = mirrorMethod->GetSelection();
 
-	if (mirrorSelection == 0) {
-		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_NONE);
-		mirrorEdit->AddFlag(mirrorSelection);
-
-		// Set enabled / disabled
-		mirrorEdit->SetDisabled(isDisabled);
-
-		return mirrorEdit;
+	if (mirrorSelection == 2) {
+		mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_VERTICAL);
 	}
-
 	else if (mirrorSelection == 1) {
-		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_HORIZONTAL);
-		mirrorEdit->AddFlag(mirrorSelection);
-
-		// Set enabled / disabled
-		mirrorEdit->SetDisabled(isDisabled);
-
-		return mirrorEdit;
+		mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_HORIZONTAL);
 	}
 
-	else if (mirrorSelection == 2) {
-		ProcessorEdit * mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_VERTICAL);
-		mirrorEdit->AddFlag(mirrorSelection);
-
-		// Set enabled / disabled
-		mirrorEdit->SetDisabled(isDisabled);
-
-		return mirrorEdit;
+	else{
+		mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_NONE);
 	}
 
-	return NULL;
+	mirrorEdit->AddFlag(PHOEDIX_PARAMETER_MIRROR_SELECT, mirrorSelection);
+
+	// Set enabled / disabled
+	mirrorEdit->SetDisabled(isDisabled);
+
+	return mirrorEdit;
 }
 
 bool MirrorWindow::CheckCopiedParamsAndFlags(){
@@ -107,10 +93,9 @@ bool MirrorWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false; }
 
-	if (edit->GetFlagsSize() == 1 && 
-		(edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
+	if (edit->GetEditType() == ProcessorEdit::EditType::MIRROR_HORIZONTAL ||
 		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_VERTICAL ||
-		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE)) {
+		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE) {
 		return true;
 		
 	}

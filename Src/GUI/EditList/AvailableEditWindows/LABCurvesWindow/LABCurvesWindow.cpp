@@ -79,82 +79,106 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	wxVector<Point> aControlPoints;
 	wxVector<Point> bControlPoints;
 
-	// Must have 3 double arrays (l, a, and b curves)
-	if(edit->GetNumDoubleArrays() != 3){ return; }
+	double * lArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_L_CURVE);
+	double * aArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_A_CURVE);
+	double * bArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_B_CURVE);
 
-	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
-	int doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return;
-		}
-	}
+	int lArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_L_CURVE);
+	int aArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_A_CURVE);
+	int bArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_B_CURVE);
 
-	// Verify all point values are between 0 and 1
-	doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
+	// L Array has at least 4 points and is an even number (each point has x and y)
+	if(lArraySize >= 4 || lArraySize %2 == 0){
 
-		// Get size of current array and array
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		double * arr = edit->GetDoubleArray(i);
+		bool hArrayValid = true;
 
 		// Check each element in array to verify it is between 0 and 1
-		for(int j = 0; j < doubleArrSize; j++){
-			if(arr[j] < 0.0 || arr[j] > 1.0){
-				return;
+		for(int i = 0; i < lArraySize; i++){
+			if(lArray[i] < 0.0 || lArray[i] > 1.0){
+				hArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(hArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < lArraySize; i+=2){
+
+				Point lPoint;
+				lPoint.x = lArray[i];
+				lPoint.y = lArray[i + 1];
+				lPoint.id = curID;
+				lControlPoints.push_back(lPoint);
+				curID += 1;
 			}
 		}
 	}
 
-	// Set l control points
-	double * lArray = edit->GetDoubleArray(0);
-	int curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(0); i+=2){
+	// A Array has at least 4 points and is an even number (each point has x and y)
+	if(aArraySize >= 4 || aArraySize %2 == 0){
 
-		Point lPoint;
-		lPoint.x = lArray[i];
-		lPoint.y = lArray[i + 1];
-		lPoint.id = curID;
-		lControlPoints.push_back(lPoint);
-		curID += 1;
+		bool aArrayValid = true;
+
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < aArraySize; i++){
+			if(aArray[i] < 0.0 || aArray[i] > 1.0){
+				aArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(aArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < aArraySize; i+=2){
+
+				Point aPoint;
+				aPoint.x = aArray[i];
+				aPoint.y = aArray[i + 1];
+				aPoint.id = curID;
+				aControlPoints.push_back(aPoint);
+				curID += 1;
+			}
+		}
 	}
 
-	// Set a control points
-	double * aArray = edit->GetDoubleArray(1);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(1); i+=2){
+	// B Array has at least 4 points and is an even number (each point has x and y)
+	if(bArraySize >= 4 || bArraySize %2 == 0){
 
-		Point aPoint;
-		aPoint.x = aArray[i];
-		aPoint.y = aArray[i + 1];
-		aPoint.id = curID;
-		aControlPoints.push_back(aPoint);
+		bool bArrayValid = true;
 
-		curID += 1;
-	}
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < bArraySize; i++){
+			if(bArray[i] < 0.0 || bArray[i] > 1.0){
+				bArrayValid = false;
+				break;
+			}
+		}
 
-	// Set b control points
-	double * bArray = edit->GetDoubleArray(2);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(2); i+=2){
+		// Push points from array to control point vector
+		if(bArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < bArraySize; i+=2){
 
-		Point bPoint;
-		bPoint.x = bArray[i];
-		bPoint.y = bArray[i + 1];
-		bPoint.id = curID;
-		bControlPoints.push_back(bPoint);
-
-		curID += 1;
+				Point bPoint;
+				bPoint.x = bArray[i];
+				bPoint.y = bArray[i + 1];
+				bPoint.id = curID;
+				bControlPoints.push_back(bPoint);
+				curID += 1;
+			}
+		}
 	}
 
 	// Set curves
 	lCurve->SetControlPoints(lControlPoints);
 	aCurve->SetControlPoints(aControlPoints);
 	bCurve->SetControlPoints(bControlPoints);
-	rScaleSlider->SetValue(edit->GetParam(0));
-	bScaleSlider->SetValue(edit->GetParam(1));
-	gScaleSlider->SetValue(edit->GetParam(2));
+
+	if(edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
+	if(edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
+	if(edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
 }
 
 ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
@@ -214,18 +238,18 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 
 		wait.Wait();
 
-		labCurveEdit->AddIntArray(lCurve16, numSteps16);
-		labCurveEdit->AddIntArray(aCurve16, numSteps16);
-		labCurveEdit->AddIntArray(bCurve16, numSteps16);
+		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
+		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_A_CURVE, aCurve16, numSteps16);
+		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_B_CURVE, bCurve16, numSteps16);
 	}
 
 	// Add control points double arrays to edit
-	labCurveEdit->AddDoubleArray(lPoints, lControlPoints.size() * 2);
-	labCurveEdit->AddDoubleArray(aPoints, aControlPoints.size() * 2);
-	labCurveEdit->AddDoubleArray(bPoints, bControlPoints.size() * 2);
-	labCurveEdit->AddParam(rScaleSlider->GetValue());
-	labCurveEdit->AddParam(gScaleSlider->GetValue());
-	labCurveEdit->AddParam(bScaleSlider->GetValue());
+	labCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_L_CURVE, lPoints, lControlPoints.size() * 2);
+	labCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_A_CURVE,aPoints, aControlPoints.size() * 2);
+	labCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_B_CURVE,bPoints, bControlPoints.size() * 2);
+	labCurveEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	labCurveEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	labCurveEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	labCurveEdit->SetDisabled(isDisabled);
@@ -239,20 +263,6 @@ bool LABCurvesWindow::CheckCopiedParamsAndFlags(){
 	if(edit == NULL){ return false; }
 
 	if(edit->GetEditType() != ProcessorEdit::EditType::LAB_CURVES){ return false; }
-
-	// Need 3 double arrars (L, A and B)
-	if(edit->GetNumDoubleArrays() != 3 && edit->GetParamsSize() != 3){
-		return false;
-	}
-
-	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
-	int doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return false;
-		}
-	}
 
 	return true;
 }

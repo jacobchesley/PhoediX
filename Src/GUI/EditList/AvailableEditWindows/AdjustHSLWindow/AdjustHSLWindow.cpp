@@ -95,25 +95,26 @@ void AdjustHSLWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Populate sliders based on edit loaded
 	if(edit == NULL){ return;}
 
-	if (edit->GetParamsSize() == 6 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
-		hueShiftSlider->SetValue(edit->GetParam(0));
-		saturationScaleSlider->SetValue(edit->GetParam(1));
-		luminaceScaleSlider->SetValue(edit->GetParam(2));
-		rScaleSlider->SetValue(edit->GetParam(3));
-		bScaleSlider->SetValue(edit->GetParam(4));
-		gScaleSlider->SetValue(edit->GetParam(5));
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
+
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_HUE)) { hueShiftSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_HUE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_SATURATION)) { saturationScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_SATURATION)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_LUMINACE)) { luminaceScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_LUMINACE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
 	}
 }
 
 ProcessorEdit * AdjustHSLWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * hslEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_HSL);
-	hslEdit->AddParam(hueShiftSlider->GetValue());
-	hslEdit->AddParam(saturationScaleSlider->GetValue());
-	hslEdit->AddParam(luminaceScaleSlider->GetValue());
-	hslEdit->AddParam(rScaleSlider->GetValue());
-	hslEdit->AddParam(gScaleSlider->GetValue());
-	hslEdit->AddParam(bScaleSlider->GetValue());
+	hslEdit->AddParam(PHOEDIX_PARAMETER_HUE, hueShiftSlider->GetValue());
+	hslEdit->AddParam(PHOEDIX_PARAMETER_SATURATION, saturationScaleSlider->GetValue());
+	hslEdit->AddParam(PHOEDIX_PARAMETER_LUMINACE, luminaceScaleSlider->GetValue());
+	hslEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	hslEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	hslEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	hslEdit->SetDisabled(isDisabled);
@@ -126,7 +127,7 @@ bool AdjustHSLWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false;}
 
-	if (edit->GetParamsSize() == 3 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
 		return true;
 	}
 	return false;

@@ -79,14 +79,17 @@ void AdjustBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	if(edit == NULL){ return;}
 
 	// Populate sliders based on edit loaded
-	if (edit->GetParamsSize() == 3 && edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_BRIGHTNESS) {
-		brightSlider->SetValue(edit->GetParam(0));
-		preservationSlider->SetValue(edit->GetParam(1));
-		toneSlider->SetValue(edit->GetParam(2));
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_BRIGHTNESS) {
 
-		if(edit->GetFlag(0) == Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS){ detailsSelect->SetSelection(0); }
-		else if(edit->GetFlag(0) == Processor::BrightnessPreservation::SHADOWS){ detailsSelect->SetSelection(1); }
-		else{ detailsSelect->SetSelection(2); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BRIGHTNESS)) { brightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BRIGHTNESS)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_PRESERVATION)) { preservationSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_PRESERVATION)); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_TONE)) { toneSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_TONE)); }
+
+		if (edit->CheckForFlag(PHOEDIX_FLAG_PRESERVATION_TYPE)) {
+			if (edit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS) { detailsSelect->SetSelection(0); }
+			else if (edit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::SHADOWS) { detailsSelect->SetSelection(1); }
+			else if (edit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::HIGHLIGHTS) { detailsSelect->SetSelection(2); }
+		}
 	}
 }
 
@@ -94,14 +97,14 @@ ProcessorEdit * AdjustBrightnessWindow::GetParamsAndFlags(){
 
 	// Add params
 	ProcessorEdit * brightEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_BRIGHTNESS);
-	brightEdit->AddParam(brightSlider->GetValue());
-	brightEdit->AddParam(preservationSlider->GetValue());
-	brightEdit->AddParam(toneSlider->GetValue());
+	brightEdit->AddParam(PHOEDIX_PARAMETER_BRIGHTNESS, brightSlider->GetValue());
+	brightEdit->AddParam(PHOEDIX_PARAMETER_PRESERVATION, preservationSlider->GetValue());
+	brightEdit->AddParam(PHOEDIX_PARAMETER_TONE, toneSlider->GetValue());
 	
 	// Add Flag
-	if(detailsSelect->GetSelection() == 0){ brightEdit->AddFlag(Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS); }
-	else if(detailsSelect->GetSelection() == 1){ brightEdit->AddFlag(Processor::BrightnessPreservation::SHADOWS); }
-	else{ brightEdit->AddFlag(Processor::BrightnessPreservation::HIGHLIGHTS); }
+	if(detailsSelect->GetSelection() == 0){ brightEdit->AddFlag(PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS); }
+	else if(detailsSelect->GetSelection() == 1){ brightEdit->AddFlag(PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::SHADOWS); }
+	else{ brightEdit->AddFlag(PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::HIGHLIGHTS); }
 
 	// Set enabled / disabled
 	brightEdit->SetDisabled(isDisabled);
@@ -114,7 +117,7 @@ bool AdjustBrightnessWindow::CheckCopiedParamsAndFlags(){
 	ProcessorEdit * edit = proc->GetEditForCopyPaste();
 	if(edit == NULL){ return false;}
 
-	if (edit->GetParamsSize() == 3 && edit->GetFlagsSize() == 1 && edit->GetEditType() == ProcessorEdit::EditType::ADJUST_BRIGHTNESS) {
+	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_BRIGHTNESS) {
 		return true;
 	}
 	return false;

@@ -113,34 +113,32 @@ void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 	this->SetUpdated(true);
 }
 
-
 void RotationWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 	// Choose method based on edit loaded
-	if (edit->GetFlagsSize() == 1 && (
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE ||
+	if (edit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE ||
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_90_CW ||
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_180 ||
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW)) {
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW) {
 
-		rotationMethod->SetSelection(edit->GetFlag(0));
+		if(edit->CheckForFlag(PHOEDIX_FLAG_ROTATE_TYPE)) { rotationMethod->SetSelection(edit->GetFlag(PHOEDIX_FLAG_ROTATE_TYPE)); }
 	}
 
 	// Populate sliders based on edit loaded
-	if (edit->GetFlagsSize() == 3 && edit->GetParamsSize() == 1 && (
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST ||
+	if (edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST ||
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC)){
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC){
 
-		rotationMethod->SetSelection(edit->GetFlag(0));
-		customRotationInterpolation->SetSelection(edit->GetFlag(1));
+		if(edit->CheckForFlag(PHOEDIX_FLAG_ROTATE_TYPE)) { rotationMethod->SetSelection(edit->GetFlag(PHOEDIX_FLAG_ROTATE_TYPE)); }
+		if(edit->CheckForFlag(PHOEDIX_FLAG_INTERPOLATION)) { customRotationInterpolation->SetSelection(edit->GetFlag(PHOEDIX_FLAG_INTERPOLATION)); }
+		int cropMethod = Processor::RotationCropping::KEEP_SIZE;
+		if(edit->CheckForFlag(PHOEDIX_FLAG_ROTATE_CROP)) { cropMethod = edit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP); }
 
-		int cropMethod = edit->GetFlag(2);
 		if (cropMethod == Processor::RotationCropping::KEEP_SIZE) { customRotationCrop->SetSelection(0); }
 		if (cropMethod == Processor::RotationCropping::FIT) { customRotationCrop->SetSelection(1); }
 		if (cropMethod == Processor::RotationCropping::EXPAND) { customRotationCrop->SetSelection(2); }
 
-		customRotationSlider->SetValue(edit->GetParam(0));
+		if(edit->CheckForParameter(PHOEDIX_PARAMETER_ROTATE_ANGLE)) { customRotationSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE)); }
 	}
 }
 
@@ -151,7 +149,7 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 	if (rotationSelection == 0) {
 	
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_NONE);
-		rotateEdit->AddFlag(rotationSelection);
+		rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
 
 		// Set enabled / disabled
 		rotateEdit->SetDisabled(isDisabled);
@@ -161,7 +159,8 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 
 	else if (rotationSelection == 1) {
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_90_CW);
-		rotateEdit->AddFlag(rotationSelection);
+
+		rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
 
 		// Set enabled / disabled
 		rotateEdit->SetDisabled(isDisabled);
@@ -171,7 +170,8 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 
 	else if (rotationSelection == 2) {
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_180);
-		rotateEdit->AddFlag(rotationSelection);
+
+		rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
 
 		// Set enabled / disabled
 		rotateEdit->SetDisabled(isDisabled);
@@ -181,7 +181,8 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 
 	else if (rotationSelection == 3) {
 		ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_270_CW);
-		rotateEdit->AddFlag(rotationSelection);
+
+		rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
 
 		// Set enabled / disabled
 		rotateEdit->SetDisabled(isDisabled);
@@ -201,10 +202,10 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 		}
 		if (customRotationInterpolation->GetSelection() == 0) {
 			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST);
-			rotateEdit->AddParam(customRotationSlider->GetValue());
-			rotateEdit->AddFlag(rotationSelection);
-			rotateEdit->AddFlag(0);
-			rotateEdit->AddFlag(crop);
+			rotateEdit->AddParam(PHOEDIX_PARAMETER_ROTATE_ANGLE, customRotationSlider->GetValue());
+			rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
+			rotateEdit->AddFlag(PHOEDIX_FLAG_INTERPOLATION, 0);
+			rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_CROP, crop);
 
 			// Set enabled / disabled
 			rotateEdit->SetDisabled(isDisabled);
@@ -213,10 +214,10 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 		}
 		else if (customRotationInterpolation->GetSelection() == 1) {
 			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR);
-			rotateEdit->AddParam(customRotationSlider->GetValue());
-			rotateEdit->AddFlag(rotationSelection);
-			rotateEdit->AddFlag(1);
-			rotateEdit->AddFlag(crop);
+			rotateEdit->AddParam(PHOEDIX_PARAMETER_ROTATE_ANGLE, customRotationSlider->GetValue());
+			rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
+			rotateEdit->AddFlag(PHOEDIX_FLAG_INTERPOLATION, 1);
+			rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_CROP, crop);
 
 			// Set enabled / disabled
 			rotateEdit->SetDisabled(isDisabled);
@@ -225,10 +226,10 @@ ProcessorEdit * RotationWindow::GetParamsAndFlags(){
 		}
 		else if (customRotationInterpolation->GetSelection() == 2) {
 			ProcessorEdit * rotateEdit = new ProcessorEdit(ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC);
-			rotateEdit->AddParam(customRotationSlider->GetValue());
-			rotateEdit->AddFlag(rotationSelection);
-			rotateEdit->AddFlag(2);
-			rotateEdit->AddFlag(crop);
+			rotateEdit->AddParam(PHOEDIX_PARAMETER_ROTATE_ANGLE, customRotationSlider->GetValue());
+			rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_TYPE, rotationSelection);
+			rotateEdit->AddFlag(PHOEDIX_FLAG_INTERPOLATION, 2);
+			rotateEdit->AddFlag(PHOEDIX_FLAG_ROTATE_CROP, crop);
 
 			// Set enabled / disabled
 			rotateEdit->SetDisabled(isDisabled);
@@ -245,20 +246,13 @@ bool RotationWindow::CheckCopiedParamsAndFlags(){
 	if(edit == NULL){ return false; }
 
 	// Choose method based on edit loaded
-	if (edit->GetFlagsSize() == 1 && (
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE ||
+	if (edit->GetEditType() == ProcessorEdit::EditType::ROTATE_NONE ||
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_90_CW ||
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_180 ||
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW)) {
-
-		return true;
-	}
-
-	// Populate sliders based on edit loaded
-	if (edit->GetFlagsSize() == 3 && edit->GetParamsSize() == 1 && (
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_270_CW|| 
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST ||
 		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
-		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC)){
+		edit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC) {
 
 		return true;
 	}

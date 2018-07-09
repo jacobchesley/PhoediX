@@ -81,82 +81,106 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	wxVector<Point> sControlPoints;
 	wxVector<Point> lControlPoints;
 
-	// Must have 3 double arrays (h, s, and l curves)
-	if(edit->GetNumDoubleArrays() != 3){ return; }
+	double * hArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_H_CURVE);
+	double * sArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_S_CURVE);
+	double * lArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_L_CURVE);
 
-	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
-	int doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return;
-		}
-	}
+	int hArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_H_CURVE);
+	int sArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_S_CURVE);
+	int lArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_L_CURVE);
 
-	// Verify all point values are between 0 and 1
-	doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
+	// H Array has at least 4 points and is an even number (each point has x and y)
+	if(hArraySize >= 4 || hArraySize %2 == 0){
 
-		// Get size of current array and array
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		double * arr = edit->GetDoubleArray(i);
+		bool hArrayValid = true;
 
 		// Check each element in array to verify it is between 0 and 1
-		for(int j = 0; j < doubleArrSize; j++){
-			if(arr[j] < 0.0 || arr[j] > 1.0){
-				return;
+		for(int i = 0; i < hArraySize; i++){
+			if(hArray[i] < 0.0 || hArray[i] > 1.0){
+				hArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(hArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < hArraySize; i+=2){
+
+				Point hPoint;
+				hPoint.x = hArray[i];
+				hPoint.y = hArray[i + 1];
+				hPoint.id = curID;
+				hControlPoints.push_back(hPoint);
+				curID += 1;
 			}
 		}
 	}
 
-	// Set h control points
-	double * lArray = edit->GetDoubleArray(0);
-	int curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(0); i+=2){
+	// S Array has at least 4 points and is an even number (each point has x and y)
+	if(sArraySize >= 4 || sArraySize %2 == 0){
 
-		Point hPoint;
-		hPoint.x = lArray[i];
-		hPoint.y = lArray[i + 1];
-		hPoint.id = curID;
-		hControlPoints.push_back(hPoint);
-		curID += 1;
+		bool sArrayValid = true;
+
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < sArraySize; i++){
+			if(sArray[i] < 0.0 || sArray[i] > 1.0){
+				sArrayValid = false;
+				break;
+			}
+		}
+
+		// Push points from array to control point vector
+		if(sArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < sArraySize; i+=2){
+
+				Point sPoint;
+				sPoint.x = sArray[i];
+				sPoint.y = sArray[i + 1];
+				sPoint.id = curID;
+				sControlPoints.push_back(sPoint);
+				curID += 1;
+			}
+		}
 	}
 
-	// Set s control points
-	double * aArray = edit->GetDoubleArray(1);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(1); i+=2){
+	// L Array has at least 4 points and is an even number (each point has x and y)
+	if(sArraySize >= 4 || sArraySize %2 == 0){
 
-		Point sPoint;
-		sPoint.x = aArray[i];
-		sPoint.y = aArray[i + 1];
-		sPoint.id = curID;
-		sControlPoints.push_back(sPoint);
+		bool lArrayValid = true;
 
-		curID += 1;
-	}
+		// Check each element in array to verify it is between 0 and 1
+		for(int i = 0; i < lArraySize; i++){
+			if(lArray[i] < 0.0 || lArray[i] > 1.0){
+				lArrayValid = false;
+				break;
+			}
+		}
 
-	// Set l control points
-	double * bArray = edit->GetDoubleArray(2);
-	curID = 0;
-	for(size_t i = 0; i < edit->GetDoubleArraySize(2); i+=2){
+		// Push points from array to control point vector
+		if(lArrayValid){
+			int curID = 0;
+			for(size_t i = 0; i < lArraySize; i+=2){
 
-		Point lPoint;
-		lPoint.x = bArray[i];
-		lPoint.y = bArray[i + 1];
-		lPoint.id = curID;
-		lControlPoints.push_back(lPoint);
-
-		curID += 1;
+				Point lPoint;
+				lPoint.x = lArray[i];
+				lPoint.y = lArray[i + 1];
+				lPoint.id = curID;
+				lControlPoints.push_back(lPoint);
+				curID += 1;
+			}
+		}
 	}
 
 	// Set curves
 	hCurve->SetControlPoints(hControlPoints);
 	sCurve->SetControlPoints(sControlPoints);
 	lCurve->SetControlPoints(lControlPoints);
-	rScaleSlider->SetValue(edit->GetParam(0));
-	bScaleSlider->SetValue(edit->GetParam(1));
-	gScaleSlider->SetValue(edit->GetParam(2));
+
+	if(edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
+	if(edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
+	if(edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
 }
 
 ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
@@ -197,8 +221,7 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 	idx = 0;
 	
 	ProcessorEdit * HSLCurveEdit = new ProcessorEdit(ProcessorEdit::EditType::HSL_CURVES);
-
-	
+		
 	if (!isDisabled) {
 
 		int numCurves = 3;
@@ -217,19 +240,19 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 
 		wait.Wait();
 
-		HSLCurveEdit->AddIntArray(hCurve16, numSteps16);
-		HSLCurveEdit->AddIntArray(sCurve16, numSteps16);
-		HSLCurveEdit->AddIntArray(lCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_H_CURVE, hCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_S_CURVE, sCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
 		
 	}
 
 	// Add control points double arrays to edit
-	HSLCurveEdit->AddDoubleArray(hPoints, hControlPoints.size() * 2);
-	HSLCurveEdit->AddDoubleArray(sPoints, sControlPoints.size() * 2);
-	HSLCurveEdit->AddDoubleArray(lPoints, lControlPoints.size() * 2);
-	HSLCurveEdit->AddParam(rScaleSlider->GetValue());
-	HSLCurveEdit->AddParam(gScaleSlider->GetValue());
-	HSLCurveEdit->AddParam(bScaleSlider->GetValue());
+	HSLCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_H_CURVE, hPoints, hControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_S_CURVE, sPoints, sControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_L_CURVE, lPoints, lControlPoints.size() * 2);
+	HSLCurveEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	HSLCurveEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	HSLCurveEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	HSLCurveEdit->SetDisabled(isDisabled);
@@ -243,20 +266,6 @@ bool HSLCurvesWindow::CheckCopiedParamsAndFlags(){
 	if(edit == NULL){ return false; }
 
 	if(edit->GetEditType() != ProcessorEdit::EditType::HSL_CURVES){ return false; }
-
-	// Need 3 double arrars (H, S and L)
-	if(edit->GetNumDoubleArrays() != 3 && edit->GetParamsSize() != 3){
-		return false;
-	}
-
-	// Verify that the array size of each array is at least 4 (2 points) and even (each point has x and y)
-	int doubleArrSize = 0;
-	for(int i = 0; i < 3; i++){
-		doubleArrSize = edit->GetDoubleArraySize(i);
-		if(doubleArrSize < 4 || doubleArrSize %2 != 0){
-			return false;
-		}
-	}
 
 	return true;
 }

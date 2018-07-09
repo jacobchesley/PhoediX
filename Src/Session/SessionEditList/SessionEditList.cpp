@@ -94,43 +94,25 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 
 				if(editNodeChildren->GetChildren() != NULL){
 					wxXmlNode * editNodeParameters = editNodeChildren->GetChildren();
-
-					// Count number of parameters
-					size_t numParams = 0;
-					wxVector<double> params;
-					while (editNodeParameters) {
-						numParams += 1;
-						editNodeParameters = editNodeParameters->GetNext();
-					}
-
-					// Resize the parameters vector to account for all parameters
-					params.resize(numParams);
-
-					// Get all parameters and place in correct order
+		
+					// Get all parameters
 					editNodeParameters = editNodeChildren->GetChildren();
-					wxString editParamNumStr;
-					size_t paramIdx = 0;
+					wxString paramName;
 					double param;
+
 					while (editNodeParameters) {
 
-						// Get param number
-						editParamNumStr = editNodeParameters->GetName();
-						editParamNumStr = editParamNumStr.SubString(5, editParamNumStr.length());
-						paramIdx = wxAtoi(editParamNumStr);
-
+						// Get param name
+						paramName = editNodeParameters->GetName();
+						
 						// Get param value
 						param = wxAtof(editNodeParameters->GetChildren()[0].GetContent());
 
-						// Add to param vector
-						params[paramIdx] = param;
+						//Add parameter to new edit
+						newEdit->AddParam(paramName, param);
 
 						// Get next parameter
 						editNodeParameters = editNodeParameters->GetNext();
-					}
-
-					// Add parameters to new edit
-					for (size_t i = 0; i < numParams; i++) {
-						newEdit->AddParam(params.at(i));
 					}
 				}
 			}
@@ -141,42 +123,24 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 				if(editNodeChildren->GetChildren() != NULL){
 					wxXmlNode * editNodeFlags = editNodeChildren->GetChildren();
 
-					// Count number of flags
-					size_t numFlags = 0;
-					wxVector<double> flags;
-					while (editNodeFlags) {
-						numFlags += 1;
-						editNodeFlags = editNodeFlags->GetNext();
-					}
-
-					// Resize the flags vector to account for all parameters
-					flags.resize(numFlags);
-
-					// Get all flags and place in correct order
+					// Get all flags
 					editNodeFlags = editNodeChildren->GetChildren();
-					wxString editFlagNumStr;
-					size_t flagIdx = 0;
+					wxString flagName;
 					int flag;
+
 					while (editNodeFlags) {
 
-						// Get flag number
-						editFlagNumStr = editNodeFlags->GetName();
-						editFlagNumStr = editFlagNumStr.SubString(4, editFlagNumStr.length());
-						flagIdx = wxAtoi(editFlagNumStr);
-
-						// Get param value
+						// Get flag name
+						flagName = editNodeFlags->GetName();
+	
+						// Get flag value
 						flag = wxAtoi(editNodeFlags->GetChildren()[0].GetContent());
 
-						// Add to param vector
-						flags[flagIdx] = flag;
-
+						// Add flag to edit
+						newEdit->AddFlag(flagName, flag);
+						
 						// Get next parameter
 						editNodeFlags = editNodeFlags->GetNext();
-					}
-
-					// Add flags to new edit
-					for (size_t i = 0; i < numFlags; i++) {
-						newEdit->AddFlag(flags.at(i));
 					}
 				}
 			}
@@ -186,31 +150,16 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 
 				if(editNodeChildren->GetChildren() != NULL){
 					wxXmlNode * editNodeDoubleArrays = editNodeChildren->GetChildren();
-					wxVector<double*> doubleArrays;
-					wxVector<int> doubleArraySizes;
-
-					// Count number of double arrays
-					size_t numDoubleArrays = 0;
-					while (editNodeDoubleArrays) {
-						numDoubleArrays += 1;
-						editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
-					}
-
-					// Resize the double arrays vector to account for all arrays
-					doubleArrays.resize(numDoubleArrays);
-					doubleArraySizes.resize(numDoubleArrays);
-
-					// Get all double arrays and place in correct order
+		
+					// Get all double arrays
 					editNodeDoubleArrays = editNodeChildren->GetChildren();
-					wxString editDoubleArrayNumStr;
-					size_t arrayIdx = 0;
+					wxString doubleArrayName;
+
 					while (editNodeDoubleArrays) {
 
-						// Get array number
-						editDoubleArrayNumStr = editNodeDoubleArrays->GetName();
-						editDoubleArrayNumStr = editDoubleArrayNumStr.SubString(11, editDoubleArrayNumStr.length());
-						arrayIdx = wxAtoi(editDoubleArrayNumStr);
-
+						// Get array name
+						doubleArrayName = editNodeDoubleArrays->GetName();
+						
 						// Count number of elements in array
 						if(!editNodeDoubleArrays->GetContent() != NULL){
 							wxString arrayStr = editNodeDoubleArrays->GetChildren()[0].GetContent();
@@ -219,21 +168,16 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 
 							// Create and populate double array
 							double * newDoubleArray = new double[numElements];
-							doubleArraySizes[arrayIdx] = numElements;
+
 							for (size_t i = 0; i < numElements; i++) {
 								arrayTokens.GetNextToken().ToDouble(&newDoubleArray[i]);
 							}
 
-							// Set double array element in vector
-							doubleArrays[arrayIdx] = newDoubleArray;
+							// Add double array to edit
+							newEdit->AddDoubleArray(doubleArrayName, newDoubleArray, numElements);
 
 						}
 						editNodeDoubleArrays = editNodeDoubleArrays->GetNext();
-					}
-
-					// Add double arrays to new edit
-					for (size_t i = 0; i < numDoubleArrays; i++) {
-						newEdit->AddDoubleArray(doubleArrays[i], doubleArraySizes[i]);
 					}
 				}
 			}
@@ -281,55 +225,50 @@ void PhoediXSessionEditList::SaveSessionEditList(wxXmlNode * phoedixProjectNode)
 
 		// Add parameters to edit node
 		wxXmlNode * paramsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Parameters");
-		wxString paramIdx;
 		wxString paramStr;
-		for (size_t paramIndex = 0; paramIndex < curEdit->GetParamsSize(); paramIndex++) {
 
-			paramIdx = "";
-			paramStr = "";
-			paramIdx << paramIndex;
-			paramStr = wxNumberFormatter::ToString(curEdit->GetParam(paramIndex), EDIT_PRECISSION, wxNumberFormatter::Style_None);
+		wxVector<wxString> parameterNames = curEdit->GetParamterNames();
+		for (size_t paramIndex = 0; paramIndex < parameterNames.size(); paramIndex++) {
 
-			wxXmlNode * paramNode = new wxXmlNode(paramsNode, wxXML_ELEMENT_NODE, "Param" + paramIdx);
+			paramStr = wxNumberFormatter::ToString(curEdit->GetParam(parameterNames[paramIndex]), EDIT_PRECISSION, wxNumberFormatter::Style_None);
+			wxXmlNode * paramNode = new wxXmlNode(paramsNode, wxXML_ELEMENT_NODE, parameterNames[paramIndex]);
 			paramNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", paramStr));
 		}
 
 		// Add Flags to edit node
 		wxXmlNode * flagsNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "Flags");
-		wxString flagIdx;
 		wxString flagStr;
-		for (size_t flagIndex = 0; flagIndex < curEdit->GetFlagsSize(); flagIndex++) {
 
-			flagIdx = "";
+		wxVector<wxString> flagNames = curEdit->GetFlagNames();
+		for (size_t flagIndex = 0; flagIndex < flagNames.size(); flagIndex++) {
+
 			flagStr = "";
-			flagIdx << flagIndex;
-			flagStr << curEdit->GetFlag(flagIndex);
+			flagStr << curEdit->GetFlag(flagNames[flagIndex]);
 
-			wxXmlNode * flagNode = new wxXmlNode(flagsNode, wxXML_ELEMENT_NODE, "Flag" + flagIdx);
+			wxXmlNode * flagNode = new wxXmlNode(flagsNode, wxXML_ELEMENT_NODE, flagNames[flagIndex]);
 			flagNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", flagStr));
 		}
 
 		// Add double array to edit node
 		wxXmlNode * doubleArrayNode = new wxXmlNode(editNode, wxXML_ELEMENT_NODE, "DoubleArrays");
-		wxString doubleIdx;
 		wxString doubleStrTemp;
 		wxString doubleStr;
-		for (size_t doubleIndex = 0; doubleIndex < curEdit->GetNumDoubleArrays(); doubleIndex++) {
 
-			doubleIdx = "";
+		wxVector<wxString> doubleArrayNames = curEdit->GetDoubleArrayNames();
+		for (size_t doubleIndex = 0; doubleIndex < doubleArrayNames.size(); doubleIndex++) {
+
 			doubleStr = "";
-			doubleIdx << doubleIndex;
 
-			for (size_t doubleNum = 0; doubleNum < curEdit->GetDoubleArraySize(doubleIndex); doubleNum++) {
+			for (size_t doubleNum = 0; doubleNum < curEdit->GetDoubleArraySize(doubleArrayNames[doubleIndex]); doubleNum++) {
 				doubleStrTemp = "";
-				doubleStrTemp = wxNumberFormatter::ToString(curEdit->GetDoubleArray(doubleIndex)[doubleNum], EDIT_PRECISSION, wxNumberFormatter::Style_None);
+				doubleStrTemp = wxNumberFormatter::ToString(curEdit->GetDoubleArray(doubleArrayNames[doubleIndex])[doubleNum], EDIT_PRECISSION, wxNumberFormatter::Style_None);
 				doubleStr += doubleStrTemp + ",";
 			}
 			
 			// remove trailing comma
 			doubleStr = doubleStr.substr(0, doubleStr.size() - 1);
 
-			wxXmlNode * doubleNode = new wxXmlNode(doubleArrayNode, wxXML_ELEMENT_NODE, "DoubleArray" + doubleIdx);
+			wxXmlNode * doubleNode = new wxXmlNode(doubleArrayNode, wxXML_ELEMENT_NODE, doubleArrayNames[doubleIndex]);
 			doubleNode->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", doubleStr));
 		}
 	}

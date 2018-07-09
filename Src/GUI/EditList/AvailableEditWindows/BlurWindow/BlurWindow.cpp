@@ -79,19 +79,12 @@ void BlurWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {
 
 void BlurWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
-	if(edit->GetEditType() == ProcessorEdit::EditType::BLUR || 
-		edit->GetEditType() == ProcessorEdit::EditType::VERTICAL_BLUR ||
-		edit->GetEditType() == ProcessorEdit::EditType::HORIZONTAL_BLUR){
-
-			if(edit->GetParamsSize() != 2){ return; }
-	}
-
 	if(edit->GetEditType() == ProcessorEdit::EditType::BLUR){ blurDirection->SetSelection(0); }
 	if(edit->GetEditType() == ProcessorEdit::EditType::HORIZONTAL_BLUR){ blurDirection->SetSelection(1); }
 	if(edit->GetEditType() == ProcessorEdit::EditType::VERTICAL_BLUR){ blurDirection->SetSelection(2); }
 
-	blurSizeSlider->SetValue(edit->GetParam(0) * 100.0);
-	numPassesSlider->SetValue(edit->GetParam(1));
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLURSIZE)) { blurSizeSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLURSIZE) * 100.0); }
+	if (edit->CheckForParameter(PHOEDIX_PARAMETER_NUM_PASSES)) { numPassesSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES)); }
 }
 
 ProcessorEdit * BlurWindow::GetParamsAndFlags(){
@@ -101,8 +94,8 @@ ProcessorEdit * BlurWindow::GetParamsAndFlags(){
 	if (blurSelection == 0) {
 
 		ProcessorEdit * blurEdit = new ProcessorEdit(ProcessorEdit::EditType::BLUR);
-		blurEdit->AddParam(blurSizeSlider->GetValue() / 100.0);
-		blurEdit->AddParam(wxRound(numPassesSlider->GetValue()));
+		blurEdit->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSizeSlider->GetValue() / 100.0);
+		blurEdit->AddParam(PHOEDIX_PARAMETER_NUM_PASSES, wxRound(numPassesSlider->GetValue()));
 		blurEdit->SetDisabled(isDisabled);
 
 		return blurEdit;
@@ -111,8 +104,8 @@ ProcessorEdit * BlurWindow::GetParamsAndFlags(){
 	else if(blurSelection == 1){
 
 		ProcessorEdit * blurEdit = new ProcessorEdit(ProcessorEdit::EditType::HORIZONTAL_BLUR);
-		blurEdit->AddParam(blurSizeSlider->GetValue() / 100.0);
-		blurEdit->AddParam(wxRound(numPassesSlider->GetValue()));
+		blurEdit->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSizeSlider->GetValue() / 100.0);
+		blurEdit->AddParam(PHOEDIX_PARAMETER_NUM_PASSES, wxRound(numPassesSlider->GetValue()));
 		blurEdit->SetDisabled(isDisabled);
 
 		return blurEdit;
@@ -121,8 +114,8 @@ ProcessorEdit * BlurWindow::GetParamsAndFlags(){
 	else if(blurSelection == 2){
 
 		ProcessorEdit * blurEdit = new ProcessorEdit(ProcessorEdit::EditType::VERTICAL_BLUR);
-		blurEdit->AddParam(blurSizeSlider->GetValue() / 100.0);
-		blurEdit->AddParam(wxRound(numPassesSlider->GetValue()));
+		blurEdit->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSizeSlider->GetValue() / 100.0);
+		blurEdit->AddParam(PHOEDIX_PARAMETER_NUM_PASSES, wxRound(numPassesSlider->GetValue()));
 		blurEdit->SetDisabled(isDisabled);
 
 		return blurEdit;
@@ -138,9 +131,8 @@ bool BlurWindow::CheckCopiedParamsAndFlags(){
 	if(edit->GetEditType() == ProcessorEdit::EditType::BLUR || 
 		edit->GetEditType() == ProcessorEdit::EditType::VERTICAL_BLUR ||
 		edit->GetEditType() == ProcessorEdit::EditType::HORIZONTAL_BLUR){
-
-			if(edit->GetParamsSize() != 2){ return false; }
-			else{ return true; }
+			return true; 
+	
 	}
 	return false;
 }
