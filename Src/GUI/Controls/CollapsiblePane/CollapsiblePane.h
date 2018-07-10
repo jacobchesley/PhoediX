@@ -13,6 +13,12 @@
 #include "wx/dc.h"
 #include "wx/dcbuffer.h"
 
+wxDECLARE_EVENT(COLLAPSE_PANE_OPEN_CLOSE, wxCommandEvent);
+
+enum {
+	ID_COLLAPSE_PANE_OPEN_CLOSE
+};
+
 class CollapsiblePane : public wxPanel {
 
 public:
@@ -23,6 +29,7 @@ public:
 	void SetTextFont(wxFont font);
 	void Collapse();
 	void Open();
+	bool IsOpen();
 
 private:
 

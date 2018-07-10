@@ -3,6 +3,8 @@
 #include "CollapsiblePane.h"
 #include "GUI/Colors/Colors.h"
 
+wxDEFINE_EVENT(COLLAPSE_PANE_OPEN_CLOSE, wxCommandEvent);
+
 CollapsiblePane::CollapsiblePane(wxWindow * parent, wxString name) : wxPanel(parent) {
 
 	parentWindow = parent;
@@ -63,6 +65,9 @@ void CollapsiblePane::Collapse() {
 	parentWindow->Layout();
 	parentWindow->FitInside();
 	arrow->Collapse();
+
+	wxCommandEvent evt(COLLAPSE_PANE_OPEN_CLOSE, ID_COLLAPSE_PANE_OPEN_CLOSE);
+	wxPostEvent(parentWindow, evt);
 }
 
 void CollapsiblePane::Open() {
@@ -80,6 +85,13 @@ void CollapsiblePane::Open() {
 	parentWindow->Layout();
 	parentWindow->FitInside();
 	arrow->Expand();
+
+	wxCommandEvent evt(COLLAPSE_PANE_OPEN_CLOSE, ID_COLLAPSE_PANE_OPEN_CLOSE);
+	wxPostEvent(parentWindow, evt);
+}
+
+bool CollapsiblePane::IsOpen() {
+	return isDisplayed;
 }
 
 void CollapsiblePane::SetTextBackgroundColour(wxColour color) {
