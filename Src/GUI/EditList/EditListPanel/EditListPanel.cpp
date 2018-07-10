@@ -7,6 +7,7 @@ wxDEFINE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
 EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImagePanel * imgPanel) : wxPanel(parent) {
 
 	par = parent;
+	currentSession = NULL;
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
 	this->SetBackgroundColour(Colors::BackDarkGrey);
@@ -59,6 +60,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListPanel::OnRightClick, this);
 	this->Bind(START_EDITS_COMPLETE, (wxObjectEventFunction)&EditListPanel::StartEditsComplete, this, ID_START_EDITS_COMPLETE);
+	this->Bind(SAVE_NO_REPROCESS, (wxObjectEventFunction)&EditListPanel::OnSaveNoReprocess, this, ID_SAVE_NO_REPROCESS);
 
 	proc = processor;
 	hasRaw = false;
@@ -157,9 +159,22 @@ void EditListPanel::ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event)) 
 	this->InformParentReprocess();
 }
 
+void EditListPanel::SetSession(PhoediXSession * newSession) {
+	currentSession = newSession;
+}
+
 void EditListPanel::InformParentReprocess(){
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
+}
+
+void EditListPanel::OnSaveNoReprocess(wxMouseEvent& WXUNUSED(event)) {
+
+	if (currentSession != NULL) {
+		this->AddEditsToProcessor();
+		currentSession->GetEditList()->SetSessionEditList(proc->GetEditVector());
+		currentSession->SaveSessionToFile(currentSession->GetProjectPath());
+	}
 }
 
 void EditListPanel::AddEditsToProcessor() {

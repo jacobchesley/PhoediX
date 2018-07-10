@@ -21,6 +21,7 @@
 #include "GUI/Colors/Colors.h"
 #include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "Processing/Processor/Processor.h"
+#include "Session/Session.h"
 #include "Debugging/MemoryLeakCheck.h"
 
 wxDECLARE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
@@ -46,6 +47,7 @@ public:
 	void ReprocessImageRaw(bool unpack = false);
 	void EnableAllEdits();
 	void DisableAllEdits();
+	void SetSession(PhoediXSession * newSession);
 
 private:
 
@@ -58,6 +60,7 @@ private:
 	void ReprocessImageEvt(wxCommandEvent& WXUNUSED(event));
 	void ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event));
 	void ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event));
+	void OnSaveNoReprocess(wxMouseEvent& WXUNUSED(event));
 
 	void AddEditToPanel(wxCommandEvent& addEvt);
 	void AddEditWindowToPanel(EditWindow * window, int editID, bool disable, bool autoActviate);
@@ -84,6 +87,7 @@ private:
 	wxWindow * par;
 
 	ZoomImagePanel * imagePanel;
+	PhoediXSession * currentSession;
 
 	enum Buttons {
 		ADD_EDIT_BUTTON = 100

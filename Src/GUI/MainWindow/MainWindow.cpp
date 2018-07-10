@@ -421,6 +421,8 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 
 	// At least one session exists now, enable menu items related to sessions
 	this->EnableDisableMenuItemsNoProject(true);
+
+	editList->SetSession(session);
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {

@@ -343,7 +343,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&RawWindow::OnSlide, this);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&RawWindow::OnCombo, this);
 	this->Bind(wxEVT_CHECKBOX, (wxObjectEventFunction)&RawWindow::OnCheck, this);
-
+	this->Bind(COLLAPSE_PANE_OPEN_CLOSE, (wxObjectEventFunction)&RawWindow::OnCollapseOpenClose, this, ID_COLLAPSE_PANE_OPEN_CLOSE);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&RawWindow::ProcessEvt, this, EditWindow::ID_PROCESS_EDITS);
 	
 	this->StartWatchdog();
@@ -874,6 +874,10 @@ ProcessorEdit * RawWindow::GetParamsAndFlags(){
 	rawEdit->AddFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_INFO, (int)infoPanelCollapse->IsOpen());
 
 	return rawEdit;
+}
+
+void RawWindow::OnCollapseOpenClose(wxCommandEvent& WXUNUSED(evt)) {
+	this->SaveNoReprocess();
 }
 
 bool RawWindow::CheckCopiedParamsAndFlags(){

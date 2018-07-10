@@ -21,12 +21,14 @@
 enum {
 	ID_REPROCESS_IMAGE,
 	ID_REPROCESS_IMAGE_RAW,
-	ID_REPROCESS_UNPACK_IMAGE_RAW
+	ID_REPROCESS_UNPACK_IMAGE_RAW,
+	ID_SAVE_NO_REPROCESS
 };
 
 wxDECLARE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(SAVE_NO_REPROCESS, wxCommandEvent);
 
 class EditWindow : public wxScrolledWindow{
 	public:
@@ -56,6 +58,7 @@ class EditWindow : public wxScrolledWindow{
 		wxVector<ProcessorEdit*> GetPreviousEdits();
 		void DestroyPreviousEdits();
 
+		void SaveNoReprocess();
 		enum {
 			ID_PROCESS_EDITS
 		};

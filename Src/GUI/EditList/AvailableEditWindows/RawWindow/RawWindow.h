@@ -32,6 +32,7 @@ class RawWindow : public EditWindow {
 		void OnCheck(wxCommandEvent& checkEvt);
 		void OnCombo(wxCommandEvent& comboEvt);
 		void OnSlide(wxCommandEvent& slideEvt);
+		void OnCollapseOpenClose(wxCommandEvent& WXUNUSED(evt));
 
 		wxWindow * parWindow;
 		Processor * proc;

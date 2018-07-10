@@ -5,6 +5,7 @@
 wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(SAVE_NO_REPROCESS, wxCommandEvent);
 
 EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * zoomImgPanel) : wxScrolledWindow(parent) {
 	editNme = editName;
@@ -35,6 +36,12 @@ void EditWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 		wxPostEvent(parWindow, evt);
 		this->SetUpdated(false);
 	}
+}
+
+void EditWindow::SaveNoReprocess() {
+
+	wxCommandEvent evt(SAVE_NO_REPROCESS, ID_SAVE_NO_REPROCESS);
+	wxPostEvent(parWindow, evt);
 }
 
 wxString EditWindow::GetName() {
