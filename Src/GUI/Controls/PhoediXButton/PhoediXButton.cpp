@@ -24,14 +24,52 @@ PhoediXButton::PhoediXButton(wxWindow * parent, wxWindowID id, const wxString& l
 
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&PhoediXButton::RightDown, this);
 	text->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&PhoediXButton::RightDown, this);
-
+	disabled = false;
 }
 
 void PhoediXButton::SetBackgroundColour(wxColor newColor) {
 	text->SetBackgroundColour(newColor);
 	wxPanel::SetBackgroundColour(newColor);
+	enableBackground = newColor;
 	text->Update();
 	text->Refresh();
+}
+
+void PhoediXButton::SetForegroundColour(wxColor newColor) {
+	text->SetForegroundColour(newColor);
+	enableForeground = newColor;
+	text->Update();
+	text->Refresh();
+}
+
+void PhoediXButton::SetDisableBackgroundColour(wxColor disableColor) {
+	disableBackground = disableColor;
+}
+
+void PhoediXButton::SetDisableForegroundColour(wxColor disableColor) {
+	disableForeground = disableColor;
+}
+
+void PhoediXButton::Disable() {
+	disabled = true;
+	text->SetBackgroundColour(disableBackground);
+	text->SetForegroundColour(disableForeground);
+	wxPanel::SetBackgroundColour(disableBackground);
+	text->Update();
+	text->Refresh();
+}
+
+void PhoediXButton::Enable() {
+	disabled = false;
+	text->SetBackgroundColour(enableBackground);
+	text->SetForegroundColour(enableForeground);
+	wxPanel::SetBackgroundColour(enableBackground);
+	text->Update();
+	text->Refresh();
+}
+
+bool PhoediXButton::GetEnabled() {
+	return !disabled;
 }
 
 wxString PhoediXButton::GetLabel() {
@@ -57,22 +95,22 @@ void PhoediXButton::SetBorder(int xBorder, int yBorder) {
 	this->Layout();
 }
 
-void PhoediXButton::SetForegroundColour(wxColor newColor) {
-	text->SetForegroundColour(newColor);
-	text->Update();
-	text->Refresh();
-}
-
 bool PhoediXButton::SetFont(const wxFont& font) {
 	return text->SetFont(font);	
 }
 
 void PhoediXButton::LeftDown(wxCommandEvent& WXUNUSED(clickEvent)){
-	wxCommandEvent buttonEvt(wxEVT_BUTTON, this->GetId());
-	wxPostEvent(this->GetParent(), buttonEvt);
+
+	if (!disabled) {
+		wxCommandEvent buttonEvt(wxEVT_BUTTON, this->GetId());
+		wxPostEvent(this->GetParent(), buttonEvt);
+	}
 }
 
 void PhoediXButton::RightDown(wxCommandEvent& WXUNUSED(clickEvent)){
-	wxCommandEvent buttonEvt(wxEVT_RIGHT_DOWN, this->GetId());
-	wxPostEvent(this->GetParent(), buttonEvt);
+
+	if (!disabled) {
+		wxCommandEvent buttonEvt(wxEVT_RIGHT_DOWN, this->GetId());
+		wxPostEvent(this->GetParent(), buttonEvt);
+	}
 }

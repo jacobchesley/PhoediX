@@ -23,6 +23,12 @@ public:
 	wxString GetLabel();
 	void SetBorder(int xBorder, int yBorder);
 
+	void Disable();
+	void Enable();
+	void SetDisableBackgroundColour(wxColor disableColor);
+	void SetDisableForegroundColour(wxColor disableColor);
+	bool GetEnabled();
+
 private:
 
 	wxBoxSizer * sizer;
@@ -30,6 +36,12 @@ private:
 	wxStaticText * text;
 	void LeftDown(wxCommandEvent& WXUNUSED(clickEvent));
 	void RightDown(wxCommandEvent& WXUNUSED(clickEvent));
+
+	wxColor enableBackground;
+	wxColor enableForeground;
+	wxColor disableBackground;
+	wxColor disableForeground;
+	bool disabled;
 };
 
 #endif
