@@ -18,6 +18,8 @@ ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title) : wxFrame(pare
 	this->GetSizer()->Layout();
 
 	imageDisplay->FitImage();
+	imageDisplay->SetFitImage(true);
+	imageDisplay->SetZoom(imageDisplay->GetZoom());
 }
 
 ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, wxImage * image) : wxFrame(parent, -1, title){
@@ -36,6 +38,8 @@ ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, wxImage * imag
 	this->GetSizer()->Layout();
 
 	imageDisplay->FitImage();
+	imageDisplay->SetFitImage(true);
+	imageDisplay->SetZoom(imageDisplay->GetZoom());
 }
 
 ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, Image * image) : wxFrame(parent, -1, title){
@@ -54,4 +58,6 @@ ZoomImageFrame::ZoomImageFrame(wxWindow * parent, wxString title, Image * image)
 	this->GetSizer()->Layout();
 
 	imageDisplay->FitImage();
+	imageDisplay->SetFitImage(true);
+	imageDisplay->SetZoom(imageDisplay->GetZoom());
 }

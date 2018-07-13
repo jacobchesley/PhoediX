@@ -110,7 +110,7 @@ void ZoomImagePanel::OnScrollRightDown(wxMouseEvent& evt) {
 
 void ZoomImagePanel::FitImage() {
 
-	scroller->FitImage();
+	scroller->FitImage(true);
 	zoomSlider->SetValue(scroller->GetZoom() * 100.0);
 }
 
