@@ -20,11 +20,14 @@
 #include "Debugging/MemoryLeakCheck.h"
 
 enum {
-	ID_DELETE_EVT
+	ID_DELETE_EVT,
+	ID_DIR_EXISTS,
+	ID_NO_DIR_EXISTS
 };
 
 wxDECLARE_EVENT(DELETE_DIR_EVENT, wxCommandEvent);
-
+wxDECLARE_EVENT(DIR_EXISTS, wxCommandEvent);
+wxDECLARE_EVENT(NO_DIR_EXISTS, wxCommandEvent);
 
 class DirectorySelections : public wxScrolledWindow {
 public:
@@ -32,11 +35,14 @@ public:
 	DirectorySelections(wxWindow * parent);
 	wxVector<wxString> GetDirectoryList();
 
+	void SendDirectoriesExist();
+	void SendNoDirectoriesExist();
+
 private:
 	wxBoxSizer * mainLayout;
-	
 	PhoediXButton * addDirectory;
-	
+	wxWindow * par;
+
 	void OnAddDirectory(wxCommandEvent& WXUNUSED(evt));
 	void AddDirectoryDisplayItem();
 	void RedrawPanel();
@@ -49,7 +55,7 @@ private:
 
 	class DirectoryDisplayItem : public wxPanel {
 	public:
-		DirectoryDisplayItem(wxWindow * parent);
+		DirectoryDisplayItem(DirectorySelections * parent);
 		wxVector<wxString> GetDirectoriesNames();
 		void SetSequence(int sequence);
 		int GetSequence();
@@ -62,9 +68,11 @@ private:
 
 		void OnShowDirectory(wxCommandEvent & WXUNUSED(evt));
 		void OnDelete(wxCommandEvent & WXUNUSED(evt));
+		void OnText(wxCommandEvent& WXUNUSED(evt));
+
 		int seq;
 
-		wxWindow * parWindow;
+		DirectorySelections * dirSelects;
 		wxBoxSizer * mainLayout;
 		wxTextCtrl * directoryText;
 		PhoediXButton * directoryButton;

@@ -19,16 +19,18 @@
 
 enum {
 	ID_ADD_LIB_IMAGE_EVT,
-	ID_OPEN_IMAGE_NEW_PROJECT
+	ID_OPEN_IMAGE_NEW_PROJECT,
+	ID_LIB_IMAGE_CHECK_EVT
 };
 
 wxDECLARE_EVENT(OPEN_IMAGE_NEW_PROJECT_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(LIBRARY_IMAGE_CHECK_EVENT, wxCommandEvent);
 
 
 class LibraryImage : public wxPanel {
 
 public:
-	LibraryImage(wxWindow * parent, wxImage * img, wxString fileName, wxString filePath);
+	LibraryImage(wxWindow * parent, wxWindow * libParent, wxImage * img, wxString fileName, wxString filePath);
 	void ChangeImage(wxImage * newImage);
 	void SetName(wxString name);
 	wxString GetName();
@@ -43,14 +45,16 @@ private:
 	void OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt));
 	void OnRightClick(wxMouseEvent& WXUNUSED(evt));
 	void OnPopupMenuClick(wxCommandEvent& inEvt);
+	void OnCheck(wxCommandEvent& WXUNUSED(evt));
 
 	wxImage * img;
 	wxBoxSizer * mainLayout;
 	wxBoxSizer * subLayout;
 	WXImagePanel * imageDisplay;
 	wxCheckBox * selectBox;
-	wxStaticText * nameDisplay;
+	wxTextCtrl * nameDisplay;
 	wxString path;
+	wxWindow * libraryParent;
 
 	enum PopupMenuActions {
 		OPEN_IN_NEW_PROJECT = 1,

@@ -61,19 +61,22 @@ private:
 	void OnAddImage(AddLibraryImageEvent & evt);
 	void OnPopulationStart(wxSizeEvent & WXUNUSED(evt));
 	void OnPopulationComplete(wxSizeEvent & WXUNUSED(evt));
+	void OnDirExists(wxSizeEvent & WXUNUSED(evt));
+	void OnNoDirExists(wxSizeEvent & WXUNUSED(evt));
+	void OnLibraryImageCheck(wxCommandEvent& WXUNUSED(evt));
+	void EnableDisableMoveCopy();
 
 	wxVector<wxString> GetSelectedFileNames();
 
 	wxBoxSizer * mainLayout;
 
-	wxWrapSizer * toolbarLayout;
+	wxBoxSizer * toolbarLayout;
 	PhoediXButton * showDirectoriesButton;
 	PhoediXButton * importButton;
 	PhoediXButton * clearButton;
 	PhoediXButton * copyButton;
 	PhoediXButton * moveButton;
 
-	wxWrapSizer * imagesLayout;
 	wxSortedArrayString imagePaths;
 
 	wxVector<LibraryImage*> libraryImages;
@@ -94,6 +97,15 @@ private:
 		ID_COPY_TO,
 		ID_MOVE_TO,
 		ID_CANCEL_PROCESS
+	};
+
+	class ImageWindowScroll : public wxScrolledWindow {
+	public:
+		ImageWindowScroll(wxWindow * parent);
+
+	private:
+		wxWrapSizer * imagesLayout;
+
 	};
 
 	class CopyImagesThread : public wxThread {
@@ -141,6 +153,7 @@ private:
 	};
 
 	LoadImagesThread * testImgThread;
+	ImageWindowScroll * imageScroll;
 };
 
 #endif

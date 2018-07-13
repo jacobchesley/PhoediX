@@ -3,11 +3,12 @@
 #include "LibraryImage.h"
 
 wxDEFINE_EVENT(OPEN_IMAGE_NEW_PROJECT_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(LIBRARY_IMAGE_CHECK_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(ADD_LIB_IMAGE_EVENT, AddLibraryImageEvent);
 
-LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName, wxString filePath) : wxPanel(parent) {
+LibraryImage::LibraryImage(wxWindow * parent, wxWindow * libParent, wxImage * image, wxString fileName, wxString filePath) : wxPanel(parent) {
 	
-	this->SetBackgroundColour(Colors::BackDarkDarkGrey);;
+	this->SetBackgroundColour(parent->GetBackgroundColour());;
 
 	path = filePath;
 
@@ -20,13 +21,13 @@ LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName
 	imageDisplay->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(LibraryImage::OnLeftDoubleClick), NULL, this);
 	imageDisplay->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(LibraryImage::OnRightClick), NULL, this);
 
-	nameDisplay = new wxStaticText(this, -1, fileName);
+	nameDisplay = new wxTextCtrl(this, -1, fileName, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE | wxTE_READONLY);
 	selectBox = new wxCheckBox(this, -1, "");
 
+	nameDisplay->SetBackgroundColour(this->GetBackgroundColour());
 	nameDisplay->SetForegroundColour(Colors::TextLightGrey);
 
-	subLayout->Add(nameDisplay);
-	subLayout->AddStretchSpacer();
+	subLayout->Add(nameDisplay, 1, wxEXPAND |wxRIGHT);
 	subLayout->Add(selectBox);
 
 	this->GetSizer()->Add(imageDisplay);
@@ -37,6 +38,9 @@ LibraryImage::LibraryImage(wxWindow * parent, wxImage * image, wxString fileName
 
 	this->Bind(wxEVT_LEFT_DCLICK, (wxMouseEventFunction)&LibraryImage::OnLeftDoubleClick, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&LibraryImage::OnRightClick, this);
+	this->Bind(wxEVT_CHECKBOX, (wxObjectEventFunction)&LibraryImage::OnCheck, this);
+
+	libraryParent = libParent;
 }
 
 void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
@@ -117,6 +121,11 @@ void LibraryImage::OnPopupMenuClick(wxCommandEvent& inEvt) {
 			wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
 		}
 	}
+}
+
+void LibraryImage::OnCheck(wxCommandEvent& WXUNUSED(evt)) {
+	wxCommandEvent evt(LIBRARY_IMAGE_CHECK_EVENT, ID_LIB_IMAGE_CHECK_EVT);
+	wxPostEvent(libraryParent, evt);
 }
 
 void LibraryImage::ChangeImage(wxImage * newImage) {

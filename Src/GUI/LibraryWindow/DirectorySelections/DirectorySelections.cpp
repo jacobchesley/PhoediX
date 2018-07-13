@@ -3,8 +3,10 @@
 #include "DirectorySelections.h"
 
 wxDEFINE_EVENT(DELETE_DIR_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(DIR_EXISTS, wxCommandEvent);
+wxDEFINE_EVENT(NO_DIR_EXISTS, wxCommandEvent);
 
-DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * parent) : wxPanel(parent) {
+DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(DirectorySelections * parent) : wxPanel(parent) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -45,8 +47,9 @@ DirectorySelections::DirectoryDisplayItem::DirectoryDisplayItem(wxWindow * paren
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&DirectorySelections::DirectoryDisplayItem::OnShowDirectory, this, DirectorySelections::DirectoryDisplayItem::ID_SHOW_DIRECTORY);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&DirectorySelections::DirectoryDisplayItem::OnDelete, this, DirectorySelections::DirectoryDisplayItem::ID_DELETE);
+	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&DirectorySelections::DirectoryDisplayItem::OnText, this);
 
-	parWindow = parent;
+	dirSelects = parent;
 	seq = -1;
 }
 
@@ -65,7 +68,31 @@ void DirectorySelections::DirectoryDisplayItem::OnDelete(wxCommandEvent& WXUNUSE
 
 	wxCommandEvent evt(DELETE_DIR_EVENT, ID_DELETE_EVT);
 	evt.SetInt(seq);
-	wxPostEvent(parWindow, evt);
+	wxPostEvent(dirSelects, evt);
+}
+
+void DirectorySelections::DirectoryDisplayItem::OnText(wxCommandEvent& WXUNUSED(evt)) {
+	
+	// This item has a valid directory.  No need to check more.
+	if (wxDir::Exists(directoryText->GetValue())) {
+		dirSelects->SendDirectoriesExist();
+		return;
+	}
+
+	else {
+		wxVector<wxString> allDirs = dirSelects->GetDirectoryList();
+
+		// Go through all directories in list
+		for (size_t i = 0; i < allDirs.size(); i++) {
+
+			// Found a valid directory.
+			if (wxDir::Exists(allDirs[i])) {
+				dirSelects->SendDirectoriesExist();
+				return;
+			}
+		}
+		dirSelects->SendNoDirectoriesExist();
+	}
 }
 
 void DirectorySelections::DirectoryDisplayItem::SetSequence(int sequence) {
@@ -115,6 +142,7 @@ DirectorySelections::DirectorySelections(wxWindow * parent) : wxScrolledWindow(p
 	this->SetSize(this->GetBestVirtualSize());
 	this->FitInside();
 	this->SetScrollRate(5, 5);
+	par = parent;
 }
 
 void DirectorySelections::AddDirectoryDisplayItem() {
@@ -179,4 +207,16 @@ wxVector<wxString> DirectorySelections::GetDirectoryList() {
 	}
 
 	return returnVec;
+}
+
+void DirectorySelections::SendDirectoriesExist() {
+
+	wxCommandEvent evt(DIR_EXISTS, ID_DIR_EXISTS);
+	wxPostEvent(par, evt);
+}
+
+void DirectorySelections::SendNoDirectoriesExist() {
+
+	wxCommandEvent evt(NO_DIR_EXISTS, ID_NO_DIR_EXISTS);
+	wxPostEvent(par, evt);
 }

@@ -13,10 +13,9 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	
 	mainLayout = new wxBoxSizer(wxVERTICAL);
-	imagesLayout = new wxWrapSizer();
 	this->SetSizer(mainLayout);
 
-	toolbarLayout = new wxWrapSizer();
+	toolbarLayout = new wxBoxSizer(wxHORIZONTAL);
 
 	showDirectoriesButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST, "Import Directories");
 	showDirectoriesButton->SetForegroundColour(Colors::TextLightGrey);
@@ -26,23 +25,39 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	importButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_IMPORT, "Populate Library");
 	importButton->SetForegroundColour(Colors::TextLightGrey);
 	importButton->SetBackgroundColour(Colors::BackGrey);
+	importButton->SetDisableBackgroundColour(Colors::BackGrey);
+	importButton->SetDisableForegroundColour(Colors::TextGrey);
+	importButton->Disable();
 	importButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	copyButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_COPY_TO, "Copy Selected");
 	copyButton->SetForegroundColour(Colors::TextLightGrey);
 	copyButton->SetBackgroundColour(Colors::BackGrey);
+	copyButton->SetDisableBackgroundColour(Colors::BackGrey);
+	copyButton->SetDisableForegroundColour(Colors::TextGrey);
+	copyButton->Disable();
 	copyButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	moveButton = new PhoediXButton(this, LibraryWindow::MenuBar::ID_MOVE_TO, "Move Selected");
 	moveButton->SetForegroundColour(Colors::TextLightGrey);
 	moveButton->SetBackgroundColour(Colors::BackGrey);
+	moveButton->SetDisableBackgroundColour(Colors::BackGrey);
+	moveButton->SetDisableForegroundColour(Colors::TextGrey);
+	moveButton->Disable();
 	moveButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	clearButton = new PhoediXButton(this, -1, "Clear Library");
 	clearButton->SetForegroundColour(Colors::TextLightGrey);
 	clearButton->SetBackgroundColour(Colors::BackGrey);
+	clearButton->SetDisableBackgroundColour(Colors::BackGrey);
+	clearButton->SetDisableForegroundColour(Colors::TextGrey);
+	clearButton->Disable();
 	clearButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
 	clearButton->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(LibraryWindow::OnHoverClearButton), NULL, this);
+
+	imageScroll = new ImageWindowScroll(this);
+	imageScroll->SetBackgroundColour(this->GetBackgroundColour());
 
 	toolbarLayout->Add(showDirectoriesButton);
 	toolbarLayout->AddSpacer(15);
@@ -55,7 +70,7 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	toolbarLayout->Add(clearButton);
 
 	this->GetSizer()->Add(toolbarLayout);
-	this->GetSizer()->Add(imagesLayout);
+	this->GetSizer()->Add(imageScroll, 1, wxEXPAND);
 
 	directorySelections = new DirectorySelections(this);
 	wxAuiPaneInfo directoryPaneInfo = wxAuiPaneInfo();
@@ -70,8 +85,6 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	PhoedixAUIManager::GetPhoedixAUIManager()->AddPane(directorySelections, directoryPaneInfo);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
-	this->SetScrollRate(5, 5);
-	
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnShowDirectories, this, LibraryWindow::MenuBar::ID_SHOW_DIRECTORY_LIST);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnImport, this, LibraryWindow::MenuBar::ID_IMPORT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&LibraryWindow::OnCopy, this, LibraryWindow::MenuBar::ID_COPY_TO);
@@ -80,6 +93,9 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	this->Bind(ADD_LIB_IMAGE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnAddImage, this);
 	this->Bind(POPULATION_STARTED_EVENT, (wxObjectEventFunction)&LibraryWindow::OnPopulationStart, this);
 	this->Bind(POPULATION_COMPLETE_EVENT, (wxObjectEventFunction)&LibraryWindow::OnPopulationComplete, this);
+	this->Bind(DIR_EXISTS, (wxObjectEventFunction)&LibraryWindow::OnDirExists, this);
+	this->Bind(NO_DIR_EXISTS, (wxObjectEventFunction)&LibraryWindow::OnNoDirExists, this);
+	this->Bind(LIBRARY_IMAGE_CHECK_EVENT, (wxObjectEventFunction)&LibraryWindow::OnLibraryImageCheck, this);
 }
 
 void LibraryWindow::OnShowDirectories(wxCommandEvent& WXUNUSED(evt)){
@@ -88,7 +104,47 @@ void LibraryWindow::OnShowDirectories(wxCommandEvent& WXUNUSED(evt)){
 }
 
 void LibraryWindow::OnResize(wxSizeEvent& WXUNUSED(evt)) {
+
+	imageScroll->SetVirtualSize(imageScroll->GetSize());
 	this->FitInside();
+	this->Layout();
+}
+
+void LibraryWindow::OnDirExists(wxSizeEvent& WXUNUSED(evt)) {
+	importButton->Enable();
+}
+
+void LibraryWindow::OnNoDirExists(wxSizeEvent& WXUNUSED(evt)) {
+	importButton->Disable();
+}
+
+void LibraryWindow::EnableDisableMoveCopy() {
+
+	bool anySelected = false;
+	// Iterate over all library images
+	for (size_t i = 0; i < libraryImages.size(); i++) {
+
+		// Find any selected images
+		if (libraryImages.at(i)->GetSelected()) {
+			anySelected = true;
+		}
+	}
+
+	// Enable copy/move
+	if (anySelected) {
+		moveButton->Enable();
+		copyButton->Enable();
+	}
+
+	// Disable copy/move
+	else {
+		moveButton->Disable();
+		copyButton->Disable();
+	}
+}
+
+void LibraryWindow::OnLibraryImageCheck(wxCommandEvent& WXUNUSED(evt)) {
+	this->EnableDisableMoveCopy();
 }
 
 void LibraryWindow::OnImport(wxCommandEvent& WXUNUSED(evt)){
@@ -125,6 +181,8 @@ void LibraryWindow::OnMove(wxCommandEvent& WXUNUSED(evt)){
 }
 
 void LibraryWindow::OnHoverClearButton(wxMouseEvent& WXUNUSED(evt)) {
+
+	if (clearButton->GetEnabled() == false) { return; }
 
 	// Display a popup menu of options
 	wxMenu popupMenu;
@@ -180,15 +238,20 @@ void LibraryWindow::ClearAll(){
 
 	// Iterate over all library images
 	for (size_t i = 0; i < libraryImages.size(); i++) {
-		imagesLayout->Detach(libraryImages.at(i));
+		imageScroll->GetSizer()->Detach(libraryImages.at(i));
 		libraryImages.at(i)->Destroy();
 	}
-	imagesLayout->Clear(true);
+	imageScroll->GetSizer()->Clear(true);
 	libraryImages.clear();
 	includedImagePaths.clear();
 	imagePaths.Clear();
+
 	this->Layout();
 	this->FitInside();
+
+	if (libraryImages.size() > 0) { clearButton->Enable(); }
+	else { clearButton->Disable(); }
+	this->EnableDisableMoveCopy();
 }
 
 void LibraryWindow::ClearSelected() {
@@ -200,7 +263,7 @@ void LibraryWindow::ClearSelected() {
 
 		// Detach and destroy all unslected imaged
 		if (libraryImages.at(i)->GetSelected()) {
-			imagesLayout->Detach(libraryImages.at(i));
+			imageScroll->GetSizer()->Detach(libraryImages.at(i));
 			libraryImages.at(i)->Destroy();
 		}
 
@@ -224,6 +287,10 @@ void LibraryWindow::ClearSelected() {
 
 	this->Layout();
 	this->FitInside();
+
+	if (libraryImages.size() > 0) { clearButton->Enable(); }
+	else { clearButton->Disable(); }
+	this->EnableDisableMoveCopy();
 }
 
 void LibraryWindow::ClearUnselected() {
@@ -235,7 +302,7 @@ void LibraryWindow::ClearUnselected() {
 
 		// Detach and destroy all unslected imaged
 		if (!libraryImages.at(i)->GetSelected()) {
-			imagesLayout->Detach(libraryImages.at(i));
+			imageScroll->GetSizer()->Detach(libraryImages.at(i));
 			libraryImages.at(i)->Destroy();
 		}
 
@@ -259,6 +326,10 @@ void LibraryWindow::ClearUnselected() {
 
 	this->Layout();
 	this->FitInside();
+
+	if (libraryImages.size() > 0) { clearButton->Enable(); }
+	else { clearButton->Disable(); }
+	this->EnableDisableMoveCopy();
 }
 
 void LibraryWindow::OnAddImage(AddLibraryImageEvent & evt){
@@ -289,25 +360,30 @@ bool LibraryWindow::CheckIfImageInDisplay(wxString imagePath){
 	}
 	return false;
 }
+
 void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxString filePath) {
 	
 	if (populationCanceled) {
 		return;
 	}
 	locker.Enter();
-	LibraryImage * newLibImage = new LibraryImage(this, newImage, fileName, filePath);
+	LibraryImage * newLibImage = new LibraryImage(imageScroll, this, newImage, fileName, filePath);
 	newImage->Destroy();
 	delete newImage;
 	newImage = NULL;
 
 	int idx = imagePaths.Add(fileName);
-	imagesLayout->Insert((idx * 3), new wxPanel(this, -1, wxDefaultPosition, wxSize(25, 25)));
-	imagesLayout->Insert((idx * 3) + 1, newLibImage);
-	imagesLayout->Insert((idx * 3) + 2, new wxPanel(this, -1, wxDefaultPosition, wxSize(25, 25)));
+	imageScroll->GetSizer()->Insert((idx * 3), new wxPanel(imageScroll, -1, wxDefaultPosition, wxSize(25, 25)));
+	imageScroll->GetSizer()->Insert((idx * 3) + 1, newLibImage);
+	imageScroll->GetSizer()->Insert((idx * 3) + 2, new wxPanel(imageScroll, -1, wxDefaultPosition, wxSize(25, 25)));
 	libraryImages.insert(libraryImages.begin() + idx, newLibImage);
 
 	this->Layout();
 	this->FitInside();
+
+	if (libraryImages.size() > 0) { clearButton->Enable(); }
+	else { clearButton->Disable(); }
+
 	locker.Leave();
 }
 
@@ -322,6 +398,13 @@ wxVector<wxString> LibraryWindow::GetSelectedFileNames() {
 	}
 
 	return fileNames;
+}
+
+LibraryWindow::ImageWindowScroll::ImageWindowScroll(wxWindow * parent) : wxScrolledWindow(parent) {
+
+	imagesLayout = new wxWrapSizer();
+	this->SetSizer(imagesLayout);
+	this->SetScrollRate(5, 5);
 }
 
 LibraryWindow::LoadImagesThread::LoadImagesThread(LibraryWindow * parent) : wxThread(wxTHREAD_DETACHED){
@@ -439,10 +522,12 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 			#endif
 
 			bool useThumbnail = true;
+			int flip= 0;
 
 			// Use embedded thumbnail of raw image
 			if(useThumbnail){
 				rawProcessor->unpack_thumb();
+				flip = rawProcessor->imgdata.sizes.flip;
 				rawImage = rawProcessor->dcraw_make_mem_thumb(&rawError);
 			}
 
@@ -461,8 +546,12 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 			if (rawError == LIBRAW_SUCCESS) {
 
 				// Copy raw image to wxImage for display
-				displayImage = new wxImage(rawImage->width, rawImage->height);
-				ImageHandler::CopyImageFromRaw(rawImage, displayImage);
+				wxImage * tempImage = new wxImage(rawImage->width, rawImage->height);
+				ImageHandler::CopyImageFromRaw(rawImage, tempImage);
+				if (flip == 3) { displayImage = new wxImage(tempImage->Rotate180()); }
+				else if (flip == 5) { displayImage = new wxImage(tempImage->Rotate90(false)); }
+				else if (flip == 6) { displayImage = new wxImage(tempImage->Rotate90(true)); }
+				else { displayImage = tempImage; }
 			}
 
 			// Free raw image and processor memory

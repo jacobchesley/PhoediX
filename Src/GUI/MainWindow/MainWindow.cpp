@@ -47,7 +47,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS, _("Show Snapshots"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP, _("Show Pixel Peeper"));
 	menuTools->AppendSeparator();
-	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library"));
+	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library\tCtrl+L"));
 
 	menuHelp->Append(MainWindow::MenuBar::ID_SHOW_SUPPORTED_CAMERAS, _("Supported Cameras (RAW)"));
 	menuHelp->Append(MainWindow::MenuBar::ID_ABOUT, _("About PhoediX"));
