@@ -6,6 +6,10 @@ wxDEFINE_EVENT(CURVE_CHANGED_EVENT, wxCommandEvent);
 
 CurvePanel::CurvePanel(wxWindow * parent, int channel) :wxPanel(parent) {
 
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		this->SetDoubleBuffered(true);
+	#endif
+
 	par = parent;
 
 	this->SetMinSize(wxSize(50, 50));
@@ -126,10 +130,6 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 
 				// draw the new spline
 				PaintNow();
-
-				// Send event to parent to inform curve has changed
-				wxCommandEvent curveEvt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
-				wxPostEvent(par, curveEvt);
 			}
 		}
 
@@ -140,9 +140,12 @@ void CurvePanel::LeftClick(wxMouseEvent& evt) {
 		this->Refresh();
 		this->Update();
 		wxSafeYield();
-
-
 	}
+
+	// Send event to parent to inform curve has changed
+	wxCommandEvent curveEvt(CURVE_CHANGED_EVENT, ID_CURVE_CHANGED);
+	wxPostEvent(par, curveEvt);
+
 	evt.Skip(false);
 }
 
