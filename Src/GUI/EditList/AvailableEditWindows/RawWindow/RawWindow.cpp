@@ -45,7 +45,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	// Interpolation
 	interpolationLabel = new wxStaticText(settingsPanel, -1, "Interpolation");
 	interpolationLabel->SetForegroundColour(Colors::TextLightGrey);
-	interpolationControl = new wxComboBox(settingsPanel, -1);
+	interpolationControl = new PhoediXComboBox(settingsPanel, -1);
 	interpolationControl->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	interpolationControl->SetForegroundColour(Colors::TextLightGrey);
 	interpolationControl->Append("Linear");
@@ -61,7 +61,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	// Flip
 	flipLabel = new wxStaticText(settingsPanel, -1, "Rotation");
 	flipLabel->SetForegroundColour(Colors::TextLightGrey);
-	flipControl = new wxComboBox(settingsPanel, -1);
+	flipControl = new PhoediXComboBox(settingsPanel, -1);
 	flipControl->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	flipControl->SetForegroundColour(Colors::TextLightGrey);
 	flipControl->Append("Camera Defined");
@@ -109,7 +109,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 
 	// Highlights
 	highlightLabel = new wxStaticText(exposurePanel, -1, "Highlight Mode");
-	highlightControl = new wxComboBox(exposurePanel, -1);
+	highlightControl = new PhoediXComboBox(exposurePanel, -1);
 	highlightLabel->SetForegroundColour(Colors::TextLightGrey);
 	highlightControl->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	highlightControl->SetForegroundColour(Colors::TextLightGrey);
@@ -160,7 +160,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 
 	// Gamma
 	gammaPresetsLabel = new wxStaticText(exposurePanel, -1, "Gamma Presets");
-	gammaPresetsControl = new wxComboBox(exposurePanel, ID_GAMMA_PRESET_COMBO);
+	gammaPresetsControl = new PhoediXComboBox(exposurePanel, ID_GAMMA_PRESET_COMBO);
 	gammaPresetsLabel->SetForegroundColour(Colors::TextLightGrey);
 	gammaPresetsControl->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	gammaPresetsControl->SetForegroundColour(Colors::TextLightGrey);
@@ -202,7 +202,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 
 	// White Balance
 	whiteBalancePresetsLabel = new wxStaticText(colorPanel, -1, "White Balance");
-	whiteBalancePresetsControl = new wxComboBox(colorPanel, ID_WHITE_BALANCE_COMBO);
+	whiteBalancePresetsControl = new PhoediXComboBox(colorPanel, ID_WHITE_BALANCE_COMBO);
 	whiteBalancePresetsLabel->SetForegroundColour(Colors::TextLightGrey);
 	whiteBalancePresetsControl->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	whiteBalancePresetsControl->SetForegroundColour(Colors::TextLightGrey);

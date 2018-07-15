@@ -8,6 +8,7 @@
 #include "GUI/Controls/CollapsiblePane/CollapsiblePane.h"
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
@@ -53,10 +54,10 @@ class RawWindow : public EditWindow {
 		wxCheckBox * greenMatchingControl;
 	
 		wxStaticText * flipLabel;
-		wxComboBox * flipControl;
+		PhoediXComboBox * flipControl;
 
 		wxStaticText * interpolationLabel;
-		wxComboBox * interpolationControl;
+		PhoediXComboBox * interpolationControl;
 		int lastInterpolationVal;
 
 		// Exposure
@@ -74,7 +75,7 @@ class RawWindow : public EditWindow {
 		DoubleSlider * brightnessControl;
 
 		wxStaticText * highlightLabel;
-		wxComboBox * highlightControl;
+		PhoediXComboBox * highlightControl;
 
 		wxStaticText * blackLevelLabel;
 		DoubleSlider * blackLevelControl;
@@ -94,7 +95,7 @@ class RawWindow : public EditWindow {
 		DoubleSlider * maxThrControl;
 
 		wxStaticText * gammaPresetsLabel;
-		wxComboBox * gammaPresetsControl;
+		PhoediXComboBox * gammaPresetsControl;
 
 		wxStaticText * gammaLevelLabel;
 		DoubleSlider * gammaLevelControl;
@@ -112,7 +113,7 @@ class RawWindow : public EditWindow {
 		wxFlexGridSizer * colorSizer;
 
 		wxStaticText * whiteBalancePresetsLabel;
-		wxComboBox * whiteBalancePresetsControl;
+		PhoediXComboBox * whiteBalancePresetsControl;
 
 		wxStaticText * redMultiplierLabel;
 		DoubleSlider * redMultiplierControl;

@@ -22,7 +22,7 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 	presetLabel = new wxStaticText(this, -1, "Preset");
 	presetLabel->SetForegroundColour(Colors::TextLightGrey);
 
-	presetBox = new wxComboBox(this, -1);
+	presetBox = new PhoediXComboBox(this, -1);
 	presetBox->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	presetBox->SetForegroundColour(Colors::TextLightGrey);
 

@@ -18,7 +18,7 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 
 	fileTypeLabel = new wxStaticText(this, -1, "Image Type");
 	fileTypeLabel->SetForegroundColour(Colors::TextLightGrey);
-	fileTypeControl = new wxComboBox(this, -1);
+	fileTypeControl = new PhoediXComboBox(this, -1);
 	fileTypeControl->AppendString("JPEG");
 	fileTypeControl->AppendString("PNG");
 	fileTypeControl->AppendString("TIFF 8 Bit");

@@ -17,6 +17,7 @@
 #include "wx/dcbuffer.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Image/Image.h"
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
 
 class PixelPeepWindow : public wxScrolledWindow{
 
@@ -28,7 +29,7 @@ public:
 private:
 
 	wxBoxSizer * mainSizer;
-	wxComboBox * gridSize;
+	PhoediXComboBox * gridSize;
 	void OnCombo(wxCommandEvent & WXUNUSED(evt));
 
 	class PixelGrid : public wxPanel {

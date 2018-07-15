@@ -20,7 +20,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	// Color Bit Depht Setting
 	colorDepthLabel = new wxStaticText(this, -1, "Color Bit Depth");
 	colorDepthLabel->SetForegroundColour(Colors::TextLightGrey);
-	colorDepth = new wxComboBox(this, -1);
+	colorDepth = new PhoediXComboBox(this, -1);
 	colorDepth->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	colorDepth->SetForegroundColour(Colors::TextLightGrey);
 	colorDepth->Append("8 Bit");
@@ -33,7 +33,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	// Color Space Setting
 	colorSpaceLabel = new wxStaticText(this, -1, "Color Space");
 	colorSpaceLabel->SetForegroundColour(Colors::TextLightGrey);
-	colorSpace = new wxComboBox(this, -1);
+	colorSpace = new PhoediXComboBox(this, -1);
 	colorSpace->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	colorSpace->SetForegroundColour(Colors::TextLightGrey);
 	colorSpace->Append("sRGB");

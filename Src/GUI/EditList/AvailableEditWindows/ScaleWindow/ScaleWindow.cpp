@@ -17,7 +17,7 @@ ScaleWindow::ScaleWindow(wxWindow * parent, wxString editName, Processor * proce
 
 	scaleMethodLabel = new wxStaticText(this, -1, "Scale Based On ");
 	scaleMethodLabel->SetForegroundColour(Colors::TextLightGrey);
-	scaleMethod = new wxComboBox(this, -1);
+	scaleMethod = new PhoediXComboBox(this, -1);
 	scaleMethod->AppendString("Percentage");
 	scaleMethod->AppendString("Custom Width & Height");
 	scaleMethod->SetBackgroundColour(this->GetBackgroundColour());
@@ -27,7 +27,7 @@ ScaleWindow::ScaleWindow(wxWindow * parent, wxString editName, Processor * proce
 	scaleInterpolationLabel = new wxStaticText(this, -1, "Interpolation Method");
 	scaleInterpolationLabel ->SetForegroundColour(Colors::TextLightGrey);
 	
-	scaleInterpolation = new wxComboBox(this, -1);
+	scaleInterpolation = new PhoediXComboBox(this, -1);
 	scaleInterpolation->AppendString("Nearest Neighbor");
 	scaleInterpolation->AppendString("Bilinear");
 	scaleInterpolation->AppendString("Bicubic");

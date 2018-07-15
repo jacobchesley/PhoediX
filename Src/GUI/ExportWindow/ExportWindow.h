@@ -17,6 +17,7 @@
 #include "GUI/Colors/Colors.h"
 #include "GUI/Icons/Icons.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
 #include "GUI/EditList/EditListPanel/EditListPanel.h"
 #include "Processing/ImageHandler/ImageHandler.h"
 #include "Processing/Processor/Processor.h"
@@ -60,7 +61,7 @@ private:
 	wxFlexGridSizer * mainSizer;
 
 	wxStaticText * fileTypeLabel;
-	wxComboBox * fileTypeControl;
+	PhoediXComboBox * fileTypeControl;
 
 	wxStaticText * jpegQualityLabel;
 	DoubleSlider * jpegQualitySlide;

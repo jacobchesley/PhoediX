@@ -14,7 +14,7 @@ HistogramDisplay::HistogramDisplay(wxWindow * parent, Processor * processor) : w
 	selectionLabel = new wxStaticText(this, -1, "Hisograms Display");
 	selectionLabel->SetForegroundColour(Colors::TextLightGrey);
 
-	histogramSelector = new wxComboBox(this, -1);
+	histogramSelector = new PhoediXComboBox(this, -1);
 	histogramSelector->AppendString("All Hsitograms");
 	histogramSelector->AppendString("Only RGBW combo");
 	histogramSelector->AppendString("R, G, B, and W");

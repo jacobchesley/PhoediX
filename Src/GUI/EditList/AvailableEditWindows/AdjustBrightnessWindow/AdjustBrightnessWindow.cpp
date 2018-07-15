@@ -25,7 +25,7 @@ AdjustBrightnessWindow::AdjustBrightnessWindow(wxWindow * parent, wxString editN
 	preservationLabel->SetForegroundColour(Colors::TextLightGrey);
 
 	brightSlider = new DoubleSlider(this, 0.0, -1.0, 1.0, 100000, 3);
-	detailsSelect = new wxComboBox(this, -1);
+	detailsSelect = new PhoediXComboBox(this, -1);
 	detailsSelect->AppendString("Shadows and Highlights");
 	detailsSelect->AppendString("Shadows Only");
 	detailsSelect->AppendString("Highlights Only");

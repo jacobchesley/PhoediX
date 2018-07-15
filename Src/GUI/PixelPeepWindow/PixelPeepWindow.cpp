@@ -12,7 +12,7 @@ PixelPeepWindow::PixelPeepWindow(wxWindow * parent) : wxScrolledWindow(parent){
 		this->SetDoubleBuffered(true);
 	#endif
 
-	gridSize = new wxComboBox(this, -1);
+	gridSize = new PhoediXComboBox(this, -1);
 	gridSize->SetBackgroundColour(this->GetBackgroundColour());
 	gridSize->SetForegroundColour(Colors::TextLightGrey);
 	gridSize->AppendString("1 x 1");

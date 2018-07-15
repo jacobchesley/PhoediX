@@ -23,7 +23,7 @@ BlurWindow::BlurWindow(wxWindow * parent, wxString editName, Processor * process
 	blurSizeLabel ->SetForegroundColour(Colors::TextLightGrey);
 	numPassesLabel ->SetForegroundColour(Colors::TextLightGrey);
 
-	blurDirection = new wxComboBox(this, -1);
+	blurDirection = new PhoediXComboBox(this, -1);
 	blurDirection->AppendString("Box Blur");
 	blurDirection->AppendString("Horizontal");
 	blurDirection->AppendString("Vertical");

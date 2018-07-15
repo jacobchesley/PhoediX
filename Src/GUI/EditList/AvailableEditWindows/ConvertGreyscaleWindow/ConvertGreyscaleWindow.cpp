@@ -24,7 +24,7 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 	greenBrightLabel->SetForegroundColour(Colors::TextLightGrey);
 	blueBrightLabel->SetForegroundColour(Colors::TextLightGrey);
 
-	greyscaleMethod = new wxComboBox(this, -1);
+	greyscaleMethod = new PhoediXComboBox(this, -1);
 	greyscaleMethod->AppendString("Human Eyesight RGB Scalars");
 	greyscaleMethod->AppendString("Average RGB Values");
 	greyscaleMethod->AppendString("Custom RGB Scalars");

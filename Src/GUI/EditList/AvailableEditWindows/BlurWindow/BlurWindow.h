@@ -5,6 +5,7 @@
 
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
 
 #include "GUI/Colors/Colors.h"
 #include "Processing/Processor/Processor.h"
@@ -31,7 +32,7 @@ private:
 	wxStaticText * blurSizeLabel;
 	wxStaticText * numPassesLabel;
 
-	wxComboBox * blurDirection;
+	PhoediXComboBox * blurDirection;
 	DoubleSlider * blurSizeSlider;
 	DoubleSlider * numPassesSlider;
 

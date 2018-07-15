@@ -5,7 +5,7 @@
 
 #include "GUI/EditList/EditWindow/EditWindow.h"
 #include "GUI/Controls/DoubleSlider/DoubleSlider.h"
-
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
@@ -28,10 +28,10 @@ private:
 	wxStaticText * editLabel;
 
 	wxStaticText * scaleMethodLabel;
-	wxComboBox * scaleMethod;
+	PhoediXComboBox * scaleMethod;
 
 	wxStaticText * scaleInterpolationLabel;
-	wxComboBox * scaleInterpolation;
+	PhoediXComboBox * scaleInterpolation;
 
 	wxStaticText * scalePercentageLabel;
 	DoubleSlider * scalePercentage;

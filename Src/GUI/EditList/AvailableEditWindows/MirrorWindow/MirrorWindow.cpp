@@ -19,7 +19,7 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 
 	mirrorMethodLabel->SetForegroundColour(Colors::TextLightGrey);
 
-	mirrorMethod = new wxComboBox(this, -1);
+	mirrorMethod = new PhoediXComboBox(this, -1);
 	mirrorMethod->AppendString("No Mirror");
 	mirrorMethod->AppendString("Mirror Horizontal");
 	mirrorMethod->AppendString("Mirror Vertical");

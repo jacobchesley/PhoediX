@@ -25,7 +25,7 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	rotationCropLabel->SetForegroundColour(Colors::TextLightGrey);
 	customRotationLabel->SetForegroundColour(Colors::TextLightGrey);
 
-	rotationMethod = new wxComboBox(this, -1);
+	rotationMethod = new PhoediXComboBox(this, -1);
 	rotationMethod->AppendString("No Rotation");
 	rotationMethod->AppendString("90 Deg. Clockwise");
 	rotationMethod->AppendString("180 Deg.");
@@ -33,13 +33,13 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 	rotationMethod->AppendString("Custom Angle");
 	rotationMethod->SetSelection(0);
 
-	customRotationInterpolation = new wxComboBox(this, -1);
+	customRotationInterpolation = new PhoediXComboBox(this, -1);
 	customRotationInterpolation->AppendString("Nearest Neightbor");
 	customRotationInterpolation->AppendString("Bilinear");
 	customRotationInterpolation->AppendString("Bicubic");
 	customRotationInterpolation->SetSelection(2);
 
-	customRotationCrop = new wxComboBox(this, -1);
+	customRotationCrop = new PhoediXComboBox(this, -1);
 	customRotationCrop->AppendString("Keep Size");
 	customRotationCrop->AppendString("Fit");
 	customRotationCrop->AppendString("Expand");

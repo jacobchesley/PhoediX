@@ -9,6 +9,8 @@
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
 
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
+
 class AdjustBrightnessWindow : public EditWindow {
 public:
 	AdjustBrightnessWindow(wxWindow * parent, wxString editName, Processor * processor);
@@ -32,7 +34,7 @@ private:
 	wxStaticText * preservationLabel;
 
 	DoubleSlider * brightSlider;
-	wxComboBox * detailsSelect;
+	PhoediXComboBox * detailsSelect;
 	DoubleSlider * toneSlider;
 	DoubleSlider * preservationSlider;
 

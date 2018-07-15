@@ -17,6 +17,7 @@
 #include "wx/textfile.h"
 
 #include "GUI/Controls/PhoediXButton/PhoediXButton.h"
+#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Image/Image.h"
@@ -59,11 +60,11 @@ private:
 	wxStaticText * settingsLabel;
 
 	wxStaticText * colorDepthLabel;
-	wxComboBox * colorDepth;
+	PhoediXComboBox * colorDepth;
 	int lastColorDepth;
 
 	wxStaticText * colorSpaceLabel;
-	wxComboBox * colorSpace;
+	PhoediXComboBox * colorSpace;
 
 	wxStaticText * numThreadsLabel;
 	wxSlider * numThreads;
@@ -95,7 +96,7 @@ private:
 		wxStaticText * generalSettingsLabel;
 
 		wxStaticText * languageLabel;
-		wxComboBox * language;		
+		PhoediXComboBox * language;		
 	};
 
 	class PerformanceSettingsPane : wxPanel{
