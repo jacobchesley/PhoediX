@@ -249,7 +249,7 @@ void DoubleSlider::OnText(wxCommandEvent& WXUNUSED(evt)){
 void DoubleSlider::ResizeValueText() {
 
 	// Get the width of the text of the value text, so we can size it correctly
-	wxString valStr = "999";
+	wxString valStr = valText->GetValue();
 	wxCoord textWidth = 0;
 	wxCoord textHeight = 0;
 	valText->GetTextExtent(valStr, &textWidth, &textHeight);
