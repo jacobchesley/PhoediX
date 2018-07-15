@@ -196,6 +196,9 @@
     <Filter Include="GUI\Edit List\Available Edits\Available Edit Windows\Blur">
       <UniqueIdentifier>{722d8a0c-dbca-4679-b41f-a3ee67b01249}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Controls\PhoediX ComboBox">
+      <UniqueIdentifier>{a37be42e-128a-4281-b282-2f2cab600cb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -368,6 +371,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\EditList\AvailableEditWindows\BlurWindow\BlurWindow.cpp">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Blur</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Controls\PhoediXComboBox\PhoediXComboBox.cpp">
+      <Filter>GUI\Controls\PhoediX ComboBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -565,6 +571,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\BlurWindow\BlurWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Blur</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Controls\PhoediXComboBox\PhoediXComboBox.h">
+      <Filter>GUI\Controls\PhoediX ComboBox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
