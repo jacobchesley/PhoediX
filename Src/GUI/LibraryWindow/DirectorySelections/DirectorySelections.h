@@ -34,6 +34,7 @@ public:
 
 	DirectorySelections(wxWindow * parent);
 	wxVector<wxString> GetDirectoryList();
+	wxVector<wxString> GetTopDirectoryList();
 
 	void SendDirectoriesExist();
 	void SendNoDirectoriesExist();
@@ -57,6 +58,7 @@ private:
 	public:
 		DirectoryDisplayItem(DirectorySelections * parent);
 		wxVector<wxString> GetDirectoriesNames();
+		wxString GetDirectoryName();
 		void SetSequence(int sequence);
 		int GetSequence();
 

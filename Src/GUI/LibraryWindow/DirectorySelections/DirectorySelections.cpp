@@ -123,6 +123,11 @@ wxVector<wxString> DirectorySelections::DirectoryDisplayItem::GetDirectoriesName
 	return returnList;
 }
 
+wxString DirectorySelections::DirectoryDisplayItem::GetDirectoryName() {
+
+	return directoryText->GetValue();
+}
+
 DirectorySelections::DirectorySelections(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
@@ -204,6 +209,16 @@ wxVector<wxString> DirectorySelections::GetDirectoryList() {
 		for (size_t j = 0; j < subDirs.size(); j++) {
 			returnVec.push_back(subDirs[j]);
 		}
+	}
+
+	return returnVec;
+}
+
+wxVector<wxString> DirectorySelections::GetTopDirectoryList() {
+	wxVector<wxString> returnVec;
+
+	for (size_t i = 0; i < directoryItems.size(); i++) {
+		returnVec.push_back(directoryItems[i]->GetDirectoryName());
 	}
 
 	return returnVec;
