@@ -12,7 +12,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	this->SetSizer(mainSizer);
 	this->SetBackgroundColour(Colors::BackDarkGrey);
 	
-	titleText = new wxStaticText(this, -1, "List of Edits");
+	titleText = new wxStaticText(this, -1, "Edit Pipeline");
 	titleText->SetForegroundColour(Colors::TextLightGrey);
 	titleText->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 

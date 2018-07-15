@@ -120,8 +120,8 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	editList = new EditListPanel(this, processor, imagePanel);
 	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
 	editListInfo.Right();
-	editListInfo.Caption("Edit List");
-	editListInfo.Name("EditList");
+	editListInfo.Caption("Edit Pipeline");
+	editListInfo.Name("EditPipeline");
 	editListInfo.CloseButton(true);
 	editListInfo.PinButton(true);
 	editListInfo.DestroyOnClose(false);
