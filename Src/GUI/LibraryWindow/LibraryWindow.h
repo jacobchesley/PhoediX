@@ -65,6 +65,7 @@ private:
 	void OnNoDirExists(wxSizeEvent & WXUNUSED(evt));
 	void OnLibraryImageCheck(wxCommandEvent& WXUNUSED(evt));
 	void EnableDisableMoveCopy();
+	wxSize GetLibraryImageSize();
 
 	wxVector<wxString> GetSelectedFileNames();
 

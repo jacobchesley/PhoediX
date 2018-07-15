@@ -16,6 +16,7 @@
 #include "GUI/ImageDisplay/ZoomImageFrame/ZoomImageFrame.h"
 #include "Processing/ImageHandler/ImageHandler.h"
 #include "GUI/AUIManager/AUIManager.h"
+#include "LibRaw.h"
 
 enum {
 	ID_ADD_LIB_IMAGE_EVT,
@@ -48,6 +49,7 @@ private:
 	void OnCheck(wxCommandEvent& WXUNUSED(evt));
 
 	wxImage * img;
+	wxBoxSizer * wrapLayout;
 	wxBoxSizer * mainLayout;
 	wxBoxSizer * subLayout;
 	WXImagePanel * imageDisplay;

@@ -12,9 +12,8 @@ LibraryImage::LibraryImage(wxWindow * parent, wxWindow * libParent, wxImage * im
 
 	path = filePath;
 
+	wrapLayout = new wxBoxSizer(wxHORIZONTAL);
 	mainLayout = new wxBoxSizer(wxVERTICAL);
-	this->SetSizer(mainLayout);
-
 	subLayout = new wxBoxSizer(wxHORIZONTAL);
 
 	imageDisplay = new WXImagePanel(this, image, true, true);
@@ -27,13 +26,22 @@ LibraryImage::LibraryImage(wxWindow * parent, wxWindow * libParent, wxImage * im
 	nameDisplay->SetBackgroundColour(this->GetBackgroundColour());
 	nameDisplay->SetForegroundColour(Colors::TextLightGrey);
 
-	subLayout->Add(nameDisplay, 1, wxEXPAND |wxRIGHT);
+	subLayout->Add(nameDisplay);
+
+	int imageWidth = imageDisplay->GetSize().GetWidth();
+	int nameWidth = nameDisplay->GetSize().GetWidth();
+	int selectWidth = selectBox->GetSize().GetWidth();
+	subLayout->AddSpacer(imageWidth - nameWidth - selectWidth);
+
+
 	subLayout->Add(selectBox);
 
-	this->GetSizer()->Add(imageDisplay);
-	this->GetSizer()->Add(subLayout, 0, wxEXPAND);
-	this->GetSizer()->AddSpacer(50);
-	
+	mainLayout->Add(imageDisplay);
+	mainLayout->Add(subLayout, 0, wxEXPAND);
+
+	wrapLayout->Add(mainLayout);
+
+	this->SetSizer(wrapLayout);
 	this->GetSizer()->Layout();
 
 	this->Bind(wxEVT_LEFT_DCLICK, (wxMouseEventFunction)&LibraryImage::OnLeftDoubleClick, this);
@@ -46,27 +54,25 @@ LibraryImage::LibraryImage(wxWindow * parent, wxWindow * libParent, wxImage * im
 void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
 	
 	wxImage * displayImage = NULL;
+	LibRaw * rawProc = new LibRaw();
 
 	// We have a raw image we can load in
 	if (ImageHandler::CheckRaw(path)) {
 
-		LibRaw rawProc;
-
-		rawProc.recycle();
 		#ifdef __WXMSW__
-			rawProc.open_file(path.wc_str());
+			rawProc->open_file(path.wc_str());
 		#else
-			rawProc.open_file(path.c_str());
+			rawProc->open_file(path.c_str());
 		#endif
-		rawProc.unpack();
-		rawProc.imgdata.params.half_size = 1;
-		rawProc.imgdata.params.use_camera_wb = 1;
-		rawProc.imgdata.params.use_auto_wb = 0;
+		rawProc->unpack();
+		rawProc->imgdata.params.half_size = 1;
+		rawProc->imgdata.params.use_camera_wb = 1;
+		rawProc->imgdata.params.use_auto_wb = 0;
 
 		int rawError = LIBRAW_SUCCESS;
 
-		rawProc.dcraw_process();
-		libraw_processed_image_t * rawImg = rawProc.dcraw_make_mem_image(&rawError);
+		rawProc->dcraw_process();
+		libraw_processed_image_t * rawImg = rawProc->dcraw_make_mem_image(&rawError);
 
 		if (rawError == LIBRAW_SUCCESS) {
 
@@ -76,7 +82,9 @@ void LibraryImage::OnLeftDoubleClick(wxMouseEvent& WXUNUSED(evt)){
 			ZoomImageFrame * displayFrame = new ZoomImageFrame(this, this->GetName(), displayImage);
 			displayFrame->Show();
 		}
-		rawProc.dcraw_clear_mem(rawImg);
+		rawProc->dcraw_clear_mem(rawImg);
+		rawProc->recycle();
+		delete rawProc;
 	}
 
 	// We have an image we can load in

@@ -368,14 +368,13 @@ void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxStr
 	}
 	locker.Enter();
 	LibraryImage * newLibImage = new LibraryImage(imageScroll, this, newImage, fileName, filePath);
+	newLibImage->SetMinSize(this->GetLibraryImageSize());
 	newImage->Destroy();
 	delete newImage;
 	newImage = NULL;
 
 	int idx = imagePaths.Add(fileName);
-	imageScroll->GetSizer()->Insert((idx * 3), new wxPanel(imageScroll, -1, wxDefaultPosition, wxSize(25, 25)));
-	imageScroll->GetSizer()->Insert((idx * 3) + 1, newLibImage);
-	imageScroll->GetSizer()->Insert((idx * 3) + 2, new wxPanel(imageScroll, -1, wxDefaultPosition, wxSize(25, 25)));
+	imageScroll->GetSizer()->Insert(idx, newLibImage);
 	libraryImages.insert(libraryImages.begin() + idx, newLibImage);
 
 	this->Layout();
@@ -385,6 +384,14 @@ void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxStr
 	else { clearButton->Disable(); }
 
 	locker.Leave();
+}
+
+wxSize LibraryWindow::GetLibraryImageSize() {
+
+	int imageSize = 250;
+	int buffer = 30;
+
+	return wxSize(imageSize + buffer, imageSize + buffer);
 }
 
 wxVector<wxString> LibraryWindow::GetSelectedFileNames() {
