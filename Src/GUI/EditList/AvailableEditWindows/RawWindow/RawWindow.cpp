@@ -384,7 +384,7 @@ void RawWindow::PopulateRawInfo(){
 	this->AddRawInfo("", "");
 	this->AddRawInfo("Camera Make", wxString(proc->rawPrcoessor.imgdata.idata.make));
 	this->AddRawInfo("Camera Model", wxString(proc->rawPrcoessor.imgdata.idata.model));
-
+	this->AddRawInfo("Software", wxString(proc->rawPrcoessor.imgdata.idata.software));
 
 	this->AddRawInfo("", "");
 	this->AddRawInfo("Lens Make", wxString(proc->rawPrcoessor.imgdata.lens.LensMake), true);
@@ -404,7 +404,6 @@ void RawWindow::PopulateRawInfo(){
 	if(!this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4MinFocal), true)){
 		this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.MaxAp4MinFocal), true);
 	}
-
 	if(!this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4MaxFocal), true)){
 		this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.MaxAp4MaxFocal), true);
 	}
@@ -439,7 +438,7 @@ wxString RawWindow::GetShutterSpeedStr(float shutterSpeed){
 		return wxString::Format(wxT("%f"), shutterSpeed);
 	}
 
-	for(int i = 1; i < 16001; i++){
+	for(int i = 1; i < 50001; i++){
 		if((1.0f / (float)i) == shutterSpeed){
 			return wxString("1/" + wxString::Format(wxT("%i"), i));
 		}
