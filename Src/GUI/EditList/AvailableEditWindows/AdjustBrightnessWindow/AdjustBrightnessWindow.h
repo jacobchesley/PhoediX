@@ -9,7 +9,7 @@
 #include "Processing/Processor/Processor.h"
 #include "Debugging/MemoryLeakCheck.h"
 
-#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
+#include "GUI/Controls/PhoediXComboBox/PhoediXComboBox.h"
 
 class AdjustBrightnessWindow : public EditWindow {
 public:
