@@ -27,6 +27,7 @@
 #include "GUI/MainWindow/MainWindow.h"
 #include "Debugging/MemoryLeakCheck.h"
 #include "Debugging/Logger/Logger.h"
+#include "Processing/Image/Image.h"
 
 class PhoediX : public wxApp {
 public:

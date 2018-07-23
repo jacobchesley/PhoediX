@@ -11,17 +11,18 @@
 #include "wx/wx.h"
 #endif
 
+#include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Colors/Colors.h"
+#include "GUI/Controls/ExifRead/ExifRead.h"
 #include "GUI/ImageDisplay/wxImagePanel/wxImagePanel.h"
 #include "GUI/ImageDisplay/ZoomImageFrame/ZoomImageFrame.h"
 #include "Processing/ImageHandler/ImageHandler.h"
-#include "GUI/AUIManager/AUIManager.h"
 #include "LibRaw.h"
 
 enum {
 	ID_ADD_LIB_IMAGE_EVT,
 	ID_OPEN_IMAGE_NEW_PROJECT,
-	ID_LIB_IMAGE_CHECK_EVT
+	ID_LIB_IMAGE_CHECK_EVT,
 };
 
 wxDECLARE_EVENT(OPEN_IMAGE_NEW_PROJECT_EVENT, wxCommandEvent);

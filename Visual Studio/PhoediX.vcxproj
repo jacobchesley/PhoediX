@@ -27,6 +27,7 @@
     <ClCompile Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.cpp" />
+    <ClCompile Include="..\Src\GUI\Controls\ExifRead\ExifRead.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\PhoediXButton\PhoediXButton.cpp" />
     <ClCompile Include="..\Src\GUI\Controls\PhoediXComboBox\PhoediXComboBox.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.cpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="..\Src\GUI\Controls\CollapsiblePane\CollapsiblePane.h" />
     <ClInclude Include="..\Src\GUI\Controls\CurvesPanel\CurvesPanel.h" />
     <ClInclude Include="..\Src\GUI\Controls\DoubleSlider\DoubleSlider.h" />
+    <ClInclude Include="..\Src\GUI\Controls\ExifRead\ExifRead.h" />
     <ClInclude Include="..\Src\GUI\Controls\PhoediXButton\PhoediXButton.h" />
     <ClInclude Include="..\Src\GUI\Controls\PhoediXComboBox\PhoediXComboBox.h" />
     <ClInclude Include="..\Src\GUI\EditList\AvailableEdits\AvailableEdits.h" />

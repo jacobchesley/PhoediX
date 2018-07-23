@@ -110,7 +110,10 @@ void LibraryImage::OnRightClick(wxMouseEvent& WXUNUSED(evt)) {
 	// Display a popup menu of options
 	wxMenu popupMenu;
 	popupMenu.Append(LibraryImage::PopupMenuActions::OPEN_IN_NEW_PROJECT, "Open Image in New Project");
-	popupMenu.Append(LibraryImage::PopupMenuActions::VIEW_IMAGE_DETAILS, "View Image Details");
+
+	if (ImageHandler::CheckRaw(this->GetPath()) || ImageHandler::CheckExif(this->GetPath())) {
+		popupMenu.Append(LibraryImage::PopupMenuActions::VIEW_IMAGE_DETAILS, "View Image Details");
+	}
 
 	popupMenu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(LibraryImage::OnPopupMenuClick), NULL, this);
 	this->PopupMenu(&popupMenu);
@@ -127,6 +130,15 @@ void LibraryImage::OnPopupMenuClick(wxCommandEvent& inEvt) {
 			wxCommandEvent evt(OPEN_IMAGE_NEW_PROJECT_EVENT, ID_OPEN_IMAGE_NEW_PROJECT);
 			evt.SetString(this->GetPath());
 			wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
+		}
+		
+		// View imaged details
+		case LibraryImage::PopupMenuActions::VIEW_IMAGE_DETAILS: {
+			Image * exifImage = new Image();
+			ImageHandler::ReadExif(this->GetPath(), exifImage);
+			ExifReadFrame * exifReadFrame = new ExifReadFrame(this, this->GetPath(), exifImage);
+			exifReadFrame->Show();
+
 		}
 	}
 }

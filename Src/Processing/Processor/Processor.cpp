@@ -7627,6 +7627,9 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			wxPostEvent(processor->GetParentWindow(), evt);
 		}
 
+		// Populate image exif information
+		ImageHandler::ReadExifFromRaw(&processor->rawPrcoessor, processor->GetImage());
+
 		processor->Unlock();
 		processor->ProcessEdits();
 		processor->DeleteRawImage();

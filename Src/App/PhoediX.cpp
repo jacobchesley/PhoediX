@@ -25,7 +25,8 @@ bool PhoediX::OnInit(){
 	Logger::LogToFile(true);
 #endif
 	wxInitAllImageHandlers();
-   
+	Image::InitExif();
+
     // Create and show the main window
 	Logger::Log("PhoediX App - Creating and Showing Main Window", Logger::LogLevel::LOG_VERBOSE);
 	MainWindow * mainWindow = new MainWindow(this);

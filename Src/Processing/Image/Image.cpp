@@ -17,6 +17,7 @@ Image::Image() {
 	width = 0;
 	height = 0;
 	errorMessage = "";
+	exifMap = std::map<size_t, void*>();
 }
 
 Image::Image(const Image& imageToCopy) {
@@ -28,6 +29,8 @@ Image::Image(const Image& imageToCopy) {
 	height = imageToCopy.height;
 	bit16Enabled = imageToCopy.bit16Enabled;
 	errorMessage = "";
+	exifMap = imageToCopy.exifMap;
+
 
 	int size = width * height;
 	if(size < 1){
@@ -619,4 +622,129 @@ void Image::Disable16Bit() {
 		delete[] imageDataBlue16;
 		imageDataBlue16 = NULL;
 	}
+}
+
+std::map<size_t, void*> * Image::GetExifMap() {
+	return &exifMap;
+}
+
+std::map<size_t, wxString> Image::exifTags = std::map<size_t, wxString>();
+std::map<size_t, int> Image::exifFormats = std::map<size_t, int>();
+
+void Image::InitExif(){
+
+	// Tags used by IFD0 (main image)
+	exifTags[0x010E] = "ImageDescription"; exifFormats[0x010E] = Image::ExifType::ASCII;
+	exifTags[0x010F] = "Make"; exifFormats[0x010F] = Image::ExifType::ASCII;
+	exifTags[0x0110] = "Model"; exifFormats[0x0110] = Image::ExifType::ASCII;
+	exifTags[0x0112] = "Orientation"; exifFormats[0x0112] = Image::ExifType::U_SHORT;
+	exifTags[0x011A] = "XResolution"; exifFormats[0x011A] = Image::ExifType::U_RATIONAL;
+	exifTags[0x011B] = "YResolution"; exifFormats[0x011B] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0128] = "ResolutionUnit"; exifFormats[0x0128] = Image::ExifType::U_SHORT;
+	exifTags[0x0131] = "Software"; exifFormats[0x0131] = Image::ExifType::ASCII;
+	exifTags[0x0132] = "DateTime"; exifFormats[0x0102] = Image::ExifType::ASCII;
+	exifTags[0x013E] = "WhitePoint"; exifFormats[0x013E] = Image::ExifType::U_RATIONAL;
+	exifTags[0x013F] = "PrimaryChromaticities"; exifFormats[0x013F] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0211] = "YCbCrCoefficients"; exifFormats[0x0211] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0213] = "YCbCrPositioning"; exifFormats[0x0213] = Image::ExifType::U_SHORT;
+	exifTags[0x0214] = "ReferenceBlackWhite"; exifFormats[0x0214] = Image::ExifType::U_RATIONAL;
+	exifTags[0x8298] = "Copyright"; exifFormats[0x8298] = Image::ExifType::ASCII;
+	exifTags[0x8769] = "ExifOffset"; exifFormats[0x8769] = Image::ExifType::U_LONG;
+
+	// Tags used by Exif SubIFD
+	exifTags[0x829A] = "ExposureTime"; exifFormats[0x829A] = Image::ExifType::U_RATIONAL;
+	exifTags[0x829D] = "FNumber"; exifFormats[0x829D] = Image::ExifType::U_RATIONAL;
+	exifTags[0x8822] = "ExposureProgram"; exifFormats[0x8822] = Image::ExifType::U_SHORT;
+	exifTags[0x8827] = "ISOSpeedRatings"; exifFormats[0x8827] = Image::ExifType::U_SHORT;
+	exifTags[0x9000] = "ExifVersion"; exifFormats[0x9000] = Image::ExifType::UNDEFINED;
+	exifTags[0x9003] = "DateTimeOriginal"; exifFormats[0x9003] = Image::ExifType::ASCII;
+	exifTags[0x9004] = "DateTimeDigitized"; exifFormats[0x9004] = Image::ExifType::ASCII;
+	exifTags[0x9101] = "ComponentConfiguration"; exifFormats[0x9101] = Image::ExifType::UNDEFINED;
+	exifTags[0x9102] = "CompressedBitsPerPixel"; exifFormats[0x9102] = Image::ExifType::U_RATIONAL;
+	exifTags[0x9201] = "ShutterSpeedValue"; exifFormats[0x9201] = Image::ExifType::S_RATIONAL;
+	exifTags[0x9202] = "AperatureValue"; exifFormats[0x9202] = Image::ExifType::U_RATIONAL;
+	exifTags[0x9203] = "BrightnessValue"; exifFormats[0x9203] = Image::ExifType::S_RATIONAL;
+	exifTags[0x9204] = "ExposureBiasValue"; exifFormats[0x9204] = Image::ExifType::S_RATIONAL;
+	exifTags[0x9205] = "MaxApertureValue"; exifFormats[0x9205] = Image::ExifType::U_RATIONAL;
+	exifTags[0x9206] = "SubjectDistance"; exifFormats[0x9206] = Image::ExifType::S_RATIONAL;
+	exifTags[0x9207] = "MeteringMode"; exifFormats[0x9207] = Image::ExifType::U_SHORT;
+	exifTags[0x9208] = "LightSource"; exifFormats[0x9208] = Image::ExifType::U_SHORT;
+	exifTags[0x9209] = "Flash"; exifFormats[0x9209] = Image::ExifType::U_SHORT;
+	exifTags[0x920A] = "FocalLength"; exifFormats[0x920A] = Image::ExifType::U_RATIONAL;
+	exifTags[0x927C] = "MakerNote"; exifFormats[0x927C] = Image::ExifType::UNDEFINED;
+	exifTags[0x9286] = "UserComment"; exifFormats[0x9286] = Image::ExifType::UNDEFINED;
+	exifTags[0xA000] = "FlashPixVersion"; exifFormats[0XA000] = Image::ExifType::UNDEFINED;
+	exifTags[0xA001] = "ColorSpace"; exifFormats[0xA001] = Image::ExifType::U_SHORT;
+	exifTags[0xA002] = "ExifImageWidth"; exifFormats[0xA002] = Image::ExifType::U_LONG;
+	exifTags[0xA003] = "ExifImageHeight";  exifFormats[0xA003] = Image::ExifType::U_LONG;
+	exifTags[0xA004] = "RelatedSoundFile"; exifFormats[0xA004] = Image::ExifType::ASCII;
+	exifTags[0xA005] = "ExifInteroperabilityOffset"; exifFormats[0xA005] = Image::ExifType::U_LONG;
+	exifTags[0xA20E] = "FocalPlaneXResolution"; exifFormats[0xA20E] = Image::ExifType::U_RATIONAL;
+	exifTags[0xA20F] = "FocalPlaneYResolution"; exifFormats[0xA20F] = Image::ExifType::U_RATIONAL;
+	exifTags[0xA210] = "FocalPlaneResolutionUnit"; exifFormats[0xA210] = Image::ExifType::U_SHORT;
+	exifTags[0xA217] = "SensingMethod"; exifFormats[0xA217] = Image::ExifType::U_SHORT;
+	exifTags[0xA300] = "FileSource"; exifFormats[0xA300] = Image::ExifType::UNDEFINED;
+	exifTags[0xA301] = "SceneType"; exifFormats[0xA301] = Image::ExifType::UNDEFINED;
+
+	// Tags used by IFD1 (thumbnail image)
+	exifTags[0x0100] = "ImageWidth"; exifFormats[0x0100] = Image::ExifType::U_LONG;
+	exifTags[0x0101] = "ImageLength"; exifFormats[0x0101] = Image::ExifType::U_LONG;
+	exifTags[0x0102] = "BitsPerSample"; exifFormats[0x0102] = Image::ExifType::U_SHORT;
+	exifTags[0x0103] = "Compression"; exifFormats[0x0103] = Image::ExifType::U_SHORT;
+	exifTags[0x0106] = "PhotometricInterpretation"; exifFormats[0x0106] = Image::ExifType::U_SHORT;
+	exifTags[0x0111] = "StripOffset";  exifFormats[0x0111] = Image::ExifType::U_LONG;
+	exifTags[0x0115] = "SamplesPerPixel"; exifFormats[0x0115] = Image::ExifType::U_SHORT;
+	exifTags[0x0116] = "RowsPerStrip"; exifFormats[0x0116] = Image::ExifType::U_LONG;
+	exifTags[0x0117] = "StripByteCounts"; exifFormats[0x0117] = Image::ExifType::U_LONG;
+	exifTags[0x011A] = "XResolution"; exifFormats[0x011A] = Image::ExifType::U_RATIONAL;
+	exifTags[0x011B] = "YResolution"; exifFormats[0x011B] = Image::ExifType::U_RATIONAL;
+	exifTags[0x011C] = "PlanarConfiguration"; exifFormats[0x011C] = Image::ExifType::U_SHORT;
+	exifTags[0x0128] = "ResolutionUnit"; exifFormats[0x0128] = Image::ExifType::U_SHORT;
+	exifTags[0x0201] = "JpegIFOffset"; exifFormats[0x0201] = Image::ExifType::U_LONG;
+	exifTags[0x0202] = "JpegIFByteCount"; exifFormats[0x0202] = Image::ExifType::U_LONG;
+	exifTags[0x0211] = "YCbCrCoefficients"; exifFormats[0x0203] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0212] = "YCbCrSubSampling"; exifFormats[0x0212] = Image::ExifType::U_SHORT;
+	exifTags[0x0213] = "YCbCrPositioning"; exifFormats[0x0213] = Image::ExifType::U_SHORT;
+	exifTags[0x0214] = "ReferenceBlackWhite"; exifFormats[0x0214] = Image::ExifType::U_RATIONAL;
+
+	// Misc Tags
+	exifTags[0x00FE] = "NewSubfileType"; exifFormats[0x00FE] = Image::ExifType::U_LONG;
+	exifTags[0x00FF] = "SubfileType"; exifFormats[0x00FF] = Image::ExifType::U_SHORT;
+	exifTags[0x012D] = "TransferFunction"; exifFormats[0x012D] = Image::ExifType::U_SHORT;
+	exifTags[0x013B] = "Artist"; exifFormats[0x013B] = Image::ExifType::ASCII;
+	exifTags[0x013D] = "Predictor"; exifFormats[0x013D] = Image::ExifType::U_SHORT;
+	exifTags[0x0142] = "TileWidth"; exifFormats[0x0142] = Image::ExifType::U_SHORT;
+	exifTags[0x0143] = "TileLength"; exifFormats[0x0143] = Image::ExifType::U_SHORT;
+	exifTags[0x0144] = "TileOffsets"; exifFormats[0x0144] = Image::ExifType::U_LONG;
+	exifTags[0x0145] = "TileByteCounts"; exifFormats[0x0145] = Image::ExifType::U_SHORT;
+	exifTags[0x014A] = "SubIFDs"; exifFormats[0x014A] = Image::ExifType::U_LONG;
+	exifTags[0x015B] = "JPEGTables"; exifFormats[0x015B] = Image::ExifType::UNDEFINED;
+	exifTags[0x828D] = "CFARepeatPatternDim"; exifFormats[0x828D] = Image::ExifType::U_SHORT;
+	exifTags[0x828E] = "CFAPattern"; exifFormats[0x828E] = Image::ExifType::U_BYTE;
+	exifTags[0x828F] = "BatteryLevel"; exifFormats[0x828F] = Image::ExifType::U_RATIONAL;
+	exifTags[0x83BB] = "IPTC/NAA"; exifFormats[0x83BB] = Image::ExifType::U_LONG;
+	exifTags[0x8773] = "InterColorProfile"; exifFormats[0x8773] = Image::ExifType::UNDEFINED;
+	exifTags[0x8824] = "SpectralSensitivity"; exifFormats[0x8824] = Image::ExifType::ASCII;
+	exifTags[0x8825] = "GPSInfo"; exifFormats[0x8825] = Image::ExifType::U_LONG;
+	exifTags[0x8828] = "OECF"; exifFormats[0x8828] = Image::ExifType::UNDEFINED;
+	exifTags[0x8829] = "Interlace"; exifFormats[0x8829] = Image::ExifType::U_SHORT;
+	exifTags[0x882A] = "TimeZoneOffset"; exifFormats[0x882A] = Image::ExifType::S_SHORT;
+	exifTags[0x882B] = "SelfTimerMode"; exifFormats[0x882B] = Image::ExifType::U_SHORT;
+	exifTags[0x920B] = "FlashEnergy"; exifFormats[0x920B] = Image::ExifType::U_RATIONAL;
+	exifTags[0x920C] = "SpatialFrequencyResponse"; exifFormats[0x920C] = Image::ExifType::UNDEFINED;
+	exifTags[0x920D] = "Noise"; exifFormats[0x920D] = Image::ExifType::UNDEFINED;
+	exifTags[0x9211] = "ImageNumber"; exifFormats[0x9211] = Image::ExifType::U_LONG;
+	exifTags[0x9212] = "SecurityClassification"; exifFormats[0x9212] = Image::ExifType::ASCII;
+	exifTags[0x9213] = "ImageHistory"; exifFormats[0x9213] = Image::ExifType::ASCII;
+	exifTags[0x9214] = "SubjectLocation"; exifFormats[0x9214] = Image::ExifType::U_SHORT;
+	exifTags[0x9215] = "ExposureIndex"; exifFormats[0x9215] = Image::ExifType::U_RATIONAL;
+	exifTags[0x9216] = "TIFF/EPStandardID"; exifFormats[0x9216] = Image::ExifType::U_BYTE;
+	exifTags[0x9290] = "SubSecTime"; exifFormats[0x9290] = Image::ExifType::ASCII;
+	exifTags[0x9291] = "SubSecTimeOriginal"; exifFormats[0x9291] = Image::ExifType::ASCII;
+	exifTags[0x9292] = "SubSecTimeDigitized"; exifFormats[0x9292] = Image::ExifType::ASCII;
+	exifTags[0xA20B] = "FlashEnergy"; exifFormats[0xA20B] = Image::ExifType::U_RATIONAL;
+	exifTags[0xA20C] = "SpatialFrequencyResponse"; exifFormats[0xA20C] = Image::ExifType::U_SHORT;
+	exifTags[0xA214] = "SubjectLocation"; exifFormats[0xA214] = Image::ExifType::U_SHORT;
+	exifTags[0xA215] = "ExposureIndex"; exifFormats[0xA215] = Image::ExifType::U_RATIONAL;
+	exifTags[0xA302] = "CFAPattern"; exifFormats[0xA302] = Image::ExifType::UNDEFINED;
 }

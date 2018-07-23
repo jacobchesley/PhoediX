@@ -38,6 +38,7 @@ void ImageHandler::LoadImageFromFile(wxString fileName, Image * image) {
 	else{
 		wxImage fileImage(fileName);
 		image->SetDataFrom8(fileImage.GetData(), fileImage.GetWidth(), fileImage.GetHeight());
+		ImageHandler::ReadExif(fileName, image);
 	}
 }
 
@@ -285,7 +286,6 @@ int ImageHandler::GetTiffBitDepth(wxString fileName){
 void ImageHandler::Read16BitTiff(wxString fileName, Image * image){
 
 	TIFF* tif = TIFFOpen(fileName.c_str(), "r");
-
 			
 	uint32 width = 0;
 	uint32 height = 0;
@@ -508,4 +508,365 @@ void ImageHandler::Write16BitTiff(wxString fileName, Image * image){
 		delete[] outBuffer;
 		TIFFClose(tif);
 	}
+}
+
+void ImageHandler::ReadExif(wxString fileName, Image * image) {
+
+	if (ImageHandler::CheckRaw(fileName)) {
+
+		// Attempt to open file in LibRaw raw processor and get the error code returned
+		LibRaw  * tempRawProc = new LibRaw();
+		#ifdef __WXMSW__
+			tempRawProc->open_file(fileName.wc_str());
+		#else
+			tempRawProc->open_file(fileName.c_str());
+		#endif
+		ImageHandler::ReadExifFromRaw(tempRawProc, image);
+		delete tempRawProc;
+	}
+	else {
+		ImageHandler::ReadExifDataFromFile(fileName, image);
+	}
+}
+
+bool ImageHandler::CheckExif(wxString fileName) {
+
+	size_t numberBytesToCheckForExif = 100000;
+	// Read in file to byte array
+	wxFileInputStream fileStream(fileName);
+	unsigned char * fileBytes = new unsigned char[fileStream.GetSize()];
+	fileStream.ReadAll(fileBytes, numberBytesToCheckForExif);
+
+	size_t exifStart = 0;
+	size_t exifSize = 0;
+
+	// Look for exif header
+	for (size_t i = 0; i < numberBytesToCheckForExif; i++) {
+
+		// Exif tag found
+		if (fileBytes[i] == 0xFF && fileBytes[i + 1] == 0xE1) {
+
+			exifSize = fileBytes[i + 2] | fileBytes[i + 3] << 8;
+			exifStart = i + 4;
+			break;
+		}
+	}
+
+	if (exifSize < 1) { return false; }
+
+	// Read in all exif data and delete file data after exif is read
+	unsigned char * exifBytes = new unsigned char[exifSize];
+	fileStream.SeekI(exifStart);
+	fileStream.Read(exifBytes, exifSize);
+	delete[] fileBytes;
+
+	// Check first 6 bytes to verify exif tag
+	unsigned char exifCheck[6];
+	exifCheck[0] = 'E'; exifCheck[1] = 'x';
+	exifCheck[2] = 'i'; exifCheck[3] = 'f';
+	exifCheck[4] = 0; exifCheck[5] = 0;
+
+	for (size_t i = 0; i < 6; i++) {
+		if (exifCheck[i] != exifBytes[i]) {
+			return false;
+		}
+	}
+
+	// Get endianness of exif data
+	bool littleEndian = true;
+	if (exifBytes[6] == 'I' && exifBytes[7] == 'I') { littleEndian = true; }
+	else if (exifBytes[6] == 'M' && exifBytes[7] == 'M') { littleEndian = false; }
+	else { return false; }
+
+	// Verify endianness
+	if (littleEndian && (exifBytes[8] != 0x2a || exifBytes[9] != 0x00)) {
+		return false;
+	}
+	if (!littleEndian && (exifBytes[8] != 0x00 || exifBytes[9] != 0x2a)) {
+		return false;
+	}
+	return true;
+}
+
+void ImageHandler::ReadExifFromRaw(LibRaw * rawProcessor, Image * image) {
+
+	(*image->GetExifMap())[0x0132] = new wxString(ctime(&rawProcessor->imgdata.other.timestamp)); // date/time
+	(*image->GetExifMap())[0x013B] = new wxString(rawProcessor->imgdata.other.artist); // Artist
+	(*image->GetExifMap())[0x010E] = new wxString(rawProcessor->imgdata.other.desc); // Description
+	(*image->GetExifMap())[0x9211] = (void*)(uint16) rawProcessor->imgdata.other.shot_order; // Shot Order
+
+	if (rawProcessor->imgdata.sizes.flip == 5 || rawProcessor->imgdata.sizes.flip == 6) {
+		(*image->GetExifMap())[0xA002] = (void*)(uint16)rawProcessor->imgdata.sizes.height; // Width (flipped)
+		(*image->GetExifMap())[0xA003] = (void*)(uint16)rawProcessor->imgdata.sizes.width; // height (flipped)
+	}
+	else {
+		(*image->GetExifMap())[0xA002] = (void*)(uint16)rawProcessor->imgdata.sizes.width; // Width 
+		(*image->GetExifMap())[0xA003] = (void*)(uint16)rawProcessor->imgdata.sizes.height; // height
+	}
+
+	// Shutter Speed calculation
+	float shutterSpeed = rawProcessor->imgdata.other.shutter;
+	UnsignedRational * shutterSpeedRational = new UnsignedRational();
+	if (shutterSpeed > 1.0) { 
+		shutterSpeedRational->numerator = shutterSpeed; 
+		shutterSpeedRational->denominator = 1; 
+	}
+	else {
+		for (int i = 1; i < 500001; i++) {
+			if ((1.0f / (float)i) == shutterSpeed) {
+				shutterSpeedRational->numerator = 1;
+				shutterSpeedRational->denominator = i;
+			}
+		}
+	}
+	(*image->GetExifMap())[0x829A] = (void*)shutterSpeedRational; // Shutter Speed
+
+	UnsignedRational * fNumberRational = new UnsignedRational();
+	fNumberRational->numerator = rawProcessor->imgdata.other.aperture;
+	fNumberRational->denominator = 1;
+	(*image->GetExifMap())[0x829D] = (void*)fNumberRational; // FNumber
+
+	(*image->GetExifMap())[0x8827] = (void*)(uint16)rawProcessor->imgdata.other.iso_speed; // ISO
+	
+	UnsignedRational * focalRational = new UnsignedRational();
+	focalRational->numerator = rawProcessor->imgdata.other.focal_len;
+	focalRational->denominator = 1;
+	(*image->GetExifMap())[0x920A] = (void*)focalRational; // Focal Length
+
+	// Flash Fired
+	if (rawProcessor->imgdata.color.flash_used > 0.0) { (*image->GetExifMap())[0x9209] = (void*)(uint16)1; }
+	else{ (*image->GetExifMap())[0x9209] = (void*)(uint16)0; }
+
+	// Camera Info
+	(*image->GetExifMap())[0x010F] = new wxString(rawProcessor->imgdata.idata.make); // Camera Make
+	(*image->GetExifMap())[0x0110] = new wxString(rawProcessor->imgdata.idata.model); // Camera Model
+	(*image->GetExifMap())[0x0131] = new wxString(rawProcessor->imgdata.idata.software); // Software
+}
+
+void ImageHandler::ReadExifDataFromFile(wxString fileName, Image * image) {
+
+	// Read in file to byte array
+	wxFileInputStream fileStream(fileName);
+	unsigned char * fileBytes = new unsigned char[fileStream.GetSize()];
+	fileStream.ReadAll(fileBytes, fileStream.GetSize());
+
+	size_t exifStart = 0;
+	size_t exifSize = 0;
+
+	// Look for exif header
+	for (int i = 0; i < fileStream.GetSize(); i++){
+
+		// Exif tag found
+		if (fileBytes[i] == 0xFF && fileBytes[i + 1] == 0xE1) {
+
+			exifSize = fileBytes[i + 2] | fileBytes[i + 3] << 8;
+			exifStart = i + 4;
+			break;
+		}
+	}
+
+	if (exifSize < 1) { return; }
+	// Read in all exif data and delete file data after exif is read
+	unsigned char * exifBytes = new unsigned char[exifSize];
+	fileStream.SeekI(exifStart);
+	fileStream.Read(exifBytes, exifSize);
+	delete[] fileBytes;
+
+	// Check first 6 bytes to verify exif tag
+	unsigned char exifCheck[6];
+	exifCheck[0] = 'E'; exifCheck[1] = 'x'; 
+	exifCheck[2] = 'i'; exifCheck[3] = 'f';
+	exifCheck[4] = 0; exifCheck[5] = 0;
+
+	for (size_t i = 0; i < 6; i++) {
+		if (exifCheck[i] != exifBytes[i]) {
+			return;
+		}
+	}
+	
+	// Get endianness of exif data
+	bool littleEndian = true;
+	if      (exifBytes[6] == 'I' && exifBytes[7] == 'I') { littleEndian = true; }
+	else if (exifBytes[6] == 'M' && exifBytes[7] == 'M') { littleEndian = false; }
+	else { return; }
+
+	// Verify endianness
+	if (littleEndian && (exifBytes[8] != 0x2a || exifBytes[9] != 0x00)) {
+		return;
+	}
+	if (!littleEndian && (exifBytes[8] != 0x00 || exifBytes[9] != 0x2a)) {
+		return;
+	}
+
+	unsigned char firstIfd[4];
+	firstIfd[0] = exifBytes[10]; firstIfd[1] = exifBytes[11]; 
+	firstIfd[2] = exifBytes[12]; firstIfd[3] = exifBytes[13];
+
+	size_t firstIFDOffset = (size_t)ImageHandler::Get32BitUnsigned(firstIfd, littleEndian);
+	
+	// exifBytes + 6 to account for start "Exif\0\0"
+	ImageHandler::ParseDirectory(exifBytes + 6, firstIFDOffset, littleEndian, image);
+}
+
+void ImageHandler::ParseDirectory(unsigned char * data, size_t offset, bool littleEndian, Image * image) {
+
+	int entryOffset = 2;
+	unsigned long nextDirectory = 0;
+	size_t numberDirectoryEntries = ImageHandler::Get16BitUnsigned(data + offset, littleEndian);
+
+	for(int i = 0; i < numberDirectoryEntries; i++){
+
+		size_t tagNumber = ImageHandler::Get16BitUnsigned(data + offset + entryOffset, littleEndian);
+		if (Image::exifTags.count(tagNumber) <= 0) { continue; } // Check for unsupported tag
+		wxString tagName = Image::exifTags[tagNumber];
+		size_t format = ImageHandler::Get16BitUnsigned(data + offset + 2 + entryOffset, littleEndian);
+		size_t numberComponents = ImageHandler::Get32BitUnsigned(data + offset + 4 + entryOffset, littleEndian);
+		int dataSize = ImageHandler::GetBytesPerComponent(format) * (int)numberComponents;
+
+		if (dataSize > 4) {
+
+			// Get offset of value from start of exif data
+			unsigned long valueOffset = ImageHandler::Get32BitUnsigned(data + offset + 8 + entryOffset, littleEndian);
+
+			// Start data at 6 (to account for start "Exif\0\0")
+			void * value = GetValueFromAddress(data, valueOffset, dataSize, format, littleEndian);	
+
+			// Dereference map pointer from image to set value
+			(*image->GetExifMap())[tagNumber] = value;		
+		}
+		else {
+
+			// parse Sub IFD Directory
+			if (format == 4 && tagNumber == 0x8769) {
+
+				// Get sub dirrectory offset and parse
+				nextDirectory = ImageHandler::Get32BitUnsigned(data + offset + 8 + entryOffset, littleEndian);
+				ImageHandler::ParseDirectory(data, nextDirectory, littleEndian, image);
+			}
+
+			// Dereference map pointer from image to set value
+			void * value = GetValue(data + offset + 8 + entryOffset, format, littleEndian);
+			(*image->GetExifMap())[tagNumber] = value;
+		}
+
+		// Check next four bytes for offset of next directory
+		if (i == numberDirectoryEntries - 1) {
+			nextDirectory = ImageHandler::Get32BitUnsigned(data + offset + 12 + entryOffset, littleEndian);
+			if (nextDirectory == 0) { return; }
+			else { ImageHandler::ParseDirectory(data, nextDirectory, littleEndian, image); }
+		}
+		entryOffset += 12;
+	}
+}
+
+int ImageHandler::GetBytesPerComponent(size_t format) {
+	if (format == 1)  { return 1; } // Unsigned byte
+	if (format == 2)  { return 1; } // Asci String
+	if (format == 3)  { return 2; } // Unsigned short
+	if (format == 4)  { return 4; } // Unsigned long
+	if (format == 5)  { return 8; } // Unsigned rational
+	if (format == 6)  { return 1; } // Signed byte
+	if (format == 7)  { return 1; } // Undefined
+	if (format == 8)  { return 2; } // Signed short
+	if (format == 9)  { return 4; } // Signed long
+	if (format == 10) { return 8; } // signed rational
+	if (format == 11) { return 4; } // Single float
+	if (format == 12) { return 8; } // Double float
+	return 0;
+}
+
+void * ImageHandler::GetValue(unsigned char * valueData, size_t format, bool littleEndian) {
+
+	if (format == 1) { return (void*)Get8BitUnsigned(valueData, littleEndian); }
+	if (format == 3) { return (void*)Get16BitUnsigned(valueData, littleEndian); }
+	if (format == 4) { return (void*)Get32BitUnsigned(valueData, littleEndian); }
+	if (format == 6) { return (void*)Get8BitSigned(valueData, littleEndian); }
+	if (format == 8) { return (void*)Get16BitSigned(valueData, littleEndian); }
+	if (format == 9) { return (void*)Get32BitSigned(valueData, littleEndian); }
+	return NULL;
+}
+
+void * ImageHandler::GetValueFromAddress(unsigned char * exifData, size_t offset, size_t dataSize, size_t format, bool littleEndian) {
+	
+	// Get ASCII String
+	if (format == 2) {
+		wxString * returnString = new wxString("");
+
+		for (size_t i = 0; i < dataSize; i++) {
+			char c = exifData[offset + i];
+			*returnString += c;
+		}
+		return returnString;
+	}
+
+	// Get Unsigned Rational
+	if (format == 5) {
+		UnsignedRational * uRational = new UnsignedRational();
+		uRational->numerator = Get32BitUnsigned(exifData + offset, littleEndian);
+		uRational ->denominator = Get32BitUnsigned(exifData + offset + 4, littleEndian);
+		return uRational;
+	}
+
+	// Get Signed Rational
+	if (format == 10) {
+		SignedRational * rational = new SignedRational();
+		rational->numerator = Get32BitSigned(exifData + offset, littleEndian);
+		rational->denominator = Get32BitSigned(exifData + offset + 4, littleEndian);
+		return rational;
+	}
+	return NULL;
+}
+
+int ImageHandler::Get8BitSigned(unsigned char * data, bool littleEndian) {
+	if (littleEndian) {
+		return data[0];
+	}
+	else {
+		return data[0];
+	}
+}
+
+unsigned int ImageHandler::Get8BitUnsigned(unsigned char * data, bool littleEndian) {
+	return (unsigned)ImageHandler::Get8BitSigned(data, littleEndian) & 0xFF;
+}
+
+int ImageHandler::Get16BitSigned(unsigned char * data, bool littleEndian) {
+	if (littleEndian) {
+		return (data[1] << 8) | data[0];
+	}
+	else {
+		return (data[0] << 8) | data[1];
+	}
+}
+
+unsigned int ImageHandler::Get16BitUnsigned(unsigned char * data, bool littleEndian) {
+	return (unsigned)ImageHandler::Get16BitSigned(data, littleEndian) & 0xFFFF;
+}
+
+long ImageHandler::Get32BitSigned(unsigned char * data, bool littleEndian) {
+	if (littleEndian) {
+		return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0]);
+	}
+	else {
+		return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3]);
+	}
+}
+
+unsigned long ImageHandler::Get32BitUnsigned(unsigned char * data, bool littleEndian) {
+	return (unsigned)ImageHandler::Get32BitSigned(data, littleEndian) & 0xFFFFFFFF;
+}
+
+wxString * ImageHandler::GetString(unsigned char * data, size_t offset) {
+	wxString *returnString = new wxString("");
+	bool continueParse = true;
+	int i = 0;
+	while (continueParse) {
+		char c = data[offset + i];
+		returnString += c;
+		if (c == '\0'){
+			continueParse = false;
+			break;
+		}
+	}
+	return returnString;
 }

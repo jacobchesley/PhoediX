@@ -199,6 +199,9 @@
     <Filter Include="GUI\Controls\PhoediX ComboBox">
       <UniqueIdentifier>{a37be42e-128a-4281-b282-2f2cab600cb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Controls\ExifRead">
+      <UniqueIdentifier>{6417ec52-6ba4-4cbb-bc96-6afbb69de4ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -374,6 +377,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\Controls\PhoediXComboBox\PhoediXComboBox.cpp">
       <Filter>GUI\Controls\PhoediX ComboBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\Controls\ExifRead\ExifRead.cpp">
+      <Filter>GUI\Controls\ExifRead</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -574,6 +580,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\Controls\PhoediXComboBox\PhoediXComboBox.h">
       <Filter>GUI\Controls\PhoediX ComboBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\Controls\ExifRead\ExifRead.h">
+      <Filter>GUI\Controls\ExifRead</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
