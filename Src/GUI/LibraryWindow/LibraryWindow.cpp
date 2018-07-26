@@ -618,6 +618,8 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 		cond->Broadcast();
 	}
 
+	delete rawProcessor;
+
 	return (wxThread::ExitCode)0;
 }
 
