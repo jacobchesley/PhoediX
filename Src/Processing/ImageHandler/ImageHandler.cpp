@@ -535,6 +535,10 @@ bool ImageHandler::CheckExif(wxString fileName) {
 	// Read in file to byte array
 	wxFileInputStream fileStream(fileName);
 	unsigned char * fileBytes = new unsigned char[fileStream.GetSize()];
+
+	if (numberBytesToCheckForExif > fileStream.GetSize()) {
+		numberBytesToCheckForExif = fileStream.GetSize();
+	}
 	fileStream.ReadAll(fileBytes, numberBytesToCheckForExif);
 
 	size_t exifStart = 0;
@@ -585,6 +589,9 @@ bool ImageHandler::CheckExif(wxString fileName) {
 	if (!littleEndian && (exifBytes[8] != 0x00 || exifBytes[9] != 0x2a)) {
 		return false;
 	}
+
+	delete[] exifBytes;
+
 	return true;
 }
 
@@ -706,6 +713,8 @@ void ImageHandler::ReadExifDataFromFile(wxString fileName, Image * image) {
 	
 	// exifBytes + 6 to account for start "Exif\0\0"
 	ImageHandler::ParseDirectory(exifBytes + 6, firstIFDOffset, littleEndian, image);
+
+	delete[] exifBytes;
 }
 
 void ImageHandler::ParseDirectory(unsigned char * data, size_t offset, bool littleEndian, Image * image) {
@@ -718,25 +727,41 @@ void ImageHandler::ParseDirectory(unsigned char * data, size_t offset, bool litt
 
 		size_t tagNumber = ImageHandler::Get16BitUnsigned(data + offset + entryOffset, littleEndian);
 		if (Image::exifTags.count(tagNumber) <= 0) { continue; } // Check for unsupported tag
-		wxString tagName = Image::exifTags[tagNumber];
 		size_t format = ImageHandler::Get16BitUnsigned(data + offset + 2 + entryOffset, littleEndian);
 		size_t numberComponents = ImageHandler::Get32BitUnsigned(data + offset + 4 + entryOffset, littleEndian);
 		int dataSize = ImageHandler::GetBytesPerComponent(format) * (int)numberComponents;
+		if ((*image->GetExifMap()).count(tagNumber) > 0) { continue; }
 
 		if (dataSize > 4) {
 
 			// Get offset of value from start of exif data
 			unsigned long valueOffset = ImageHandler::Get32BitUnsigned(data + offset + 8 + entryOffset, littleEndian);
 
-			// Start data at 6 (to account for start "Exif\0\0")
-			void * value = GetValueFromAddress(data, valueOffset, dataSize, format, littleEndian);	
+			// Handle mutliple values for the same tag
+			if (Image::exifIsGPSCoordinate(tagNumber)) {
+
+				// Rational is 8 bytes, get number of them
+				int numRationals = dataSize / 8;
+
+				// Create new vector to push rationals to
+				(*image->GetExifMap())[tagNumber] = new wxVector<UnsignedRational*>();
+
+				for (int j = 0; j < numRationals; j++) {
+					void * value = GetValueFromAddress(data, valueOffset + (j * 8), dataSize, format, littleEndian);
+					((wxVector<UnsignedRational*>*)(*image->GetExifMap())[tagNumber])->push_back((UnsignedRational*)value);
+				}
+			}
 
 			// Dereference map pointer from image to set value
-			(*image->GetExifMap())[tagNumber] = value;		
+			else {
+				// Get value from address
+				void * value = GetValueFromAddress(data, valueOffset, dataSize, format, littleEndian);
+				(*image->GetExifMap())[tagNumber] = value;
+			}
 		}
 		else {
 
-			// parse Sub IFD Directory
+			// Parse Sub IFD Directory
 			if (format == 4 && tagNumber == 0x8769) {
 
 				// Get sub dirrectory offset and parse
@@ -744,9 +769,21 @@ void ImageHandler::ParseDirectory(unsigned char * data, size_t offset, bool litt
 				ImageHandler::ParseDirectory(data, nextDirectory, littleEndian, image);
 			}
 
-			// Dereference map pointer from image to set value
-			void * value = GetValue(data + offset + 8 + entryOffset, format, littleEndian);
-			(*image->GetExifMap())[tagNumber] = value;
+			// Parse GPS IFD Directory
+			else if (format == 4 && tagNumber == 0x8825) {
+
+				// Get sub dirrectory offset and parse
+				nextDirectory = ImageHandler::Get32BitUnsigned(data + offset + 8 + entryOffset, littleEndian);
+				ImageHandler::ParseDirectory(data, nextDirectory, littleEndian, image);
+			}
+
+			else {
+
+				// Dereference map pointer from image to set value
+				void * value = GetValue(data + offset + 8 + entryOffset, format, littleEndian);
+				(*image->GetExifMap())[tagNumber] = value;
+				
+			}
 		}
 
 		// Check next four bytes for offset of next directory
@@ -777,12 +814,12 @@ int ImageHandler::GetBytesPerComponent(size_t format) {
 
 void * ImageHandler::GetValue(unsigned char * valueData, size_t format, bool littleEndian) {
 
-	if (format == 1) { return (void*)Get8BitUnsigned(valueData, littleEndian); }
-	if (format == 3) { return (void*)Get16BitUnsigned(valueData, littleEndian); }
-	if (format == 4) { return (void*)Get32BitUnsigned(valueData, littleEndian); }
-	if (format == 6) { return (void*)Get8BitSigned(valueData, littleEndian); }
-	if (format == 8) { return (void*)Get16BitSigned(valueData, littleEndian); }
-	if (format == 9) { return (void*)Get32BitSigned(valueData, littleEndian); }
+	if (format == 1) { return (void*) new int(Get8BitUnsigned(valueData, littleEndian)); }
+	if (format == 3) { return (void*) new int(Get16BitUnsigned(valueData, littleEndian)); }
+	if (format == 4) { return (void*) new int(Get32BitUnsigned(valueData, littleEndian)); }
+	if (format == 6) { return (void* )new int(Get8BitSigned(valueData, littleEndian)); }
+	if (format == 8) { return (void*) new int(Get16BitSigned(valueData, littleEndian)); }
+	if (format == 9) { return (void*) new int(Get32BitSigned(valueData, littleEndian)); }
 	return NULL;
 }
 
@@ -856,17 +893,3 @@ unsigned long ImageHandler::Get32BitUnsigned(unsigned char * data, bool littleEn
 	return (unsigned)ImageHandler::Get32BitSigned(data, littleEndian) & 0xFFFFFFFF;
 }
 
-wxString * ImageHandler::GetString(unsigned char * data, size_t offset) {
-	wxString *returnString = new wxString("");
-	bool continueParse = true;
-	int i = 0;
-	while (continueParse) {
-		char c = data[offset + i];
-		returnString += c;
-		if (c == '\0'){
-			continueParse = false;
-			break;
-		}
-	}
-	return returnString;
-}

@@ -135,10 +135,12 @@ void LibraryImage::OnPopupMenuClick(wxCommandEvent& inEvt) {
 		// View imaged details
 		case LibraryImage::PopupMenuActions::VIEW_IMAGE_DETAILS: {
 			Image * exifImage = new Image();
+			exifImage->SetWidth(0); exifImage->SetHeight(0);
+			exifImage->InitImage();
 			ImageHandler::ReadExif(this->GetPath(), exifImage);
 			ExifReadFrame * exifReadFrame = new ExifReadFrame(this, this->GetPath(), exifImage);
 			exifReadFrame->Show();
-
+			delete exifImage;
 		}
 	}
 }

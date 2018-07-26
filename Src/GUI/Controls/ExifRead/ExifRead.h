@@ -12,6 +12,7 @@
 #include "GUI/Icons/Icons.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Image/Image.h"
+#include <list>
 
 class ExifRead : public wxPanel {
 
@@ -25,7 +26,7 @@ private:
 	wxGridSizer * sizer;
 	wxVector<wxStaticText*> labels;
 	wxVector<wxTextCtrl*> values;
-	wxVector<size_t> formats;
+	wxVector<size_t> tags;
 };
 
 class ExifReadFrame : public wxFrame {
@@ -33,6 +34,7 @@ public:
 	ExifReadFrame(wxWindow * parent, wxString name, Image * image);
 	
 private:
+
 	wxBoxSizer * mainSizer;
 	wxScrolledWindow * scrollWin;
 

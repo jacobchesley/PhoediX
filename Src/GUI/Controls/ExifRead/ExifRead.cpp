@@ -21,6 +21,10 @@ void ExifRead::AddExifData(std::map<size_t, void*> exifData) {
 
 void ExifRead::AddExifRow(size_t tag, void * data) {
 
+	if (tag == 0x0128) {
+		int test = 0;
+	}
+	if (data == NULL) { return; }
 	wxString labelString = Image::exifTags[tag];
 	wxString valueString = "";
 
@@ -30,15 +34,44 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	// short/int/Long to string
 	if (format == 1 || format == 3 || format == 4 ||
 		format == 6 || format == 8 || format == 9) {
-		valueString << (long)data;
+		valueString << *(int*)data;
+		delete data;
+		data = NULL;
 	}
 
 	// Unsigned Rational to string
-	else if (format == 5) {
+	else if (format == 5 && !Image::exifIsGPSCoordinate(tag)) {
 		UnsignedRational * uRational = (UnsignedRational*)data;
 		valueString << uRational->numerator;
 		valueString += "/";
 		valueString << uRational->denominator;
+
+		delete uRational;
+		data = NULL;
+	}
+
+	// GPS Coordinate to string
+	else if (format == 5 && Image::exifIsGPSCoordinate(tag)) {
+
+		wxVector<UnsignedRational*>* gpsCoordList = (wxVector<UnsignedRational*>*)data;
+		for (size_t i = 0; i < gpsCoordList->size(); i++) {
+
+			UnsignedRational * uRational = gpsCoordList->at(i);
+			if (uRational->denominator != 0) {
+				double valueDouble = (double)uRational->numerator / (double)uRational->denominator;
+				wxString valStr = "";
+				valStr << valueDouble;
+				valueString += valStr;
+				if (i < gpsCoordList->size() - 1) {
+					valueString += ",";
+				}
+			}
+			delete uRational;
+			uRational = NULL;
+		}
+		gpsCoordList->clear();
+		delete gpsCoordList;
+		gpsCoordList = NULL;
 	}
 
 	// Signed Rational to string
@@ -47,11 +80,16 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 		valueString << rational->numerator;
 		valueString += "/";
 		valueString << rational->denominator;
+
+		delete rational;
+		rational = NULL;
 	}
 
 	// String to string
 	else if (format == 2) {
 		valueString = *(wxString*)data;
+		delete (wxString*)data;
+		data = NULL;
 	}
 
 	// Undefined
@@ -66,7 +104,7 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 
 	labels.push_back(label);
 	values.push_back(value);
-	formats.push_back(format);
+	tags.push_back(tag);
 
 	sizer->Add(label);
 	sizer->Add(value);

@@ -30,8 +30,7 @@ Image::Image(const Image& imageToCopy) {
 	bit16Enabled = imageToCopy.bit16Enabled;
 	errorMessage = "";
 	exifMap = imageToCopy.exifMap;
-
-
+	
 	int size = width * height;
 	if(size < 1){
 		return;
@@ -642,7 +641,7 @@ void Image::InitExif(){
 	exifTags[0x011B] = "YResolution"; exifFormats[0x011B] = Image::ExifType::U_RATIONAL;
 	exifTags[0x0128] = "ResolutionUnit"; exifFormats[0x0128] = Image::ExifType::U_SHORT;
 	exifTags[0x0131] = "Software"; exifFormats[0x0131] = Image::ExifType::ASCII;
-	exifTags[0x0132] = "DateTime"; exifFormats[0x0102] = Image::ExifType::ASCII;
+	exifTags[0x0132] = "DateTime"; exifFormats[0x0132] = Image::ExifType::ASCII;
 	exifTags[0x013E] = "WhitePoint"; exifFormats[0x013E] = Image::ExifType::U_RATIONAL;
 	exifTags[0x013F] = "PrimaryChromaticities"; exifFormats[0x013F] = Image::ExifType::U_RATIONAL;
 	exifTags[0x0211] = "YCbCrCoefficients"; exifFormats[0x0211] = Image::ExifType::U_RATIONAL;
@@ -747,4 +746,45 @@ void Image::InitExif(){
 	exifTags[0xA214] = "SubjectLocation"; exifFormats[0xA214] = Image::ExifType::U_SHORT;
 	exifTags[0xA215] = "ExposureIndex"; exifFormats[0xA215] = Image::ExifType::U_RATIONAL;
 	exifTags[0xA302] = "CFAPattern"; exifFormats[0xA302] = Image::ExifType::UNDEFINED;
+
+	// GPS Info
+	exifTags[0x0000] = "GPSVersionID"; exifFormats[0x0000] = Image::ExifType::U_BYTE;
+	exifTags[0x0001] = "GPSLatitudeRef"; exifFormats[0x0001] = Image::ExifType::ASCII;
+	exifTags[0x0002] = "GPSLatitude"; exifFormats[0x0002] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0003] = "GPSLongitudeRef"; exifFormats[0x0003] = Image::ExifType::ASCII;
+	exifTags[0x0004] = "GPSLongitude"; exifFormats[0x0004] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0005] = "GPSAltitudeRef"; exifFormats[0x0005] = Image::ExifType::U_BYTE;
+	exifTags[0x0006] = "GPSAltitude"; exifFormats[0x0006] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0007] = "GPSTimeStamp"; exifFormats[0x0007] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0008] = "GPSSatellites"; exifFormats[0x0008] = Image::ExifType::ASCII;
+	exifTags[0x0009] = "GPSStatus"; exifFormats[0x0009] = Image::ExifType::ASCII;
+	exifTags[0x000A] = "GPSMeasureMode"; exifFormats[0x000a] = Image::ExifType::ASCII;
+	exifTags[0x000B] = "GPSDOP"; exifFormats[0x000B] = Image::ExifType::U_RATIONAL;
+	exifTags[0x000C] = "GPSSpeedRef"; exifFormats[0x000C] = Image::ExifType::ASCII;
+	exifTags[0x000D] = "GPSSpeed"; exifFormats[0x000D] = Image::ExifType::U_RATIONAL;
+	exifTags[0x000E] = "GPSTrackRef"; exifFormats[0x000E] = Image::ExifType::ASCII;
+	exifTags[0x000F] = "GPSTrack"; exifFormats[0x000F] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0010] = "GPSImgDirectionRef"; exifFormats[0x0010] = Image::ExifType::ASCII;
+	exifTags[0x0011] = "GPSImgDirection"; exifFormats[0x0011] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0012] = "GPSMapDatum"; exifFormats[0x0012] = Image::ExifType::ASCII;
+	exifTags[0x0013] = "GPSDestLatitudeRef"; exifFormats[0x0013] = Image::ExifType::ASCII;
+	exifTags[0x0014] = "GPSDestLatitude"; exifFormats[0x0014] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0015] = "GPSDestLongitudeRef"; exifFormats[0x0015] = Image::ExifType::ASCII;
+	exifTags[0x0016] = "GPSDestLongitude"; exifFormats[0x0016] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0017] = "GPSDestBearingRef"; exifFormats[0x0017] = Image::ExifType::ASCII;
+	exifTags[0x0018] = "GPSDestBearing"; exifFormats[0x0018] = Image::ExifType::U_RATIONAL;
+	exifTags[0x0019] = "GPSDestDistanceRef"; exifFormats[0x0019] = Image::ExifType::ASCII;
+	exifTags[0x001A] = "GPSDestDistance"; exifFormats[0x001A] = Image::ExifType::U_RATIONAL;
+	exifTags[0x001B] = "GPSProcessingMethod"; exifFormats[0x001B] = Image::ExifType::UNDEFINED;
+	exifTags[0x001C] = "GPSAreaInformation"; exifFormats[0x001C] = Image::ExifType::UNDEFINED;
+	exifTags[0x001D] = "GPSDateStamp"; exifFormats[0x001D] = Image::ExifType::ASCII;
+	exifTags[0x001E] = "GPSDifferential"; exifFormats[0x001E] = Image::ExifType::U_SHORT;
+	exifTags[0x001F] = "GPSHPositioningError"; exifFormats[0x001F] = Image::ExifType::U_RATIONAL;
+}
+
+bool Image::exifIsGPSCoordinate(size_t tag) {
+	if (tag == 0x0002 || tag == 0x0004 || tag== 0x0007 || tag == 0x0014 || tag == 0x0016) {
+		return true;
+	}
+	return false;
 }
