@@ -21,6 +21,7 @@ public:
 	void AddExifData(Image * image);
 	void AddExifData(std::map<size_t, void*> exifData);
 	void AddExifRow(size_t tag, void * data);
+	void ClearExif();
 
 private:
 	wxGridSizer * sizer;
@@ -41,4 +42,20 @@ private:
 	wxBoxSizer * scrollSizer;
 	ExifRead * exifTable;
 };
+
+class ExifReadWindow : public wxWindow {
+public:
+	ExifReadWindow(wxWindow * parent);
+	void ClearExif();
+	void AddExif(Image * image);
+
+private:
+
+	wxBoxSizer * mainSizer;
+	wxScrolledWindow * scrollWin;
+
+	wxBoxSizer * scrollSizer;
+	ExifRead * exifTable;
+};
+
 #endif

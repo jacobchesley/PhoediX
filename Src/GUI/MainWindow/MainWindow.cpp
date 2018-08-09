@@ -37,8 +37,9 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuFile->Append(MainWindow::MenuBar::ID_EXIT, _("Exit"));
 
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE, _("Show Image"));
-	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit list"));
+	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit Pipeline"));
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS, _("Show Histograms"));
+	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO, _("Show Image Info"));
 
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT, _("Fast Edit"));
 	menuTools->AppendSeparator();
@@ -190,6 +191,18 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	pixelPeepPaneInfo.Hide();
 	auiManager->AddPane(pixelPeepWindow, pixelPeepPaneInfo);
 
+	imageInfoPanel = new ExifReadWindow(this);
+	wxAuiPaneInfo exifReadPaneInfo = wxAuiPaneInfo();
+	exifReadPaneInfo.Float();
+	exifReadPaneInfo.Caption("Image Information");
+	exifReadPaneInfo.Name("Image Information");
+	exifReadPaneInfo.CloseButton(true);
+	exifReadPaneInfo.PinButton(true);
+	exifReadPaneInfo.DestroyOnClose(false);
+	exifReadPaneInfo.BestSize(imageInfoPanel->GetClientSize());
+	exifReadPaneInfo.Hide();
+	auiManager->AddPane(imageInfoPanel, exifReadPaneInfo);
+
 	auiManager->Update();
 
 	aboutWindow = new AboutWindow(this);
@@ -210,6 +223,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowPixelPeep, this, MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLibrary, this, MainWindow::MenuBar::ID_SHOW_LIBRARY);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowImageInfo, this, MainWindow::MenuBar::ID_SHOW_IMAGE_INFO);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSupportedCameras, this, MainWindow::MenuBar::ID_SHOW_SUPPORTED_CAMERAS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowAbout, this, MainWindow::MenuBar::ID_ABOUT);
 
@@ -628,10 +642,21 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 	this->SetTitle("PhoediX - " + imageFile.GetFullName());
 
 	bool rawProject = false;
+
 	// Handle Raw Image
 	if(ImageHandler::CheckRaw(imagePath)){
 		exportWindow->RawImageLoaded(true);
 		rawProject = true;
+
+		LibRaw * imageInfoRaw = new LibRaw();
+
+		#ifdef __WXMSW__
+			imageInfoRaw->open_file(imagePath.wc_str());
+		#else
+			imageInfoRaw->open_file(imagePath.c_str());
+		#endif
+		ImageHandler::ReadExifFromRaw(imageInfoRaw, processor->GetImage());
+		imageInfoPanel->AddExif(processor->GetImage());
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images
@@ -642,6 +667,11 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 		originalImagePanel->ChangeImage(processor->GetOriginalImage());
 		processor->SetUpdated(true);
 		processor->Unlock();
+
+		if (ImageHandler::CheckExif(imagePath)) {
+			ImageHandler::ReadExif(imagePath, processor->GetImage());
+			imageInfoPanel->AddExif(processor->GetImage());
+		}
 	}
 
 	else{
@@ -847,6 +877,21 @@ void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 	}
 }
 
+void MainWindow::ShowImageInfo(wxCommandEvent& evt) {
+
+	// If image info item is checked, show the image info
+	if(evt.IsChecked()){
+		auiManager->GetPane(imageInfoPanel).Show();
+		auiManager->Update();
+	}
+
+	// Otherwise, hide the image info
+	else{
+		auiManager->GetPane(imageInfoPanel).Hide();
+		auiManager->Update();
+	}
+}
+
 void MainWindow::ShowAbout(wxCommandEvent& WXUNUSED(evt)){
 	aboutWindow->CenterOnParent();
 	aboutWindow->Show();
@@ -862,6 +907,7 @@ void MainWindow::SetMenuChecks(){
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE)->Check(auiManager->GetPane(imagePanel).IsShown());
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST)->Check(auiManager->GetPane(editList).IsShown());
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS)->Check(auiManager->GetPane(histogramDisplay).IsShown());
+	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO)->Check(auiManager->GetPane(imageInfoPanel).IsShown());
 
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS)->Check(auiManager->GetPane(snapshotWindow).IsShown());
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->Check(auiManager->GetPane(originalImagePanel).IsShown());
@@ -892,6 +938,7 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE)->Enable(enable);
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST)->Enable(enable);
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS)->Enable(enable);
+	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO)->Enable(enable);
 
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL)->Enable(enable);
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->Enable(enable);
@@ -903,6 +950,7 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE)->Check(false);
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST)->Check(false);
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS)->Check(false);
+		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO)->Check(false);
 
 		auiManager->GetPane(imagePanel).Hide();
 		auiManager->GetPane(editList).Hide();

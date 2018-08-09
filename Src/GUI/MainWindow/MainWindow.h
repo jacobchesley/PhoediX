@@ -31,6 +31,7 @@
 #include "GUI/ImportImageDialog/ImportImageDialog.h"
 #include "GUI/LibraryWindow/LibraryWindow.h"
 #include "GUI/SupportedCamerasWindow/SupportedCamerasWindow.h"
+#include "GUI/Controls/ExifRead/ExifRead.h"
 #include "Session/Session.h"
 #include "Debugging/MemoryLeakCheck.h"
 
@@ -67,6 +68,7 @@ private:
 	void ShowSupportedCameras(wxCommandEvent& WXUNUSED(event));
 	void ShowEditList(wxCommandEvent& evt);
 	void ShowHistograms(wxCommandEvent& evt);
+	void ShowImageInfo(wxCommandEvent& evt);
 	void OnReprocessTimer(wxTimerEvent& evt);
 	void OnImagePanelMouse(wxMouseEvent & evt);
 	void OnReprocess(wxCommandEvent& WXUNUSED(event));
@@ -128,6 +130,7 @@ private:
 	wxImage * emptyImage;
 	Image * emptyPhxImage;
 	HistogramDisplay * histogramDisplay;
+	ExifReadWindow * imageInfoPanel;
 
 	PhoediXSession * currentSession;
 	wxVector<PhoediXSession*> allSessions;
@@ -155,6 +158,7 @@ private:
 		ID_SHOW_IMAGE,
 		ID_SHOW_EDIT_LIST,
 		ID_SHOW_HISTOGRAMS,
+		ID_SHOW_IMAGE_INFO,
 
 		// Tools
 		ID_ENABLE_FAST_EDIT,

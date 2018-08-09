@@ -21,9 +21,6 @@ void ExifRead::AddExifData(std::map<size_t, void*> exifData) {
 
 void ExifRead::AddExifRow(size_t tag, void * data) {
 
-	if (tag == 0x0128) {
-		int test = 0;
-	}
 	if (data == NULL) { return; }
 	wxString labelString = Image::exifTags[tag];
 	wxString valueString = "";
@@ -110,6 +107,13 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	sizer->Add(value);
 }
 
+void ExifRead::ClearExif(){
+	sizer->Clear(true);
+	labels.clear();
+	values.clear();
+	tags.clear();
+}
+
 ExifReadFrame::ExifReadFrame(wxWindow * parent, wxString name, Image * image) : wxFrame(parent, -1, name) {
 
 	Icons icons;
@@ -134,4 +138,36 @@ ExifReadFrame::ExifReadFrame(wxWindow * parent, wxString name, Image * image) : 
 
 	this->GetSizer()->Add(scrollWin, 1, wxEXPAND);
 	this->GetSizer()->Layout();
+}
+
+ExifReadWindow::ExifReadWindow(wxWindow * parent) : wxWindow(parent, -1) {
+
+	Icons icons;
+	wxIcon theIcon;
+	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
+
+	this->SetBackgroundColour(parent->GetBackgroundColour());
+	mainSizer = new wxBoxSizer(wxVERTICAL);
+	this->SetSizer(mainSizer);
+
+	scrollWin = new wxScrolledWindow(this);
+	scrollSizer = new wxBoxSizer(wxVERTICAL);
+	scrollWin->SetSizer(scrollSizer);
+	scrollWin->SetBackgroundColour(this->GetBackgroundColour());
+
+	exifTable = new ExifRead(scrollWin);
+	scrollWin->GetSizer()->Add(exifTable, 0, wxEXPAND);
+	scrollWin->SetVirtualSize(exifTable->GetSize());
+	scrollWin->SetScrollbars(1, 1, exifTable->GetSize().GetWidth(), exifTable->GetSize().GetHeight());
+
+	this->GetSizer()->Add(scrollWin, 1, wxEXPAND);
+	this->GetSizer()->Layout();
+}
+
+void ExifReadWindow::ClearExif(){
+	exifTable->ClearExif();
+}
+
+void ExifReadWindow::AddExif(Image * img){
+	exifTable->AddExifData(img);
 }
