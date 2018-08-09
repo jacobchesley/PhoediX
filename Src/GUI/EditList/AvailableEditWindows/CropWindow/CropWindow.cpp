@@ -75,7 +75,9 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 
 	enableCropBox = new PhoediXButton(this, CropWindow::ID_ENABLE_CROP_BOX, "Enable Grid Lines");
 	enableCropBox->SetForegroundColour(Colors::TextLightGrey);
+	enableCropBox->SetDisableForegroundColour(Colors::TextGrey);
 	enableCropBox->SetBackgroundColour(Colors::BackGrey);
+	enableCropBox->SetDisableBackgroundColour(Colors::BackGrey);
 	enableCropBox->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	boxEnabled = false;
 
