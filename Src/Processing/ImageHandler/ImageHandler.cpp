@@ -259,6 +259,9 @@ bool ImageHandler::CheckRaw(wxString fileName){
 
 bool ImageHandler::CheckImage(wxString fileName){
 
+	// Temporarly disable logging so warnings about unsupported images don't appear
+	wxLogNull noLog;
+
 	if(wxImage::CanRead(fileName)){
 		wxImage fileImage(fileName);
 		return fileImage.IsOk();
@@ -600,15 +603,15 @@ void ImageHandler::ReadExifFromRaw(LibRaw * rawProcessor, Image * image) {
 	(*image->GetExifMap())[0x0132] = new wxString(ctime(&rawProcessor->imgdata.other.timestamp)); // date/time
 	(*image->GetExifMap())[0x013B] = new wxString(rawProcessor->imgdata.other.artist); // Artist
 	(*image->GetExifMap())[0x010E] = new wxString(rawProcessor->imgdata.other.desc); // Description
-	(*image->GetExifMap())[0x9211] = (void*)(uint16) rawProcessor->imgdata.other.shot_order; // Shot Order
+	(*image->GetExifMap())[0x9211] = (void*) new uint16(rawProcessor->imgdata.other.shot_order); // Shot Order
 
 	if (rawProcessor->imgdata.sizes.flip == 5 || rawProcessor->imgdata.sizes.flip == 6) {
-		(*image->GetExifMap())[0xA002] = (void*)(uint16)rawProcessor->imgdata.sizes.height; // Width (flipped)
-		(*image->GetExifMap())[0xA003] = (void*)(uint16)rawProcessor->imgdata.sizes.width; // height (flipped)
+		(*image->GetExifMap())[0xA002] = (void*) new uint16(rawProcessor->imgdata.sizes.height); // Width (flipped)
+		(*image->GetExifMap())[0xA003] = (void*) new uint16(rawProcessor->imgdata.sizes.width); // height (flipped)
 	}
 	else {
-		(*image->GetExifMap())[0xA002] = (void*)(uint16)rawProcessor->imgdata.sizes.width; // Width 
-		(*image->GetExifMap())[0xA003] = (void*)(uint16)rawProcessor->imgdata.sizes.height; // height
+		(*image->GetExifMap())[0xA002] = (void*) new uint16(rawProcessor->imgdata.sizes.width); // Width 
+		(*image->GetExifMap())[0xA003] = (void*) new uint16(rawProcessor->imgdata.sizes.height); // height
 	}
 
 	// Shutter Speed calculation
@@ -633,7 +636,7 @@ void ImageHandler::ReadExifFromRaw(LibRaw * rawProcessor, Image * image) {
 	fNumberRational->denominator = 1;
 	(*image->GetExifMap())[0x829D] = (void*)fNumberRational; // FNumber
 
-	(*image->GetExifMap())[0x8827] = (void*)(uint16)rawProcessor->imgdata.other.iso_speed; // ISO
+	(*image->GetExifMap())[0x8827] = (void*) new uint16(rawProcessor->imgdata.other.iso_speed); // ISO
 	
 	UnsignedRational * focalRational = new UnsignedRational();
 	focalRational->numerator = rawProcessor->imgdata.other.focal_len;
@@ -641,8 +644,8 @@ void ImageHandler::ReadExifFromRaw(LibRaw * rawProcessor, Image * image) {
 	(*image->GetExifMap())[0x920A] = (void*)focalRational; // Focal Length
 
 	// Flash Fired
-	if (rawProcessor->imgdata.color.flash_used > 0.0) { (*image->GetExifMap())[0x9209] = (void*)(uint16)1; }
-	else{ (*image->GetExifMap())[0x9209] = (void*)(uint16)0; }
+	if (rawProcessor->imgdata.color.flash_used > 0.0) { (*image->GetExifMap())[0x9209] = (void*) new uint16(1); }
+	else{ (*image->GetExifMap())[0x9209] = (void*) new uint16(0); }
 
 	// Camera Info
 	(*image->GetExifMap())[0x010F] = new wxString(rawProcessor->imgdata.idata.make); // Camera Make
