@@ -12,6 +12,7 @@
 #endif
 
 #include "wx/dir.h"
+#include "wx/filename.h"
 
 #include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Colors/Colors.h"

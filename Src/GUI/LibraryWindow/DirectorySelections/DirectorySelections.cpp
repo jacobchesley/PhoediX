@@ -108,6 +108,11 @@ wxVector<wxString> DirectorySelections::DirectoryDisplayItem::GetDirectoriesName
 	wxVector<wxString> returnList;
 	returnList.push_back(directoryText->GetValue());
 
+	wxString dirPrefix = directoryText->GetValue();
+	if (!wxFileName::IsPathSeparator(dirPrefix[dirPrefix.size() - 1])){
+		dirPrefix += wxFileName::GetPathSeparator();
+	}
+
 	// Add all sub directories to vector if needed
 	if (subDirectoriesCheck->IsChecked()) {
 		
@@ -116,7 +121,7 @@ wxVector<wxString> DirectorySelections::DirectoryDisplayItem::GetDirectoriesName
 		bool cont = directory.GetFirst(&dirName, "", wxDIR_DIRS);
 		while (cont) {
 			cont = directory.GetNext(&dirName);
-			returnList.push_back(dirName);
+			returnList.push_back(dirPrefix + dirName);
 		}
 	}
 
@@ -201,6 +206,7 @@ void DirectorySelections::RedrawPanel() {
 }
 
 wxVector<wxString> DirectorySelections::GetDirectoryList() {
+
 	wxVector<wxString> returnVec;
 
 	for (size_t i = 0; i < directoryItems.size(); i++) {
