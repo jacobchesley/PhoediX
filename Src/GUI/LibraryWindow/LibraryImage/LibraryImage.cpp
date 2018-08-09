@@ -131,7 +131,8 @@ void LibraryImage::OnPopupMenuClick(wxCommandEvent& inEvt) {
 			evt.SetString(this->GetPath());
 			wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
 		}
-		
+		break;
+
 		// View imaged details
 		case LibraryImage::PopupMenuActions::VIEW_IMAGE_DETAILS: {
 			Image * exifImage = new Image();
@@ -142,6 +143,7 @@ void LibraryImage::OnPopupMenuClick(wxCommandEvent& inEvt) {
 			exifReadFrame->Show();
 			delete exifImage;
 		}
+		break;
 	}
 }
 
