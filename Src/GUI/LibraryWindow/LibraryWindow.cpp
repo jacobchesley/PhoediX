@@ -439,12 +439,13 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 
 		if (canceled) { break; }
 
+		wxString dirName = allDirectories[dir];
 		// Check directory, and continue if it does not exist
 		if (!wxDir::Exists(allDirectories[dir])) {continue; }
 
 		// Get all file names
 		wxArrayString allFileNames;
-		wxDir::GetAllFiles(allDirectories[dir], &allFileNames);
+		wxDir::GetAllFiles(allDirectories[dir], &allFileNames, wxEmptyString, wxDIR_FILES);
 
 		// Add file names to list of files
 		for(size_t file = 0; file < allFileNames.size(); file++){
