@@ -21,6 +21,7 @@ public:
 	void SetForegroundColour(wxColor newColor);
 	bool SetFont(const wxFont &font);
 	wxString GetLabel();
+	void SetLabel(wxString label);
 	void SetBorder(int xBorder, int yBorder);
 
 	void Disable();

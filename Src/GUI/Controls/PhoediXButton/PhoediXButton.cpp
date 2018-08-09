@@ -76,6 +76,10 @@ wxString PhoediXButton::GetLabel() {
 	return text->GetLabel();
 }
 
+void PhoediXButton::SetLabel(wxString label) {
+	text->SetLabel(label);
+}
+
 void PhoediXButton::SetBorder(int xBorder, int yBorder) {
 	sizer->Clear();
 	outerSizer->Clear();
