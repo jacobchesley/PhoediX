@@ -38,7 +38,6 @@ void ImageHandler::LoadImageFromFile(wxString fileName, Image * image) {
 	else{
 		wxImage fileImage(fileName);
 		image->SetDataFrom8(fileImage.GetData(), fileImage.GetWidth(), fileImage.GetHeight());
-		ImageHandler::ReadExif(fileName, image);
 	}
 }
 
@@ -534,7 +533,7 @@ void ImageHandler::ReadExif(wxString fileName, Image * image) {
 
 bool ImageHandler::CheckExif(wxString fileName) {
 
-	size_t numberBytesToCheckForExif = 100000;
+	size_t numberBytesToCheckForExif = 50000;
 	// Read in file to byte array
 	wxFileInputStream fileStream(fileName);
 	unsigned char * fileBytes = new unsigned char[fileStream.GetSize()];
@@ -559,7 +558,10 @@ bool ImageHandler::CheckExif(wxString fileName) {
 		}
 	}
 
-	if (exifSize < 1) { return false; }
+	if (exifSize < 1) { 
+		delete[] fileBytes;
+		return false;
+	}
 
 	// Read in all exif data and delete file data after exif is read
 	unsigned char * exifBytes = new unsigned char[exifSize];
