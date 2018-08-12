@@ -184,6 +184,8 @@ private:
 #define PHOEDIX_PARAMETER_DENOMINATOR "Denominator"
 #define PHOEDIX_FLAG_ASPECT_SELECTION "AspectSelection"
 #define PHOEDIX_FLAG_CROP_ENABLED "CropEnabled"
+#define PHOEDIX_FLAG_FLIP_ASPECT "FlipAspect"
+#define PHOEDIX_FLAG_BOX_ENABLED "BoxEnabled"
 
 // Greyscale Parameter/Flag/Array names
 #define PHOEDIX_FLAG_GREYTYPE "GreyType"
