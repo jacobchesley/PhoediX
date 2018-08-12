@@ -5486,7 +5486,6 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 	int xMin = 0;
 	int iMapPlus = 0;
 	int iMapMin = 0;
-
 	double scalar = 1.0/((2.0 * (pixelBlurSize))+1.0);
 
 	// Process 8 bit data
@@ -5508,7 +5507,6 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			x = i % width;
 			y = i / width;
 
-			// First pixel in row
 			// First pixel in row
 			if(x == 0){
 
@@ -5534,6 +5532,7 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 
 					iMapPlus = (y * width) + xPlus;
 					iMapMin = (y * width) + xMin;
+					scalar = 1.0 / ((2.0 * pixelBlurSize) + 1.0);
 
 					tempRed += redData8[iMapPlus];
 					tempRed -= redData8[iMapMin];
@@ -5604,10 +5603,11 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 				xPlus = x + pixelBlurSize + 1;
 				xMin = x - pixelBlurSize;
 
-				if(xPlus <= width - 1 && xMin >= 0){
+				if(xPlus < width  && xMin >= 0){
 
 					iMapPlus = (y * width) + xPlus;
 					iMapMin = (y * width) + xMin;
+					scalar = 1.0 / ((2.0 * pixelBlurSize) + 1.0);
 
 					tempRed += redData16[iMapPlus];
 					tempRed -= redData16[iMapMin];
@@ -5635,7 +5635,6 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			redData16Dup[i] = tempRedScale;
 			greenData16Dup[i] = tempGreenScale;
 			blueData16Dup[i] = tempBlueScale;
-
 		}
 	}
 }
@@ -5676,7 +5675,6 @@ void Processor::BoxBlurVertical(double blurSize, int dataStart, int dataEnd) {
 	int iMapMin = 0;
 	int yPlus = 0;
 	int yMin = 0;
-
 	double scalar = 1.0/((2.0 * pixelBlurSize)+1.0);
 
 	// Process 8 bit data
@@ -5717,7 +5715,7 @@ void Processor::BoxBlurVertical(double blurSize, int dataStart, int dataEnd) {
 				yMin = y - pixelBlurSize;
 
 				if(yPlus <= height - 1 && yMin >= 0){
-			
+
 					iMapPlus = (yPlus * width) + x;
 					iMapMin = (yMin * width) + x;
 
@@ -5794,7 +5792,7 @@ void Processor::BoxBlurVertical(double blurSize, int dataStart, int dataEnd) {
 				yPlus = y + pixelBlurSize + 1;
 				yMin = y - pixelBlurSize;
 
-				if(yPlus <= height - 1 && yMin >= 0){
+				if(yPlus < height && yMin >= 0){
 			
 					iMapPlus = (yPlus * width) + x;
 					iMapMin = (yMin * width) + x;
@@ -6669,6 +6667,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 			// Peform Crop edit
 			case ProcessorEdit::EditType::CROP: {
+
+				if (curEdit->GetFlag(PHOEDIX_FLAG_CROP_ENABLED) == 0) { break; }
 
 				processor->SendMessageToParent("Processing crop" + fullEditNumStr);
 
