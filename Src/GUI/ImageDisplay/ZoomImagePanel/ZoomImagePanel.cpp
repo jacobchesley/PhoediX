@@ -819,6 +819,7 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			// Refresh and Update are CRITICAL!  This forces the screen to redraw NOW
 			// so the freshly drawn DC with lines gets drawn to screen immediately.
 			// Provides real time feedback!
+			quality = wxINTERPOLATION_NONE;
 			this->Refresh();
 			this->Update();
 		
@@ -883,6 +884,7 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 		}
 		this->Redraw();
 	}
+	quality = wxINTERPOLATION_FAST;
 }
 
 void ZoomImagePanel::ImageScroll::OnPaint(wxPaintEvent& evt) {
