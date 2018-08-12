@@ -1,26 +1,24 @@
 # PhoediX #
-PhoediX is a non destructive image editing application created by Jacob Chesley.  This is an application currently under development, and will be capable of loading, editing and saving image files.  An image is loaded into PhoediX, and a list of edits the user select and modifies are completed on the image.  The edit list along with each edits parameters will be able to be saved, and used on multiple images.  This allows the original image to remain as is, and a render of a new image after the edits are completed on the original can be saved as a new image.  
+PhoediX is a non destructive image editing application created by Jacob Chesley.
+
+Visit www.phoedix.com for more information.
 
 The current list of image edits PhoediX is capable of are:
 
-* **Brightness Adjustment** (scalar/multiplicative and Additive) (All Color Channels and Per Channel).
-* **Contrast Adjustmen**t (All Color Channels and Per Channel).
-* **Grayscale Conversion** (Average channels, human eyesight multipliers, and custom channel multipliers).
-* **Channel Transform** (Each channel is created by all channels using multipliers.  Example - Sepia Tone).
-* **Image Rotation** (90, 180, and 270 Clockwise.  Nearest Neighbor, Bilinear and Bicubic interpolation use for custom angles)
-* **RGB Curves** (A brightness curves tool for brightness, red, green and blue channels)
-* **LAB Curves** (A curves tool for LAB color space)
-
-Edits Coming Soon:
-
-* **Raw File Processing using LibRaw**
-
-General PhoediX capabilites Coming Soon:
-
-* Save Edit List (PhoediX project?)
-* Open Edit List (PhoediX project?)
-* Open a Raw Image - using Libraw
-* Edit a Raw Image - using LibRaw
-* Save Raw Image edit parameters (PhoediX project?)
+* **Brightness Adjustment** Adjust the brightness of the image with options to preserve details in shadows, highlights, or both.
+* **Contrast Adjustment** Adjust the contrast using a linear or built in S curve function, to give the image a more vivid or flat look.
+* **Adjust HSL** Adjust the Hue, Saturtation, and Luminance (HSL) channels of the image.
+* **Adjust LAB** Adjust the Luminance, A, and B (LAB) channels of the image.
+* **Adjust RGB** Adjust the Red, Green, and Blue (RGB) channels of the image.
+* **HSL Curves** Adjust the Hue, Saturtation, and Luminance (HSL) channels of the image using custom defined curves.
+* **LAB Curves** Adjust the Luminance, A, and B (LAB) channels of the image using custom defined curves.
+* **RGB Curves** Adjust the Red, Green, and Blue (RGB) channels of the image using custom defined curves.
+* **Grayscale Conversion** Convert the image to greyscale, with three different options. Options include Average of RGB channels, human eyesight scale, or custom scale.
+* **Channel Mixer** Mix RGB master channels of the image with RGB subchannels for each channel.
+* **Rotate Image** 	Rotate the image 90, 180, or 270 degrees. Custom angles and cropping available as well, using nearest neighbor, bilinear, or bicubic interpolation.
+* **Mirror Image** 	Mirror the image vertically or horizontally.
+* **Scale Image** Scale and resize the image to any size (with or without preserving the aspect ratio).  Choose nearest neighbor, bilinear, or bicubic interpolation.
+* **Crop Image** Crop the image (with or without preserving the aspect ratio).
+* **Blur Image** Use Fast Blur to blur the image horizontally, vertically, or in both directions. Specify the blur size and number of iterations.
 
 Head on over to the Wiki to learn how to build PhoediX from source!
