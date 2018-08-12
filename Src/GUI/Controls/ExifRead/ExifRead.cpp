@@ -5,18 +5,27 @@ ExifRead::ExifRead(wxWindow * parent) : wxPanel(parent) {
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 	sizer = new wxGridSizer(2);
 	this->SetSizer(sizer);
+
+	this->AddNoExifMessage();
 }
 
 void ExifRead::AddExifData(Image * image) {
+
+	sizer->Clear(true);
 	this->AddExifData(*image->GetExifMap());
+
+	if (labels.size() == 0) { this->AddNoExifMessage(); }
 }
 
 void ExifRead::AddExifData(std::map<size_t, void*> exifData) {
 
+	sizer->Clear(true);
 	// Add all exif data
 	for (std::map<size_t, void*>::const_iterator it = exifData.begin(); it != exifData.end(); it++) {
 		this->AddExifRow(it->first, it->second);
 	}
+
+	if (labels.size() == 0) { this->AddNoExifMessage(); }
 }
 
 void ExifRead::AddExifRow(size_t tag, void * data) {
@@ -107,11 +116,20 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	sizer->Add(value);
 }
 
+void ExifRead::AddNoExifMessage() {
+
+	noExifMessage = new wxStaticText(this, -1, "No EXIF or RAW information available.");
+	noExifMessage->SetForegroundColour(Colors::TextLightGrey);
+	noExifMessage->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	sizer->Add(noExifMessage);
+}
+
 void ExifRead::ClearExif(){
 	sizer->Clear(true);
 	labels.clear();
 	values.clear();
 	tags.clear();
+	this->AddNoExifMessage();
 }
 
 ExifReadFrame::ExifReadFrame(wxWindow * parent, wxString name, Image * image) : wxFrame(parent, -1, name) {

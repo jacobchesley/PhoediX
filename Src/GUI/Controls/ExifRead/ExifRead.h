@@ -24,7 +24,9 @@ public:
 	void ClearExif();
 
 private:
+	void AddNoExifMessage();
 	wxGridSizer * sizer;
+	wxStaticText * noExifMessage;
 	wxVector<wxStaticText*> labels;
 	wxVector<wxTextCtrl*> values;
 	wxVector<size_t> tags;
