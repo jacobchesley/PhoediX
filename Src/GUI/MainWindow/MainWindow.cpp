@@ -322,53 +322,17 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
-	wxVector<PhoediXSession *> sessionsToClose;
+	// Remove all sessions
 	for (size_t i = 0; i < allSessions.size(); i++) {
-
-		// Ask if needs saving, then close if okay
-		if (this->CheckSessionNeedsSaved(allSessions.at(i))) {
-
-			wxString message = allSessions.at(i)->GetName() + " project is not saved to disk.  Are you sure you want to continue closing this project?";
-			wxMessageDialog msg(this, message, "Close Project?", wxYES_NO | wxNO_DEFAULT);
-			if (msg.ShowModal() == wxID_YES) { 
-				sessionsToClose.push_back(allSessions.at(i)); 
-			}
-		}
-
-		// Session does not need saved, close
-		else {
-			sessionsToClose.push_back(allSessions.at(i));
-		}
-	}
-
-	// Remove all closed sessions from menu window
-	for (size_t i = 0; i < sessionsToClose.size(); i++) {
 
 		// Close and destroy the session
-		this->CloseSession(sessionsToClose.at(i));
-		sessionsToClose.at(i)->Destroy();
+		this->CloseSession(allSessions.at(i));
+		allSessions.at(i)->Destroy();
 	}
 
-	size_t numRemoved = 0;
-	for (size_t i = 0; i < allSessions.size(); i++) {
-		if (allSessions.at(i)->GetID() < 0) {
-			allSessions.erase(allSessions.begin() + i - numRemoved);
-			numRemoved += 1;
-		}
-	}
-	
-	// Set current session to last opened session (if any sessions are open)
-	if (allSessions.size() > 0) {
-		currentSession = allSessions.at(allSessions.size() - 1);
-		this->OpenSession(currentSession);
-	}
-
-	// No sessions opened, disable menu items related to sessions
-	else {
-		currentSession = NULL;
-		this->EnableDisableMenuItemsNoProject(false);
-		this->SetTitle("PhoediX");
-	}
+	currentSession = NULL;
+	this->EnableDisableMenuItemsNoProject(false);
+	this->SetTitle("PhoediX");
 }
 
 void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
