@@ -634,6 +634,8 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 		return; 
 	}
 
+	imageInfoPanel->ClearExif();
+
 	emptyPhxImage->Destroy();
 	if (editList->GetRawWindowOpen()) { editList->RemoveRawWindow(); }
 	
