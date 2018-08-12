@@ -117,7 +117,8 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnEnableBox, this, CropWindow::ID_ENABLE_CROP_BOX);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnEnableCrop, this, CropWindow::ID_ENABLE_CROP);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnResetCrop, this, CropWindow::ID_RESET_CROP);
-	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::FlipAspect, this, CropWindow::ID_FLIP_ASPECTS);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&CropWindow::OnFlipAspect, this, CropWindow::ID_FLIP_ASPECTS);
+	this->Bind(GRID_MOVE_EVENT, (wxObjectEventFunction)&CropWindow::OnGridMove, this);
 	this->SetSizer(mainSizer);
 	this->FitInside();
 	this->SetScrollRate(5, 5);
@@ -131,6 +132,8 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	cropGrid.endX = 1.0;
 	cropGrid.startY = 0.0;
 	cropGrid.endY = 1.0;
+
+	aspectFlipped = false;
 }
 
 void CropWindow::ChangeAspect(bool gridUpdate){
@@ -238,7 +241,11 @@ void CropWindow::OnCombo(wxCommandEvent& WXUNUSED(evt)) {
 	this->ChangeAspect();	
 }
 
-void CropWindow::FlipAspect(wxCommandEvent& WXUNUSED(evt)){
+void CropWindow::OnFlipAspect(wxCommandEvent& WXUNUSED(evt)) {
+	this->FlipAspect();
+}
+
+void CropWindow::FlipAspect(){
 
 	wxArrayString values = defaultAspects->GetStrings();
 
@@ -260,20 +267,25 @@ void CropWindow::FlipAspect(wxCommandEvent& WXUNUSED(evt)){
 	customAspectHeight->SetValue(currentCustomWidth);
 
 	this->ChangeAspect();	
+	aspectFlipped = !aspectFlipped;
 }
 
 void CropWindow::OnEnableBox(wxCommandEvent& WXUNUSED(evt)) {
 
 	if(cropEnabled) { return; }
 	boxEnabled = !boxEnabled;
+	this->EnableBox(boxEnabled);
+}
 
-	if(boxEnabled) {
+void CropWindow::EnableBox(bool enable) {
+
+	if (enable) {
 		this->GetZoomImagePanel()->SetGridOwner((int)this->GetId());
 		this->GetZoomImagePanel()->SetGrid(cropGrid);
 		this->GetZoomImagePanel()->ActivateGrid();
 		enableCropBox->SetLabel("Disable Grid Lines");
 	}
-	else{
+	else {
 		cropGrid.startX = this->GetZoomImagePanel()->GetGrid().startX;
 		cropGrid.startY = this->GetZoomImagePanel()->GetGrid().startY;
 		cropGrid.endX = this->GetZoomImagePanel()->GetGrid().endX;
@@ -281,7 +293,7 @@ void CropWindow::OnEnableBox(wxCommandEvent& WXUNUSED(evt)) {
 		this->GetZoomImagePanel()->SetGridOwner(-1);
 		this->GetZoomImagePanel()->DeactivateGrid();
 		enableCropBox->SetLabel("Enable Grid Lines");
-	}	
+	}
 }
 
 void CropWindow::OnEnableCrop(wxCommandEvent& WXUNUSED(evt)) {
@@ -328,6 +340,14 @@ void CropWindow::OnResetCrop(wxCommandEvent& WXUNUSED(evt)) {
 	this->SetUpdated(true);
 }
 
+void CropWindow::OnGridMove(wxCommandEvent& WXUNUSED(evt)) {
+
+	if (this->GetId() == this->GetZoomImagePanel()->GetGridOwner()) {
+		cropGrid = this->GetZoomImagePanel()->GetGrid();
+		this->SaveNoReprocess();
+	}
+}
+
 void CropWindow::ResetCropValues() {
 
 }
@@ -335,7 +355,12 @@ void CropWindow::ResetCropValues() {
 void CropWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 	if(edit == NULL){ return;}
-	if(edit->GetEditType() == ProcessorEdit::EditType::CROP && edit->GetParamsSize() == 6){
+	if(edit->GetEditType() == ProcessorEdit::EditType::CROP){
+
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_NUMERATOR)) { customAspectWidth->SetValue(wxString::Format(wxT("%f"), edit->GetParam(PHOEDIX_PARAMETER_NUMERATOR))); }
+		if (edit->CheckForParameter(PHOEDIX_PARAMETER_DENOMINATOR)) { customAspectHeight->SetValue(wxString::Format(wxT("%f"), edit->GetParam(PHOEDIX_PARAMETER_DENOMINATOR))); }
+		if (edit->CheckForFlag(PHOEDIX_FLAG_FLIP_ASPECT)) { if (edit->GetFlag(PHOEDIX_FLAG_FLIP_ASPECT) == 1) { this->FlipAspect(); } }
+		if (edit->CheckForFlag(PHOEDIX_FLAG_ASPECT_SELECTION)) { defaultAspects->SetSelection(edit->GetFlag(PHOEDIX_FLAG_ASPECT_SELECTION)); this->ChangeAspect(); }
 
 		// Get start and end positions
 		if (edit->CheckForParameter(PHOEDIX_PARAMETER_STARTX)) { cropGrid.startX = edit->GetParam(PHOEDIX_PARAMETER_STARTX); }
@@ -343,30 +368,29 @@ void CropWindow::SetParamsAndFlags(ProcessorEdit * edit){
 		if (edit->CheckForParameter(PHOEDIX_PARAMETER_CROP_WIDTH)) { cropGrid.endX = edit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH) + cropGrid.startX; }
 		if (edit->CheckForParameter(PHOEDIX_PARAMETER_CROP_HEIGHT)) { cropGrid.endY = edit->GetParam(PHOEDIX_PARAMETER_CROP_HEIGHT) + cropGrid.startY; }
 
-		// Get previous grid info
-		int oldOwner = this->GetZoomImagePanel()->GetGridOwner();
+		int oldGridOwner = this->GetZoomImagePanel()->GetGridOwner();
 		Grid oldGrid = this->GetZoomImagePanel()->GetGrid();
 
 		// Set crop grid temporarly
 		this->GetZoomImagePanel()->SetGridOwner((int)this->GetId());
 		this->GetZoomImagePanel()->SetGrid(cropGrid);
-
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_NUMERATOR)) { customAspectWidth->SetValue(wxString::Format(wxT("%f"), edit->GetParam(PHOEDIX_PARAMETER_NUMERATOR))); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_DENOMINATOR)) { customAspectHeight->SetValue(wxString::Format(wxT("%f"), edit->GetParam(PHOEDIX_PARAMETER_DENOMINATOR))); }
-
-		if (edit->CheckForFlag(PHOEDIX_FLAG_ASPECT_SELECTION)) { defaultAspects->SetSelection(edit->GetFlag(PHOEDIX_FLAG_ASPECT_SELECTION)); }
-		this->ChangeAspect(false);
-
+		
 		if (edit->CheckForFlag(PHOEDIX_FLAG_CROP_ENABLED)) {
 			if (edit->GetFlag(PHOEDIX_FLAG_CROP_ENABLED) == 0) { this->EnableCrop(false); }
 			if (edit->GetFlag(PHOEDIX_FLAG_CROP_ENABLED) == 1) { this->EnableCrop(true); }
 		}
 
+		// Show / hide grid lines
+		if (edit->CheckForFlag(PHOEDIX_FLAG_BOX_ENABLED)) { 
+			boxEnabled = (bool)edit->GetFlag(PHOEDIX_FLAG_BOX_ENABLED);
+			this->EnableBox(boxEnabled); 
+		}
+
 		this->SetUpdated(true);
 
-		// Set grid back to previous info incase it's not this windows
-		if(oldOwner != this->GetId()){
-			this->GetZoomImagePanel()->SetGridOwner(oldOwner);
+		// If this crop edit does not have control of the grid, return control to previous owner
+		if (!boxEnabled) {
+			this->GetZoomImagePanel()->SetGridOwner(oldGridOwner);
 			this->GetZoomImagePanel()->SetGrid(oldGrid);
 		}
 	}
@@ -379,43 +403,24 @@ ProcessorEdit * CropWindow::GetParamsAndFlags(){
 	customAspectWidth->GetValue().ToDouble(&numerator);
 	customAspectHeight->GetValue().ToDouble(&denominator);
 
-	if (cropEnabled) {
+	// Create crop edit with crop parameters
+	ProcessorEdit * cropEdit = new ProcessorEdit(ProcessorEdit::EditType::CROP);
 
-		// Create crop edit with crop parameters
-		ProcessorEdit * cropEdit = new ProcessorEdit(ProcessorEdit::EditType::CROP);
+	cropEdit->AddParam(PHOEDIX_PARAMETER_STARTX, cropGrid.startX);
+	cropEdit->AddParam(PHOEDIX_PARAMETER_STARTY, cropGrid.startY);
+	cropEdit->AddParam(PHOEDIX_PARAMETER_CROP_WIDTH, cropGrid.endX - cropGrid.startX);
+	cropEdit->AddParam(PHOEDIX_PARAMETER_CROP_HEIGHT, cropGrid.endY - cropGrid.startY);
+	cropEdit->AddParam(PHOEDIX_PARAMETER_NUMERATOR, numerator);
+	cropEdit->AddParam(PHOEDIX_PARAMETER_DENOMINATOR, denominator);
 
-		cropEdit->AddParam(PHOEDIX_PARAMETER_STARTX, cropGrid.startX);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_STARTY, cropGrid.startY);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_CROP_WIDTH, cropGrid.endX - cropGrid.startX);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_CROP_HEIGHT, cropGrid.endY - cropGrid.startY);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_NUMERATOR, numerator);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_DENOMINATOR, denominator);
+	cropEdit->AddFlag(PHOEDIX_FLAG_ASPECT_SELECTION, defaultAspects->GetSelection());
+	cropEdit->AddFlag(PHOEDIX_FLAG_CROP_ENABLED, (int)cropEnabled);
+	cropEdit->AddFlag(PHOEDIX_FLAG_FLIP_ASPECT, (int)aspectFlipped);
+	cropEdit->AddFlag(PHOEDIX_FLAG_BOX_ENABLED, (int)boxEnabled);
 
-		cropEdit->AddFlag(PHOEDIX_FLAG_ASPECT_SELECTION, defaultAspects->GetSelection());
-		cropEdit->AddFlag(PHOEDIX_FLAG_CROP_ENABLED, (int)cropEnabled);
-
-		// Set enabled / disabled
-		cropEdit->SetDisabled(isDisabled);
-		return cropEdit;
-	}
-	else {
-
-		// Create crop edit with full image size
-		ProcessorEdit * cropEdit = new ProcessorEdit(ProcessorEdit::EditType::CROP);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_STARTX, (double)0.0);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_STARTY, (double)0.0);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_CROP_WIDTH, (double)1.0);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_CROP_HEIGHT, (double)1.0);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_NUMERATOR, numerator);
-		cropEdit->AddParam(PHOEDIX_PARAMETER_DENOMINATOR, denominator);
-
-		cropEdit->AddFlag(PHOEDIX_FLAG_ASPECT_SELECTION, defaultAspects->GetSelection());
-		cropEdit->AddFlag(PHOEDIX_FLAG_CROP_ENABLED, (int)cropEnabled);
-
-		// Set enabled / disabled
-		cropEdit->SetDisabled(isDisabled);
-		return cropEdit;
-	}
+	// Set enabled / disabled
+	cropEdit->SetDisabled(isDisabled);
+	return cropEdit;
 }
 
 bool CropWindow::CheckCopiedParamsAndFlags(){

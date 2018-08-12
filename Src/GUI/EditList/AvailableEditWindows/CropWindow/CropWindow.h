@@ -24,19 +24,20 @@ public:
 	bool CheckCopiedParamsAndFlags();
 	ProcessorEdit * GetParamsAndFlags();
 
-protected:
-	void SetCropBoxUI(double startX, double startY, double width, double height);
 private:
 
 	void OnCombo(wxCommandEvent& WXUNUSED(evt));
 	void OnEnableBox(wxCommandEvent& WXUNUSED(evt));
+	void EnableBox(bool enable);
 	void OnEnableCrop(wxCommandEvent& WXUNUSED(evt));
 	void EnableCrop(bool enable);
 	void OnResetCrop(wxCommandEvent& WXUNUSED(evt));
 	void OnText(wxCommandEvent& evt);
-	void FlipAspect(wxCommandEvent& WXUNUSED(evt));
+	void FlipAspect();
+	void OnFlipAspect(wxCommandEvent& WXUNUSED(evt));
 	void ResetCropValues();
 	void ChangeAspect(bool gridUpdate = true);
+	void OnGridMove(wxCommandEvent& WXUNUSED(evt));
 	Grid limitGrid(Grid inGrid);
 	Grid GetNewAspectGrid(double aspectRatio);
 
@@ -65,6 +66,7 @@ private:
 	bool cropEnabled;
 	bool forceAspect;
 	double aspect;
+	bool aspectFlipped;
 
 	Grid cropGrid;
 	
