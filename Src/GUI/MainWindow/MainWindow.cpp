@@ -37,11 +37,12 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuFile->Append(MainWindow::MenuBar::ID_EXIT, _("Exit"));
 
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE, _("Show Image"));
-	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit Pipeline"));
+	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit Pipeline\tCtrl+P"));
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS, _("Show Histograms"));
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO, _("Show Image Info"));
 
-	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT, _("Fast Edit"));
+	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT, _("Fast Edit\tCtrl+F"));
+	menuTools->Append(MainWindow::MenuBar::ID_FORCE_REPROCESS, _("Force Reprocess\tCtrl+R"));
 	menuTools->AppendSeparator();
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL, _("Show Original Image"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW, _("Show Original Image (separate window)"));
@@ -218,6 +219,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowEditList, this, MainWindow::MenuBar::ID_SHOW_EDIT_LIST);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowHistograms, this, MainWindow::MenuBar::ID_SHOW_HISTOGRAMS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnEnableFastEdit, this, MainWindow::MenuBar::ID_ENABLE_FAST_EDIT);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnForceReprocess, this, MainWindow::MenuBar::ID_FORCE_REPROCESS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowOriginal, this, MainWindow::MenuBar::ID_SHOW_ORIGINAL);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowOriginalWindow, this, MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
@@ -676,6 +678,10 @@ void MainWindow::ShowImageRelatedWindows(){
 }
 
 void MainWindow::OnReprocessTimer(wxTimerEvent& WXUNUSED(event)){
+	editList->ReprocessImageRaw();
+}
+
+void MainWindow::OnForceReprocess(wxCommandEvent& WXUNUSED(event)) {
 	editList->ReprocessImageRaw();
 }
 

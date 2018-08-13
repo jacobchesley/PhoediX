@@ -72,6 +72,7 @@ private:
 	void OnReprocessTimer(wxTimerEvent& evt);
 	void OnImagePanelMouse(wxMouseEvent & evt);
 	void OnReprocess(wxCommandEvent& WXUNUSED(event));
+	void OnForceReprocess(wxCommandEvent& WXUNUSED(event));
 
 	void CreateNewProject(wxString projectFile, bool rawProject);
 	void OpenImage(wxString imagePath, bool checkForProject = true);
@@ -162,6 +163,7 @@ private:
 
 		// Tools
 		ID_ENABLE_FAST_EDIT,
+		ID_FORCE_REPROCESS,
 		ID_SHOW_ORIGINAL,
 		ID_SHOW_ORIGINAL_WINDOW,
 		ID_SHOW_SNAPSHOTS,
