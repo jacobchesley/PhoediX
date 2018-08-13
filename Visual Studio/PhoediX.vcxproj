@@ -59,7 +59,6 @@
     <ClCompile Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.cpp" />
-    <ClCompile Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.cpp" />
     <ClCompile Include="..\Src\GUI\LibraryWindow\LibraryWindow.cpp" />
@@ -126,7 +125,6 @@
     <ClInclude Include="..\Src\GUI\ImageDisplay\wxImagePanel\wxImagePanel.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImageFrame\ZoomImageFrame.h" />
     <ClInclude Include="..\Src\GUI\ImageDisplay\ZoomImagePanel\ZoomImagePanel.h" />
-    <ClInclude Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.h" />
     <ClInclude Include="..\Src\GUI\LibraryWindow\DirectorySelections\DirectorySelections.h" />
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryImage\LibraryImage.h" />
     <ClInclude Include="..\Src\GUI\LibraryWindow\LibraryWindow.h" />

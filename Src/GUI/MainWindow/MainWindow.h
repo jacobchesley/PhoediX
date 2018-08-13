@@ -29,7 +29,6 @@
 #include "GUI/Colors/Colors.h"
 #include "GUI/HistogramDisplay/HistogramDisplay.h"
 #include "GUI/AboutWindow/AboutWindow.h"
-#include "GUI/ImportImageDialog/ImportImageDialog.h"
 #include "GUI/LibraryWindow/LibraryWindow.h"
 #include "GUI/SupportedCamerasWindow/SupportedCamerasWindow.h"
 #include "GUI/Controls/ExifRead/ExifRead.h"

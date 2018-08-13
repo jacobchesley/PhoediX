@@ -151,9 +151,6 @@
     <Filter Include="GUI\Export Window">
       <UniqueIdentifier>{42574900-a77c-4f00-b945-5c4e112db4b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GUI\Import Image Dialog">
-      <UniqueIdentifier>{f3884e67-b828-43fb-b406-9b2991aecfd8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI\Settings Window">
       <UniqueIdentifier>{7454ac40-37e3-495b-abf3-f5006c8f2931}</UniqueIdentifier>
     </Filter>
@@ -338,9 +335,6 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\AboutWindow\AboutWindow.cpp">
       <Filter>GUI\About Window</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.cpp">
-      <Filter>GUI\Import Image Dialog</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\GUI\PixelPeepWindow\PixelPeepWindow.cpp">
       <Filter>GUI\Pixel Peep Window</Filter>
@@ -541,9 +535,6 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\AboutWindow\AboutWindow.h">
       <Filter>GUI\About Window</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\GUI\ImportImageDialog\ImportImageDialog.h">
-      <Filter>GUI\Import Image Dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\GUI\PixelPeepWindow\PixelPeepWindow.h">
       <Filter>GUI\Pixel Peep Window</Filter>
