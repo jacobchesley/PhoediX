@@ -1,4 +1,5 @@
-// Copyright 2016 Jacob Chesley
+// Copyright 2018 Jacob Chesley.
+// See LICENSE.TXT in root of project for license information.
 
 #ifndef DOUBLE_SLIDER_H
 #define DOUBLE_SLIDER_H

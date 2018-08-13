@@ -1,4 +1,5 @@
-// Copyright 2016 Jacob Chesley
+// Copyright 2018 Jacob Chesley.
+// See LICENSE.TXT in root of project for license information.
 
 #ifndef RGB_CURVE_H
 #define RGB_CURVE_H

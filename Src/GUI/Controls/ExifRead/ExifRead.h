@@ -1,3 +1,6 @@
+// Copyright 2018 Jacob Chesley.
+// See LICENSE.TXT in root of project for license information.
+
 #ifndef EXIF_READ_H
 #define EXIF_READ_H
 

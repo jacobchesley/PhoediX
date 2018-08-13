@@ -1,3 +1,6 @@
+// Copyright 2018 Jacob Chesley.
+// See LICENSE.TXT in root of project for license information.
+
 #include "ExifRead.h"
 
 ExifRead::ExifRead(wxWindow * parent) : wxPanel(parent) {

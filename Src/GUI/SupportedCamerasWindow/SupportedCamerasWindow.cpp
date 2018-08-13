@@ -1,3 +1,6 @@
+// Copyright 2018 Jacob Chesley.
+// See LICENSE.TXT in root of project for license information.
+
 #include "SupportedCamerasWindow.h"
 #include "libraw.h"
 
