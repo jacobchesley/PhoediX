@@ -563,9 +563,6 @@
     <ClInclude Include="..\Src\Settings\Settings.h">
       <Filter>Settings</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\ShiftRGBWindow\AdjustRGBWindow.h">
-      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust RGB</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustLABWindow\AdjustLABWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust LAB</Filter>
     </ClInclude>
@@ -583,6 +580,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\Controls\ExifRead\ExifRead.h">
       <Filter>GUI\Controls\ExifRead</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustRGBWindow\AdjustRGBWindow.h">
+      <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust RGB</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
