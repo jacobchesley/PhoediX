@@ -1,4 +1,4 @@
-cd /Users/jacob/Development/wxWidgets-3.1.0
+cd /Users/jacob/Development/wxWidgets-3.0.4
 
 # Clean wxWidgets builds
 rm -rf build-release_32
