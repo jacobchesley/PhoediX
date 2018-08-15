@@ -22,7 +22,10 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
 
-	aboutPhoediX = new wxStaticText(this, -1, "About PhoediX");
+	wxString app32or64 = "";
+	if (sizeof(void*) == 4) { app32or64 = " - 32 Bit"; }
+	if (sizeof(void*) == 8) { app32or64 = " - 64 Bit"; }
+	aboutPhoediX = new wxStaticText(this, -1, "About PhoediX" + app32or64);
 	aboutPhoediX->SetForegroundColour(Colors::TextWhite);
 	aboutPhoediX->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
