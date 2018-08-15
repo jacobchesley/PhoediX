@@ -95,7 +95,7 @@ private:
 	};
 
 	enum PopupMenuActions{
-		COPY_EDIT_LIST,
+		COPY_EDIT_LIST = 1,
 		PASTE_EDIT_LIST,
 		ENABLE_ALL_EDITS,
 		DISABLE_ALL_EDITS

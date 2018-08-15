@@ -1,4 +1,8 @@
-baseDir ="$(pwd)"
+baseDir ="$(pwd)"cd ..
+cd ..
+cd ..
+phoedixDir="$(pwd)"
+
 cd /Users/jacob/Development/tiff-4.0.9
 
 # Clean LibTiff builds
@@ -13,6 +17,7 @@ cd build-release_32
 ../configure CC="clang -arch i386" CXX="clang++ -arch i386" --prefix="$(pwd)" --disable-static &&
 sudo make
 cp ./libtiff/tiffconf.h ../libtiff
+cp ./libtiff/.libs/libtiff.5.dylib $phoedixDir/build/Release_32/lib
 
 cd ..
 
@@ -22,6 +27,7 @@ cd build-release_64
 ../configure CC="clang -arch x86_64" CXX="clang++ -arch x86_64" --prefix="$(pwd)" --disable-static &&
 sudo make
 cp ./libtiff/tiffconf.h ../libtiff
+cp ./libtiff/.libs/libtiff.5.dylib $phoedixDir/build/Release_64/lib
 
 cd ..
 
