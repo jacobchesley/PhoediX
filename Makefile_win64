@@ -15,7 +15,7 @@ OUT_DIR=$(BUILD_DIR)/Objects
 
 PREPROCESSOR=/D "WIN64" /D "_CRT_SECURE_NO_DEPRECATE=1" /D "_CRT_NON_CONFORMING_SWPRINTFS=1" /D "_SCL_SECURE_NO_WARNINGS=1" /D "__WXMSW__" /D "NDEBUG" /D "_UNICODE" /D "_WINDOWS" /D "NOPCH" /D "_WINSOCKAPI_" /D "UNICODE" 
 CC=cl.exe
-COMPILE_FLAG=/c /EHsc /MP /MT /I. /O2 /W0 /nologo $(PREPROCESSOR)
+COMPILE_FLAG=/c /EHsc /fp:precise /Gd /GR /GS /I. /MT /MP /nologo /openmp /O2 /W0 /Zc:inline $(PREPROCESSOR)
 
 SRC=./Src
 VS="./Visual Studio"
@@ -26,7 +26,7 @@ LIBTIFF_LIB_PATH=$(WX_PATH)/lib/x64
 
 LL=LINK.exe
 LINKER_INCLUDE = /LIBPATH:$(WX_LIB_PATH) /LIBPATH:$(LIBRAW_LIB_PATH) /LIBPATH:$(LIBTIFF_LIB_PATH) "wxmsw30u_core.lib" "wxbase30u.lib" "wxmsw30u_adv.lib" "wxmsw30u_aui.lib" "wxbase30u_xml.lib" "wxtiff.lib" "wxjpeg.lib" "wxpng.lib" "wxzlib.lib" "wxregexu.lib" "wxexpat.lib" "libraw.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "winspool.lib" "winmm.lib" "shell32.lib" "comctl32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "rpcrt4.lib" "advapi32.lib" "wsock32.lib" "wininet.lib" "odbc32.lib" "odbccp32.lib"
-LINK_FLAG=/MACHINE:X64 $(LINKER_INCLUDE)
+LINK_FLAG=/MACHINE:X64 /NXCOMPAT /DYNAMICBASE /MANIFEST:EMBED $(LINKER_INCLUDE)
 
 RC=RC.exe
 RC_INCLUDE = $(VS)/PhoediX.rc
