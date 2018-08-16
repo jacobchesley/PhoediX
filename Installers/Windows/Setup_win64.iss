@@ -11,10 +11,9 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{8EC19654-9A6F-4753-ABDC-7BB8D8576989}
+AppId={{B7A495A2-A9C6-4B09-856A-F81A29E9D5AD}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -22,12 +21,14 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=C:\Development\PhoediX\Installers\Windows
-OutputBaseFilename=setup
-SetupIconFile=C:\Development\PhoediX\Icon\px.ico
+OutputDir=..\..\Installers\Windows
+OutputBaseFilename=PhoediX_Setup_x64
+SetupIconFile=..\..\Icon\px.ico
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
+VersionInfoCopyright={#MyAppPublisher}
+VersionInfoVersion={#MyAppVersion}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -39,15 +40,10 @@ LicenseFile=AllLicenses.txt
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\Build\Release_x64\PhoediX.exe"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\..\Build\Release_x64\libraw.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\..\Build\Release_x64\libtiff.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-Source: "..\..\Build\Release_x64\settings.ini"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode
-
-Source: "..\..\Build\Release_x86\PhoediX.exe"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\..\Build\Release_x86\libraw.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\..\Build\Release_x86\libtiff.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
-Source: "..\..\Build\Release_x86\settings.ini"; DestDir: "{app}"; Flags: ignoreversion; Check: not Is64BitInstallMode
+Source: "..\..\Build\Release_x64\PhoediX.exe"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\..\Build\Release_x64\libraw.dll"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\..\Build\Release_x64\libtiff.dll"; DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\..\Build\Release_x64\settings.ini"; DestDir: "{app}"; Flags: ignoreversion;
 
 Source: "..\..\3rd Party Licenses\*"; DestDir: "{app}\3rd Party Licenses"; Flags: ignoreversion recursesubdirs
 
@@ -63,12 +59,3 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
-;[Code]
-;var 
-;  licensePage: TOutputMsgMemoWizardPage;
-;  acceptButton: TButton
-;  cancelButton: TButton
-
-;  procedure InitializeWizard();
-;  begin
-;    licensePage := CreateOutputMsgMemoPage(wpLicense, SetupMessage(msgWizardLicense), SetupMessage(msgLicenseLabel),'test 2', '');
