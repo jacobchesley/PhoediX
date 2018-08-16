@@ -5558,9 +5558,10 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
 			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
 				
-			redData8Dup[i] = tempRedScale;
-			greenData8Dup[i] = tempGreenScale;
-			blueData8Dup[i] = tempBlueScale;
+			idx = (width * y) + x;
+			redData8Dup[idx] = tempRedScale;
+			greenData8Dup[idx] = tempGreenScale;
+			blueData8Dup[idx] = tempBlueScale;
 		}
 	}
 
@@ -5604,11 +5605,10 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 				xPlus = x + pixelBlurSize + 1;
 				xMin = x - pixelBlurSize;
 
-				if(xPlus < width  && xMin >= 0){
+				if(xPlus < width && xMin >= 0){
 
 					iMapPlus = (y * width) + xPlus;
 					iMapMin = (y * width) + xMin;
-					scalar = 1.0 / ((2.0 * pixelBlurSize) + 1.0);
 
 					tempRed += redData16[iMapPlus];
 					tempRed -= redData16[iMapMin];
@@ -5623,7 +5623,7 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			tempRedScale = tempRed * scalar;
 			tempGreenScale = tempGreen * scalar;
 			tempBlueScale = tempBlue* scalar;
-
+			
 			// handle overflow or underflow
 			tempRedScale = (tempRedScale > 65535) ? 65535 : tempRedScale;
 			tempGreenScale = (tempGreenScale  > 65535) ? 65535 : tempGreenScale;
@@ -5632,10 +5632,12 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			tempRedScale = (tempRedScale  < 0) ? 0 : tempRedScale;
 			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
 			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
-
-			redData16Dup[i] = tempRedScale;
-			greenData16Dup[i] = tempGreenScale;
-			blueData16Dup[i] = tempBlueScale;
+		
+			idx = (width * y) + x;
+			redData16Dup[idx] = tempRedScale;
+			greenData16Dup[idx] = tempGreenScale;
+			blueData16Dup[idx] = tempBlueScale;
+			
 		}
 	}
 }
