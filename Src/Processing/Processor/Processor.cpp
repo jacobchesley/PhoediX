@@ -6585,7 +6585,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				// Get all parameters from the edit
 				double redRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_RED);
-				double redGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
+				double redGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_GREEN);
 				double redBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_BLUE);
 				double greenRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_RED);
 				double greenGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN);
@@ -7245,7 +7245,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 
 			// Get all parameters from the edit
 			double redRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_RED);
-			double redGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
+			double redGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_GREEN);
 			double redBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_BLUE);
 			double greenRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_RED);
 			double greenGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN);
