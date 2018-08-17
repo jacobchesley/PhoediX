@@ -43,6 +43,7 @@ private:
 	wxString GetUniqueName(wxString tryName);
 
 	wxVector<Snapshot*> snapshots;
+	wxDataViewColumn * textColumn;
 
 	wxBoxSizer * mainSizer;
 	wxDataViewListCtrl * snapshotList;

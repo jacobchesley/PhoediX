@@ -15,8 +15,8 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
 
-	snapshotList = new wxDataViewListCtrl(this, -1, wxDefaultPosition, wxDefaultSize, 0 | wxDV_NO_HEADER |wxDV_MULTIPLE);
-	snapshotList->AppendTextColumn("Snapshot Name");
+	snapshotList = new wxDataViewListCtrl(this, -1, wxDefaultPosition, wxDefaultSize, wxDV_SINGLE);
+	snapshotList->AppendTextColumn("Snapshot Name", wxDATAVIEW_CELL_INERT, 200);
 	snapshotList->SetBackgroundColour(this->GetBackgroundColour());
 	snapshotList->SetForegroundColour(Colors::TextLightGrey);
 
@@ -51,6 +51,10 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 
 	this->SetScrollRate(5, 5);
 
+	this->Layout();
+	this->Fit();
+	this->SetClientSize(this->GetVirtualSize());
+
 	this->Bind(wxEVT_SIZE, (wxObjectEventFunction)&SnapshotWindow::OnResize, this);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SnapshotWindow::OnRemoveSnapshot, this, SnapshotWindow::Buttons::ID_REMOVE_SNAPSHOT);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SnapshotWindow::OnRenameSnapshot, this, SnapshotWindow::Buttons::ID_RENAME_SNAPSHOT);
@@ -59,6 +63,7 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 }
 
 void SnapshotWindow::OnResize(wxSizeEvent& WXUNUSED(evt)) {
+
 	this->FitInside();
 }
 

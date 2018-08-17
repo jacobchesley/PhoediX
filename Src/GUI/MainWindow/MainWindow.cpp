@@ -177,6 +177,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	snapshotPaneInfo.PinButton(true);
 	snapshotPaneInfo.DestroyOnClose(false);
 	snapshotPaneInfo.BestSize(snapshotWindow->GetClientSize());
+	snapshotPaneInfo.MinSize(snapshotWindow->GetClientSize());
 	snapshotPaneInfo.Hide();
 	auiManager->AddPane(snapshotWindow, snapshotPaneInfo);
 
