@@ -43,7 +43,7 @@ class SettingsWindow : public wxScrolledWindow {
 
 public:
 	SettingsWindow(wxWindow * parent, Processor * processor, EditListPanel * editLst);
-	void ApplySettings(bool ShowMessage = false);
+	void ApplySettings(bool ShowMessage = false, bool overwriteLast = true);
 	void ReadSettings();
 	void WriteSettings();
 	void Cleanup();
@@ -51,6 +51,7 @@ public:
 private:
 
 	void OnApply(wxCommandEvent& WXUNUSED(evt));
+	void OnOkay(wxCommandEvent& WXUNUSED(evt));
 	void OnCancel(wxCommandEvent& WXUNUSED(evt));
 	void WriteLines(wxTextFile * file);
 	void SendBlankMessageTimer(wxTimerEvent& WXUNUSED(event));
@@ -72,6 +73,7 @@ private:
 	DoubleSlider * numThreads;
 
 	wxBoxSizer * buttonSizer;
+	PhoediXButton * okSettingsButton;
 	PhoediXButton * applySettingsButton;
 	PhoediXButton * cancelButton;
 
@@ -83,6 +85,7 @@ private:
 
 
 	enum {
+		ID_OK_SETTINGS,
 		ID_APPLY_SETTINGS,
 		ID_CANCEL
 	};

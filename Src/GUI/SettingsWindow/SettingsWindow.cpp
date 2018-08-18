@@ -52,16 +52,22 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	numThreads->SetBackgroundColour(this->GetBackgroundColour());
 
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+
+	okSettingsButton = new PhoediXButton(this, SettingsWindow::ID_OK_SETTINGS, "OK");
+	okSettingsButton->SetForegroundColour(Colors::TextLightGrey);
+	okSettingsButton->SetBackgroundColour(Colors::BackGrey);
+	okSettingsButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
+	cancelButton = new PhoediXButton(this, SettingsWindow::ID_CANCEL, "Cancel");
+	cancelButton->SetForegroundColour(Colors::TextLightGrey);
+	cancelButton->SetBackgroundColour(Colors::BackGrey);
+	cancelButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
+
 	applySettingsButton = new PhoediXButton(this, SettingsWindow::ID_APPLY_SETTINGS, "Apply Settings");
 	applySettingsButton->SetForegroundColour(Colors::TextLightGrey);
 	applySettingsButton->SetBackgroundColour(Colors::BackGrey);
 	applySettingsButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
-	cancelButton = new PhoediXButton(this, SettingsWindow::ID_CANCEL, "Cancel");
-	cancelButton->SetForegroundColour(Colors::TextGrey);
-	cancelButton->SetBackgroundColour(Colors::BackGrey);
-	cancelButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
+	
 	gridSizer->Add(colorDepthLabel);
 	gridSizer->Add(colorDepth);
 	gridSizer->Add(colorSpaceLabel);
@@ -69,9 +75,12 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	gridSizer->Add(numThreadsLabel);
 	gridSizer->Add(numThreads);
 
-	buttonSizer->Add(applySettingsButton);
+
+	buttonSizer->Add(okSettingsButton);
 	buttonSizer->AddSpacer(20);
 	buttonSizer->Add(cancelButton);
+	buttonSizer->AddSpacer(20);
+	buttonSizer->Add(applySettingsButton);
 
 	mainSizer->Add(settingsLabel);
 	mainSizer->AddSpacer(10);
@@ -91,15 +100,23 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	blankMessageTimer = new wxTimer(this);
 
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnApply, this, SettingsWindow::ID_APPLY_SETTINGS);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnOkay, this, SettingsWindow::ID_OK_SETTINGS);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnCancel, this, SettingsWindow::ID_CANCEL);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&SettingsWindow::SendBlankMessageTimer, this);
 }
 
 void SettingsWindow::OnApply(wxCommandEvent& WXUNUSED(evt)) {
-	this->ApplySettings(true);
+	this->ApplySettings(true, false);
 }
 
-void SettingsWindow::ApplySettings(bool ShowMessage){
+void SettingsWindow::OnOkay(wxCommandEvent& WXUNUSED(evt)) {
+	this->ApplySettings(true, true);
+
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).Hide();
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+}
+
+void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
 
 	if (colorDepth->GetSelection() == 0 && lastColorDepth != colorDepth->GetSelection()) {
 		proc->GetOriginalImage()->Disable16Bit();
@@ -139,11 +156,13 @@ void SettingsWindow::ApplySettings(bool ShowMessage){
 	if (colorSpace->GetSelection() == 2) { proc->SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); }
 	if (colorSpace->GetSelection() == 3) { proc->SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); }
 
-	lastSettings.bitDepth = colorDepth->GetSelection();
-	lastSettings.colorSpace = colorSpace->GetSelection();
-	lastSettings.numThreads = numThreads->GetValue();
+	if (overwriteLast) {
+		lastSettings.bitDepth = colorDepth->GetSelection();
+		lastSettings.colorSpace = colorSpace->GetSelection();
+		lastSettings.numThreads = numThreads->GetValue();
+		this->WriteSettings();
+	}
 
-	this->WriteSettings();
 	editList->ReprocessImageRaw();
 
 	// Send applied settings message to parent to display in info bar
@@ -268,6 +287,9 @@ void SettingsWindow::OnCancel(wxCommandEvent& WXUNUSED(evt)) {
 	colorDepth->SetSelection(lastSettings.bitDepth);
 	colorSpace->SetSelection(lastSettings.colorSpace);
 	numThreads->SetValue(lastSettings.numThreads);
+
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).Hide();
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
 void SettingsWindow::Cleanup() {
