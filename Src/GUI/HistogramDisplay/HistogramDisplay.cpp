@@ -12,11 +12,11 @@ HistogramDisplay::HistogramDisplay(wxWindow * parent, Processor * processor) : w
 	// 2 Columns, 15 pixel vertical gap, 5 pixel horizontal gap
 	controlsLayout = new wxFlexGridSizer(2, 15, 5);
 
-	selectionLabel = new wxStaticText(this, -1, "Hisograms Display");
+	selectionLabel = new wxStaticText(this, -1, "Histograms Display");
 	selectionLabel->SetForegroundColour(Colors::TextLightGrey);
 
 	histogramSelector = new PhoediXComboBox(this, -1);
-	histogramSelector->AppendString("All Hsitograms");
+	histogramSelector->AppendString("All Histograms");
 	histogramSelector->AppendString("Only RGBW combo");
 	histogramSelector->AppendString("R, G, B, and W");
 	histogramSelector->AppendString("R, G, B");
