@@ -5558,10 +5558,9 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
 			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
 				
-			idx = (width * y) + x;
-			redData8Dup[idx] = tempRedScale;
-			greenData8Dup[idx] = tempGreenScale;
-			blueData8Dup[idx] = tempBlueScale;
+			redData8Dup[i] = tempRedScale;
+			greenData8Dup[i] = tempGreenScale;
+			blueData8Dup[i] = tempBlueScale;
 		}
 	}
 
@@ -5633,10 +5632,9 @@ void Processor::BoxBlurHorizontal(double blurSize, int dataStart, int dataEnd) {
 			tempGreenScale = (tempGreenScale  < 0) ? 0 : tempGreenScale;
 			tempBlueScale = (tempBlueScale  < 0) ? 0 : tempBlueScale;
 		
-			idx = (width * y) + x;
-			redData16Dup[idx] = tempRedScale;
-			greenData16Dup[idx] = tempGreenScale;
-			blueData16Dup[idx] = tempBlueScale;
+			redData16Dup[i] = tempRedScale;
+			greenData16Dup[i] = tempGreenScale;
+			blueData16Dup[i] = tempBlueScale;
 			
 		}
 	}
@@ -5670,8 +5668,8 @@ void Processor::BoxBlurVertical(double blurSize, int dataStart, int dataEnd) {
 	int64_t tempGreenScale = 0;
 	int64_t tempBlueScale = 0;
 
-	int x = dataStart % width;
-	int y = dataStart / width;
+	int x = dataStart;
+	int y = 0;
 
 	int idx = 0;
 	int iMapPlus = 0;
@@ -6178,11 +6176,23 @@ void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize
 
 		// Get Chunk Size
 		chunkSize = (processor->GetImage()->GetWidth() / numThreads) * processor->GetImage()->GetHeight();
+
 		int chunkStart = 0;
+		int dataRemain = processor->GetImage()->GetWidth() * processor->GetImage()->GetHeight();
 		for (int thread = 0; thread < numThreads; thread++) {
-			EditThread * editWorker = new EditThread(processor, edit, chunkStart, chunkSize + chunkStart, &mutexLock, &wait, numThreads, &threadComplete);
-			editWorker->Run();
-			chunkStart += (processor->GetImage()->GetWidth() / numThreads);
+
+			if (thread != numThreads - 1) {
+				EditThread * editWorker = new EditThread(processor, edit, chunkStart, chunkSize + chunkStart, &mutexLock, &wait, numThreads, &threadComplete);
+				editWorker->Run();
+				chunkStart += (processor->GetImage()->GetWidth() / numThreads);
+				dataRemain -= chunkSize;
+			}
+
+			// Go all the way to end of data (incase of rounding error)
+			else {
+				EditThread * editWorker = new EditThread(processor, edit, chunkStart, dataRemain + chunkStart, &mutexLock, &wait, numThreads, &threadComplete);
+				editWorker->Run();
+			}
 		}
 	}
 
