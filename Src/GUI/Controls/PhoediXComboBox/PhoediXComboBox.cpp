@@ -7,6 +7,7 @@ PhoediXComboBox::PhoediXComboBox(wxWindow * parent, wxWindowID id) : wxComboBox(
 	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&PhoediXComboBox::OnText, this);
 	this->Bind(wxEVT_CHAR, (wxObjectEventFunction)&PhoediXComboBox::OnText, this);
 	this->Bind(wxEVT_COMMAND_TEXT_CUT, (wxObjectEventFunction)&PhoediXComboBox::OnText, this);
+	this->Bind(wxEVT_KEY_DOWN, (wxObjectEventFunction)&PhoediXComboBox::OnText, this);
 	focused = false;
 }
 
