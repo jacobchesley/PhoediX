@@ -18,7 +18,8 @@
 #include "wx/textfile.h"
 
 #include "GUI/Controls/PhoediXButton/PhoediXButton.h"
-#include "GUI/Controls//PhoediXComboBox/PhoediXComboBox.h"
+#include "GUI/Controls/PhoediXComboBox/PhoediXComboBox.h"
+#include "GUI/Controls/DoubleSlider/DoubleSlider.h"
 #include "GUI/AUIManager/AUIManager.h"
 #include "GUI/Colors/Colors.h"
 #include "Processing/Image/Image.h"
@@ -68,7 +69,7 @@ private:
 	PhoediXComboBox * colorSpace;
 
 	wxStaticText * numThreadsLabel;
-	wxSlider * numThreads;
+	DoubleSlider * numThreads;
 
 	wxBoxSizer * buttonSizer;
 	PhoediXButton * applySettingsButton;
@@ -111,7 +112,7 @@ private:
 		wxStaticText * performanceSettingsLabel;
 
 		wxStaticText * numThreadsLabel;
-		wxSlider * numThreads;
+		DoubleSlider * numThreads;
 	};
 
 	class LibrarySettingsPane : wxPanel{

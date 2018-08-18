@@ -47,9 +47,10 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	numThreadsLabel = new wxStaticText(this, -1, "Number of Threads");
 	numThreadsLabel->SetForegroundColour(Colors::TextLightGrey);
 	int maxThreads = wxThread::GetCPUCount();
-	numThreads = new wxSlider(this, -1, maxThreads, 1, maxThreads, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+	numThreads = new DoubleSlider(this, (double)maxThreads, 1.0, (double)maxThreads, (double)maxThreads - 1.0, 0);
 	numThreads->SetForegroundColour(Colors::TextLightGrey);
-	
+	numThreads->SetBackgroundColour(this->GetBackgroundColour());
+
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	applySettingsButton = new PhoediXButton(this, SettingsWindow::ID_APPLY_SETTINGS, "Apply Settings");
 	applySettingsButton->SetForegroundColour(Colors::TextLightGrey);
@@ -121,10 +122,10 @@ void SettingsWindow::ApplySettings(bool ShowMessage){
 	}
 	else{}
 
-	if (numThreads->GetValue() > 1) {
+	if (numThreads->GetValue() > 1.0) {
 		proc->SetMultithread(true);
-		proc->SetNumThreads(numThreads->GetValue());
-		PhoedixSettings::SetNumThreads(numThreads->GetValue());
+		proc->SetNumThreads((int)numThreads->GetValue());
+		PhoedixSettings::SetNumThreads((int)numThreads->GetValue());
 	}
 	else {
 		proc->SetMultithread(false);
@@ -201,7 +202,7 @@ void SettingsWindow::ReadSettings() {
 					int maxThreads = wxThread::GetCPUCount();
 					if (numThreadVal < 1) { numThreadVal = 1; }
 					if (numThreadVal > maxThreads) { numThreadVal = maxThreads; }
-					numThreads->SetValue(numThreadVal);
+					numThreads->SetValue((double)numThreadVal);
 				}
 			}
 		}
