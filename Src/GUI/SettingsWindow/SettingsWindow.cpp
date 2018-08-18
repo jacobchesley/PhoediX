@@ -230,6 +230,7 @@ void SettingsWindow::WriteSettings() {
 		settingsFile.Create(settingsFilePath);
 		this->WriteLines(&settingsFile);
 	}
+	settingsFile.Close();
 }
 
 void SettingsWindow::WriteLines(wxTextFile * file) {
@@ -250,7 +251,7 @@ void SettingsWindow::WriteLines(wxTextFile * file) {
 
 	// Number of Threads
 	wxString numThreadsSettingsStr = "NUM_THREADS=";
-	numThreadsSettingsStr += wxString::Format(wxT("%i"), numThreads->GetValue());
+	numThreadsSettingsStr += wxString::Format(wxT("%i"),(int) numThreads->GetValue());
 	file->AddLine(numThreadsSettingsStr);
 
 	file->Write();
