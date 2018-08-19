@@ -15,8 +15,10 @@ SnapshotWindow::SnapshotWindow(wxWindow * parent, EditListPanel * editListPanel,
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 	this->SetSizer(mainSizer);
 
-	snapshotList = new wxDataViewListCtrl(this, -1, wxDefaultPosition, wxDefaultSize, wxDV_SINGLE);
-	snapshotList->AppendTextColumn("Snapshot Name", wxDATAVIEW_CELL_INERT, 200);
+	snapshotList = new wxListCtrl(this, -1, wxDefaultPosition, wxDefaultSize, wxLC_SINGLE_SEL| wxLC_REPORT);
+	snapshotList->AppendColumn("Snapshot Name");
+	snapshotList->SetColumnWidth(0, wxLIST_AUTOSIZE_USEHEADER);
+	
 	snapshotList->SetBackgroundColour(this->GetBackgroundColour());
 	snapshotList->SetForegroundColour(Colors::TextLightGrey);
 
@@ -69,12 +71,15 @@ void SnapshotWindow::OnResize(wxSizeEvent& WXUNUSED(evt)) {
 
 void SnapshotWindow::OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt)){
 	
+	
 	size_t numberRemoved = 0;
 	Snapshot * test;
+
+	int toDelete = this->GetSelectedRow();
 	for(size_t i = 0; i < snapshotList->GetItemCount() + numberRemoved; i++){
 
 		// If row is selected, delete it from the GUI and internal snapshot list
-		if(snapshotList->IsRowSelected(i - numberRemoved)){
+		if(toDelete == i){
 
 			// Remove name from GUI
 			snapshotList->DeleteItem(i - numberRemoved);
@@ -100,11 +105,14 @@ void SnapshotWindow::OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt)){
 	for (size_t i = 0; i < snapshots.size(); i++) {
 		snapshots.at(i)->snapshotIndex = i;
 	}
+	
+	// Save project
+	editPanel->SaveNoReprocessWithSnapshots(this->GetSnapshots());
 }
 
 void SnapshotWindow::OnRenameSnapshot(wxCommandEvent & WXUNUSED(evt)){
 
-	size_t selectedRow = snapshotList->GetSelectedRow();
+	size_t selectedRow = this->GetSelectedRow();
 
 	// If selected row is okay and only one selected row
 	if(selectedRow != wxNOT_FOUND && selectedRow < snapshots.size()){
@@ -119,25 +127,31 @@ void SnapshotWindow::OnRenameSnapshot(wxCommandEvent & WXUNUSED(evt)){
 
 			// Delete snapshot from GUI, and insert new name at the selected row
 			snapshotList->DeleteItem(selectedRow);
-			wxVector<wxVariant> snapshotListData;
-			snapshotListData.push_back(newName);
-			snapshotList->InsertItem(selectedRow, snapshotListData);
+			snapshotList->InsertItem(selectedRow, newName);
 		}
 		renameDialog->Destroy();
 	}
+
+	// Save project
+	editPanel->SaveNoReprocessWithSnapshots(this->GetSnapshots());
 }
 
 void SnapshotWindow::OnRestoreSnapshot(wxCommandEvent & WXUNUSED(evt)){
-	if(snapshotList->GetSelectedRow() != wxNOT_FOUND && (size_t)snapshotList->GetSelectedRow() < snapshots.size()){
+
 	
-		editPanel->AddEditWindows(snapshots.at(snapshotList->GetSelectedRow())->editList);
-		PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(snapshots.at(snapshotList->GetSelectedRow())->auiPerspective);
+	if(this->GetSelectedRow() != wxNOT_FOUND && (size_t)this->GetSelectedRow() < snapshots.size()){
+	
+		editPanel->AddEditWindows(snapshots.at(this->GetSelectedRow())->editList);
+		PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(snapshots.at(this->GetSelectedRow())->auiPerspective);
 		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 	}
+
+	// Reprocess
+	editPanel->ReprocessImageRaw();
 }
 
 void SnapshotWindow::OnTakeSnapshot(wxCommandEvent & WXUNUSED(evt)){
-
+		
 	editPanel->AddEditsToProcessor();
 
 	// Create a new snapshot
@@ -158,7 +172,10 @@ void SnapshotWindow::OnTakeSnapshot(wxCommandEvent & WXUNUSED(evt)){
 	// Add snapshot name to GUI
 	wxVector<wxVariant> snapshotListData;
 	snapshotListData.push_back(newSnapshot->snapshotName);
-	snapshotList->AppendItem(snapshotListData);
+	snapshotList->InsertItem(snapshotList->GetItemCount(), newSnapshot->snapshotName);
+
+	// Save project
+	editPanel->SaveNoReprocessWithSnapshots(this->GetSnapshots());
 }
 
 wxVector<Snapshot*> SnapshotWindow::GetSnapshots(){
@@ -186,9 +203,8 @@ void SnapshotWindow::AddSnapshots(wxVector<Snapshot*> snapshotsToLoad) {
 		// Add snapshot name to GUI
 		wxVector<wxVariant> snapshotListData;
 		snapshotListData.push_back(tempSnapshot->snapshotName);
-		snapshotList->AppendItem(snapshotListData);
+		snapshotList->InsertItem(snapshotList->GetItemCount(), tempSnapshot->snapshotName);
 	}
-	
 }
 
 void SnapshotWindow::DeleteAllSnapshots(){
@@ -206,6 +222,16 @@ void SnapshotWindow::DeleteAllSnapshots(){
 
 	snapshotList->DeleteAllItems();
 	snapshots.clear();
+}
+
+int SnapshotWindow::GetSelectedRow() {
+
+	for (size_t i = 0; i < snapshotList->GetItemCount(); i++) {
+		if (snapshotList->GetItemState(i, wxLIST_STATE_SELECTED)) {
+			return i;
+		}
+	}
+	return wxNOT_FOUND;
 }
 
 wxString SnapshotWindow::GetUniqueName(wxString tryName){

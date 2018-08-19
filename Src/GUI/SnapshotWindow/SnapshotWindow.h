@@ -39,6 +39,7 @@ private:
 	void OnRemoveSnapshot(wxCommandEvent & WXUNUSED(evt));
 	void OnRestoreSnapshot(wxCommandEvent & WXUNUSED(evt));
 	void OnTakeSnapshot(wxCommandEvent & WXUNUSED(evt));
+	int GetSelectedRow();
 
 	wxString GetUniqueName(wxString tryName);
 
@@ -46,7 +47,7 @@ private:
 	wxDataViewColumn * textColumn;
 
 	wxBoxSizer * mainSizer;
-	wxDataViewListCtrl * snapshotList;
+	wxListCtrl * snapshotList;
 
 	wxWrapSizer * buttonSizer;
 
