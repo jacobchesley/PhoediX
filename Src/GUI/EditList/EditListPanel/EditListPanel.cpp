@@ -170,10 +170,26 @@ void EditListPanel::InformParentReprocess(){
 }
 
 void EditListPanel::OnSaveNoReprocess(wxMouseEvent& WXUNUSED(event)) {
+	this->SaveNoReprocess();
+}
+
+void EditListPanel::SaveNoReprocess() {
 
 	if (currentSession != NULL) {
 		this->AddEditsToProcessor();
+		currentSession->SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
 		currentSession->GetEditList()->SetSessionEditList(proc->GetEditVector());
+		currentSession->SaveSessionToFile(currentSession->GetProjectPath());
+	}
+}
+
+void EditListPanel::SaveNoReprocessWithSnapshots(wxVector<Snapshot*> snapshots) {
+
+	if (currentSession != NULL) {
+		this->AddEditsToProcessor();
+		currentSession->SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
+		currentSession->GetEditList()->SetSessionEditList(proc->GetEditVector());
+		currentSession->SetSnapshots(snapshots);
 		currentSession->SaveSessionToFile(currentSession->GetProjectPath());
 	}
 }

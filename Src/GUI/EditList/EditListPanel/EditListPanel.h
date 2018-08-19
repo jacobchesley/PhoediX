@@ -46,6 +46,8 @@ public:
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
 	void ReprocessImage();
 	void ReprocessImageRaw(bool unpack = false);
+	void SaveNoReprocess();
+	void SaveNoReprocessWithSnapshots(wxVector<Snapshot*> snapshots);
 	void EnableAllEdits();
 	void DisableAllEdits();
 	void SetSession(PhoediXSession * newSession);
