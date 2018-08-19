@@ -9,6 +9,9 @@ cd ForInstaller
 forInstaller="$(pwd)"
 
 cp -rf ../PhoediX.app ./
+cd PhoediX.app
+cp -rf "../../../../3rd Party Licenses" ./
+cd ..
 mkdir .background
 cp "../../../Graphics/DMG Installer Background/dmg_installer_background.png" ./.background
 
