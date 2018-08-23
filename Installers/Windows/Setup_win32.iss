@@ -28,6 +28,7 @@ Compression=lzma
 SolidCompression=yes
 VersionInfoCopyright={#MyAppPublisher}
 VersionInfoVersion={#MyAppVersion}
+SignTool=signtool
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

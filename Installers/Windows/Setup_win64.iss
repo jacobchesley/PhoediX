@@ -29,6 +29,7 @@ SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
 VersionInfoCopyright={#MyAppPublisher}
 VersionInfoVersion={#MyAppVersion}
+SignTool=signtool
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
