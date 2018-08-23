@@ -1,29 +1,114 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#940000">
-<meta name="description" content="Univeristy of Cincinnati Astro Cats.  NASA USLI Team.">
+<meta name="theme-color" content="#151515">
+<meta name="description" content="PhoediX - By Jacob Chesley.">
 <meta name="keywords" content="PhoediX, Image, Image Processing, Photo, Photo Processing, RAW, RAW Processing, RAW Processor, Jacob, Chesley, JacobChesley>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>PhoediX</title>
 	<link href="./phoedix.css" rel="stylesheet" type="text/css" />
+	<script src="./jquery/jquery.min.js"></script>
+
+	<link rel="apple-touch-icon" sizes="57x57" href="./images/icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="./images/icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="./images/icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="./images/icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="./images/icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="./images/icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="./images/icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="./images/icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="./images/icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="./images/icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./images/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="./images/icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./images/icons/favicon-16x16.png">
+	<link rel="manifest" href="./images/icons/manifest.json">
+	<meta name="msapplication-TileImage" content="./images/icons/ms-icon-144x144.png">
+
 </head>
 
-<div class="ComingSoonBlock">
-	<div class="PhoediXTitle1">
-		Phoedi
+<body>
+	<ul class="Nav">
+	<div class="NavFloatLeft">
+		<li><a class="TopLeftTitle" href="./index.html">PhoediX</a></li>
 	</div>
-	<div class="PhoediXTitle2">
-		X
-	</div>
+		<div class="NavFloatRight">
+			<li><a class="NavButton" href="./About">About</a></li>
+			<li><a class="NavButton" href="./New">What's New</a></li>
+			<li><a class="NavButton" href="./Features">Features</a></li>
+			<li><a class="NavButton" href="./Download">Download</a></li>
+		</div>
+	</ul>
+	<div class="BodyWrap">
 	<div class="PhoediXBriefDescription">
-		A non destrucrive image editing program, able to process 8 and 16 bit image files, including raw files.  
+		Intoducing <b>PhoediX</b>, a free, open source, non desctrucrive image editing application!  With the ability to handle RAW files, 16 bits per channel processing, and a customizable edit order, you take full control of all aspects of the image, from start to finish.  PhoediX is available for Windows, macOS, and Linux, in 32 and 64 bit application formats.
 	</div>
-	<div class="Title">
-		Created by Jacob Chesley.
+	<div class="LargeScreenshotContainer">
+		<img class="LargeScreenshot" src="./images/PhoediX_Screenshot.png"/>
 	</div>
-	<div class="SubTitle">
-		Website coming soon...
+
+	<div class="ContentSection" style="background-color:#282828;">
+		<div class="ContentPhotoLeft">
+			<img class="ContentImg" src="./images/Non_Destruct.png"/>
+		</div>
+
+		<div class="ContentTextRight">
+			<div class="ContentTitle">Non Destructive Editing</div>
+			<div class="Content">PhoediX is a non destructive image editor, meaning the work in progress photo is just a rendering of edits applied to the original.  The original photo (be it a RAW file or bitmap like JPG, PNG, BMP, TIFF), PhoediX never writes to this file.  The edits are stored in a "sidecar" file in a subfolder of the image.  What you see in PhoediX is just a rendering.  Once you are happy with the photo, you may export the rendering to a new file.  This will allow you to keep the original file along with the edit sidecar file, so you can go back later and keep editing where you left off at anytime.</div>
+		</div>
+
 	</div>
+
+	<div class="ContentSection" style="background-color:#1C1C1C;">
+		<div class = "ContentPhotoRight">
+			<img class="ContentImg" src="./images/RAWLogo.png" style="width:15em;"/>
+		</div>
+
+		<div class="ContentTextLeft">
+			<div class="ContentTitle">RAW Files</div>
+			<div class="Content">With the help of the library LibRaw, PhoediX is able to read and process RAW files from over 1000 cameras!  From the newest camera makes to older classics, most likey your digital camera will be supported.  For more information about LibRaw, visit www.libraw.org</div>
+		</div>
+
+	</div>
+
+	<div class="ContentSection" style="background-color:#282828;">
+		<div class = "ContentPhotoLeft">
+			<img class="ContentImg" src="./images/816Logo.png" style="width:15em;"/>
+		</div>
+
+		<div class="ContentTextRight">
+			<div class="ContentTitle">8 / 16 Bits Per Channel</div>
+			<div class="Content">PhoediX allows the image processing to work in both 8 or 16 bits per channel.  Most common images are 8 bits per channel, but allowing processing in 16 bit per channel allows much greater dynamic range, and less artificats to appear (especially when combining multiple color manipulating edits).  Even if exporting to an 8 bit image (most common image formats are 8 bit) processing in full 16 bits can create smoother gradients and fewer artificats in the final export.</div>
+		</div>
+
+	</div>
+
+	<div class="ContentSection" style="background-color:#1C1C1C;">
+		<div class = "ContentPhotoRight">
+			<img class="ContentImg" src="./images/PhoediX_Edit_Pipeline.png" style="width:15em;"/>
+		</div>
+
+		<div class="ContentTextLeft">
+			<div class="ContentTitle">Edit Pipeline</div>
+			<div class="Content">Use the Edit Pipeline to define the order of edits.  You can place edits in any order, and use multiple of the same edit (even with different parameters).  Easily copy/paste edit parameters between edits in the same project, or in different projects!  With the Edit Pipeline, you are in full control of the final image</div>
+		</div>
+
+	</div>
+	<div class="Copyright">Copyright Jacob Chesley 2018</div>
 </div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+	$(".NavFloatRight").addClass("NavFloatRight").before('<img class="ThreeBar" src="./images/icons/menu.png"></img>');
+	$(".ThreeBar").click(function(){
+		$(".NavFloatRight").toggle();
+	});
+    $(window).resize(function(){
+		if(window.innerWidth > 768) {
+			$(".NavFloatRight").removeAttr("style");
+		}
+	});
+</script>

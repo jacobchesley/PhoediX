@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151515">
+<meta name="description" content="PhoediX - By Jacob Chesley.">
+<meta name="keywords" content="PhoediX, Image, Image Processing, Photo, Photo Processing, RAW, RAW Processing, RAW Processor, Jacob, Chesley, JacobChesley>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>PhoediX</title>
+	<link href="../phoedix.css" rel="stylesheet" type="text/css" />
+	<script src="../jquery/jquery.min.js"></script>
+
+	<link rel="apple-touch-icon" sizes="57x57" href="../images/icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="../images/icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="../images/icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="../images/icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="../images/icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="../images/icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="../images/icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="../images/icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="../images/icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="../images/icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="../images/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="../images/icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../images/icons/favicon-16x16.png">
+	<link rel="manifest" href="../images/icons/manifest.json">
+	<meta name="msapplication-TileImage" content="../images/icons/ms-icon-144x144.png">
+	
+</head>
+
+<body>
+	<ul class="Nav">
+	<div class="NavFloatLeft">
+		<li><a class="TopLeftTitle" href="../index.html">PhoediX</a></li>
+	</div>
+		<div class="NavFloatRight">
+			<li><a class="NavButton" href="../About">About</a></li>
+			<li><a class="NavButton" href="../New">What's New</a></li>
+			<li><a class="NavButton" href="../Features">Features</a></li>
+			<li><a class="NavButton" href="../Download">Download</a></li>
+		</div>
+	</ul>
+	<div class="BodyWrap">
+	<div class="FeatureWrap" style="background-color:#1C1C1C;">	
+		<div class="Feature">
+			<div class="FeatureTitle">
+				Non Desctructive Editing
+			</div>
+			<div class="FeatureContent">
+				Non destructive editing allows you to edit an image without overwriting the original.  The edits are stored in a sperate file and a rendering is displayed on the screen.  Export the rendering when you are happy with edits to a new image file.
+			</div>
+		</div>
+		<div class="Feature">
+			<div class="FeatureTitle">
+				RAW Files
+			</div>
+			<div class="FeatureContent">
+				Use PhoediX to work with RAW iamges.  
+			</div>
+		</div>
+		<div class="Feature">
+			<div class="FeatureTitle">
+				8 / 16 Bit Image Processing
+			</div>
+			<div class="FeatureContent">
+				Choose the bit depth in settings to select working with 8 or 16 bits per channel processing.  Allowing 16 bits per channel processing will allow for cleaner edits with fewer artficats. 
+			</div>
+		</div>
+		<div class="Feature">
+			<div class="FeatureTitle">
+				Edit Pipeline
+			</div>
+			<div class="FeatureContent">
+				Use the Edit Pipeline to define the order of your edits.  Move edits around easily, and copy/paste edit parameters between edits in the current project, or another open project.
+			</div>
+		</div>
+		<div class="Feature">
+			<div class="FeatureTitle">
+				Library
+			</div>
+			<div class="FeatureContent">
+				Use the built in Library to preview images in a single or in multiple directories.  Quickly expand the images for closer inspection, open in a PhoediX project, and view details about the image.
+			</div>
+		</div>
+		<div class="Feature">
+			<div class="FeatureTitle">
+				Pixel Peeper
+			</div>
+			<div class="FeatureContent">
+				Pixel Peeper shows color information about the pixel at the location on an image from a right mouse click.  Neighbor pixels of a selected size can be displayed as well.  Right click on the pixel in the pixel peeper window to view color and location properties.
+			</div>
+		</div>
+	</div>
+	<div class="FeatureWrap" style="background-color:#282828;">
+		<div class="Feature">
+			<div class="FeatureTitle">
+				Available Edits
+			</div>
+			<div class="FeatureContent">
+				<table style="width:100%">
+					<tr>
+						<th class="EditHeader1">Edit</th>
+						<th class="EditHeader2">Description</th> 
+					</tr>
+					<tr>
+						<td>Adjust Brightness</td> 
+						<td>Adjust the brightness of the image with options to preserve details in shadows, highlights, or both.</td>
+					</tr>
+					<tr>
+						<td>Adjust Contrast</td>
+						<td>Adjust the contrast using a linear or built in S curve function, to give the image a more vivid or flat look.</td> 
+					</tr>
+					<tr>
+						<td>Adjust HSL</td>
+						<td>Adjust the Hue, Saturtation, and Luminance (HSL) channels of the image.</td> 
+					</tr>
+					<tr>
+						<td>Adjust LAB</td>
+						<td>Adjust the Luminance, A, and B (LAB) channels of the image.</td> 
+					</tr>
+					<tr>
+						<td>Adjust RGB</td>
+						<td>Adjust the Red, Green, and Blue (RGB) channels of the image.</td> 
+					</tr>
+					<tr>
+						<td>HSL Curves</td>
+						<td>Adjust the Hue, Saturtation, and Luminance (HSL) channels of the image using custom defined curves.</td> 
+					</tr>
+					<tr>
+						<td>LAB Curves</td>
+						<td>Adjust the Luminance, A, and B (LAB) channels of the image using custom defined curves.</td> 
+					</tr>
+					<tr>
+						<td>RGB Curves</td>
+						<td>Adjust the Red, Green, and Blue (RGB) channels of the image using custom defined curves.</td> 
+					</tr>
+					<tr>
+						<td>Convert to Greyscale</td>
+						<td>Convert the image to greyscale, with three different options.  Options include Average of RGB channels, human eyesight scale, or custom scale.</td> 
+					</tr>
+					<tr>
+						<td>Channel Mixer</td>
+						<td>Mix RGB master channels of the image with RGB subchannels for each channel.</td> 
+					</tr>
+					<tr>
+						<td>Rotate Image</td>
+						<td>Rotate the image 90, 180, or 270 degrees.  Custom angles and cropping available as well, using nearest neighbor, bilinear, or bicubic interpolation.</td> 
+					</tr>
+					<tr>
+						<td>Mirror Image</td>
+						<td>Mirror the image vertically or horizontally.</td> 
+					</tr>
+					<tr>
+						<td>Scale Image</td>
+						<td>Scale and resize the image to any size (with or without preserving the aspect ratio).</td> 
+					</tr>
+					<tr>
+						<td>Crop Image</td>
+						<td>Crop the image (with or without preserving the aspect ratio).</td> 
+					</tr>
+					<tr>
+						<td>Blur Image</td>
+						<td>Use Fast Blur to blur the image horizontally, vertically, or in both directions.  Specify the blur size and number of iterations.</td> 
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="Copyright">Copyright Jacob Chesley 2018</div>
+	</div>
+</body>
+
+<script type="text/javascript">
+	$(".NavFloatRight").addClass("NavFloatRight").before('<img class="ThreeBar" src="../images/icons/menu.png"></img>');
+	$(".ThreeBar").click(function(){
+		$(".NavFloatRight").toggle();
+	});
+    $(window).resize(function(){
+		if(window.innerWidth > 768) {
+			$(".NavFloatRight").removeAttr("style");
+		}
+	});
+</script>

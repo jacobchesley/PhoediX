@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151515">
+<meta name="description" content="PhoediX - By Jacob Chesley.">
+<meta name="keywords" content="PhoediX, Image, Image Processing, Photo, Photo Processing, RAW, RAW Processing, RAW Processor, Jacob, Chesley, JacobChesley>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>PhoediX</title>
+	<link href="../phoedix.css" rel="stylesheet" type="text/css" />
+	<script src="../jquery/jquery.min.js"></script>
+
+	<link rel="apple-touch-icon" sizes="57x57" href="../images/icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="../images/icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="../images/icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="../images/icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="../images/icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="../images/icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="../images/icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="../images/icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="../images/icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="../images/icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="../images/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="../images/icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../images/icons/favicon-16x16.png">
+	<link rel="manifest" href="../images/icons/manifest.json">
+	<meta name="msapplication-TileImage" content="../images/icons/ms-icon-144x144.png">
+
+</head>
+
+<body>
+	<ul class="Nav">
+	<div class="NavFloatLeft">
+		<li><a class="TopLeftTitle" href="../index.html">PhoediX</a></li>
+	</div>
+		<div class="NavFloatRight">
+			<li><a class="NavButton" href="../About">About</a></li>
+			<li><a class="NavButton" href="../New">What's New</a></li>
+			<li><a class="NavButton" href="../Features">Features</a></li>
+			<li><a class="NavButton" href="../Download">Download</a></li>
+		</div>
+	</ul>
+	<div class="BodyWrap">
+	<div class="New" style="background-color:#1C1C1C;">
+		<div class="NewHeader">
+			New in PhoediX 0.1.0
+		</div>
+		<div class="NewContent">
+			PhoediX 0.1.0 will be the very first release of PhoediX.  So what's new?  Well... Everything!</br>
+			Visit the <a class="LibraryDescriptionLink" href="../Download">Download</a> page to get PhoediX 0.1.0 when it becomes available.</br></br>
+
+			Be sure to see below for planned future improvements for the next version.
+		</div>
+	</div>
+
+	<div class="New" style="background-color:#282828;">
+		<div class="NewHeader">
+			Planned new features of PhoediX 0.2.0
+		</div>
+		<div class="NewContent">
+			&#9679; New Edit - Unsharp Mask</br>
+			&#9679; New Edit - Image Denoising</br>
+			&#9679; Creating and applying presets</br>
+			&#9679; Printing directly from PhoediX</br>
+
+		</div>
+	</div>
+	<div class="CopyrightBottom">Copyright Jacob Chesley 2018</div>
+</body>
+
+<script type="text/javascript">
+	$(".NavFloatRight").addClass("NavFloatRight").before('<img class="ThreeBar" src="../images/icons/menu.png"></img>');
+	$(".ThreeBar").click(function(){
+		$(".NavFloatRight").toggle();
+	});
+    $(window).resize(function(){
+		if(window.innerWidth > 768) {
+			$(".NavFloatRight").removeAttr("style");
+		}
+	});
+</script>

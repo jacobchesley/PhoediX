@@ -1,6 +1,31 @@
 *{margin:0}
-html{font-size:16px;height:100%;margin:0;background:#FFF}
+html{font-size:16px;overflow-x:hidden;overflow-y:scroll;height:100%;margin:0;background:#000000}
 body{height:100%}
+.BodyWrap{padding-top:3.5em;height:100%}
+.Nav{list-style-type:none;padding:0;overflow:hidden;width:100%;background-color:rgba(60,60,60,1.0);position:fixed;z-index:10000}
+li{float:left}
+.NavButton{display:inline-block;width:100%;color:#FFF;font-family:"Arial";font-size:1.2em;text-align:center;text-decoration:none;padding-top:.5em;padding-bottom:.5em;padding-right:2em;height:auto}
+.NavFloatLeft{float:left}
+.NavFloatRight{float:right}
+.TopLeftTitle{display:block;width:100%;color:#FFF;font-family:"Arial";font-size:1.7em;text-decoration:none;padding-top:.3em;padding-bottom:.3em;padding-left:.5em;height:auto}
+@media screen and (max-width: 800px) {
+.NavFloatRight{display:none;float:none}
+.ThreeBar{width:2em;display:block;color:#FFF;float:right;margin-top:.5em;margin-right:1em;font-weight:700}
+li{display:block;float:none;animation:slidein .5s;animation-timing-function:ease-out}
+}
+@-webkit-keyframes slidein {
+from{max-height:0}
+to{max-height:15em}
+}
+to{max-height:15em;max-height:15em}
+@keyframes slidein {
+from{max-height:0}
+to{max-height:15em}
+}
+@media screen and (min-width: 800px) {
+.menu{display:none}
+.ThreeBar{display:none}
+}
 .ComingSoonBlock{
 	width:100%;
 	height:100%;
@@ -23,11 +48,20 @@ body{height:100%}
 }
 .PhoediXBriefDescription{
 	font-family:"Arial";
-	font-size:1.5em;
+	font-size:1.3em;
+	line-height: 1.4em;
+	color:#DDDDDD;
 	width: 50%;
 	text-align: left;
+	margin-top:1.0em;
 	padding-left: 25%;
 	margin-bottom: 3.0em;
+}
+@media screen and (max-width: 800px) {
+	.PhoediXBriefDescription{
+		padding-left: 5%;
+		width: 90%;
+	}
 }
 .Title{
 	font-family:"Arial";
@@ -44,4 +78,372 @@ body{height:100%}
 	width: 50%;
 	text-align: left;
 	padding-left: 25%;
+}
+
+.LargeScreenshotContainer{
+	text-align: center;
+}
+.LargeScreenshot{
+	width:75%;
+}
+
+.ContentSection{
+	display:inline-block;
+	padding-top: 2.5em;
+	padding-bottom: 2.5em;
+	padding-left:10%;
+	padding-right:10%;
+}
+.ContentSection2{
+	display:inline-block;
+	margin-top: 5em;
+	padding-left:10%;
+	padding-right:10%;
+}
+
+.ContentPhotoLeft{
+	width: 35%;
+	float: left;
+	margin-left:10%;
+}
+.ContentPhotoRight{
+	width: 35%;
+	float: right;
+	margin-right:10%;
+}
+.ContentImg{
+	width: 100%;
+}
+.ContentImgRight{
+	float: right;
+	width: 15em;
+}
+.ContentTextLeft{
+	width:40%;
+	float: right;
+	margin-right:10%;
+}
+
+.ContentTextRight{
+	width:40%;
+	float: left;
+	margin-left:10%;
+}
+
+.ContentTitle{
+	font-family:"Arial";
+	font-weight: bold;
+	font-size:1.3em;
+	line-height: 1.4em;
+	color:#DDDDDD;
+	text-align: left;
+	margin-bottom:1em;
+}
+.Content{
+	font-family:"Arial";
+	font-size:1.1em;
+	line-height: 1.4em;
+	color:#DDDDDD;
+	text-align: left;
+}
+@media screen and (max-width: 800px) {
+	
+	.ContentTitle{
+		margin-top:0.5em;
+		text-align: center;
+	}
+	.ContentPhotoLeft{
+		float: none;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.ContentPhotoRight{
+		float: none;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.ContentImgRight{
+		float: none;
+
+	}
+	.ContentTextLeft{
+		width:90%;
+		float: none;
+		margin-left: 5%;
+	}
+
+	.ContentTextRight{
+		width:90%;
+		float: none;
+		
+	}
+	.ContentImg{
+		width: 200% !important;
+		margin-left: -50% !important;	
+	}
+}
+
+.AboutWrap{
+	padding-left: 25%;
+	padding-right: 25%;
+	padding-top: 1em;
+	padding-bottom: 3em;
+	background-color:#1C1C1C;
+}
+.AboutTitle{
+	font-family:"Arial";
+	font-size:1.3em;
+	font-weight:bold;
+	line-height: 1.4em;
+	color:#FFFFFF;
+	text-align: left;
+	margin-bottom:0.2em;
+}
+.AboutContent{
+	font-family:"Arial";
+	font-size:1.1em;
+	line-height: 1.4em;
+	color:#DDDDDD;
+	text-align: left;
+}
+.LibraryWrap{
+	padding-left: 25%;
+	padding-right: 25%;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	background-color:#282828;
+}
+.Library{
+	margin-bottom:2em;
+}
+.LibraryHeadline{
+	color:#FFFFFF;
+	font-family:"Arial";
+	font-size:1.3em;
+	line-height: 1.4em;
+	font-weight: bold;
+	margin-bottom:0.2em;
+}
+.LibraryTitle{
+	color:#FFFFFF;
+	font-family:"Arial";
+	font-size:1.2em;
+	line-height: 1.4em;
+	font-weight: bold;
+}
+.LibraryDescription{
+	color:#DDDDDD;
+	font-family:"Arial";
+	font-size:1.0em;
+	line-height: 1.4em;
+}
+.LibraryDescriptionLink{
+	color:#DDDDDD;
+}
+
+@media screen and (max-width: 800px) {
+	.AboutWrap{
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+	.LibraryWrap{
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+}
+.New{
+	padding-left: 25%;
+	padding-right: 25%;
+	padding-top: 2.5em;
+	padding-bottom: 2.5em;
+}
+.NewHeader{
+	color:#FFFFFF;
+	font-family:"Arial";
+	font-size:1.3em;
+	line-height: 1.4em;
+	font-weight: bold;
+}
+.NewContent{
+	color:#DDDDDD;
+	font-family:"Arial";
+	font-size:1.1em;
+	line-height: 1.4em;
+}
+
+@media screen and (max-width: 800px) {
+	.New{
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+}
+
+.FeatureWrap{
+	padding-left: 25%;
+	padding-right: 25%;
+	padding-bottom: 1.5em;
+	padding-top: 1.5em;
+}
+.Feature{
+	margin-bottom: 2em;
+}
+.FeatureTitle{
+	color:#FFFFFF;
+	font-family:"Arial";
+	font-size:1.3em;
+	line-height: 1.3em;
+	font-weight: bold;
+}
+.FeatureContent{
+	color:#DDDDDD;
+	font-family:"Arial";
+	font-size:1.1em;
+	line-height: 1.4em;
+}
+@media screen and (max-width: 800px) {
+	.FeatureWrap{
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+}
+.PhoediXDownloadSection{
+	padding-left: 25%;
+	padding-right: 25%;
+	overflow:hidden;
+	padding-top:1em;
+	padding-bottom:1em;
+}
+.PhoediXDownloadTitle{
+	color:#FFFFFF;
+	font-family:"Arial";
+	font-size:1.3em;
+	line-height: 1.3em;
+	font-weight: bold;
+	margin-bottom:0.5em;
+}
+.PhoediXDownloadPlatform{
+	color:#FFFFFF;
+	font-family:"Arial";
+	font-size:1.3em;
+	margin-bottom:6em;
+}
+.Platform{
+	display:inline;
+	margin-top:5em;
+}
+.PlatformLogoWindows{
+	margin-top:0.5em;
+	float: left;
+	background-image:url("./images/windows.png");
+	background-size: 2.5em 2.5em;
+	height: 2.5em;
+	width: 2.5em;
+}
+.PlatformLogoMacOS{
+	margin-top:0.5em;
+	float: left;
+	background-image:url("./images/mac.png");
+	background-size: 3.0em 3.0em;
+	height: 3.0em;
+	width: 3.0em;
+}
+.PlatformLogoLinuxGTK{
+	margin-top:0.5em;
+	float: left;
+	background-image:url("./images/gtk.png");
+	background-size: 3.0em 3.0em;
+	height: 3.0em;
+	width: 3.0em;
+}
+.PhoediXDownloadArch{
+	float:left;
+	font-family:"Arial";
+	font-size:1.1em;
+}
+.PhoediXDownloadLarge{
+	margin-top:0.4em;
+	margin-bottom:0.4em;
+	font-style:bold;
+	padding-left:1em;
+	margin-bottom:0.5em;
+}
+.PhoediXDownloadSmall{
+	color:#000000;
+	margin-top:0.4em;
+	margin-bottom:0.4em;
+	font-size:0.8em;
+	padding-left:1.2em;
+}
+.PhoediXDownloadLink{
+	color:#DDDDDD;
+	font-family:"Arial";
+	font-size: 0.9em;
+}
+.DownloadRequirementsPlatform{
+	font-family:"Arial";
+	font-size:1.3em;
+	color:#FFFFFF;
+	padding-bottom:0.5em;
+	margin-top:1em;
+}
+.DownloadRequirements{
+	font-family:"Arial";
+	font-size:1.0em;
+	color:#DDDDDD;
+	padding-left: 2em;
+	padding-bottom:0.5em;
+}
+
+@media screen and (max-width: 800px) {
+	.PhoediXDownloadSection{
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+}
+
+.EditHeader1{
+	text-align:left;
+	font-size:1.2em;
+	color:#FFFFFF;
+	width:9em;
+	padding: 0.3em 0.4em 0.3em 0.4em;
+}
+.EditHeader2{
+	text-align:left;
+	font-size:1.2em;
+	color:#FFFFFF;
+	padding: 0.3em 0.4em 0.3em 0.4em;
+}
+table {
+    table-layout: auto;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top:1em;
+}
+table td {
+    padding: 0.3em 0.4em 0.3em 0.4em;
+}
+table .absorbing-column {
+    width: 100%;
+}
+tr:nth-child(even) {background: #1B1B1B;}
+tr:nth-child(odd) {background: #222222;}
+
+.Copyright{
+	color:#DDDDDD;
+	text-align: center;
+	font-family:"Arial";
+	padding-top:1em;
+	padding-bottom: 1em;
+}
+
+.CopyrightBottom{
+	position: fixed; bottom: 0;
+	color:#DDDDDD;
+	text-align: center;
+	font-family:"Arial";
+	padding-top:1em;
+	padding-bottom: 1em;
+	left:40%;
+	right:40%;
 }

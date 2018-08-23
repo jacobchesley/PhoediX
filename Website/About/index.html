@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151515">
+<meta name="description" content="PhoediX - By Jacob Chesley.">
+<meta name="keywords" content="PhoediX, Image, Image Processing, Photo, Photo Processing, RAW, RAW Processing, RAW Processor, Jacob, Chesley, JacobChesley>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>PhoediX</title>
+	<link href="../phoedix.css" rel="stylesheet" type="text/css" />
+	<script src="../jquery/jquery.min.js"></script>
+
+	<link rel="apple-touch-icon" sizes="57x57" href="../images/icons/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="../images/icons/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="../images/icons/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="../images/icons/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="../images/icons/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="../images/icons/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="../images/icons/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="../images/icons/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="../images/icons/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="../images/icons/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="../images/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="../images/icons/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="../images/icons/favicon-16x16.png">
+	<link rel="manifest" href="../images/icons/manifest.json">
+	<meta name="msapplication-TileImage" content="../images/icons/ms-icon-144x144.png">
+	
+</head>
+
+<body>
+	<ul class="Nav">
+	<div class="NavFloatLeft">
+		<li><a class="TopLeftTitle" href="../index.html">PhoediX</a></li>
+	</div>
+		<div class="NavFloatRight">
+			<li><a class="NavButton" href="../About">About</a></li>
+			<li><a class="NavButton" href="../New">What's New</a></li>
+			<li><a class="NavButton" href="../Features">Features</a></li>
+			<li><a class="NavButton" href="../Download">Download</a></li>
+		</div>
+	</ul>
+	<div class="BodyWrap">
+	<div class="AboutWrap">
+		<div class="AboutTitle">
+			About PhoediX and a Breif History
+		</div>
+		<div class="AboutContent">
+			PhoediX (pronounced like <b>PHO</b>to <b>ED</b>itor <b>X</b>) is a free, open source, non destructive image editing application, available for Windows, macOS, and Linux Ubuntu.  Hi, my name is Jacob Chesley and this is a personal project of mine.  I like to work on this for fun in my spare time.</br></br>In 2013 during College at the University of Cincinnati, I took a course in Photography to fulfil a fine arts credit.  During this course, I began working on an image editing program that I used to edit my photos for the class.  After working on this project for fun on and off for 3 years, I rebuilt the application from the ground up in 2016 and named it PhoediX.  PhoediX is the product of 5 years expirementation in image editing software creation.</br></br>PhoediX is written entireley in C++ for performance reasons.  With each edit and many features multithreaded on all platforms, and careful memory management, PhoediX is created with performance as a top priorirty.  Be sure to check out the source code repository at <a class="LibraryDescriptionLink" href="https://github.com/jacobchesley/PhoediX">www.github.com/jacobchesley/PhoediX</a>.	
+		</div>
+	</div>
+	<div class="LibraryWrap">
+	<div class="Library">
+		<div class="LibraryHeadline">Libraries Used in PhoediX</div>
+		<a class="LibraryTitle" href="http://www.wxwidgets.org">wxWidgets</a>
+		<div class="LibraryDescription">
+			wxWidgets is the GUI library PhoediX uses, to maintain a consistent look and feel accross all platforms.  wxWidgets is also used for image loading and saving (except 16 bit TIFF), and threading.  Because of wxWidgets, PhoediX can be built on all major platforms with only a handfull of platform specific function calls, in one single codebase. For more information, visit <a class="LibraryDescriptionLink" href="http://www.wxwidgets.org">www.wxwidgets.org</a>
+		</div>
+	</div>
+	<div class="Library">
+		<a class="LibraryTitle" href="http://www.libraw.org">LibRaw</a>
+		<div class="LibraryDescription">
+			LibRaw is used in PhoediX to read, and render RAW image formats from over 1000 camera makes and models.  When a RAW image is loaded, PhoediX passes the file to LibRaw internally to handle reading and rendering the output image.  If the edit at the top of the Edit Pipeline is Raw Processor, the result image from the Raw Processor is a rendering from LibRaw.  For more information, visit <a class="LibraryDescriptionLink" href="http://www.libraw.org">www.libraw.org</a>
+		</div>
+	</div>
+	<div class="Library">
+		<a class="LibraryTitle" href="http://www.simplesystems.org/libtiff">LibTiff</a>
+		<div class="LibraryDescription">
+			LibTiff is used to read and write 16 bit TIFF files.  Though wxWidgets does have the capability to read 16 bit TIFF files, they are intenrally truncated to 8 bit images (all wxWidget images are stored in 8 bit format).  If a 16 bit TIFF file is detected during load, PhoediX uses LibTiff to read the image and will store it in memory in 8 or 16 bit format (depending on the bit depth setting).  Anytime a 16 bit TIFF is to be exported, LibTiff is used to write the file.  For more information, visit <a class="LibraryDescriptionLink" href="http://www.simplesystems.org/libtiff">www.simplesystems.org/libtiff</a>
+		</div>
+	</div>
+	</div>
+	<div class="Copyright">Copyright Jacob Chesley 2018</div>
+</body>
+</html>
+
+<script type="text/javascript">
+	$(".NavFloatRight").addClass("NavFloatRight").before('<img class="ThreeBar" src="../images/icons/menu.png"></img>');
+	$(".ThreeBar").click(function(){
+		$(".NavFloatRight").toggle();
+	});
+    $(window).resize(function(){
+		if(window.innerWidth > 768) {
+			$(".NavFloatRight").removeAttr("style");
+		}
+	});
+</script>
