@@ -13,7 +13,7 @@
 #endif
 
 #include "wx/datetime.h"
-#include "Wx/wfstream.h"
+#include "wx/wfstream.h"
 #include "wx/xml/xml.h"
 
 #include "SessionEditList/SessionEditList.h"

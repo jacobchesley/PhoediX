@@ -18,7 +18,7 @@
 #include "GUI/ImageDisplay/wxImagePanel/wxImagePanel.h"
 #include "GUI/ImageDisplay/ZoomImageFrame/ZoomImageFrame.h"
 #include "Processing/ImageHandler/ImageHandler.h"
-#include "LibRaw.h"
+#include "libraw.h"
 
 enum {
 	ID_ADD_LIB_IMAGE_EVT,
