@@ -17,44 +17,7 @@ cd libtiff
 echo " "
 echo "Removing old library directories"
 echo " "
-RMDIR /S /Q x86
 RMDIR /S /Q x64
-
-echo " "
-echo "Setting up 32 bit build enviornment for LibTiff"
-echo " "
-
-call %VCVARSALL% x86
-
-echo " "
-echo "********************************************"
-echo "        Building 32 bit LibTiff        "
-echo "********************************************"
-echo "
-
-cd ..
-cd port
-nmake /f Makefile.vc clean
-nmake /f Makefile.vc 
-cd ..
-cd libtiff
-
-nmake.exe /f Makefile.vc clean
-nmake.exe /f Makefile.vc all
-
-MKDIR x86
-xcopy *.obj x86
-xcopy *.ilk x86
-xcopy *.exp x86
-xcopy libtiff.dll x86
-
-echo " "
-echo "Copying libtiff.dll to PhoediX\Build\Debug_x86 and PhoediX\Build\Release_x86"
-echo " "
-cd x86
-xcopy libtiff.dll %PHOEDIX%\Build\Debug_x86\
-xcopy libtiff.dll %PHOEDIX%\Build\Release_x86\
-
 
 echo " "
 echo "Setting up 64 bit build enviornment for LibRaw"
@@ -102,5 +65,3 @@ if exist tiffconfig.h (
     echo "Creating tiffconfig.h"
     type tiffconf.vc.h > tiffconf.h
 )
-
-Pause
