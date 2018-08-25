@@ -46,6 +46,9 @@ DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, dou
 
 	// Fit the value text control with the text
 	this->ResizeValueText();
+
+	wxSize slideMinSize = slide->GetMinSize();
+	slide->SetMinSize(wxSize(120, slideMinSize.GetHeight()));
 }
 
 void DoubleSlider::SetBackgroundColour(wxColor newColor) {
