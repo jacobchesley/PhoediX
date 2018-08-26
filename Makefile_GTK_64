@@ -357,7 +357,7 @@ Link:
 	cp $(LIBRAW_LINK_PATH)/libraw_r.so.19 $(LIB_PATH)
 	cp $(LIBTIFF_LINK_PATH)/libtiff.so.5 $(LIB_PATH)
 
-	$(LL) $(LINK_FLAG) $(BUILD_DIR)/PhoediX $(AllObjectsOutStr) $(LINK_ALL)
+	$(LL) $(LINK_FLAG) $(BUILD_DIR)/phoedix $(AllObjectsOutStr) $(LINK_ALL)
 	
 
 Clean:
