@@ -48,7 +48,7 @@ DoubleSlider::DoubleSlider(wxWindow * parent, double initVal, double minVal, dou
 	this->ResizeValueText();
 
 	wxSize slideMinSize = slide->GetMinSize();
-	slide->SetMinSize(wxSize(120, slideMinSize.GetHeight()));
+	slide->SetMinSize(wxSize(125, slideMinSize.GetHeight()));	
 }
 
 void DoubleSlider::SetBackgroundColour(wxColor newColor) {
