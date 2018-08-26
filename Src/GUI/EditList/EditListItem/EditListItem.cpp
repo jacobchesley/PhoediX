@@ -59,10 +59,10 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 		disableButton->SetBitmap(icons.DisableButton.Rescale(22, 22, wxIMAGE_QUALITY_HIGH));
 
 		// Size buttons
-		upButton->SetMinSize(wxSize(17, 17));
-		downButton->SetMinSize(wxSize(17, 17));
-		deleteButton->SetMinSize(wxSize(22, 22));
-		disableButton->SetMinSize(wxSize(22, 22));
+		upButton->SetMinSize(wxSize(20, 20));
+		downButton->SetMinSize(wxSize(20, 20));
+		deleteButton->SetMinSize(wxSize(25, 25));
+		disableButton->SetMinSize(wxSize(35, 25));
 
 		// Add up and down button to its own sizer
 		upDownButtonSizer->Add(upButton);
