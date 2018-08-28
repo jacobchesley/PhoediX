@@ -404,6 +404,17 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	// At least one session exists now, enable menu items related to sessions
 	this->EnableDisableMenuItemsNoProject(true);
 
+	if (session->GetFastProcess()) {
+		menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Check(true);
+		processor->EnableFastEdit();
+		imagePanel->EnableHalfSize();
+	}
+	else {
+		menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Check(false);
+		processor->DisableFastEdit();
+		imagePanel->DisableHalfSize();
+	}
+
 	editList->SetSession(session);
 }
 
@@ -893,15 +904,16 @@ void MainWindow::SetMenuChecks(){
 void MainWindow::OnEnableFastEdit(wxCommandEvent& evt) {
 	if(evt.IsChecked()){ 
 		processor->EnableFastEdit(); 
-		editList->ReprocessImageRaw(true);
 		imagePanel->EnableHalfSize();
-	
+		currentSession->SetFastProcess(true);
 	}
 	else{ 
 		processor->DisableFastEdit(); 
-		editList->ReprocessImageRaw(true);
 		imagePanel->DisableHalfSize();
+		currentSession->SetFastProcess(false);
 	}
+	editList->ReprocessImageRaw(true);
+	this->SaveCurrentSession();
 }
 
 void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
@@ -915,6 +927,8 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS)->Enable(enable);
 	menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO)->Enable(enable);
 
+	menuTools->FindItem(MainWindow::MenuBar::ID_FORCE_REPROCESS)->Enable(enable);
+	menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Enable(enable);
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL)->Enable(enable);
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->Enable(enable);
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS)->Enable(enable);
@@ -927,10 +941,13 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS)->Check(false);
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO)->Check(false);
 
+		menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Check(false);
+
 		auiManager->GetPane(imagePanel).Hide();
 		auiManager->GetPane(editList).Hide();
 		auiManager->GetPane(histogramDisplay).Hide();
 		auiManager->Update();
+
 	}
 }
 

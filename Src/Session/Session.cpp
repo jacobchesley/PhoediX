@@ -18,6 +18,7 @@ PhoediXSession::PhoediXSession(){
 	id = -1;
 	name = "";
 	fitImage = false;
+	processFast = false;
 	histogramDisplaySelect = 0;
 }
 
@@ -108,6 +109,16 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 				int fitImageInt = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
 				if(fitImageInt == 0){ fitImage = false;}
 				else{ fitImage = true; }
+			}
+		}
+
+		// Get Fast Process
+		if (sessionInfo->GetName() == "FastProcess") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				int processFastInt = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+				if (processFastInt == 0) { processFast = false; }
+				else { processFast = true; }
 			}
 		}
 
@@ -234,6 +245,10 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	wxXmlNode * imageFit = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "FitImage");
 	imageFit->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)fitImage)));
 
+	// Write fast process
+	wxXmlNode * fastProc = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "FastProcess");
+	fastProc->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)processFast)));
+
 	// Write the perspective for AUI to XML Doc
 	wxXmlNode * perspective = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "Perspective");
 	perspective->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", auiPerspective));
@@ -348,6 +363,14 @@ void PhoediXSession::SetFitImage(bool imageFit) {
 
 bool PhoediXSession::GetFitImage(){
 	return fitImage;
+}
+
+void PhoediXSession::SetFastProcess(bool fastProcess) {
+	processFast = fastProcess;
+}
+
+bool PhoediXSession::GetFastProcess() {
+	return processFast;
 }
 
 void PhoediXSession::GenerateID() {

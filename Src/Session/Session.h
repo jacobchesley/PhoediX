@@ -60,6 +60,9 @@ public:
 	wxString GetPerspective();
 	void SetPerspective(wxString newPerspective);
 
+	void SetFastProcess(bool fastProcess);
+	bool GetFastProcess();
+
 	void GenerateID();
 	int GetID();
 
@@ -84,6 +87,7 @@ private:
 	int imgWidth;
 	int imgHeight;
 	bool fitImage;
+	bool processFast;
 	wxString auiPerspective;
 	int histogramDisplaySelect;
 	int id;
