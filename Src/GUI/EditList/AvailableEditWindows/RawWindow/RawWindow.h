@@ -47,10 +47,6 @@ class RawWindow : public EditWindow {
 		wxPanel * settingsPanel;
 		wxFlexGridSizer * settingsSizer;
 
-		wxStaticText * halfSizeLabel;
-		wxCheckBox * halfSizeControl;
-		bool lastHalfSizeVal;
-
 		wxStaticText * greenMatchingLabel;
 		wxCheckBox * greenMatchingControl;
 	
@@ -141,21 +137,6 @@ class RawWindow : public EditWindow {
 
 		wxStaticText * waveletNoiseLabel;
 		DoubleSlider * waveletNoiseControl;
-
-		wxStaticText * cfaCleanLabel;
-		wxCheckBox * cfaCleanControl;
-
-		wxStaticText * cfaCleanLLabel;
-		DoubleSlider * cfaCleanLControl;
-
-		wxStaticText * cfaCleanCLabel;
-		DoubleSlider * cfaCleanCControl;
-
-		wxStaticText * cfaCleanLineEnableLabel;
-		wxCheckBox * cfaCleanLineEnableControl;
-
-		wxStaticText * cfaCleanLineLabel;
-		DoubleSlider * cfaCleanLineControl;
 
 		// Info
 		CollapsiblePane * infoPanelCollapse;

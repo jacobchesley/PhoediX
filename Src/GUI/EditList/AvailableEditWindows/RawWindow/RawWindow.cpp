@@ -28,14 +28,6 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	settingsPanelCollapse->SetTextForegroundColour(Colors::TextLightGrey);
 	settingsPanelCollapse->SetTextFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
-	// Half Size
-	halfSizeLabel = new wxStaticText(settingsPanel, -1, "Half Size");
-	halfSizeLabel->SetForegroundColour(Colors::TextLightGrey);
-	halfSizeControl = new wxCheckBox(settingsPanel, -1, "");
-	settingsPanel->GetSizer()->Add(halfSizeLabel);
-	settingsPanel->GetSizer()->Add(halfSizeControl);
-	lastHalfSizeVal = halfSizeControl->GetValue();
-
 	// Four Color
 	greenMatchingLabel = new wxStaticText(settingsPanel, -1, "Green Matching");
 	greenMatchingLabel->SetForegroundColour(Colors::TextLightGrey);
@@ -261,50 +253,7 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->FormatSlider(waveletNoiseControl);
 	noisePanel->GetSizer()->Add(waveletNoiseLabel);
 	noisePanel->GetSizer()->Add(waveletNoiseControl);
-
-	// CFA Clean
-	cfaCleanLabel = new wxStaticText(noisePanel, -1, "Color Filter Array NR");
-	cfaCleanLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanControl = new wxCheckBox(noisePanel, ID_CFA_CLEAN_CHECK, "");
-	cfaCleanControl->SetValue(false);
-	noisePanel->GetSizer()->Add(cfaCleanLabel);
-	noisePanel->GetSizer()->Add(cfaCleanControl);
-
-	cfaCleanLLabel = new wxStaticText(noisePanel, -1, "CFA Luminance NR");
-	cfaCleanLLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanLControl = new DoubleSlider(noisePanel, 0.01, 0.0, 0.5, 500000, 5);
-	this->FormatSlider(cfaCleanLControl);
-	noisePanel->GetSizer()->Add(cfaCleanLLabel);
-	noisePanel->GetSizer()->Add(cfaCleanLControl);
-	cfaCleanLLabel->Hide();
-	cfaCleanLControl->Hide();
-
-	cfaCleanCLabel = new wxStaticText(noisePanel, -1, "CFA Color NR");
-	cfaCleanCLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanCControl = new DoubleSlider(noisePanel, 0.01, 0.0, 0.5, 500000, 5);
-	this->FormatSlider(cfaCleanCControl);
-	noisePanel->GetSizer()->Add(cfaCleanCLabel);
-	noisePanel->GetSizer()->Add(cfaCleanCControl);
-	cfaCleanCLabel->Hide();
-	cfaCleanCControl->Hide();
-
-	// CFA Line Clean (Debanding)
-	cfaCleanLineEnableLabel = new wxStaticText(noisePanel, -1, "Banding Reduction");
-	cfaCleanLineEnableLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanLineEnableControl = new wxCheckBox(noisePanel, ID_CFA_CLEAN_LINE_CHECK, "");
-	cfaCleanLineEnableControl->SetValue(false);
-	noisePanel->GetSizer()->Add(cfaCleanLineEnableLabel);
-	noisePanel->GetSizer()->Add(cfaCleanLineEnableControl);
-
-	cfaCleanLineLabel = new wxStaticText(noisePanel, -1, "Debanding NR");
-	cfaCleanLineLabel->SetForegroundColour(Colors::TextLightGrey);
-	cfaCleanLineControl = new DoubleSlider(noisePanel, 0.001, 0.0, 0.02, 500000, 5);
-	this->FormatSlider(cfaCleanLineControl);
-	noisePanel->GetSizer()->Add(cfaCleanLineLabel);
-	noisePanel->GetSizer()->Add(cfaCleanLineControl);
-	cfaCleanLineLabel->Hide();
-	cfaCleanLineControl->Hide();
-	
+		
 	// ---------------------------  RAW info labels and controls --------------------------- 
 	infoPanelCollapse = new CollapsiblePane(this, " RAW Information");
 	infoPanelCollapse->SetTextBackgroundColour(this->GetBackgroundColour());
@@ -459,34 +408,6 @@ void RawWindow::OnCheck(wxCommandEvent& checkEvent) {
 		else {
 			autoBrightThrControl->Hide();
 			autoBrightThrLabel->Hide();
-		}
-	}
-
-	// CFA Clean
-	if (checkEvent.GetId() == ID_CFA_CLEAN_CHECK) {
-		if (cfaCleanControl->GetValue()) {
-			cfaCleanCLabel->Show();
-			cfaCleanCControl->Show();
-			cfaCleanLLabel->Show();
-			cfaCleanLControl->Show();
-		}
-		else {
-			cfaCleanCLabel->Hide();
-			cfaCleanCControl->Hide();
-			cfaCleanLLabel->Hide();
-			cfaCleanLControl->Hide();
-		}
-	}
-
-	// CFA Line Clean
-	if (checkEvent.GetId() == ID_CFA_CLEAN_LINE_CHECK) {
-		if (cfaCleanLineEnableControl->GetValue()) {
-			cfaCleanLineLabel->Show();
-			cfaCleanLineControl->Show();
-		}
-		else {
-			cfaCleanLineLabel->Hide();
-			cfaCleanLineControl->Hide();
 		}
 	}
 
@@ -694,18 +615,12 @@ void RawWindow::Process() {
 	proc->rawPrcoessor.imgdata.params.gamm[0] = (float)(1.0f/(float)gammaLevelControl->GetValue());
 	proc->rawPrcoessor.imgdata.params.gamm[1] = (float)gammaSlopeControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_qual = interpolationControl->GetSelection();
-	proc->rawPrcoessor.imgdata.params.half_size = (int)halfSizeControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.green_matching = greenMatchingControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[0] = redMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[1] = greenMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[2] = blueMultiplierControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.user_mul[3] = greenMultiplierControl->GetValue();
-	//oc->rawPrcoessor.imgdata.params.cfa_clean = (int)cfaCleanControl->GetValue();
-	//proc->rawPrcoessor.imgdata.params.lclean = (float)cfaCleanLControl->GetValue();
-	//proc->rawPrcoessor.imgdata.params.cclean = (float)cfaCleanCControl->GetValue();
 	proc->rawPrcoessor.imgdata.params.threshold = (float)waveletNoiseControl->GetValue();
-	//proc->rawPrcoessor.imgdata.params.cfaline = (int)cfaCleanLineEnableControl->GetValue();
-	//proc->rawPrcoessor.imgdata.params.linenoise = (float)cfaCleanLineControl->GetValue();
 
 	// Get bit depth of processor image, and set output bps to this
 	if(proc->GetImage() != NULL && proc->GetImage()->GetWidth() > 0 && proc->GetImage()->GetHeight() > 0){
@@ -783,26 +698,11 @@ void RawWindow::Process() {
 		break;
 	}
 	
-	// Unpack and reprocess if needed
-	if (
-		halfSizeControl->GetValue() != lastHalfSizeVal
-		//interpolationControl->GetSelection() != lastInterpolationVal
-		) {
-		
-		lastHalfSizeVal =  halfSizeControl->GetValue();
-		//lastInterpolationVal = interpolationControl->GetSelection();
+	// Send reprocess raw event
+	wxCommandEvent evt(REPROCESS_IMAGE_RAW_EVENT, ID_REPROCESS_IMAGE_RAW);
+	wxPostEvent(parWindow, evt);
 
-		wxCommandEvent evt(REPROCESS_UNPACK_IMAGE_RAW_EVENT, ID_REPROCESS_UNPACK_IMAGE_RAW);
-		wxPostEvent(parWindow, evt);
-	}
-
-	// Just reprcoess if unpack not needed
-	else {
-		wxCommandEvent evt(REPROCESS_IMAGE_RAW_EVENT, ID_REPROCESS_IMAGE_RAW);
-		wxPostEvent(parWindow, evt);
-	}
 	this->SetUpdated(false);
-
 }
 
 void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
