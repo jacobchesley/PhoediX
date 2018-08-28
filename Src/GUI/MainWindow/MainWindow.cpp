@@ -202,7 +202,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	exifReadPaneInfo.CloseButton(true);
 	exifReadPaneInfo.PinButton(true);
 	exifReadPaneInfo.DestroyOnClose(false);
-	exifReadPaneInfo.BestSize(imageInfoPanel->GetClientSize());
+	exifReadPaneInfo.FloatingSize(imageInfoPanel->GetMinSize());
 	exifReadPaneInfo.Hide();
 	auiManager->AddPane(imageInfoPanel, exifReadPaneInfo);
 
@@ -627,6 +627,7 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 		#endif
 		ImageHandler::ReadExifFromRaw(imageInfoRaw, processor->GetImage());
 		imageInfoPanel->AddExif(processor->GetImage());
+
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images

@@ -75,5 +75,21 @@ void EditSelection::OnAdd(wxCommandEvent& WXUNUSED(event)) {
 
 void EditSelection::FitEdits() {
 
-	//PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).FloatingSize(editList->GetBestSize());
+	this->FitInside();
+
+	int editListWidth = editList->GetViewRect().GetWidth() + 25;
+	int editListHeight = 0;
+	for (int i = 0; i < editList->GetItemCount(); i++) {
+		wxRect * itemRect = new wxRect();
+		editListHeight += editList->GetItemRect(i, *itemRect);
+		editListHeight += itemRect->GetHeight() * 1.5;
+		delete itemRect;
+	}
+
+	if (editListWidth > 800) { editListWidth = 800; }
+	if (editListHeight > 800) { editListHeight = 800; }
+
+	this->SetClientSize(wxSize(editListWidth, editListHeight));
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).FloatingSize(this->GetClientSize());
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }

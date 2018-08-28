@@ -151,7 +151,7 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	tags.push_back(tag);
 
 	sizer->Add(label);
-	sizer->Add(value);
+	sizer->Add(value, 0, wxEXPAND);
 }
 
 void ExifRead::AddNoExifMessage() {
@@ -215,9 +215,13 @@ ExifReadWindow::ExifReadWindow(wxWindow * parent) : wxWindow(parent, -1) {
 	scrollWin->GetSizer()->Add(exifTable, 0, wxEXPAND);
 	scrollWin->SetVirtualSize(exifTable->GetSize());
 	scrollWin->SetScrollbars(1, 1, exifTable->GetSize().GetWidth(), exifTable->GetSize().GetHeight());
+	scrollWin->FitInside();
 
 	this->GetSizer()->Add(scrollWin, 1, wxEXPAND);
 	this->GetSizer()->Layout();
+
+	this->FitInside();
+	this->SetMinSize(wxSize(400, 400));
 }
 
 void ExifReadWindow::ClearExif(){
