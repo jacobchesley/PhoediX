@@ -41,9 +41,44 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	int format = Image::exifFormats[tag];
 
 	// short/int/Long to string
-	if (format == 1 || format == 3 || format == 4 ||
+	/*if (format == 1 || format == 3 || format == 4 ||
 		format == 6 || format == 8 || format == 9) {
 		valueString << *(int*)data;
+		delete data;
+		data = NULL;
+	}
+	*/
+
+	if (format == 1) {
+		valueString << *(uint8_t*)data;
+		delete data;
+		data = NULL;
+	}
+	else if (format == 3) {
+		valueString << *(uint16_t*)data;
+		delete data;
+		data = NULL;
+	}
+
+	else if (format == 4) {
+		valueString << *(uint32_t*)data;
+		delete data;
+		data = NULL;
+	}
+
+	if (format == 6) {
+		valueString << *(int8_t*)data;
+		delete data;
+		data = NULL;
+	}
+	else if (format == 8) {
+		valueString << *(int16_t*)data;
+		delete data;
+		data = NULL;
+	}
+
+	else if (format == 9) {
+		valueString << *(int32_t*)data;
 		delete data;
 		data = NULL;
 	}

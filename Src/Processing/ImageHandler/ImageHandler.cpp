@@ -606,15 +606,15 @@ void ImageHandler::ReadExifFromRaw(LibRaw * rawProcessor, Image * image) {
 	(*image->GetExifMap())[0x0132] = new wxString(ctime(&rawProcessor->imgdata.other.timestamp)); // date/time
 	(*image->GetExifMap())[0x013B] = new wxString(rawProcessor->imgdata.other.artist); // Artist
 	(*image->GetExifMap())[0x010E] = new wxString(rawProcessor->imgdata.other.desc); // Description
-	(*image->GetExifMap())[0x9211] = (void*) new uint16(rawProcessor->imgdata.other.shot_order); // Shot Order
+	(*image->GetExifMap())[0x9211] = (void*) new uint32((uint32)wxRound(rawProcessor->imgdata.other.shot_order)); // Shot Order
 
 	if (rawProcessor->imgdata.sizes.flip == 5 || rawProcessor->imgdata.sizes.flip == 6) {
-		(*image->GetExifMap())[0xA002] = (void*) new uint16(rawProcessor->imgdata.sizes.height); // Width (flipped)
-		(*image->GetExifMap())[0xA003] = (void*) new uint16(rawProcessor->imgdata.sizes.width); // height (flipped)
+		(*image->GetExifMap())[0xA002] = (void*) new uint32((uint32)wxRound(rawProcessor->imgdata.sizes.height)); // Width (flipped)
+		(*image->GetExifMap())[0xA003] = (void*) new uint32((uint32)wxRound(rawProcessor->imgdata.sizes.width)); // height (flipped)
 	}
 	else {
-		(*image->GetExifMap())[0xA002] = (void*) new uint16(rawProcessor->imgdata.sizes.width); // Width 
-		(*image->GetExifMap())[0xA003] = (void*) new uint16(rawProcessor->imgdata.sizes.height); // height
+		(*image->GetExifMap())[0xA002] = (void*) new uint32((uint32)wxRound(rawProcessor->imgdata.sizes.width)); // Width 
+		(*image->GetExifMap())[0xA003] = (void*) new uint32((uint32)wxRound(rawProcessor->imgdata.sizes.height)); // height
 	}
 
 	// Shutter Speed calculation
