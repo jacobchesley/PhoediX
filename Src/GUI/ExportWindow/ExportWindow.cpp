@@ -125,6 +125,10 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 
 	exportStarted = true;
 
+	// Get flag for fast edit, and force disable
+	fastEditFlag = proc->GetFastEdit();
+	proc->DisableFastEdit();
+	
 	// Process both raw image (if it has one) and image itself
 	editList->ReprocessImageRaw();
 	progressSize = proc->GetLastNumEdits() + 1;
@@ -137,7 +141,12 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 
 void ExportWindow::ProcessingComplete(){
 
+
 	if(exportStarted){
+
+		// Enable or disable fast edit flag after export.
+		if (fastEditFlag) { proc->EnableFastEdit(); }
+		else { proc->DisableFastEdit(); }
 		
 		// Make sure progress bar is including saving image step
 		//this->SetEditNum(proc->GetLastNumEdits() + 1);

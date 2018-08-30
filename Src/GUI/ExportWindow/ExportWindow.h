@@ -58,6 +58,7 @@ private:
 	bool exportStarted;
 	EditListPanel * editList;
 	Processor * proc;
+	bool fastEditFlag;
 
 	wxFlexGridSizer * mainSizer;
 
