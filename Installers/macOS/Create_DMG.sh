@@ -49,7 +49,7 @@ chmod -Rf go-w /Volumes/PhoediX_x64
 sync
 sync
 hdiutil detach ${device}
-hdiutil convert "pack.temp.dmg" -format UDZO -imagekey zlib-level=9 -o "PhoediX_x64.dmg"
+hdiutil convert "pack.temp.dmg" -format UDZO -imagekey zlib-level=9 -o "PhoediX.dmg"
 
 rm -f pack.temp.dmg 
 rm -rf $forInstaller
