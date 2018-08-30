@@ -69,7 +69,6 @@ private:
 	void OnSlide(wxCommandEvent & WXUNUSED(event));
 	void OnText(wxCommandEvent & WXUNUSED(event));
 	void OnBrowse(wxCommandEvent & WXUNUSED(event));
-	void OnKeepSize(wxCommandEvent & WXUNUSED(event));
 	void SaveProject();
 
 

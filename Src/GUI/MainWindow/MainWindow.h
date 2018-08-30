@@ -50,7 +50,6 @@ public:
 	void OnOpenWindow(wxCommandEvent& evt);
 private:
 
-	void OnNewProject(wxCommandEvent& WXUNUSED(event));
 	void SaveProject(wxCommandEvent& WXUNUSED(event));
 	void CloseCurrentProject(wxCommandEvent& WXUNUSED(event));
 	void CloseAllProjects(wxCommandEvent& WXUNUSED(event));
