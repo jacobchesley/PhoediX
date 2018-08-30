@@ -123,6 +123,22 @@ void ExportWindow::OnBrowse(wxCommandEvent & WXUNUSED(event)){
 
 void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 
+	wxString extension = "";
+	int fileType = ImageHandler::SaveType::JPEG;
+	if (fileTypeControl->GetSelection() == 0) { fileType = ImageHandler::SaveType::JPEG; extension = ".jpg"; }
+	else if (fileTypeControl->GetSelection() == 1) { fileType = ImageHandler::SaveType::PNG; extension = ".png"; }
+	else if (fileTypeControl->GetSelection() == 2) { fileType = ImageHandler::SaveType::TIFF8; extension = ".tif"; }
+	else if (fileTypeControl->GetSelection() == 3) { fileType = ImageHandler::SaveType::TIFF16; extension = ".tif"; }
+	else if (fileTypeControl->GetSelection() == 4) { fileType = ImageHandler::SaveType::BMP; extension = ".bmp"; }
+	else {}
+
+	wxString fileName = outputFolderText->GetValue() + wxFileName::GetPathSeparator() + outputNameText->GetValue() + extension;
+	if (wxFileExists(fileName)) {
+		if (wxMessageBox(_(outputNameText->GetValue() + extension + " Already exists.  File will be overwritten.  Is this okay?"), _("File Exists"), wxICON_QUESTION | wxYES_NO, this) == wxNO) {
+			return;
+		}
+	}
+
 	exportStarted = true;
 
 	// Get flag for fast edit, and force disable
@@ -162,6 +178,7 @@ void ExportWindow::ProcessingComplete(){
 		int jpegQual = (int)jpegQualitySlide->GetValue();
 
 		wxString fileName = outputFolderText->GetValue() + wxFileName::GetPathSeparator() + outputNameText->GetValue() + extension;
+
 
 		// Save the image
 		ImageHandler::SaveImageToFile(fileName, proc->GetImage(), fileType, jpegQual);
