@@ -373,9 +373,9 @@ Link:
 
 Clean:
 	rm -rf $(BUILD_DIR)
-	mkdir $(BUILD_DIR)
-	mkdir $(BUILD_DIR)/App
-	mkdir $(OUT_DIR)
+	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/App
+	mkdir -p $(OUT_DIR)
 
 MacApp:
 	SetFile -t APPL $(BUILD_DIR)/App/PhoediX
