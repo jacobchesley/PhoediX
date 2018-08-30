@@ -399,6 +399,13 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	imagePanel->SetZoom(session->GetImageZoomLevel());
 	imagePanel->SetDrag(session->GetImageScrollX(), session->GetImageScrollY());
 	imagePanel->SetFitImage(session->GetFitImage());
+
+	// Set export controls
+	exportWindow->SetImageType(session->GetExportImageType());
+	exportWindow->SetJPEGQuality(session->GetExportJPEGQuality());
+	exportWindow->SetExportFolder(session->GetExportFolder());
+	exportWindow->SetExportName(session->GetExportName());
+
 	this->SetMenuChecks();
 
 	// At least one session exists now, enable menu items related to sessions
@@ -498,6 +505,11 @@ void MainWindow::SaveCurrentSession() {
 	}
 	currentSession->SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
 	currentSession->SetSnapshots(snapshotWindow->GetSnapshots());
+
+	currentSession->SetExportImageType(exportWindow->GetImageType());
+	currentSession->SetExportJPEGQuality(exportWindow->GetJPEGQuality());
+	currentSession->SetExportFolder(exportWindow->GetExportFolder());
+	currentSession->SetExportName(exportWindow->GetExportName());
 
 	// Replace existing session in all sessions, with updated session
 	for(size_t i = 0; i < allSessions.size(); i++){

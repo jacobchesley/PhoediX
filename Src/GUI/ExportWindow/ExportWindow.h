@@ -43,6 +43,18 @@ public:
 	void SetMessage(wxString message);
 	void RawImageLoaded(bool isThereRawImage);
 
+	int GetImageType();
+	void SetImageType(int type);
+
+	int GetJPEGQuality();
+	void SetJPEGQuality(int quality);
+	
+	wxString GetExportFolder();
+	void SetExportFolder(wxString folder);
+
+	wxString GetExportName();
+	void SetExportName(wxString name);
+
 private:
 
 	int progressSize;

@@ -20,6 +20,10 @@ PhoediXSession::PhoediXSession(){
 	fitImage = false;
 	processFast = false;
 	histogramDisplaySelect = 0;
+	exportFolder = "";
+	exportName = "";
+	exportImageType = 0;
+	exportJPEGQuality = 90;
 }
 
 PhoediXSession::~PhoediXSession() {
@@ -127,6 +131,38 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 			// Get first child (the actual content)
 			if(sessionInfo->GetChildren() != NULL){
 				auiPerspective = sessionInfo->GetChildren()[0].GetContent();
+			}
+		}
+
+		// Get Export Folder node
+		if (sessionInfo->GetName() == "ExportFolder") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				exportFolder = sessionInfo->GetChildren()[0].GetContent();
+			}
+		}
+
+		// Get Export Name node
+		if (sessionInfo->GetName() == "ExportName") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				exportName = sessionInfo->GetChildren()[0].GetContent();
+			}
+		}
+
+		// Get Export Image Type
+		if (sessionInfo->GetName() == "ExportImageType") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				exportImageType = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Export Image JPEG Quality
+		if (sessionInfo->GetName() == "ExportJPEGQuality") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				exportJPEGQuality = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
 			}
 		}
 
@@ -253,6 +289,22 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	wxXmlNode * perspective = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "Perspective");
 	perspective->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", auiPerspective));
 
+	// Write the export folder
+	wxXmlNode * exFolder = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ExportFolder");
+	exFolder->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", exportFolder));
+
+	// Write the export name
+	wxXmlNode * exName = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ExportName");
+	exName->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", exportName));
+
+	// Write export image type
+	wxXmlNode * exType = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ExportImageType");
+	exType->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)exportImageType)));
+
+	// Write export jpeg quality
+	wxXmlNode * exJpegQual = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ExportJPEGQuality");
+	exJpegQual->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)exportJPEGQuality)));
+
 	// Write the edit list to XML Doc
 	editList->SaveSessionEditList(sessionInfo);
 
@@ -371,6 +423,38 @@ void PhoediXSession::SetFastProcess(bool fastProcess) {
 
 bool PhoediXSession::GetFastProcess() {
 	return processFast;
+}
+
+wxString PhoediXSession::GetExportFolder() {
+	return exportFolder;
+}
+
+void PhoediXSession::SetExportFolder(wxString exFolder) {
+	exportFolder = exFolder;
+}
+
+wxString PhoediXSession::GetExportName() {
+	return exportName;
+}
+
+void PhoediXSession::SetExportName(wxString exName) {
+	exportName = exName;
+}
+
+int PhoediXSession::GetExportImageType() {
+	return exportImageType;
+}
+
+void PhoediXSession::SetExportImageType(int type) {
+	exportImageType = type;
+}
+
+int PhoediXSession::GetExportJPEGQuality() {
+	return exportJPEGQuality;
+}
+
+void PhoediXSession::SetExportJPEGQuality(int quality) {
+	exportJPEGQuality = quality;
 }
 
 void PhoediXSession::GenerateID() {

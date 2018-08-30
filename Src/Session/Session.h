@@ -72,6 +72,18 @@ public:
 	void SetProjectPath(wxString path);
 	wxString GetProjectPath();
 
+	wxString GetExportFolder();
+	void SetExportFolder(wxString exFolder);
+
+	wxString GetExportName();
+	void SetExportName(wxString exName);
+
+	int GetExportImageType();
+	void SetExportImageType(int type);
+
+	int GetExportJPEGQuality();
+	void SetExportJPEGQuality(int quality);
+
 	static bool CompareSessions(PhoediXSession * sessionOne, PhoediXSession * sessionTwo);
 	static bool CheckIfSession(wxString filePath);
 
@@ -91,6 +103,11 @@ private:
 	wxString auiPerspective;
 	int histogramDisplaySelect;
 	int id;
+	wxString exportFolder;
+	wxString exportName;
+	int exportImageType;
+	int exportJPEGQuality;
+
 
 	wxString name;
 };

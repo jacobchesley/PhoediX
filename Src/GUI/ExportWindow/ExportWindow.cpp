@@ -262,3 +262,44 @@ void ExportWindow::SetMessage(wxString message){
 	evt.SetString(message);
 	wxPostEvent(this, evt);
 }
+
+int ExportWindow::GetImageType() {
+	return fileTypeControl->GetSelection();
+}
+
+void ExportWindow::SetImageType(int type) {
+	fileTypeControl->SetSelection(type);
+
+	if (fileTypeControl->GetSelection() == 0) {
+		jpegQualityLabel->Show();
+		jpegQualitySlide->Show();
+	}
+	else {
+		jpegQualityLabel->Hide();
+		jpegQualitySlide->Hide();
+	}
+	this->Layout();
+}
+
+int ExportWindow::GetJPEGQuality() {
+	return (int)jpegQualitySlide->GetValue();
+}
+
+void ExportWindow::SetJPEGQuality(int quality) {
+	jpegQualitySlide->SetValue((double)quality);
+}
+
+wxString ExportWindow::GetExportFolder() {
+	return outputFolderText->GetValue();
+}
+void ExportWindow::SetExportFolder(wxString folder) {
+	outputFolderText->SetValue(folder);
+}
+
+wxString ExportWindow::GetExportName() {
+	return outputNameText->GetValue();
+}
+
+void ExportWindow::SetExportName(wxString name) {
+	outputNameText->SetValue(name);
+}
