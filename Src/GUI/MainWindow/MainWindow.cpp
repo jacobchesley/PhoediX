@@ -241,6 +241,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&MainWindow::ClearStatusbarText, this, EVT_CLEAR_STATUS_TIMER);
 	this->Bind(UPDATE_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnUpdateImage, this, ID_UPDATE_IMAGE);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnReprocess, this, ID_REPROCESS_IMAGE);
+	this->Bind(SAVE_PROJECT_EVENT, (wxObjectEventFunction)&MainWindow::SaveProject, this, ID_SAVE_PROJECT);
 
 	emptyImage = new wxImage(0, 0);
 	emptyPhxImage = new Image();
@@ -483,7 +484,6 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 void MainWindow::SaveProject(wxCommandEvent & WXUNUSED(evt)) {
 
 	this->SaveCurrentSession();
-	currentSession->SaveSessionToFile(currentSession->GetProjectPath());
 }
 
 void MainWindow::SaveCurrentSession() {
@@ -517,6 +517,8 @@ void MainWindow::SaveCurrentSession() {
 			allSessions[i] = currentSession;
 		}
 	}
+
+	currentSession->SaveSessionToFile(currentSession->GetProjectPath());
 }
 
 void MainWindow::LoadProject(wxString projectPath) {
@@ -722,6 +724,7 @@ void MainWindow::OnReprocess(wxCommandEvent& WXUNUSED(event)){
 void MainWindow::ShowSettings(wxCommandEvent& WXUNUSED(evt)) {
 	auiManager->GetPane(settingsWindow).Show();
 	auiManager->Update();
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowImage(wxCommandEvent& evt) {
@@ -737,6 +740,7 @@ void MainWindow::ShowImage(wxCommandEvent& evt) {
 		auiManager->GetPane(imagePanel).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowEditList(wxCommandEvent& evt) {
@@ -752,6 +756,7 @@ void MainWindow::ShowEditList(wxCommandEvent& evt) {
 		auiManager->GetPane(editList).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowHistograms(wxCommandEvent& evt) {
@@ -767,6 +772,7 @@ void MainWindow::ShowHistograms(wxCommandEvent& evt) {
 		auiManager->GetPane(histogramDisplay).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowSnapshots(wxCommandEvent& evt) {
@@ -782,6 +788,7 @@ void MainWindow::ShowSnapshots(wxCommandEvent& evt) {
 		auiManager->GetPane(snapshotWindow).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowPixelPeep(wxCommandEvent& evt) {
@@ -797,6 +804,7 @@ void MainWindow::ShowPixelPeep(wxCommandEvent& evt) {
 		auiManager->GetPane(pixelPeepWindow).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowOriginal(wxCommandEvent& evt) {
@@ -839,6 +847,7 @@ void MainWindow::ShowOriginal(wxCommandEvent& evt) {
 		auiManager->GetPane(imagePanel).Caption("Working Image");
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowOriginalWindow(wxCommandEvent& evt) {
@@ -854,6 +863,7 @@ void MainWindow::ShowOriginalWindow(wxCommandEvent& evt) {
 		auiManager->GetPane(originalImagePanel).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 bool MainWindow::OriginalImageDispalyed() {
@@ -873,6 +883,7 @@ void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 		auiManager->GetPane(libraryWindow).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowImageInfo(wxCommandEvent& evt) {
@@ -888,6 +899,7 @@ void MainWindow::ShowImageInfo(wxCommandEvent& evt) {
 		auiManager->GetPane(imageInfoPanel).Hide();
 		auiManager->Update();
 	}
+	this->SaveCurrentSession();
 }
 
 void MainWindow::ShowAbout(wxCommandEvent& WXUNUSED(evt)){

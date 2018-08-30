@@ -27,12 +27,14 @@
 enum {
 	ID_UPDATE_EXPORT_PROGRESS_NUM_EVENT,
 	ID_UPDATE_EXPORT_PROGRESS_MSG_EVENT,
-	ID_UPDATE_EXPORT_PROGRESS_CLOSE
+	ID_UPDATE_EXPORT_PROGRESS_CLOSE,
+	ID_SAVE_PROJECT
 };
 
 wxDECLARE_EVENT(UPDATE_EXPORT_PROGRESS_NUM_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(UPDATE_EXPORT_PROGRESS_MSG_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(UPDATE_EXPORT_PROGRESS_CLOSE, wxCommandEvent);
+wxDECLARE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
 class ExportWindow : public wxScrolledWindow {
 
@@ -64,8 +66,12 @@ private:
 	bool rawImageLoaded;
 	void OnExport(wxCommandEvent & WXUNUSED(event));
 	void OnCombo(wxCommandEvent & WXUNUSED(event));
+	void OnSlide(wxCommandEvent & WXUNUSED(event));
+	void OnText(wxCommandEvent & WXUNUSED(event));
 	void OnBrowse(wxCommandEvent & WXUNUSED(event));
 	void OnKeepSize(wxCommandEvent & WXUNUSED(event));
+	void SaveProject();
+
 
 	bool exportStarted;
 	EditListPanel * editList;

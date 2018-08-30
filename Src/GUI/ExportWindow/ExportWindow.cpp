@@ -6,6 +6,7 @@
 wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_NUM_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_MSG_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_CLOSE, wxCommandEvent);
+wxDEFINE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
 ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPanel * panel) : wxScrolledWindow(parent){
 
@@ -83,6 +84,8 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ExportWindow::OnBrowse, this, ExportWindow::ExportActions::ID_BROWSE);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ExportWindow::OnExport, this, ExportWindow::ExportActions::ID_EXPORT);
 	this->Bind(wxEVT_COMBOBOX, (wxObjectEventFunction)&ExportWindow::OnCombo, this);
+	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&ExportWindow::OnSlide, this);
+	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ExportWindow::OnText, this);
 	this->Bind(UPDATE_EXPORT_PROGRESS_MSG_EVENT, (wxObjectEventFunction)&ExportWindow::SetProgressEditMsg, this, ID_UPDATE_EXPORT_PROGRESS_MSG_EVENT);
 	this->Bind(UPDATE_EXPORT_PROGRESS_NUM_EVENT, (wxObjectEventFunction)&ExportWindow::SetProgressEditNum, this, ID_UPDATE_EXPORT_PROGRESS_NUM_EVENT);
 	this->Bind(UPDATE_EXPORT_PROGRESS_CLOSE, (wxObjectEventFunction)&ExportWindow::CloseProgress, this, ID_UPDATE_EXPORT_PROGRESS_CLOSE);
@@ -109,6 +112,14 @@ void ExportWindow::OnCombo(wxCommandEvent & WXUNUSED(event)){
 		jpegQualitySlide->Hide();
 	}
 	this->Layout();
+	this->SaveProject();
+}
+
+void ExportWindow::OnSlide(wxCommandEvent & WXUNUSED(event)) {
+	this->SaveProject();
+}
+void ExportWindow::OnText(wxCommandEvent & WXUNUSED(event)) {
+	this->SaveProject();
 }
 
 void ExportWindow::OnBrowse(wxCommandEvent & WXUNUSED(event)){
@@ -116,9 +127,11 @@ void ExportWindow::OnBrowse(wxCommandEvent & WXUNUSED(event)){
 	// Browse for directory to store export in
 	wxDirDialog openDirDialog(this, "Export Folder");
 	if (openDirDialog.ShowModal() == wxID_CANCEL) {
+		this->SaveProject();
 		return;
 	}
 	outputFolderText->SetValue(openDirDialog.GetPath());
+	this->SaveProject();
 }
 
 void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
@@ -302,4 +315,10 @@ wxString ExportWindow::GetExportName() {
 
 void ExportWindow::SetExportName(wxString name) {
 	outputNameText->SetValue(name);
+}
+
+void ExportWindow::SaveProject() {
+
+	wxCommandEvent evt(SAVE_PROJECT_EVENT, ID_SAVE_PROJECT);
+	wxPostEvent(this->GetParent(), evt);
 }
