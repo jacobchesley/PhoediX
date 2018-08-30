@@ -7500,18 +7500,32 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 }
 
 Processor::RawProcessThread::RawProcessThread(Processor * processorPar, bool unpackAndProcess) : wxThread(wxTHREAD_DETACHED) {
+
 	processor = processorPar;
 	unpackProcess = unpackAndProcess;
-
-	if(processor->GetFastEdit()){
+	bool fastProcessRaw = processor->GetFastEdit();
+	
+	// If fast edit, set half size and turn off denoising for performance
+	if(fastProcessRaw){
 		processor->rawPrcoessor.imgdata.params.half_size = 1;
-		//unpackProcess = true;
+		processor->rawPrcoessor.imgdata.params.threshold = 0.0;
 	}
+	else {
+		processor->rawPrcoessor.imgdata.params.half_size = 0;
+	}
+
+	// Open and unpack data if there is a change in fast process.
+	if (fastProcessRaw != processor->lastRawFastProcess) {
+		unpackProcess = true;
+	}
+	
+	processor->lastRawFastProcess = processor->GetFastEdit();
 }
 
 wxThread::ExitCode Processor::RawProcessThread::Entry() {
 
 	if (unpackProcess) {
+
 		while (processor->GetLockedRaw()) {
 			this->Sleep(20);
 		}
@@ -7537,6 +7551,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 
 			processor->SendMessageToParent("Unpacking Raw File");
 			processor->rawErrorCode = processor->rawPrcoessor.unpack();
+
 			// Unpack failed, present error and return
 			if(processor->rawErrorCode != 0){
 
@@ -7547,8 +7562,6 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			}
 
 		processor->UnlockRaw();
-		processor->ProcessRaw();
-		return 0;
 	}
 
 	if (processor->GetLockedRaw()) {

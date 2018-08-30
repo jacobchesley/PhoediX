@@ -168,7 +168,8 @@ public:
 	static int rawExpected;
 
 	libraw_processed_image_t * rawImage;
-	
+	bool lastRawFastProcess;
+
 protected:
 
 	static int RawCallback(void *data, enum LibRaw_progress p, int iteration, int expected);
