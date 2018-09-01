@@ -167,7 +167,7 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 
 	while (exportStarted) {
 
-		Sleep(10);
+		wxMilliSleep(10);
 		progressMutex->Lock();
 		progressDialog.Update(currentEditNumber, currentEditString);
 		progressMutex->Unlock();
