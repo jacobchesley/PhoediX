@@ -5,7 +5,6 @@
 
 wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_NUM_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_MSG_EVENT, wxCommandEvent);
-wxDEFINE_EVENT(UPDATE_EXPORT_PROGRESS_CLOSE, wxCommandEvent);
 wxDEFINE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
 ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPanel * panel) : wxScrolledWindow(parent){
@@ -72,7 +71,7 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 	exportButton->SetForegroundColour(Colors::TextLightGrey);
 	exportButton->SetBackgroundColour(Colors::BackGrey);
 	exportButton->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
-
+	
 	this->GetSizer()->Add(exportButton);
 	this->GetSizer()->Add(new wxPanel(this));
 	this->GetSizer()->Add(new wxPanel(this));
@@ -88,13 +87,13 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 	this->Bind(wxEVT_TEXT, (wxObjectEventFunction)&ExportWindow::OnText, this);
 	this->Bind(UPDATE_EXPORT_PROGRESS_MSG_EVENT, (wxObjectEventFunction)&ExportWindow::SetProgressEditMsg, this, ID_UPDATE_EXPORT_PROGRESS_MSG_EVENT);
 	this->Bind(UPDATE_EXPORT_PROGRESS_NUM_EVENT, (wxObjectEventFunction)&ExportWindow::SetProgressEditNum, this, ID_UPDATE_EXPORT_PROGRESS_NUM_EVENT);
-	this->Bind(UPDATE_EXPORT_PROGRESS_CLOSE, (wxObjectEventFunction)&ExportWindow::CloseProgress, this, ID_UPDATE_EXPORT_PROGRESS_CLOSE);
 
-	progress = NULL;
 	exportStarted = false;
 	rawImageLoaded = false;
 	progressSize = 0;
-
+	currentEditNumber = 0;
+	currentEditString = "";	
+	progressMutex = new wxMutex();
 }
 
 void ExportWindow::RawImageLoaded(bool isRawImageLoaded){
@@ -145,8 +144,8 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 	else if (fileTypeControl->GetSelection() == 4) { fileType = ImageHandler::SaveType::BMP; extension = ".bmp"; }
 	else {}
 
-	wxString fileName = outputFolderText->GetValue() + wxFileName::GetPathSeparator() + outputNameText->GetValue() + extension;
-	if (wxFileExists(fileName)) {
+	wxString exportFilename = outputFolderText->GetValue() + wxFileName::GetPathSeparator() + outputNameText->GetValue() + extension;
+	if (wxFileExists(exportFilename)) {
 		if (wxMessageBox(_(outputNameText->GetValue() + extension + " Already exists.  File will be overwritten.  Is this okay?"), _("File Exists"), wxICON_QUESTION | wxYES_NO, this) == wxNO) {
 			return;
 		}
@@ -160,25 +159,33 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 	
 	// Process both raw image (if it has one) and image itself
 	editList->ReprocessImageRaw();
-	progressSize = proc->GetLastNumEdits() + 1;
-	progress = new wxGenericProgressDialog("Export Image Progress", "", progressSize, this, wxPD_SMOOTH | wxPD_APP_MODAL);
-	Icons icons;
-	wxIcon theIcon;
-	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
-	progress->SetIcon(theIcon);
+	
+	wxGenericProgressDialog progressDialog("Export Status", "", proc->GetEditVector().size(), this, wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_SMOOTH);
+	progressDialog.SetRange(proc->GetEditVector().size());
+	currentEditNumber = 0;
+	currentEditString = "";
+
+	while (exportStarted) {
+
+		Sleep(10);
+		progressMutex->Lock();
+		progressDialog.Update(currentEditNumber, currentEditString);
+		progressMutex->Unlock();
+		wxSafeYield();
+	}
 }
 
 void ExportWindow::ProcessingComplete(){
 
-
 	if(exportStarted){
+
+		exportStarted = false;
 
 		// Enable or disable fast edit flag after export.
 		if (fastEditFlag) { proc->EnableFastEdit(); }
 		else { proc->DisableFastEdit(); }
 		
 		// Make sure progress bar is including saving image step
-		//this->SetEditNum(proc->GetLastNumEdits() + 1);
 		this->SetMessage("Saving Image");
 		wxString extension = "";
 		int fileType = ImageHandler::SaveType::JPEG;
@@ -191,14 +198,10 @@ void ExportWindow::ProcessingComplete(){
 		int jpegQual = (int)jpegQualitySlide->GetValue();
 
 		wxString fileName = outputFolderText->GetValue() + wxFileName::GetPathSeparator() + outputNameText->GetValue() + extension;
-
-
+		
 		// Save the image
 		ImageHandler::SaveImageToFile(fileName, proc->GetImage(), fileType, jpegQual);
 
-		// Destrory progress dialog
-		wxCommandEvent closeEvt(UPDATE_EXPORT_PROGRESS_CLOSE, ID_UPDATE_EXPORT_PROGRESS_CLOSE);
-		wxPostEvent(this, closeEvt);
 	}
 }
 
@@ -209,10 +212,9 @@ void ExportWindow::SetProgressEditMsg(wxCommandEvent & evt){
 		return;
 	}
 
-	// Update if we can
-	if(exportStarted && progress != NULL){
-		progress->Update(progress->GetValue(), evt.GetString());
-	}
+	progressMutex->Lock();
+	currentEditString = evt.GetString();
+	progressMutex->Unlock();
 }
 
 void ExportWindow::SetProgressEditNum(wxCommandEvent & evt){
@@ -222,40 +224,12 @@ void ExportWindow::SetProgressEditNum(wxCommandEvent & evt){
 		return;
 	}
 
-	// If we cant enter, we are in the middle of closing the progress bar
-	if (!locker.TryEnter()) {
-		return;
-	}
-
-	if(exportStarted && progress != NULL){
-		progress->Update(evt.GetInt(), progress->GetMessage());
-	}
-}
-
-void ExportWindow::CloseProgress(wxCommandEvent& WXUNUSED(evt)){
-
-	// Enter locker to prevent other methods from access our amost destoryed progress dialog
-	locker.Enter();
-	
-	// Destroy
-	if(exportStarted && progress != NULL){
-		exportStarted = false;
-		progress->Destroy();
-		progress->Close();
-		wxSafeYield();
-		progress = NULL;
-	}
-
-	// Leave locker
-	locker.Leave();
+	progressMutex->Lock();
+	currentEditNumber = evt.GetInt();
+	progressMutex->Unlock();
 }
 
 void ExportWindow::SetEditNum(int editNum){
-
-	// If we cant enter, we are in the middle of closing the progress bar
-	if(!locker.TryEnter()){
-		return;
-	}
 
 	// Fire event with int to update to
 	wxCommandEvent evt(UPDATE_EXPORT_PROGRESS_NUM_EVENT, ID_UPDATE_EXPORT_PROGRESS_NUM_EVENT);
@@ -264,11 +238,6 @@ void ExportWindow::SetEditNum(int editNum){
 }
 
 void ExportWindow::SetMessage(wxString message){
-
-	// If we cant enter, we are in the middle of closing the progress bar
-	if(!locker.TryEnter()){
-		return;
-	}
 
 	// Fire event with string to update message to
 	wxCommandEvent evt(UPDATE_EXPORT_PROGRESS_MSG_EVENT, ID_UPDATE_EXPORT_PROGRESS_MSG_EVENT);

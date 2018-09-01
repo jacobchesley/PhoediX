@@ -27,13 +27,11 @@
 enum {
 	ID_UPDATE_EXPORT_PROGRESS_NUM_EVENT,
 	ID_UPDATE_EXPORT_PROGRESS_MSG_EVENT,
-	ID_UPDATE_EXPORT_PROGRESS_CLOSE,
 	ID_SAVE_PROJECT
 };
 
 wxDECLARE_EVENT(UPDATE_EXPORT_PROGRESS_NUM_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(UPDATE_EXPORT_PROGRESS_MSG_EVENT, wxCommandEvent);
-wxDECLARE_EVENT(UPDATE_EXPORT_PROGRESS_CLOSE, wxCommandEvent);
 wxDECLARE_EVENT(SAVE_PROJECT_EVENT, wxCommandEvent);
 
 class ExportWindow : public wxScrolledWindow {
@@ -62,7 +60,6 @@ private:
 	int progressSize;
 	void SetProgressEditNum(wxCommandEvent & evt);
 	void SetProgressEditMsg(wxCommandEvent & evt);
-	void CloseProgress(wxCommandEvent & WXUNUSED(evt));
 	bool rawImageLoaded;
 	void OnExport(wxCommandEvent & WXUNUSED(event));
 	void OnCombo(wxCommandEvent & WXUNUSED(event));
@@ -70,8 +67,7 @@ private:
 	void OnText(wxCommandEvent & WXUNUSED(event));
 	void OnBrowse(wxCommandEvent & WXUNUSED(event));
 	void SaveProject();
-
-
+	
 	bool exportStarted;
 	EditListPanel * editList;
 	Processor * proc;
@@ -94,11 +90,14 @@ private:
 
 	PhoediXButton * exportButton;
 
-	wxGenericProgressDialog * progress;
-	wxCriticalSection locker;
+	wxMutex * progressMutex;
+	int currentEditNumber;
+	wxString currentEditString;
+
 	enum ExportActions{
 		ID_BROWSE,
 		ID_EXPORT
 	};
+		
 };
 #endif
