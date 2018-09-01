@@ -16,15 +16,15 @@ mkdir .background
 cp "../../../Graphics/DMG Installer Background/dmg_installer_background.png" ./.background
 
 cd $dmgDir
-rm -f PhoediX_x64.dmg
+rm -f PhoediX.dmg
 rm -f pack.temp.dmg
 
-hdiutil create -srcfolder "$forInstaller" -volname "PhoediX_x64" -fs HFS+ -format UDRW "pack.temp.dmg"
+hdiutil create -srcfolder "$forInstaller" -volname "PhoediX" -fs HFS+ -format UDRW "pack.temp.dmg"
 device=$(hdiutil attach -readwrite -noverify -noautoopen "pack.temp.dmg" | egrep '^/dev/' | sed 1q | awk '{print $1}')
 sleep 3
 echo '
    tell application "Finder"
-     tell disk "'PhoediX_x64'"
+     tell disk "'PhoediX'"
            open
            set current view of container window to icon view
            set toolbar visible of container window to false
@@ -45,7 +45,7 @@ echo '
 ' | osascript
 
 
-chmod -Rf go-w /Volumes/PhoediX_x64
+chmod -Rf go-w /Volumes/PhoediX
 sync
 sync
 hdiutil detach ${device}
