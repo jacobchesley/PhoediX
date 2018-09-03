@@ -309,7 +309,7 @@ wxString SettingsWindow::GetSettingsFile() {
 	wxString settingsFilePath = configDirectory + wxFileName::GetPathSeparator() + "settings.ini";
 
 	if (!wxDir::Exists(configDirectory)) {
-		wxMkDir(configDirectory);
+		wxMkDir(configDirectory, wxS_DIR_DEFAULT);
 	}
 	return settingsFilePath;
 }
