@@ -36,10 +36,10 @@ ContrastWindow::ContrastWindow(wxWindow * parent, wxString editName, Processor *
 	blueContrastCenterLabel->SetForegroundColour(Colors::TextLightGrey);
 	curveSelectionLabel->SetForegroundColour(Colors::TextLightGrey);
 
-	allContrastSlider = new DoubleSlider(this, 1.0, 0.0, 5.0, 100000);
-	redContrastSlider = new DoubleSlider(this, 1.0, 0.0, 5.0, 100000);
-	greenContrastSlider = new DoubleSlider(this, 1.0, 0.0, 5.0, 100000);
-	blueContrastSlider = new DoubleSlider(this, 1.0, 0.0, 5.0, 100000);
+	allContrastSlider = new DoubleSlider(this, 1.0, 0.0, 3.0, 100000);
+	redContrastSlider = new DoubleSlider(this, 1.0, 0.0, 3.0, 100000);
+	greenContrastSlider = new DoubleSlider(this, 1.0, 0.0, 3.0, 100000);
+	blueContrastSlider = new DoubleSlider(this, 1.0, 0.0, 3.0, 100000);
 	allContrastCenterSlider = new DoubleSlider(this, 0.5, 0.0, 1.0, 100000);
 	redContrastCenterSlider = new DoubleSlider(this, 0.5, 0.0, 1.0, 100000);
 	greenContrastCenterSlider = new DoubleSlider(this, 0.5, 0.0, 1.0, 100000);
