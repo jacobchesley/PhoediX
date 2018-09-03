@@ -6,6 +6,7 @@
 int PhoedixSettings::bitDepth = 8;
 int PhoedixSettings::colorSpace = 0;
 int PhoedixSettings::numThreads = 0;
+bool PhoedixSettings::libraryImageUseRaw = false;
 
 int PhoedixSettings::GetBitDepth() {
 	return bitDepth;
@@ -26,4 +27,11 @@ int PhoedixSettings::GetNumThreads() {
 }
 void PhoedixSettings::SetNumThreads(int newNumThreads) {
 	numThreads = newNumThreads;
+}
+
+bool PhoedixSettings::GetLibraryImageUseRaw() {
+	return libraryImageUseRaw;
+}
+void PhoedixSettings::SetLibraryImageUseRaw(bool useRawImage) {
+	libraryImageUseRaw = useRawImage;
 }

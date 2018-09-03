@@ -16,6 +16,7 @@
 #include "wx/tokenzr.h"
 #include "wx/stdpaths.h"
 #include "wx/textfile.h"
+#include "wx/dir.h"
 
 #include "GUI/Controls/PhoediXButton/PhoediXButton.h"
 #include "GUI/Controls/PhoediXComboBox/PhoediXComboBox.h"
@@ -35,6 +36,7 @@ struct Settings{
 	int bitDepth;
 	int colorSpace;
 	int numThreads;
+	int libraryPreview;
 };
 
 wxDECLARE_EVENT(RELOAD_IMAGE_EVENT, wxCommandEvent);
@@ -47,7 +49,8 @@ public:
 	void ReadSettings();
 	void WriteSettings();
 	void Cleanup();
-	
+	wxString GetSettingsFile();
+
 private:
 
 	void OnApply(wxCommandEvent& WXUNUSED(evt));
@@ -69,6 +72,9 @@ private:
 	wxStaticText * colorSpaceLabel;
 	PhoediXComboBox * colorSpace;
 
+	wxStaticText * libraryImagePreviewLabel;
+	PhoediXComboBox *libraryImagePreview;
+
 	wxStaticText * numThreadsLabel;
 	DoubleSlider * numThreads;
 
@@ -82,8 +88,7 @@ private:
 	
 	wxTimer * blankMessageTimer;
 	Settings lastSettings;
-
-
+	
 	enum {
 		ID_OK_SETTINGS,
 		ID_APPLY_SETTINGS,

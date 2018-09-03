@@ -28,9 +28,13 @@ public:
 	static int GetNumThreads();
 	static void SetNumThreads(int newNumThreads);
 
+	static bool GetLibraryImageUseRaw();
+	static void SetLibraryImageUseRaw(bool useRawImage);
+
 private:
 	static int bitDepth;
 	static int colorSpace;
 	static int numThreads;
+	static bool libraryImageUseRaw;
 };
 #endif

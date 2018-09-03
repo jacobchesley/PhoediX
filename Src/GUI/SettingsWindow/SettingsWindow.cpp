@@ -43,6 +43,15 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	colorSpace->Append("Pro Photo RGB");
 	colorSpace->SetSelection(0);
 
+	libraryImagePreviewLabel = new wxStaticText(this, -1, "Library Image Preview");
+	libraryImagePreviewLabel->SetForegroundColour(Colors::TextLightGrey);
+	libraryImagePreview = new PhoediXComboBox(this, -1);
+	libraryImagePreview->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	libraryImagePreview->SetForegroundColour(Colors::TextLightGrey);
+	libraryImagePreview->Append("Use Embedded Thumbnail");
+	libraryImagePreview->Append("Use RAW Image");
+	libraryImagePreview->SetSelection(0);
+
 	// Number of Threads Setting
 	numThreadsLabel = new wxStaticText(this, -1, "Number of Threads");
 	numThreadsLabel->SetForegroundColour(Colors::TextLightGrey);
@@ -72,10 +81,11 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	gridSizer->Add(colorDepth);
 	gridSizer->Add(colorSpaceLabel);
 	gridSizer->Add(colorSpace);
+	gridSizer->Add(libraryImagePreviewLabel);
+	gridSizer->Add(libraryImagePreview);
 	gridSizer->Add(numThreadsLabel);
 	gridSizer->Add(numThreads);
-
-
+	
 	buttonSizer->Add(okSettingsButton);
 	buttonSizer->AddSpacer(20);
 	buttonSizer->Add(cancelButton);
@@ -156,10 +166,15 @@ void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
 	if (colorSpace->GetSelection() == 2) { proc->SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::WIDE_GAMUT_RGB); }
 	if (colorSpace->GetSelection() == 3) { proc->SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); PhoedixSettings::SetColorSpace(ColorSpaceENUM::PROPHOTO_RGB); }
 
+	// Library Preview
+	if (libraryImagePreview->GetSelection() == 0) { PhoedixSettings::SetLibraryImageUseRaw(false); }
+	else{ PhoedixSettings::SetLibraryImageUseRaw(true); }
+
 	if (overwriteLast) {
 		lastSettings.bitDepth = colorDepth->GetSelection();
 		lastSettings.colorSpace = colorSpace->GetSelection();
 		lastSettings.numThreads = numThreads->GetValue();
+		lastSettings.libraryPreview = libraryImagePreview->GetSelection();
 		this->WriteSettings();
 	}
 
@@ -176,10 +191,7 @@ void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
 
 void SettingsWindow::ReadSettings() {
 
-	wxString exectuablePath = wxStandardPaths::Get().GetExecutablePath();
-	wxFileName directory = wxFileName(exectuablePath);
-	wxString executableDir = directory.GetPath();
-	wxString settingsFilePath = executableDir + wxFileName::GetPathSeparator() + "settings.ini";
+	wxString settingsFilePath = this->GetSettingsFile();
 
 	// if settings file does not exist, write settings
 	if (!wxFile::Exists(settingsFilePath)) {
@@ -223,6 +235,11 @@ void SettingsWindow::ReadSettings() {
 					if (numThreadVal > maxThreads) { numThreadVal = maxThreads; }
 					numThreads->SetValue((double)numThreadVal);
 				}
+
+				if (key == "LIBRARY_PREVIEW") {
+					if (value == "USE_EMBEDDED_THUMBNAIL") { libraryImagePreview->SetSelection(0); }
+					if (value == "USE_RAW_IMAGE") { libraryImagePreview->SetSelection(1); }
+				}
 			}
 		}
 	}
@@ -231,10 +248,7 @@ void SettingsWindow::ReadSettings() {
 
 void SettingsWindow::WriteSettings() {
 
-	wxString exectuablePath = wxStandardPaths::Get().GetExecutablePath();
-	wxFileName directory = wxFileName(exectuablePath);
-	wxString executableDir = directory.GetPath();
-	wxString settingsFilePath = executableDir + wxFileName::GetPathSeparator() + "settings.ini";
+	wxString settingsFilePath = this->GetSettingsFile();
 
 	wxTextFile settingsFile(settingsFilePath);
 
@@ -268,12 +282,36 @@ void SettingsWindow::WriteLines(wxTextFile * file) {
 	if (colorSpace->GetSelection() == 3) { colorSpaceSettingsStr += "PRO_PHOTO_RGB"; }
 	file->AddLine(colorSpaceSettingsStr);
 
+	// Library Preview
+	wxString libraryPreviewSettingsStr = "LIBRARY_PREVIEW=";
+	if (libraryImagePreview->GetSelection() == 0) { libraryPreviewSettingsStr += "USE_EMBEDDED_THUMBNAIL"; }
+	if (libraryImagePreview->GetSelection() == 1) { libraryPreviewSettingsStr += "USE_RAW_IMAGE"; }
+	file->AddLine(libraryPreviewSettingsStr);
+
 	// Number of Threads
 	wxString numThreadsSettingsStr = "NUM_THREADS=";
 	numThreadsSettingsStr += wxString::Format(wxT("%i"),(int) numThreads->GetValue());
 	file->AddLine(numThreadsSettingsStr);
 
 	file->Write();
+}
+
+wxString SettingsWindow::GetSettingsFile() {
+
+	#if defined(__WXGTK__)
+		wxString appDir = ".PhoediX";
+	#else
+		wxString appDir = "PhoediX";
+	#endif
+
+
+	wxString configDirectory = wxStandardPaths::Get().GetUserConfigDir() + wxFileName::GetPathSeparator() + appDir;
+	wxString settingsFilePath = configDirectory + wxFileName::GetPathSeparator() + "settings.ini";
+
+	if (!wxDir::Exists(configDirectory)) {
+		wxMkDir(configDirectory);
+	}
+	return settingsFilePath;
 }
 
 void SettingsWindow::SendBlankMessageTimer(wxTimerEvent& WXUNUSED(event)) {
@@ -286,6 +324,7 @@ void SettingsWindow::OnCancel(wxCommandEvent& WXUNUSED(evt)) {
 
 	colorDepth->SetSelection(lastSettings.bitDepth);
 	colorSpace->SetSelection(lastSettings.colorSpace);
+	libraryImagePreview->SetSelection(lastSettings.libraryPreview);
 	numThreads->SetValue(lastSettings.numThreads);
 
 	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).Hide();
