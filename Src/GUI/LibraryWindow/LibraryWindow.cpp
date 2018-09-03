@@ -509,7 +509,7 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 	
 	LibRaw * rawProcessor = new LibRaw();
 	libraw_processed_image_t * rawImage = NULL;
-	int rawError;
+	int rawError = 0;
 
 	wxImage * displayImage = NULL;
 	int maxSize = 250;
@@ -530,7 +530,7 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 				rawProcessor->open_file(fileName.c_str());
 			#endif
 
-			bool useThumbnail = true;
+			bool useThumbnail = !PhoedixSettings::GetLibraryImageUseRaw();
 			int flip= 0;
 
 			// Use embedded thumbnail of raw image
