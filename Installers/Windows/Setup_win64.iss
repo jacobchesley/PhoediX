@@ -44,7 +44,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "..\..\Build\Release_x64\PhoediX.exe"; DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\..\Build\Release_x64\libraw.dll"; DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\..\Build\Release_x64\libtiff.dll"; DestDir: "{app}"; Flags: ignoreversion;
-Source: "..\..\Build\Release_x64\settings.ini"; DestDir: "{app}"; Flags: ignoreversion;
 
 Source: "..\..\3rd Party Licenses\*"; DestDir: "{app}\3rd Party Licenses"; Flags: ignoreversion recursesubdirs
 
