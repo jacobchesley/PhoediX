@@ -1045,15 +1045,14 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 	processor->Lock();
 	if (processor->GetImage()->GetWidth() < 1 || processor->GetImage()->GetHeight() < 1) {
 		processor->Unlock();
-		processor->SetDoFitImage(false);
 		return;
 	}
-	ChangeImageThread * changeImage = new ChangeImageThread(imagePanel, processor);
+	ChangeImageThread * changeImage = new ChangeImageThread(imagePanel, processor, processor->GetDoFitImage());
 	changeImage->Run();
 	pixelPeepWindow->UpdateImage(processor->GetImage());
 	histogramDisplay->UpdateHistograms();
 	if (processor->GetDoFitImage()) {
-		imagePanel->FitImage();
+
 		currentSession->SetImageZoomLevel(imagePanel->GetZoom());
 		this->SaveCurrentSession();
 	}
@@ -1061,7 +1060,6 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 	imagePanel->Redraw();
 	
 	exportWindow->ProcessingComplete();
-	processor->SetDoFitImage(false);
 }
 
 bool MainWindow::CheckSessionNeedsSaved(PhoediXSession * session) {
@@ -1121,12 +1119,15 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	this->Destroy();
 }
 
-MainWindow::ChangeImageThread::ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor) : wxThread(wxTHREAD_DETACHED){
+MainWindow::ChangeImageThread::ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor, bool fitImage) : wxThread(wxTHREAD_DETACHED){
 	imgPanel = imagePanel;
 	proc = processor;
+	fit = fitImage;
 }
 
 wxThread::ExitCode MainWindow::ChangeImageThread::Entry(){
 	imgPanel->ChangeImage(proc->GetImage());
+	if (fit) { imgPanel->FitImage(); }
+	proc->SetDoFitImage(false);
 	return (wxThread::ExitCode)0;
 }

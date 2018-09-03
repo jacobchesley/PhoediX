@@ -181,8 +181,7 @@ private:
 	class ChangeImageThread : public wxThread {
 
 		public:
-			ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor);
-			void StopWatching();
+			ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor, bool fitImage);
 
 		protected:
 			virtual wxThread::ExitCode Entry();
@@ -190,6 +189,7 @@ private:
 		private:
 			ZoomImagePanel * imgPanel;
 			Processor * proc;
+			bool fit;
 	};
 
 };		
