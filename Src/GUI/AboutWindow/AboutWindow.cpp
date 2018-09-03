@@ -23,11 +23,14 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	this->SetSizer(mainSizer);
 
 	wxString app32or64 = "";
-	if (sizeof(void*) == 4) { app32or64 = " - 32 Bit"; }
-	if (sizeof(void*) == 8) { app32or64 = " - 64 Bit"; }
-	aboutPhoediX = new wxStaticText(this, -1, "About PhoediX" + app32or64);
+	if (sizeof(void*) == 4) { app32or64 = "32 Bit"; }
+	if (sizeof(void*) == 8) { app32or64 = "64 Bit"; }
+	aboutPhoediX = new wxStaticText(this, -1, "About PhoediX");
 	aboutPhoediX->SetForegroundColour(Colors::TextWhite);
 	aboutPhoediX->SetFont(wxFont(13, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+
+	applicationBit = new wxStaticText(this, -1, app32or64);
+	applicationBit->SetForegroundColour(Colors::TextLightGrey);
 
 	versionTitle = new wxStaticText(this, -1, "PhoediX Version");
 	versionValue = new wxStaticText(this, -1, PHOEDIX_VERSION_STRING);
@@ -118,6 +121,8 @@ AboutWindow::AboutWindow(wxWindow * parent) : wxFrame(parent, -1, "About PhoediX
 	okayButton->SetFont(wxFont(11, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	mainSizer->Add(aboutPhoediX, 0, wxALIGN_CENTER);
+	mainSizer->AddSpacer(2);
+	mainSizer->Add(applicationBit, 0, wxALIGN_CENTER);
 	mainSizer->AddSpacer(5);
 	mainSizer->Add(aboutSizer);
 	mainSizer->AddSpacer(50);

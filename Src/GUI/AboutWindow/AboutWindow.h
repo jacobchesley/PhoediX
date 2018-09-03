@@ -36,6 +36,7 @@ private:
 	wxFlexGridSizer * aboutSizer;
 
 	wxStaticText * aboutPhoediX;
+	wxStaticText * applicationBit;
 
 	wxStaticText * versionTitle;
 	wxStaticText * versionValue;
