@@ -202,7 +202,7 @@ void DoubleSlider::OnSlide(wxCommandEvent& slideEvt) {
 	slideEvt.Skip();
 
 	// Generate a thumbrelease event so parent edits will reconize the change
-	if (!wxGetMouseState().LeftDown()) {
+	if (!wxGetMouseState().LeftIsDown()) {
 		wxCommandEvent evt(wxEVT_SCROLL_THUMBRELEASE);
 		wxPostEvent(this->GetParent(), evt);
 	}
