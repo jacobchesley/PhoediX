@@ -20,7 +20,11 @@ enum {
 	CURVE_CHANNEL_BRIGHT,
 	CURVE_CHANNEL_RED,
 	CURVE_CHANNEL_GREEN,
-	CURVE_CHANNEL_BLUE
+	CURVE_CHANNEL_BLUE,
+	CURVE_CHANNEL_BLUE_TO_YELLOW,
+	CURVE_CHANNEL_GREEN_TO_RED,
+	CURVE_CHANNEL_GREY_TO_WHITE,
+	CURVE_CHANNEL_HUE
 };
 
 enum{
@@ -60,6 +64,7 @@ private:
 	void DestroySpline();
 	bool CheckForChanges();
 	wxVector<Point> ClipCurve(wxVector<Point> points);
+	wxColour GetRGBFromHue(double degree);
 
 };
 

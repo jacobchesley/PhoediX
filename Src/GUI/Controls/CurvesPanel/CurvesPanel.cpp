@@ -349,6 +349,46 @@ void CurvePanel::Render(wxDC& dc) {
 		y1 = (SplinePoints[i].y * Size.GetHeight());
 		y2 = (SplinePoints[i + 1].y * Size.GetHeight());
 
+		double position = (double)x2 / (double)Size.GetWidth();
+
+		if (channelColor == CURVE_CHANNEL_BLUE_TO_YELLOW) {
+
+			wxColour blueYellow(255 * position, 255 * position, (255 - (position * 255.0)));
+			wxBrush blueYellowBrush(blueYellow);
+			CurvePen.SetColour(blueYellow);
+			dc.SetBrush(blueYellowBrush);
+			dc.SetPen(CurvePen);
+		}
+
+		if (channelColor == CURVE_CHANNEL_GREEN_TO_RED) {
+
+			wxColour greenRed(255 * position, (255 - (position * 255.0)), 0);
+			wxBrush  greenRedBrush(greenRed);
+			CurvePen.SetColour(greenRed);
+			dc.SetBrush(greenRedBrush);
+			dc.SetPen(CurvePen);
+		}
+
+		if (channelColor == CURVE_CHANNEL_GREY_TO_WHITE) {
+
+			int grey = (position * 255.0 * 0.5) + 127;
+			if (grey > 255) { grey = 255; }
+			wxColour greyColor(grey, grey, grey);
+			wxBrush  greyColorBrush(greyColor);
+			CurvePen.SetColour(greyColor);
+			dc.SetBrush(greyColorBrush);
+			dc.SetPen(CurvePen);
+		}
+
+		if (channelColor == CURVE_CHANNEL_HUE) {
+
+			wxColour hueColor = this->GetRGBFromHue(position * 360.0);
+			wxBrush  hueColorBrush(hueColor);
+			CurvePen.SetColour(hueColor);
+			dc.SetBrush(hueColorBrush);
+			dc.SetPen(CurvePen);
+		}
+
 		dc.DrawLine(wxPoint((int)x1, (int)y1), wxPoint((int)x2, (int)y2));
 	}
 
@@ -372,8 +412,50 @@ void CurvePanel::Render(wxDC& dc) {
 			ControlPoints[i].y = 1.0;
 		}
 
+
 		x1Circle = ControlPoints[i].x * Size.GetWidth();
 		y1Circle = ControlPoints[i].y * Size.GetHeight();
+
+		double position = (double)x1Circle / (double)Size.GetWidth();
+
+		if (channelColor == CURVE_CHANNEL_BLUE_TO_YELLOW) {
+
+			wxColour blueYellow(255 * position, 255 * position, (255 - (position * 255.0)));
+			wxBrush blueYellowBrush(blueYellow);
+			CurvePen.SetColour(blueYellow);
+			dc.SetBrush(blueYellowBrush);
+			dc.SetPen(CurvePen);
+		}
+
+		if (channelColor == CURVE_CHANNEL_GREEN_TO_RED) {
+
+			wxColour greenRed(255 * position, (255 - (position * 255.0)), 0);
+			wxBrush  greenRedBrush(greenRed);
+			CurvePen.SetColour(greenRed);
+			dc.SetBrush(greenRedBrush);
+			dc.SetPen(CurvePen);
+		}
+
+		if (channelColor == CURVE_CHANNEL_GREY_TO_WHITE) {
+
+			int grey = (position * 255.0 * 0.5) + 127;
+			if (grey > 255) { grey = 255; }
+			wxColour greyColor(grey, grey, grey);
+			wxBrush  greyColorBrush(greyColor);
+			CurvePen.SetColour(greyColor);
+			dc.SetBrush(greyColorBrush);
+			dc.SetPen(CurvePen);
+		}
+
+		if (channelColor == CURVE_CHANNEL_HUE) {
+
+			wxColour hueColor = this->GetRGBFromHue(position * 360.0);
+			wxBrush  hueColorBrush(hueColor);
+			CurvePen.SetColour(hueColor);
+			dc.SetBrush(hueColorBrush);
+			dc.SetPen(CurvePen);
+		}
+
 		dc.DrawCircle(wxPoint((int)x1Circle, (int)y1Circle), 4);
 	}
 }
@@ -468,4 +550,61 @@ bool CurvePanel::CheckForChanges() {
 		}
 	}
 	return false;
+}
+
+wxColour CurvePanel::GetRGBFromHue(double degree) {
+
+	double luminace = 0.5;
+	double saturation = 1.0;
+	double hue = degree;
+	double temp1 = 0.0;
+	double temp2 = 0.0;
+	double tempR = 0.0;
+	double tempG = 0.0;
+	double tempB = 0.0;
+	double tempRedHSL = 0.0;
+	double tempGreenHSL = 0.0;
+	double tempBlueHSL = 0.0;
+
+	if (luminace < 0.5) { temp1 = luminace * (1.0 + saturation); }
+	else { temp1 = (luminace + saturation) - (luminace * saturation); }
+
+	temp2 = (2 * luminace) - temp1;
+
+	// Convert 0-360 to 0-1
+	hue /= 360.0;
+
+	// Create temporary RGB from hue
+	tempR = hue + (1.0 / 3.0);
+	tempG = hue;
+	tempB = hue - (1.0 / 3.0);
+
+	// Adjust all temp RGB values to be between 0 and 1
+	if (tempR < 0.0) { tempR += 1.0; }
+	if (tempR > 1.0) { tempR -= 1.0; }
+	if (tempG < 0.0) { tempG += 1.0; }
+	if (tempG > 1.0) { tempG -= 1.0; }
+	if (tempB < 0.0) { tempB += 1.0; }
+	if (tempB > 1.0) { tempB -= 1.0; }
+
+	// Calculate RGB Red from HSL
+	if ((6.0 * tempR) < 1.0) { tempRedHSL = temp2 + ((temp1 - temp2) * 6.0 * tempR); }
+	else if ((2.0 * tempR) < 1.0) { tempRedHSL = temp1; }
+	else if ((3.0 * tempR) < 2.0) { tempRedHSL = temp2 + ((temp1 - temp2)*((2.0 / 3.0) - tempR)*6.0); }
+	else { tempRedHSL = temp2; }
+
+	// Calculate RGB Green from HSL
+	if ((6.0 * tempG) < 1.0) { tempGreenHSL = temp2 + ((temp1 - temp2) * 6.0 * tempG); }
+	else if ((2.0 * tempG) < 1.0) { tempGreenHSL = temp1; }
+	else if ((3.0 * tempG) < 2.0) { tempGreenHSL = temp2 + ((temp1 - temp2)*((2.0 / 3.0) - tempG)*6.0); }
+	else { tempGreenHSL = temp2; }
+
+	// Calculate RGB Blue from HSL
+	if ((6.0 * tempB) < 1.0) { tempBlueHSL = temp2 + ((temp1 - temp2) * 6.0 * tempB); }
+	else if ((2.0 * tempB) < 1.0) { tempBlueHSL = temp1; }
+	else if ((3.0 * tempB) < 2.0) { tempBlueHSL = temp2 + ((temp1 - temp2)*((2.0 / 3.0) - tempB)*6.0); }
+	else { tempBlueHSL = temp2; }
+
+	// Scale to 0 - 255
+	return wxColour(tempRedHSL * 255.0, tempGreenHSL * 255.0, tempBlueHSL * 255.0);
 }
