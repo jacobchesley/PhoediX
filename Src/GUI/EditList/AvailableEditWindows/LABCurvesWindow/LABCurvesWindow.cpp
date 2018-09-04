@@ -12,8 +12,8 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	curveTabs = new wxNotebook(this, -1);
 	
 	lCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BRIGHT);
-	aCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
-	bCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
+	aCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_GREEN_TO_RED);
+	bCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE_TO_YELLOW);
 
 	lCurve->SetMinSize(wxSize(100, 100));
 	aCurve->SetMinSize(wxSize(100, 100));

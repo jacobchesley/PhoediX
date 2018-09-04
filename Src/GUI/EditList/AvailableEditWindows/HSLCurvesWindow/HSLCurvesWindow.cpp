@@ -10,9 +10,9 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 
 	curveTabs = new wxNotebook(this, -1);
 
-	hCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BRIGHT);
-	sCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_RED);
-	lCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
+	hCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_HUE);
+	sCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_GREY_TO_WHITE);
+	lCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BRIGHT);
 
 	hCurve->SetMinSize(wxSize(100, 100));
 	sCurve->SetMinSize(wxSize(100, 100));
