@@ -335,6 +335,7 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 		allSessions.at(i)->Destroy();
 	}
 
+	allSessions.clear();
 	currentSession = NULL;
 	this->EnableDisableMenuItemsNoProject(false);
 	this->SetTitle("PhoediX");
