@@ -6459,7 +6459,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			// Peform Blur edit
 			case ProcessorEdit::EditType::BLUR: {
 
-				processor->SendMessageToParent("Processing blur" + fullEditNumStr);
+				processor->SendMessageToParent("Processing Blur" + fullEditNumStr);
 
 				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
 				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
@@ -6481,11 +6481,13 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						processor->SetupBlur();
 						this->Multithread(horizontalBlur);
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 
 						// Blur vertically
 						processor->SetupBlur();
 						this->Multithread(verticalBlur);
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 
 						delete horizontalBlur;
 						delete verticalBlur;
@@ -6503,11 +6505,13 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						processor->SetupBlur();
 						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 
 						// Blur vertically
 						processor->SetupBlur();
 						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 					}
 				}
 			}
@@ -6516,7 +6520,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			// Peform Horizontal Blur edit
 			case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
 
-				processor->SendMessageToParent("Processing horizontal blur" + fullEditNumStr);
+				processor->SendMessageToParent("Processing Horizontal Blur" + fullEditNumStr);
 
 				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
 				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
@@ -6531,6 +6535,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						processor->SetupBlur();
 						this->Multithread(curEdit);
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 					}
 				}
 
@@ -6542,6 +6547,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						processor->SetupBlur();
 						processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize));
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 					}
 				}
 			}
@@ -6550,7 +6556,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			// Peform Blur edit
 			case ProcessorEdit::EditType::VERTICAL_BLUR: {
 
-				processor->SendMessageToParent("Processing vertical blur" + fullEditNumStr);
+				processor->SendMessageToParent("Processing Vertical Blur" + fullEditNumStr);
 
 				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
 				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
@@ -6568,6 +6574,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						processor->SetupBlur();
 						this->Multithread(curEdit);
 						processor->CleanupBlur();
+						if (processor->forceStop) { break; }
 					}
 				}
 
@@ -6581,6 +6588,7 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						processor->SetupBlur();
 						processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize));
 						processor->CleanupBlur();
+						if(processor->forceStop){ break; }
 					}
 
 					processor->SetUpdated(true);
@@ -7145,8 +7153,10 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 	}
 	
 	// Send update image event to parent window, to get latest image from processor
-	wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
-	wxPostEvent(processor->GetParentWindow(), evt);
+	if (!processor->forceStop) {
+		wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
+		wxPostEvent(processor->GetParentWindow(), evt);
+	}
 
 	processor->forceStopCritical.Enter();
 	processor->forceStop = false;
