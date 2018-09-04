@@ -410,19 +410,21 @@ void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 	dc.GetGraphicsContext()->SetInterpolationQuality(quality);
 	dc.DrawBitmap(bitmapDraw, wxPoint(xShift/tempScalar, yShift/tempScalar));
 
+	xShift /= tempScalar;
+	yShift /= tempScalar;
+
+	// Draw Crop Grid
 	if (gridActive){
 		
 		int lineWidth = (int) (4.0 / this->GetZoom());
 		if(this->GetZoom() < 1.0){ lineWidth = 2;}
 
-		xShift /= scalar;
-		yShift /= scalar;
 		lineWidth /= scalar;
 
 		wxColour white(255, 255, 255);
 		wxDash dashPattern[2];
-		dashPattern[0] = 15;
-		dashPattern[1] = 15;
+		dashPattern[0] = 15.0*scalar;
+		dashPattern[1] = 15.0*scalar;
 		wxPen dashPen(white, lineWidth, wxPENSTYLE_USER_DASH);
 		dashPen.SetDashes(2, dashPattern);
 
@@ -548,6 +550,11 @@ void ZoomImagePanel::ImageScroll::OnScroll(wxCommandEvent & WXUNUSED(evt)){
 
 void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 	
+	double tempScalar = 1.0;
+	if(!this->GetFitImage()){
+		tempScalar = scalar;
+	}
+
 	// First left click before drag
 	dragStartX = evt.GetPosition().x;
 	dragStartY = evt.GetPosition().y;
@@ -561,16 +568,16 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 	this->CalcUnscrolledPosition(dragStartX, dragStartY, &unscrollX, &unscrollY);
 
 	// Scale dragging coordinates
-	int dragStartXScale = unscrollX / (this->GetZoom() * scalar);
-	int dragStartYScale = unscrollY / (this->GetZoom() * scalar);
+	int dragStartXScale = unscrollX / (this->GetZoom() * tempScalar);
+	int dragStartYScale = unscrollY / (this->GetZoom() * tempScalar);
 
-	int pixelToleranceGridCorner = 10 / (this->GetZoom() * scalar);
+	int pixelToleranceGridCorner = 10 / (this->GetZoom() * tempScalar);
 	int hitTarget = -1;  // target = 0 i top left.  target = 1 if top right.  target = 2 if bottom left.  target = 3 if bottom right.
 	int gridMoveDirection = 1;
 
 	// Calculate new width and height based on zoom
-	int imgWidth = bitmapDraw.GetWidth() * (this->GetZoom() * scalar);
-	int imgHeight = bitmapDraw.GetHeight() * (this->GetZoom() * scalar);
+	int imgWidth = bitmapDraw.GetWidth() * (this->GetZoom() * tempScalar);
+	int imgHeight = bitmapDraw.GetHeight() * (this->GetZoom() * tempScalar);
 	if (imgWidth < 1 || imgHeight < 1) { return; }
 
 	// Get shift values (because image is centered in panel)
@@ -582,8 +589,8 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 	int yShift = 0;
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth) / 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
-	xShift /= scalar;
-	yShift /= scalar;
+	xShift /= tempScalar;
+	yShift /= tempScalar;
 
 	int gridStartXShift = (int)drawGrid.startX + xShift;
 	int gridStartYShift = (int)drawGrid.startY + yShift;
@@ -683,8 +690,8 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			int dxScale = dx / this->GetZoom();
 			int dyScale = dy / this->GetZoom();
 
-			dxScale /= scalar;
-			dyScale /= scalar;
+			dxScale /= tempScalar;
+			dyScale /= tempScalar;
 
 			int dragScaleShiftX = dragStartXScale + dxScale - xShift;
 			int dragScaleShiftY = dragStartYScale + dyScale - yShift;
@@ -848,6 +855,10 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 		gridMoving = false;
 		wxCommandEvent moveEvt(GRID_MOVE_EVENT, ID_GRID_MOVE_EVENT);
 		wxPostEvent(wxWindow::FindWindowById(this->GetGridOwner()), moveEvt);
+
+		quality = wxINTERPOLATION_FAST;
+		this->Refresh();
+		this->Update();
 	}
 
 	// Handle dragging image
@@ -941,9 +952,19 @@ bool ZoomImagePanel::ImageScroll::GetFitImage(){
 
 void ZoomImagePanel::ImageScroll::EnableHalfSize(){
 	scalar = 2.0;
+
+	drawGrid.startX /= scalar;
+	drawGrid.startY /= scalar;
+	drawGrid.endX /= scalar;
+	drawGrid.endY /= scalar;
 }
 
 void ZoomImagePanel::ImageScroll::DisableHalfSize(){
+
+	drawGrid.startX *= scalar;
+	drawGrid.startY *= scalar;
+	drawGrid.endX *= scalar;
+	drawGrid.endY *= scalar;
 
 	scalar = 1.0;
 }
