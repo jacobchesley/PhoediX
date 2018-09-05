@@ -45,6 +45,7 @@
     <ClCompile Include="..\Src\GUI\EditList\EditSelection\EditSelection.cpp" />
     <ClCompile Include="..\Src\GUI\EditList\EditWindow\EditWindow.cpp" />
     <ClCompile Include="..\Src\GUI\ExportWindow\ExportWindow.cpp" />
+    <ClCompile Include="..\Src\GUI\GuidelinesWindow\GuidelinesWindow.cpp" />
     <ClCompile Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.cpp" />
     <ClCompile Include="..\Src\GUI\Icons\Icons.cpp" />
     <ClCompile Include="..\Src\GUI\ImageDisplay\ImagePanel\ImagePanel.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="..\Src\GUI\EditList\EditSelection\EditSelection.h" />
     <ClInclude Include="..\Src\GUI\EditList\EditWindow\EditWindow.h" />
     <ClInclude Include="..\Src\GUI\ExportWindow\ExportWindow.h" />
+    <ClInclude Include="..\Src\GUI\GuidelinesWindow\GuidelinesWindow.h" />
     <ClInclude Include="..\Src\GUI\HistogramDisplay\HistogramDisplay.h" />
     <ClInclude Include="..\Src\GUI\Icons\delete_button.h" />
     <ClInclude Include="..\src\GUI\Icons\disable_button.h" />

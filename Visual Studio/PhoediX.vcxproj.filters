@@ -199,6 +199,9 @@
     <Filter Include="GUI\Controls\ExifRead">
       <UniqueIdentifier>{6417ec52-6ba4-4cbb-bc96-6afbb69de4ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GUI\Guidelines Window">
+      <UniqueIdentifier>{9ba47e78-448e-42fe-a4ee-79766079f797}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\GUI\MainWindow\MainWindow.cpp">
@@ -374,6 +377,9 @@
     </ClCompile>
     <ClCompile Include="..\Src\GUI\Controls\ExifRead\ExifRead.cpp">
       <Filter>GUI\Controls\ExifRead</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Src\GUI\GuidelinesWindow\GuidelinesWindow.cpp">
+      <Filter>GUI\Guidelines Window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -574,6 +580,9 @@
     </ClInclude>
     <ClInclude Include="..\Src\GUI\EditList\AvailableEditWindows\AdjustRGBWindow\AdjustRGBWindow.h">
       <Filter>GUI\Edit List\Available Edits\Available Edit Windows\Adjust RGB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\GUI\GuidelinesWindow\GuidelinesWindow.h">
+      <Filter>GUI\Guidelines Window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

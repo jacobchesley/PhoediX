@@ -32,6 +32,7 @@
 #include "GUI/LibraryWindow/LibraryWindow.h"
 #include "GUI/SupportedCamerasWindow/SupportedCamerasWindow.h"
 #include "GUI/Controls/ExifRead/ExifRead.h"
+#include "GUI/GuidelinesWindow/GuidelinesWindow.h"
 #include "Session/Session.h"
 #include "Debugging/MemoryLeakCheck.h"
 
@@ -58,6 +59,7 @@ private:
 	void ShowImage(wxCommandEvent& WXUNUSED(event));
 	void ShowPixelPeep(wxCommandEvent& WXUNUSED(event));
 	void ShowSnapshots(wxCommandEvent& WXUNUSED(event));
+	void ShowGuidelines(wxCommandEvent& WXUNUSED(event));
 	void ShowLibrary(wxCommandEvent& WXUNUSED(event));
 	void ShowOriginal(wxCommandEvent& WXUNUSED(event));
 	void ShowOriginalWindow(wxCommandEvent& WXUNUSED(event));
@@ -118,6 +120,7 @@ private:
 	ExportWindow * exportWindow;
 	SettingsWindow * settingsWindow;
 	PixelPeepWindow * pixelPeepWindow;
+	GuidelinesWindow * guidelinesWindow;
 	LibraryWindow * libraryWindow;
 	SnapshotWindow * snapshotWindow;
 	SupportedCamerasWindow * supportedCamerasWindow;
@@ -167,6 +170,7 @@ private:
 		ID_SHOW_ORIGINAL_WINDOW,
 		ID_SHOW_SNAPSHOTS,
 		ID_SHOW_PIXEL_PEEP,
+		ID_SHOW_GUIDELINES,
 		ID_SHOW_LIBRARY,
 
 		// Help

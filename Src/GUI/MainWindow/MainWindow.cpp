@@ -49,6 +49,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW, _("Show Original Image (separate window)"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS, _("Show Snapshots"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP, _("Show Pixel Peeper"));
+	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_GUIDELINES, _("Show Image Guidelines Configuration\tCtrl+G"));
 	menuTools->AppendSeparator();
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library\tCtrl+L"));
 
@@ -94,6 +95,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 
 	imagePanel = new ZoomImagePanel(this, processor->GetImage());
 	imagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	imagePanel->ShowGuidelinesOption();
 
 	originalImagePanel = new ZoomImagePanel(this, processor->GetImage());
 	originalImagePanel->SetBackgroundColour(Colors::BackDarkDarkGrey);
@@ -154,6 +156,18 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	settingsPaneInfo.BestSize(settingsWindow->GetClientSize());
 	settingsPaneInfo.Hide();
 	auiManager->AddPane(settingsWindow, settingsPaneInfo);
+
+	guidelinesWindow = new GuidelinesWindow(this, imagePanel);
+	wxAuiPaneInfo guidelinesPaneInfo = wxAuiPaneInfo();
+	guidelinesPaneInfo.Float();
+	guidelinesPaneInfo.Caption("Image Guidelines Configuration");
+	guidelinesPaneInfo.Name("GuidelinesConfig");
+	guidelinesPaneInfo.CloseButton(true);
+	guidelinesPaneInfo.PinButton(true);
+	guidelinesPaneInfo.DestroyOnClose(false);
+	guidelinesPaneInfo.BestSize(settingsWindow->GetClientSize());
+	guidelinesPaneInfo.Hide();
+	auiManager->AddPane(guidelinesWindow, guidelinesPaneInfo);
 
 	libraryWindow = new LibraryWindow(this);
 	wxAuiPaneInfo libraryPaneInfo = wxAuiPaneInfo();
@@ -226,6 +240,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowOriginalWindow, this, MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSnapshots, this, MainWindow::MenuBar::ID_SHOW_SNAPSHOTS);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowPixelPeep, this, MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP);
+	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowGuidelines, this, MainWindow::MenuBar::ID_SHOW_GUIDELINES);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowLibrary, this, MainWindow::MenuBar::ID_SHOW_LIBRARY);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowImageInfo, this, MainWindow::MenuBar::ID_SHOW_IMAGE_INFO);
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::ShowSupportedCameras, this, MainWindow::MenuBar::ID_SHOW_SUPPORTED_CAMERAS);
@@ -408,6 +423,14 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	exportWindow->SetExportFolder(session->GetExportFolder());
 	exportWindow->SetExportName(session->GetExportName());
 
+	// Set Guide Colors
+	guidelinesWindow->SetGuidelineType(session->GetGuidelineType());
+	guidelinesWindow->SetGuideColor(session->GetGuidelineColor());
+	guidelinesWindow->SetGridColor1(session->GetCropgridColor1());
+	guidelinesWindow->SetGridColor2(session->GetCropgridColor2());
+	if (session->GetGuidelinesShown()) { imagePanel->ActivateGuidelines(); }
+	else { imagePanel->DeactivateGuidelines(); }
+
 	this->SetMenuChecks();
 
 	// At least one session exists now, enable menu items related to sessions
@@ -511,6 +534,12 @@ void MainWindow::SaveCurrentSession() {
 	currentSession->SetExportJPEGQuality(exportWindow->GetJPEGQuality());
 	currentSession->SetExportFolder(exportWindow->GetExportFolder());
 	currentSession->SetExportName(exportWindow->GetExportName());
+
+	currentSession->SetGuidelineType(guidelinesWindow->GetGuidelineType());
+	currentSession->SetGuidelineColor(guidelinesWindow->GetGuideColor());
+	currentSession->SetCropgridColor1(guidelinesWindow->GetGridColor1());
+	currentSession->SetCropgridColor2(guidelinesWindow->GetGridColor2());
+	currentSession->SetGuidelinesShown(imagePanel->GetGuidelinesActive());
 
 	// Replace existing session in all sessions, with updated session
 	for(size_t i = 0; i < allSessions.size(); i++){
@@ -871,6 +900,22 @@ bool MainWindow::OriginalImageDispalyed() {
 	return menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->IsChecked();
 }
 
+void MainWindow::ShowGuidelines(wxCommandEvent& evt) {
+
+	// If library menu item is checked, show the edit list
+	if (evt.IsChecked()) {
+		auiManager->GetPane(guidelinesWindow).Show();
+		auiManager->Update();
+	}
+
+	// Otherwise, hide the library
+	else {
+		auiManager->GetPane(guidelinesWindow).Hide();
+		auiManager->Update();
+	}
+	this->SaveCurrentSession();
+}
+
 void MainWindow::ShowLibrary(wxCommandEvent& evt) {
 
 	// If library menu item is checked, show the edit list
@@ -923,6 +968,7 @@ void MainWindow::SetMenuChecks(){
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS)->Check(auiManager->GetPane(snapshotWindow).IsShown());
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->Check(auiManager->GetPane(originalImagePanel).IsShown());
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP)->Check(auiManager->GetPane(pixelPeepWindow).IsShown());
+	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_GUIDELINES)->Check(auiManager->GetPane(guidelinesWindow).IsShown());
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_LIBRARY)->Check(auiManager->GetPane(libraryWindow).IsShown());
 }
 
@@ -958,21 +1004,32 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->Enable(enable);
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS)->Enable(enable);
 	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP)->Enable(enable);
+	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_GUIDELINES)->Enable(enable);
 
 	// Uncheck items and hide panels if needed
 	if (!enable) {
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE)->Check(false);
+
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST)->Check(false);
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS)->Check(false);
 		menuView->FindItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO)->Check(false);
 
 		menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Check(false);
+		menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL)->Check(false);
+		menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW)->Check(false);
+		menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS)->Check(false);
+		menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP)->Check(false);
+		menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_GUIDELINES)->Check(false);
 
 		auiManager->GetPane(imagePanel).Hide();
+		auiManager->GetPane(originalImagePanel).Hide();
+		auiManager->GetPane(pixelPeepWindow).Hide();
+		auiManager->GetPane(snapshotWindow).Hide();
+		auiManager->GetPane(guidelinesWindow).Hide();
 		auiManager->GetPane(editList).Hide();
 		auiManager->GetPane(histogramDisplay).Hide();
-		auiManager->Update();
 
+		auiManager->Update();
 	}
 }
 
