@@ -37,9 +37,9 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuFile->AppendSeparator();
 	menuFile->Append(MainWindow::MenuBar::ID_EXIT, _("Exit"));
 
-	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE, _("Show Image"));
+	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE, _("Show Image\tCtrl+I"));
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_EDIT_LIST, _("Show Edit Pipeline\tCtrl+P"));
-	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS, _("Show Histograms"));
+	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_HISTOGRAMS, _("Show Histograms\tCtrl+H"));
 	menuView->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_IMAGE_INFO, _("Show Image Info"));
 
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT, _("Fast Edit\tCtrl+F"));
@@ -49,7 +49,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL_WINDOW, _("Show Original Image (separate window)"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_SNAPSHOTS, _("Show Snapshots"));
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_PIXEL_PEEP, _("Show Pixel Peeper"));
-	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_GUIDELINES, _("Show Image Guidelines Configuration\tCtrl+G"));
+	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_GUIDELINES, _("Show Image Guidelines Configuration"));
 	menuTools->AppendSeparator();
 	menuTools->AppendCheckItem(MainWindow::MenuBar::ID_SHOW_LIBRARY, _("Show Library\tCtrl+L"));
 
