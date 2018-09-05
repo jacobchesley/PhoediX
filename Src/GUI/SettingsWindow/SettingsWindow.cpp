@@ -121,9 +121,6 @@ void SettingsWindow::OnApply(wxCommandEvent& WXUNUSED(evt)) {
 
 void SettingsWindow::OnOkay(wxCommandEvent& WXUNUSED(evt)) {
 	this->ApplySettings(true, true);
-
-	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).Hide();
-	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
 void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
