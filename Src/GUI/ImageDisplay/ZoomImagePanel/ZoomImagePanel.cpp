@@ -54,12 +54,19 @@ void ZoomImagePanel::InitControls(){
 	viewImage100->SetBackgroundColour(Colors::BackDarkDarkGrey);
 	viewImage100->SetForegroundColour(Colors::TextLightGrey);
 
+	enableGuidelines = new PhoediXButton(this, ZoomImagePanel::Buttons::GUIDELINES, "Enable Guidelines");
+	enableGuidelines->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	enableGuidelines->SetForegroundColour(Colors::TextLightGrey);
+	enableGuidelines->Hide();
+
 	controlSizer->AddSpacer(10);
 	controlSizer->Add(zoomSlider);
 	controlSizer->AddSpacer(15);
 	controlSizer->Add(fullImageView);
 	controlSizer->AddSpacer(15);
 	controlSizer->Add(viewImage100);
+	controlSizer->AddSpacer(15);
+	controlSizer->Add(enableGuidelines);
 
 	this->GetSizer()->Add(scroller, 1, wxGROW);
 	this->GetSizer()->Add(controlSizer);
@@ -71,6 +78,7 @@ void ZoomImagePanel::InitControls(){
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnZoom100, this, ZoomImagePanel::Buttons::ZOOM_100);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&ZoomImagePanel::OnReguardScrollTimer, this);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&ZoomImagePanel::OnScrollRightDown, this);
+	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&ZoomImagePanel::OnGuidelines, this, ZoomImagePanel::Buttons::GUIDELINES);
 }
 
 void ZoomImagePanel::DestroyTimer(){
@@ -101,6 +109,16 @@ void ZoomImagePanel::OnFitImage(wxCommandEvent& WXUNUSED(event)) {
 
 	if(scroller->GetFitImage()){ this->SetFitImage(false); }
 	else{ this->SetFitImage(true); }
+}
+
+void ZoomImagePanel::OnGuidelines(wxTimerEvent & WXUNUSED(evt)){
+
+	if(scroller->GetGuidelinesActive()){
+		this->DeactivateGuidelines();
+	}
+	else{
+		this->ActivateGuidelines();
+	}
 }
 
 void ZoomImagePanel::OnScrollRightDown(wxMouseEvent& evt) {
@@ -206,6 +224,10 @@ void ZoomImagePanel::SetGrid(Grid newGrid) {
 	scroller->SetGrid(newGrid);
 }
 
+void ZoomImagePanel::SetGridColors(wxColour color1, wxColour color2) {
+	scroller->SetGridColors(color1, color2);
+}
+
 void ZoomImagePanel::SetGridOwner(int newOwner) {
 	scroller->SetGridOwner(newOwner);
 }
@@ -246,6 +268,40 @@ double ZoomImagePanel::GetImageAspect() {
 	return scroller->GetImageAspect();
 }
 
+void ZoomImagePanel::ActivateGuidelines(){
+	scroller->ActivateGuidelines();
+	enableGuidelines->SetLabel("Disable Guidelines");
+}
+
+void ZoomImagePanel::DeactivateGuidelines(){
+	scroller->DeactivateGuidelines();
+	enableGuidelines->SetLabel("Enable Guidelines");
+}
+
+void ZoomImagePanel::SetGuidelines(Guidelines guide){
+	scroller->SetGuidelines(guide);
+}
+
+void ZoomImagePanel::SetGuidelineColor(wxColour color) {
+	scroller->SetGuidelineColor(color);
+}
+
+Guidelines ZoomImagePanel::GetGuidelines(){
+	return scroller->GetGuidelines();
+}
+
+bool ZoomImagePanel::GetGuidelinesActive() {
+	return scroller->GetGuidelinesActive();
+}
+
+void ZoomImagePanel::ShowGuidelinesOption(){
+	enableGuidelines->Show();
+}
+
+void ZoomImagePanel::HideGuidelinesOption(){
+	enableGuidelines->Hide();
+}
+
 ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	currentlyDrawing = false;
@@ -262,6 +318,8 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	scaleGrid.startY = 0.0;
 	scaleGrid.endX = 1.0;
 	scaleGrid.endY = 1.0;
+	scaleGrid.color1 = wxColor(0, 0, 0);
+	scaleGrid.color2 = wxColor(255, 255, 255);
 	gridAspect = 1.0;
 	enforceGridAspect = false;
 
@@ -269,7 +327,14 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent) : wxScrolledWindow(p
 	drawGrid.startY = 0.0;
 	drawGrid.endX = 0.0;
 	drawGrid.endY= 0.0;
+	drawGrid.color1 = wxColor(0, 0, 0);
+	drawGrid.color2 = wxColor(255, 255, 255);
 	gridMoving = false;
+
+	showGuidelines = false;
+	guidelines.guidelineX = 3;
+	guidelines.guidelineY = 3;
+	guidelines.color = wxColor(128, 128, 128);
 
 	scalar = 1.0;
 	quality = wxINTERPOLATION_FAST;
@@ -303,6 +368,8 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	scaleGrid.startY = 0.0;
 	scaleGrid.endX = 1.0;
 	scaleGrid.endY = 1.0;
+	scaleGrid.color1 = wxColor(0, 0, 0);
+	scaleGrid.color2 = wxColor(255, 255, 255);
 	gridAspect = 1.0;
 	enforceGridAspect = false;
 
@@ -310,7 +377,14 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, Image * image) : wxS
 	drawGrid.startY = 0.0;
 	drawGrid.endX = image->GetWidth();
 	drawGrid.endY = image->GetHeight();
+	drawGrid.color1 = wxColor(0, 0, 0);
+	drawGrid.color2 = wxColor(255, 255, 255);
 	gridMoving = false;
+
+	showGuidelines = false;
+	guidelines.guidelineX = 3;
+	guidelines.guidelineY = 3;
+	guidelines.color = wxColor(128, 128, 128);
 
 	scalar = 1.0;
 	quality = wxINTERPOLATION_FAST;
@@ -342,6 +416,8 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	scaleGrid.startY = 0.0;
 	scaleGrid.endX = 1.0;
 	scaleGrid.endY = 1.0;
+	scaleGrid.color1 = wxColor(0, 0, 0);
+	scaleGrid.color2 = wxColor(255, 255, 255);
 	gridAspect = 1.0;
 	enforceGridAspect = false;
 
@@ -349,7 +425,14 @@ ZoomImagePanel::ImageScroll::ImageScroll(wxWindow * parent, wxImage * image) : w
 	drawGrid.startY = 0.0;
 	drawGrid.endX = image->GetWidth();
 	drawGrid.endY = image->GetHeight();
+	drawGrid.color1 = wxColor(0, 0, 0);
+	drawGrid.color2 = wxColor(255, 255, 255);
 	gridMoving = false;
+
+	showGuidelines = false;
+	guidelines.guidelineX = 3;
+	guidelines.guidelineY = 3;
+	guidelines.color = wxColor(128, 128, 128);
 
 	scalar = 1.0;
 	quality = wxINTERPOLATION_FAST;
@@ -421,18 +504,16 @@ void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 
 		lineWidth /= scalar;
 
-		wxColour white(255, 255, 255);
 		wxDash dashPattern[2];
 		dashPattern[0] = 15.0*scalar;
 		dashPattern[1] = 15.0*scalar;
-		wxPen dashPen(white, lineWidth, wxPENSTYLE_USER_DASH);
+		wxPen dashPen(drawGrid.color1, lineWidth, wxPENSTYLE_USER_DASH);
 		dashPen.SetDashes(2, dashPattern);
 
-		wxColour black(0, 0, 0);
-		wxPen blackPen(black, lineWidth, wxPENSTYLE_SOLID);
+		wxPen pen1(drawGrid.color2, lineWidth, wxPENSTYLE_SOLID);
 
 		// Draw solid black line
-		dc.SetPen(blackPen);
+		dc.SetPen(pen1);
 
 		int startXShift = (int)drawGrid.startX + xShift;
 		int startYShift = (int)drawGrid.startY + yShift;
@@ -457,6 +538,41 @@ void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 		// Left Line and Right Line (dashed white)
 		dc.DrawLine(startXShift, startYShift, startXShift, endYShift);
 		dc.DrawLine(endXShift, startYShift, endXShift, endYShift);
+	}
+
+	// Draw guidelines
+	if(showGuidelines){
+
+		int guidelineWidth = 2 / tempScalar;
+
+		wxPen guidePen(guidelines.color, guidelineWidth);
+		dc.SetPen(guidePen);
+
+		// Draw horizontal lines
+		for(int i = 1; i < guidelines.guidelineY; i++){
+
+			int height = ((double)i/(double)guidelines.guidelineY) * imgHeight;
+
+			int startXShift = (int)xShift;
+			int startYShift = (int)height/(zoom * tempScalar) + yShift;
+			int endXShift = (int)imgWidth/(zoom * tempScalar) + xShift;
+			int endYShift = (int)height/(zoom * tempScalar) + yShift;
+
+			dc.DrawLine(startXShift, startYShift, endXShift, endYShift);
+		}
+
+		// Draw vertical lines
+		for(int i = 1; i < guidelines.guidelineY; i++){
+
+			int width = ((double)i/(double)guidelines.guidelineX) * imgWidth;
+
+			int startXShift = (int)width/(zoom * tempScalar) + xShift;
+			int startYShift = (int)yShift;
+			int endXShift = (int)width/(zoom * tempScalar) + xShift;
+			int endYShift = (int)imgHeight/(zoom * tempScalar) + yShift;
+
+			dc.DrawLine(startXShift, startYShift, endXShift, endYShift);
+		}
 	}
 }
 
@@ -981,10 +1097,10 @@ void ZoomImagePanel::ImageScroll::FitImage(bool refresh) {
 	double zoomHeight = (double)height / (double)imageHeight;
 
 	if (zoomWidth <= zoomHeight) {
-		this->SetZoom(zoomWidth, refresh);
+		this->SetZoom(zoomWidth - 0.02, refresh);
 	}
 	else {
-		this->SetZoom(zoomHeight, refresh);
+		this->SetZoom(zoomHeight - 0.02, refresh);
 	}
 }
 
@@ -1067,6 +1183,14 @@ void ZoomImagePanel::ImageScroll::SetGrid(Grid newGrid) {
 	this->Update();
 }
 
+void ZoomImagePanel::ImageScroll::SetGridColors(wxColour color1, wxColour color2) {
+	drawGrid.color1 = color1;
+	drawGrid.color2 = color2;
+	scaleGrid.color1 = color1;
+	scaleGrid.color2 = color2;
+	this->Redraw();
+}
+
 void ZoomImagePanel::ImageScroll::OnRightDown(wxMouseEvent & evt) {
 
 	wxMouseEvent newEvent(evt);
@@ -1096,4 +1220,33 @@ void ZoomImagePanel::ImageScroll::OnRightDown(wxMouseEvent & evt) {
 
 double ZoomImagePanel::ImageScroll::GetImageAspect() {
 	return (double)bitmapDraw.GetWidth() / (double)bitmapDraw.GetHeight();
+}
+
+void ZoomImagePanel::ImageScroll::ActivateGuidelines(){
+	showGuidelines = true;
+	this->Redraw();
+}
+
+void ZoomImagePanel::ImageScroll::DeactivateGuidelines(){
+	showGuidelines = false;
+	this->Redraw();
+}
+
+void ZoomImagePanel::ImageScroll::SetGuidelines(Guidelines guide){
+	guidelines.guidelineX = guide.guidelineX;
+	guidelines.guidelineY = guide.guidelineY;
+	this->Redraw();
+}
+
+Guidelines ZoomImagePanel::ImageScroll::GetGuidelines(){
+	return guidelines;
+}
+
+bool ZoomImagePanel::ImageScroll::GetGuidelinesActive(){
+	return showGuidelines;
+}
+
+void ZoomImagePanel::ImageScroll::SetGuidelineColor(wxColour color) {
+	guidelines.color = color;
+	this->Redraw();
 }

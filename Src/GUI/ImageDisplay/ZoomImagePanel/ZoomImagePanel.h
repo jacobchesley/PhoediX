@@ -38,6 +38,14 @@ struct Grid {
 	double startY;
 	double endX;
 	double endY;
+	wxColour color1;
+	wxColour color2;
+};
+
+struct Guidelines{
+	int guidelineX;
+	int guidelineY;
+	wxColour color;
 };
 
 class ZoomImagePanel : public wxPanel {
@@ -68,6 +76,7 @@ public:
 	bool GetGridActive();
 	Grid GetGrid();
 	void SetGrid(Grid newGrid);
+	void SetGridColors(wxColour color1, wxColour color2);
 	void SetGridOwner(int ownerID);
 	int GetGridOwner();
 	void SetGridAspect(double aspect);
@@ -79,12 +88,22 @@ public:
 	void DisableHalfSize();
 	double GetImageAspect();
 
+	void ShowGuidelinesOption();
+	void HideGuidelinesOption();
+	void ActivateGuidelines();
+	void DeactivateGuidelines();
+	void SetGuidelines(Guidelines guide);
+	Guidelines GetGuidelines();
+	void SetGuidelineColor(wxColour color);
+	bool GetGuidelinesActive();
+
 private:
 
 	void InitControls();
 	void OnZoom(wxCommandEvent& slideEvent);
 	void OnFitImage(wxCommandEvent& WXUNUSED(event));
 	void OnZoom100(wxCommandEvent& WXUNUSED(event));
+	void OnGuidelines(wxTimerEvent & WXUNUSED(evt));
 	void OnReguardScrollTimer(wxTimerEvent & WXUNUSED(evt));
 	void OnScrollRightDown(wxMouseEvent & evt);
 
@@ -94,13 +113,15 @@ private:
 	DoubleSlider * zoomSlider;
 	PhoediXButton * fullImageView;
 	PhoediXButton * viewImage100;
-
+	PhoediXButton * enableGuidelines;
+	
 	int lastDragX;
 	int lastDragY;
 
 	enum Buttons {
 		ZOOM_100,
-		ZOOM_FIT
+		ZOOM_FIT,
+		GUIDELINES
 	};
 
 	enum GridHitTaget {
@@ -145,6 +166,7 @@ private:
 		bool GetGridActive();
 		Grid GetGrid();
 		void SetGrid(Grid newGrid);
+		void SetGridColors(wxColour color1, wxColour color2);
 		void SetGridOwner(int newOwner);
 		int GetGridOwner();
 		void SetGridAspect(double aspect);
@@ -156,6 +178,13 @@ private:
 		void DisableHalfSize();
 
 		double GetImageAspect();
+
+		void ActivateGuidelines();
+		void DeactivateGuidelines();
+		void SetGuidelines(Guidelines guide);
+		Guidelines GetGuidelines();
+		bool GetGuidelinesActive();
+		void SetGuidelineColor(wxColour color);
 
 	private:
 
@@ -194,6 +223,9 @@ private:
 
 		Grid scaleGrid;
 		Grid drawGrid;
+
+		bool showGuidelines;
+		Guidelines guidelines;
 
 		wxInterpolationQuality quality;
 	};
