@@ -24,6 +24,11 @@ PhoediXSession::PhoediXSession(){
 	exportName = "";
 	exportImageType = 0;
 	exportJPEGQuality = 90;
+	guideColor = wxColor(128, 128, 128);
+	gridColor1 = wxColor(0, 0, 0);
+	gridColor2 = wxColor(255, 255, 255);
+	guideType = 1;
+	showGuidelines = false;
 }
 
 PhoediXSession::~PhoediXSession() {
@@ -166,6 +171,48 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 			}
 		}
 
+		// Get Guideline Type
+		if (sessionInfo->GetName() == "GuidelineType") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				guideType = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Guideline Color
+		if (sessionInfo->GetName() == "GuidelineColor") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				guideColor.Set(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Crop Grid Color 1
+		if (sessionInfo->GetName() == "CropGridColor1") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				gridColor1.Set(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Crop Grid Color 2
+		if (sessionInfo->GetName() == "CropGridColor2") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				gridColor2.Set(sessionInfo->GetChildren()[0].GetContent());
+			}
+		}
+
+		// Get Show Guideline
+		if (sessionInfo->GetName() == "ShowGuidelines") {
+			// Get first child (the actual content)
+			if (sessionInfo->GetChildren() != NULL) {
+				int showGuidelineInt = wxAtoi(sessionInfo->GetChildren()[0].GetContent());
+				if (showGuidelineInt == 0) { showGuidelines = false; }
+				else { showGuidelines = true; }
+			}
+		}
+
 		// Get and load edit list into session
 		if (sessionInfo->GetName() == "EditList") {
 			editList->LoadSessionEditList(sessionInfo);
@@ -304,6 +351,26 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	// Write export jpeg quality
 	wxXmlNode * exJpegQual = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ExportJPEGQuality");
 	exJpegQual->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)exportJPEGQuality)));
+
+	// Write guideline type
+	wxXmlNode * exGuideType = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "GuidelineType");
+	exGuideType->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)guideType)));
+
+	// Write show guidelines
+	wxXmlNode * exGuideShow = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "ShowGuidelines");
+	exGuideShow->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", wxString::Format(wxT("%i"), (int)showGuidelines)));
+
+	// Write guideline color
+	wxXmlNode * exGuideColor = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "GuidelineColor");
+	exGuideColor->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", guideColor.GetAsString()));
+
+	// Write grid color 1
+	wxXmlNode * exGridColor1 = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "CropGridColor1");
+	exGridColor1->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", gridColor1.GetAsString()));
+
+	// Write grid color 2
+	wxXmlNode * exGridColor2 = new wxXmlNode(sessionInfo, wxXML_ELEMENT_NODE, "CropGridColor2");
+	exGridColor2->AddChild(new wxXmlNode(wxXML_TEXT_NODE, "", gridColor2.GetAsString()));
 
 	// Write the edit list to XML Doc
 	editList->SaveSessionEditList(sessionInfo);
@@ -455,6 +522,45 @@ int PhoediXSession::GetExportJPEGQuality() {
 
 void PhoediXSession::SetExportJPEGQuality(int quality) {
 	exportJPEGQuality = quality;
+}
+
+wxColour PhoediXSession::GetGuidelineColor() {
+	return guideColor;
+}
+
+void PhoediXSession::SetGuidelineColor(wxColour color) {
+	guideColor = color;
+}
+
+wxColour PhoediXSession::GetCropgridColor1() {
+	return gridColor1;
+}
+
+void PhoediXSession::SetCropgridColor1(wxColour color) {
+	gridColor1 = color;
+}
+
+wxColour PhoediXSession::GetCropgridColor2() {
+	return gridColor2;
+}
+
+void PhoediXSession::SetCropgridColor2(wxColour color) {
+	gridColor2 = color;
+}
+
+int PhoediXSession::GetGuidelineType() {
+	return guideType;
+}
+
+void PhoediXSession::SetGuidelineType(int type) {
+	guideType = type;
+}
+
+bool PhoediXSession::GetGuidelinesShown() {
+	return showGuidelines;
+}
+void PhoediXSession::SetGuidelinesShown(bool guidelinesShown) {
+	showGuidelines = guidelinesShown;
 }
 
 void PhoediXSession::GenerateID() {

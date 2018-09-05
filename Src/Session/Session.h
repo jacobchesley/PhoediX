@@ -87,6 +87,21 @@ public:
 	static bool CompareSessions(PhoediXSession * sessionOne, PhoediXSession * sessionTwo);
 	static bool CheckIfSession(wxString filePath);
 
+	wxColour GetGuidelineColor();
+	void SetGuidelineColor(wxColour color);
+
+	wxColour GetCropgridColor1();
+	void SetCropgridColor1(wxColour color);
+
+	wxColour GetCropgridColor2();
+	void SetCropgridColor2(wxColour color);
+
+	int GetGuidelineType();
+	void SetGuidelineType(int type);
+
+	bool GetGuidelinesShown();
+	void SetGuidelinesShown(bool guidelinesShown);
+
 private:
 
 	wxString projectPath;
@@ -107,7 +122,11 @@ private:
 	wxString exportName;
 	int exportImageType;
 	int exportJPEGQuality;
-
+	wxColour guideColor;
+	wxColour gridColor1;
+	wxColour gridColor2;
+	int guideType;
+	bool showGuidelines;
 
 	wxString name;
 };
