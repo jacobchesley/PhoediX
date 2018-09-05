@@ -385,6 +385,8 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	processor->KillRawProcessing();
 	imagePanel->ChangeImage(emptyImage);
 	histogramDisplay->ZeroOutHistograms();
+	imagePanel->DeactivateGrid();
+	imagePanel->DeactivateGuidelines();
 	
 	if(session->GetImageScrollWidth() > 0 && session->GetImageScrollHeight() > 0) {
 		wxImage * tempImage = new wxImage(session->GetImageScrollWidth(), session->GetImageScrollHeight());
