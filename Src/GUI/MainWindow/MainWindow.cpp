@@ -305,6 +305,7 @@ void MainWindow::OpenFiles(wxArrayString files) {
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 
+	this->SaveCurrentSession();
 	processor->DestroyAll();
 	imagePanel->ChangeImage(emptyImage);
 
@@ -487,6 +488,7 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 
 void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 	
+	this->SaveCurrentSession();
 	// If the session to open is the same as the one currently opened, keep open
 	if (evt.GetId() == currentSession->GetID()) {
 		menuWindow->FindChildItem(evt.GetId())->Check();
