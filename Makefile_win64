@@ -48,8 +48,8 @@ PhoediX.obj : $(SRC_APP)/PhoediX.h $(SRC_APP)/PhoediX.cpp
 #GUI
 
 #Main GUI
-MainGUIObjects = AboutWindow.obj AUIManager.obj Colors.obj ExportWindow.obj HistogramDisplay.obj Icons.obj MainWindow.obj PixelPeepWindow.obj LibraryWindow.obj LibraryImage.obj DirectorySelections.obj SettingsWindow.obj SnapshotWindow.obj SnapshotRenameDialog.obj SupportedCamerasWindow.obj
-MainGUIObjectsOut = $(OUT_DIR)/AboutWindow.obj $(OUT_DIR)/AUIManager.obj $(OUT_DIR)/Colors.obj $(OUT_DIR)/ExportWindow.obj $(OUT_DIR)/HistogramDisplay.obj $(OUT_DIR)/Icons.obj $(OUT_DIR)/MainWindow.obj $(OUT_DIR)/PixelPeepWindow.obj $(OUT_DIR)/LibraryWindow.obj $(OUT_DIR)/LibraryImage.obj $(OUT_DIR)/DirectorySelections.obj $(OUT_DIR)/SettingsWindow.obj $(OUT_DIR)/SnapshotWindow.obj $(OUT_DIR)/SnapshotRenameDialog.obj $(OUT_DIR)/SupportedCamerasWindow.obj
+MainGUIObjects = AboutWindow.obj AUIManager.obj Colors.obj ExportWindow.obj GuidelinesWindow.obj HistogramDisplay.obj Icons.obj MainWindow.obj PixelPeepWindow.obj LibraryWindow.obj LibraryImage.obj DirectorySelections.obj SettingsWindow.obj SnapshotWindow.obj SnapshotRenameDialog.obj SupportedCamerasWindow.obj
+MainGUIObjectsOut = $(OUT_DIR)/AboutWindow.obj $(OUT_DIR)/AUIManager.obj $(OUT_DIR)/Colors.obj $(OUT_DIR)/ExportWindow.obj $(OUT_DIR)/HistogramDisplay.obj $(OUT_DIR)/Icons.obj $(OUT_DIR)/MainWindow.obj $(OUT_DIR)/PixelPeepWindow.obj $(OUT_DIR)/LibraryWindow.obj $(OUT_DIR)/LibraryImage.obj $(OUT_DIR)/DirectorySelections.obj $(OUT_DIR)/SettingsWindow.obj $(OUT_DIR)/SnapshotWindow.obj $(OUT_DIR)/SnapshotRenameDialog.obj $(OUT_DIR)/SupportedCamerasWindow.obj $(OUT_DIR)/GuidelinesWindow
 MainGUI: $(MainGUIObjects)
 SRC_GUI = $(SRC)/GUI
 
@@ -57,6 +57,7 @@ SRC_ABOUTWINDOW = $(SRC_GUI)/AboutWindow
 SRC_AUIMANAGER = $(SRC_GUI)/AUIManager
 SRC_COLORS = $(SRC_GUI)/Colors
 SRC_EXPORTWINDOW = $(SRC_GUI)/ExportWindow
+SRC_GUIDELINESWINDOW = $(SRC_GUI)/GuidelinesWindow
 SRC_HISTOGRAMDISPLAY = $(SRC_GUI)/HistogramDisplay
 SRC_ICONS = $(SRC_GUI)/Icons
 SRC_MAINWINDOW = $(SRC_GUI)/MainWindow
@@ -80,6 +81,9 @@ Colors.obj : $(SRC_COLORS)/Colors.h $(SRC_COLORS)/Colors.cpp
 
 ExportWindow.obj : $(SRC_EXPORTWINDOW)/ExportWindow.h $(SRC_EXPORTWINDOW)/ExportWindow.cpp
 	$(CC) $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_EXPORTWINDOW)/ExportWindow.cpp /Fo$(OUT_DIR)/ExportWindow.obj
+
+GuidelinesWindow.obj : $(SRC_GUIDELINESWINDOW)/GuidelinesWindow.h $(SRC_GUIDELINESWINDOW)/GuidelinesWindow.cpp
+	$(CC) $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_GUIDELINESWINDOW)/GuidelinesWindow.cpp /Fo$(OUT_DIR)/GuidelinesWindow.obj
 
 HistogramDisplay.obj : $(SRC_HISTOGRAMDISPLAY)/HistogramDisplay.h $(SRC_HISTOGRAMDISPLAY)/HistogramDisplay.cpp
 	$(CC) $(COMPILE_FLAG) $(INCLUDE_ALL) $(SRC_HISTOGRAMDISPLAY)/HistogramDisplay.cpp /Fo$(OUT_DIR)/HistogramDisplay.obj
