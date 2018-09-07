@@ -89,7 +89,7 @@ private:
 	};
 
 	enum PopupMenuActions{
-		COPY_EDIT_PARAMS,
+		COPY_EDIT_PARAMS = 1,
 		PASTE_EDIT_PARAMS
 
 	};
