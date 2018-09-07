@@ -6158,6 +6158,8 @@ void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize
 	wxCondition wait(mutexLock);
 	int threadComplete = 0;
 
+	mutexLock.Lock();
+
 	// Horizontal blur must have data seperated into full rows
 	if(edit->GetEditType()== ProcessorEdit::HORIZONTAL_BLUR){
 
@@ -7502,7 +7504,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 	mutLock->Unlock();
 
 	// All worker threads have finished, signal condition to continue
-	if (*complete == threads) {
+	if (*complete == threads && cond->IsOk()) {
 		cond->Broadcast();
 	}
 
