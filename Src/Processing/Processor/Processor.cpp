@@ -2707,7 +2707,7 @@ void Processor::Rotate270CW(int dataStart, int dataEnd) {
 
 			x = newOffset % height;
 			y = newOffset / height;
-			newOffset = height * (width - 1 - x) + y;
+			newOffset = width * (height - 1 - x) + y;
 
 			redData8[i] = redData8Dup[newOffset];
 			greenData8[i] = greenData8Dup[newOffset];
@@ -2739,7 +2739,7 @@ void Processor::Rotate270CW(int dataStart, int dataEnd) {
 
 			x = newOffset % height;
 			y = newOffset / height;
-			newOffset = height * (width - 1 - x) + y;
+			newOffset = width * (height - 1 - x) + y;
 		
 			redData16[i] = redData16Dup[newOffset];
 			greenData16[i] = greenData16Dup[newOffset];
