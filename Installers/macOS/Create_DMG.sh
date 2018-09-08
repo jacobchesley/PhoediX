@@ -10,7 +10,11 @@ forInstaller="$(pwd)"
 
 cp -rf ../PhoediX.app ./
 cd PhoediX.app
-cp -rf "../../../../3rd Party Licenses" ./
+cp -rf "../../../../3rd Party Licenses" ./Contents
+
+xattr -cr "$forInstaller/PhoediX.app"
+codesign -s "Developer ID Application: Jacob Chesley" "$forInstaller/PhoediX.app"
+
 cd ..
 mkdir .background
 cp "../../../Graphics/DMG Installer Background/dmg_installer_background.png" ./.background
@@ -50,6 +54,7 @@ sync
 sync
 hdiutil detach ${device}
 hdiutil convert "pack.temp.dmg" -format UDZO -imagekey zlib-level=9 -o "PhoediX.dmg"
+codesign -s "Developer ID Application: Jacob Chesley" "PhoediX.dmg"
 
 rm -f pack.temp.dmg 
 rm -rf $forInstaller
