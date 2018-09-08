@@ -6217,6 +6217,7 @@ void Processor::ProcessThread::Multithread(ProcessorEdit * edit, int maxDataSize
 	}
 	// Wait for all worker threads to complete
 	wait.Wait();
+	mutexLock.Unlock();
 	processor->SetUpdated(true);
 }
 

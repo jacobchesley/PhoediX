@@ -251,6 +251,7 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * gCurveThread8 = new GetCurveThread(greenCurve, numSteps8, greenCurve8, numCurves, &curveComplete, &mutexLock, &wait); gCurveThread8->Run();
 		GetCurveThread * bCurveThread8 = new GetCurveThread(blueCurve, numSteps8, blueCurve8, numCurves, &curveComplete, &mutexLock, &wait); bCurveThread8->Run();
 		wait.Wait();
+		mutexLock.Unlock();
 
 		curveComplete = 0;
 		GetCurveThread * lCurveThread16 = new GetCurveThread(brightCurve, numSteps16, brightCurve16, numCurves, &curveComplete, &mutexLock, &wait); lCurveThread16->Run();
@@ -258,6 +259,7 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * gCurveThread16 = new GetCurveThread(greenCurve, numSteps16, greenCurve16, numCurves, &curveComplete, &mutexLock, &wait); gCurveThread16->Run();
 		GetCurveThread * bCurveThread16 = new GetCurveThread(blueCurve, numSteps16, blueCurve16, numCurves, &curveComplete, &mutexLock, &wait); bCurveThread16->Run();
 		wait.Wait();
+		mutexLock.Unlock();
 
 		// Add 8 bit map
 		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE, brightCurve8, numSteps8);
@@ -311,11 +313,12 @@ wxThread::ExitCode RGBCurvesWindow::GetCurveThread::Entry(){
 
 	mutLock->Lock();
 	*complete += 1;
-	
+	mutLock->Unlock();
+
 	// All worker threads have finished, signal condition to continue
 	if (*complete == threads) {
 		cond->Broadcast();
 	}
-	mutLock->Unlock();
+	
 	return (wxThread::ExitCode) 0;
 }

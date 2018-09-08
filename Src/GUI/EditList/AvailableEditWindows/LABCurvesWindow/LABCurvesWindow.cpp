@@ -238,6 +238,7 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * bCurveThread = new GetCurveThread(bCurve, numSteps16, bCurve16, numCurves, &curveComplete, &mutexLock, &wait); bCurveThread->Run();
 
 		wait.Wait();
+		mutexLock.Unlock();
 
 		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
 		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_A_CURVE, aCurve16, numSteps16);
@@ -285,12 +286,12 @@ wxThread::ExitCode LABCurvesWindow::GetCurveThread::Entry(){
 
 	mutLock->Lock();
 	*complete += 1;
+	mutLock->Unlock();
 
 	// All worker threads have finished, signal condition to continue
 	if (*complete == threads) {
 		cond->Broadcast();
 	}
 	
-	mutLock->Unlock();
 	return (wxThread::ExitCode) 0;
 }

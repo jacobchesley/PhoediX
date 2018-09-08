@@ -240,6 +240,7 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * lCurveThread = new GetCurveThread(lCurve, numSteps16, lCurve16, numCurves, &curveComplete, &mutexLock, &wait); lCurveThread->Run();
 
 		wait.Wait();
+		mutexLock.Unlock();
 
 		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_H_CURVE, hCurve16, numSteps16);
 		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_S_CURVE, sCurve16, numSteps16);
@@ -288,11 +289,12 @@ wxThread::ExitCode HSLCurvesWindow::GetCurveThread::Entry(){
 
 	mutLock->Lock();
 	*complete += 1;
-	
+	mutLock->Unlock();
+
 	// All worker threads have finished, signal condition to continue
 	if (*complete == threads) {
 		cond->Broadcast();
 	}
-	mutLock->Unlock();
+	
 	return (wxThread::ExitCode) 0;
 }
