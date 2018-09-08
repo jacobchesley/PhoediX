@@ -564,17 +564,19 @@ void PhoediXSession::SetGuidelinesShown(bool guidelinesShown) {
 }
 
 void PhoediXSession::GenerateID() {
-    #if defined(__WXMSW__) || defined(__WXGTK__)
-        id = rand() % 20000 + 500;
-    #endif
+	#if defined(__WXMSW__) || defined(__WXGTK__)
+		id = rand() % 20000 + 500;
+	#endif
     
-    #if defined(__WXMAC__)
-        FILE * fp = fopen("/dev/random", "r");
-        if(!fp){ return;}
-        for(int i = 0; i < sizeof(id); i++){ id <<= 8; id |= fgetc(fp); }
-        fclose(fp);
-    id = id % 20000 + 500;
-    #endif
+	#if defined(__WXMAC__)
+		FILE * fp = fopen("/dev/random", "r");
+		if(!fp){ return;}
+		for(int i = 0; i < sizeof(id); i++){ id <<= 8; id |= fgetc(fp); }
+		fclose(fp);
+
+		if(id < 1) { id *= -1;}
+		id = id % 20000 + 500;
+	#endif
 }
 
 int PhoediXSession::GetID() {
