@@ -40,6 +40,7 @@ public:
 	static std::map<size_t, wxString> exifTags;
 	static std::map<size_t, int> exifFormats;
 	static bool exifIsGPSCoordinate(size_t tag);
+	static bool KeepRationalAsFraction(size_t tag);
 
 	enum ExifType{
 		U_BYTE = 1,

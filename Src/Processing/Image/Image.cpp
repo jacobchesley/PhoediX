@@ -789,3 +789,8 @@ bool Image::exifIsGPSCoordinate(size_t tag) {
 	}
 	return false;
 }
+
+bool Image::KeepRationalAsFraction(size_t tag) {
+	if (tag == 0x9201) { return true; }
+	return false;
+}

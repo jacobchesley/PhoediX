@@ -40,14 +40,6 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	// Convert data formats to strings
 	int format = Image::exifFormats[tag];
 
-	// short/int/Long to string
-	/*if (format == 1 || format == 3 || format == 4 ||
-		format == 6 || format == 8 || format == 9) {
-		valueString << *(int*)data;
-		delete data;
-		data = NULL;
-	}
-	*/
 
 	if (format == 1) {
 		valueString << *(uint8_t*)data;
@@ -85,11 +77,19 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 
 	// Unsigned Rational to string
 	else if (format == 5 && !Image::exifIsGPSCoordinate(tag)) {
-		UnsignedRational * uRational = (UnsignedRational*)data;
-		valueString << uRational->numerator;
-		valueString += "/";
-		valueString << uRational->denominator;
 
+		UnsignedRational * uRational = (UnsignedRational*)data;
+
+		if (Image::KeepRationalAsFraction(tag)) {
+			valueString << uRational->numerator;
+			valueString += "/";
+			valueString << uRational->denominator;
+
+		}
+		else {
+			double number = (double)uRational->numerator / (double)uRational->denominator;
+			valueString = wxString::Format(wxT("%f"), number);
+		}
 		delete uRational;
 		data = NULL;
 	}
@@ -121,9 +121,16 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	// Signed Rational to string
 	else if (format == 10) {
 		SignedRational * rational = (SignedRational*)data;
-		valueString << rational->numerator;
-		valueString += "/";
-		valueString << rational->denominator;
+
+		if (Image::KeepRationalAsFraction(tag)) {
+			valueString << rational->numerator;
+			valueString += "/";
+			valueString << rational->denominator;
+		}
+		else {
+			double number = (double)rational->numerator / (double)rational->denominator;
+			valueString = wxString::Format(wxT("%f"), number);
+		}
 
 		delete rational;
 		rational = NULL;
