@@ -15,7 +15,8 @@ RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor
 	greenCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_GREEN);
 	blueCurve = new CurvePanel(curveTabs, CURVE_CHANNEL_BLUE);
 
-	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
+	curveTabs->SetBackgroundColour(parent->GetBackgroundColour());
+	curveTabs->SetForegroundColour(Colors::TextLightGrey);
 	curveTabs->AddPage(brightCurve, "All Channels", true);
 	curveTabs->AddPage(redCurve, "Red Channel", false);
 	curveTabs->AddPage(greenCurve, "Green Channel", false);

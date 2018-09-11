@@ -44,7 +44,8 @@ HSLCurvesWindow::HSLCurvesWindow(wxWindow * parent, wxString editName, Processor
 	gScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 	bScaleSlider->SetValuePosition(DoubleSlider::VALUE_INLINE_RIGHT);
 
-	curveTabs->SetBackgroundColour(wxColour(54, 54, 54));
+	curveTabs->SetBackgroundColour(parent->GetBackgroundColour());
+	curveTabs->SetForegroundColour(Colors::TextLightGrey);
 	curveTabs->AddPage(hCurve, "H Channel", true);
 	curveTabs->AddPage(sCurve, "S Channel", false);
 	curveTabs->AddPage(lCurve, "L Channel", false);
