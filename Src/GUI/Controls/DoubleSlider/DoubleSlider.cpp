@@ -266,7 +266,8 @@ void DoubleSlider::ResizeValueText() {
 
 	// Resize the value text with the current text size
 	valText->SetMinSize(wxSize(textWidth + 10, textHeight));
-	valText->Refresh();
+	valText->SetSize(wxSize(textWidth + 10, textHeight));
+	this->Layout();
 }
 
 void DoubleSlider::ShowMinMax() {
