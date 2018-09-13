@@ -403,6 +403,7 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 
 	// Load perspective after edits are loaded
 	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session->GetPerspective(), true);
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(imagePanel).Caption("Working Image");
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
 	// Set zoom and drag after window has been positioned
