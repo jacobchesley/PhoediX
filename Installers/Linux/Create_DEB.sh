@@ -22,7 +22,7 @@ cd $debDir/PhoediX/DEBIAN
 
 touch control
 echo Package: PhoediX >> control
-echo Version: 0.1.0 >> control
+echo Version: 1.0.0 >> control
 echo Section: base >> control
 echo Priority: optional >> control
 echo Architecture: amd64 >> control
