@@ -579,7 +579,6 @@ void EditListPanel::EditListScroll::AddEdit(EditListItem * edit) {
 	// Set best size and min size of parent to min size needed to not show scrollbars
 	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(parWindow).BestSize(this->GetVirtualSize());
 	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(parWindow).MinSize(this->GetVirtualSize());
-	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
 	// Make minimum size of parent the original min size.  This panel is still the size that it does not 
 	// show scroll bars, but can get smaller now
