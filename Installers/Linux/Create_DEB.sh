@@ -3,22 +3,22 @@ cd ..
 cd ..
 phoedixDir="$(pwd)"
 
-rm -rf $debDir/PhoediX_0.1.0
+rm -rf $debDir/PhoediX
 
-mkdir -p $debDir/PhoediX_0.1.0
-mkdir -p $debDir/PhoediX_0.1.0/usr/bin
-mkdir -p $debDir/PhoediX_0.1.0/usr/lib
-mkdir -p $debDir/PhoediX_0.1.0/usr/share/applications
-mkdir -p $debDir/PhoediX_0.1.0/usr/share/icons
-mkdir -p $debDir/PhoediX_0.1.0/usr/share/doc/phoedix/
-mkdir -p $debDir/PhoediX_0.1.0/DEBIAN
+mkdir -p $debDir/PhoediX
+mkdir -p $debDir/PhoediX/usr/bin
+mkdir -p $debDir/PhoediX/usr/lib
+mkdir -p $debDir/PhoediX/usr/share/applications
+mkdir -p $debDir/PhoediX/usr/share/icons
+mkdir -p $debDir/PhoediX/usr/share/doc/phoedix/
+mkdir -p $debDir/PhoediX/DEBIAN
 
-cp $phoedixDir/Build/Release_64/phoedix $debDir/PhoediX_0.1.0/usr/bin
-cp -a $phoedixDir/Build/Release_64/lib/. $debDir/PhoediX_0.1.0/usr/lib
-cp -a $phoedixDir/Icon/Linux/. $debDir/PhoediX_0.1.0/usr/share/
-cp -a "$phoedixDir/3rd Party Licenses" $debDir/PhoediX_0.1.0/usr/share/doc/phoedix/
+cp $phoedixDir/Build/Release_64/phoedix $debDir/PhoediX/usr/bin
+cp -a $phoedixDir/Build/Release_64/lib/. $debDir/PhoediX/usr/lib
+cp -a $phoedixDir/Icon/Linux/. $debDir/PhoediX/usr/share/
+cp -a "$phoedixDir/3rd Party Licenses" $debDir/PhoediX/usr/share/doc/phoedix/
 
-cd $debDir/PhoediX_0.1.0/DEBIAN
+cd $debDir/PhoediX/DEBIAN
 
 touch control
 echo Package: PhoediX >> control
@@ -54,9 +54,9 @@ echo Copyright: 1988-1997 Sam Leffler, 1991-1997 Silicon Graphics, Inc. >> copyr
 echo License: BSD-Like >> copyright
 echo " For more information, see /usr/share/doc/phoedix/Copyrights.txt" >> copyright
 
-cp copyright $debDir/PhoediX_0.1.0/usr/share/doc/phoedix
+cp copyright $debDir/PhoediX/usr/share/doc/phoedix
 
-cd $debDir/PhoediX_0.1.0/usr/share/applications
+cd $debDir/PhoediX/usr/share/applications
 touch phoedix.desktop
 echo [Desktop Entry] >> phoedix.desktop
 echo Type=Application >> phoedix.desktop
@@ -67,11 +67,4 @@ echo Icon=phoedix >> phoedix.desktop
 
 cd $debDIr
 
-dpkg-deb --build $debDir/PhoediX_0.1.0
-
-
-
-
-
-
-
+dpkg-deb --build $debDir/PhoediX
