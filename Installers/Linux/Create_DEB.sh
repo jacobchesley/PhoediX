@@ -31,7 +31,7 @@ echo Description: PhoediX >> control
 echo " A non destructuve image editing and raw processing program." >> control
 echo " Handles RAW Files, offers 16 bits per channel processing," >> control
 echo " and customizable edit order." >> control
-echo Homepage: www.phoedix.com >> control
+echo Homepage: http://www.phoedix.com >> control
 
 touch copyright
 echo Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/ >> copyright
