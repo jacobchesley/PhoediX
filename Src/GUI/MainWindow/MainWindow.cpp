@@ -146,16 +146,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	auiManager->AddPane(exportWindow, exportPaneInfo);
 	
 	settingsWindow = new SettingsWindow(this, processor, editList);
-	wxAuiPaneInfo settingsPaneInfo = wxAuiPaneInfo();
-	settingsPaneInfo.Float();
-	settingsPaneInfo.Caption("PhoediX Settings");
-	settingsPaneInfo.Name("Settings");
-	settingsPaneInfo.CloseButton(true);
-	settingsPaneInfo.PinButton(true);
-	settingsPaneInfo.DestroyOnClose(false);
-	settingsPaneInfo.BestSize(settingsWindow->GetClientSize());
-	settingsPaneInfo.Hide();
-	auiManager->AddPane(settingsWindow, settingsPaneInfo);
 
 	guidelinesWindow = new GuidelinesWindow(this, imagePanel);
 	wxAuiPaneInfo guidelinesPaneInfo = wxAuiPaneInfo();
@@ -388,7 +378,7 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	histogramDisplay->ZeroOutHistograms();
 	imagePanel->DeactivateGrid();
 	imagePanel->DeactivateGuidelines();
-	
+		
 	if(session->GetImageScrollWidth() > 0 && session->GetImageScrollHeight() > 0) {
 		wxImage * tempImage = new wxImage(session->GetImageScrollWidth(), session->GetImageScrollHeight());
 		imagePanel->ChangeImage(tempImage);
@@ -756,9 +746,7 @@ void MainWindow::OnReprocess(wxCommandEvent& WXUNUSED(event)){
 }
 
 void MainWindow::ShowSettings(wxCommandEvent& WXUNUSED(evt)) {
-	auiManager->GetPane(settingsWindow).Show();
-	auiManager->Update();
-	this->SaveCurrentSession();
+	settingsWindow->Show();
 }
 
 void MainWindow::ShowImage(wxCommandEvent& evt) {

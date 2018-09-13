@@ -5,7 +5,15 @@
 
 wxDEFINE_EVENT(RELOAD_IMAGE_EVENT, wxCommandEvent);
 
-SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditListPanel * editLst) : wxScrolledWindow(parent) {
+SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditListPanel * editLst) : wxFrame(parent, -1, "PhoediX Settings") {
+
+	this->SetWindowStyle(wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP);
+	this->CenterOnParent();
+
+	Icons icons;
+	wxIcon theIcon;
+	theIcon.CopyFromBitmap(wxBitmap(icons.pxIcon));
+	this->SetIcon(theIcon);
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -100,7 +108,6 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 
 	this->SetSizer(mainSizer);
 	this->FitInside();
-	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
 
@@ -112,6 +119,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnApply, this, SettingsWindow::ID_APPLY_SETTINGS);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnOkay, this, SettingsWindow::ID_OK_SETTINGS);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SettingsWindow::OnCancel, this, SettingsWindow::ID_CANCEL);
+	this->Bind(wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)&SettingsWindow::OnClose, this);
 	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&SettingsWindow::SendBlankMessageTimer, this);
 }
 
@@ -121,6 +129,7 @@ void SettingsWindow::OnApply(wxCommandEvent& WXUNUSED(evt)) {
 
 void SettingsWindow::OnOkay(wxCommandEvent& WXUNUSED(evt)) {
 	this->ApplySettings(true, true);
+	this->Hide();
 }
 
 void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
@@ -131,18 +140,12 @@ void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
 		lastColorDepth = colorDepth->GetSelection();
 		PhoedixSettings::SetBitDepth(8);
 
-		wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
-		wxPostEvent(parWindow, reloadEvent);
-
 	}
 	else if (colorDepth->GetSelection() == 1 && lastColorDepth != colorDepth->GetSelection()) {
 		proc->GetOriginalImage()->Enable16Bit();
 		proc->GetImage()->Enable16Bit();
 		lastColorDepth = colorDepth->GetSelection();
 		PhoedixSettings::SetBitDepth(16);
-
-		wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
-		wxPostEvent(parWindow, reloadEvent);
 	}
 	else{}
 
@@ -175,14 +178,16 @@ void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
 		this->WriteSettings();
 	}
 
-	editList->ReprocessImageRaw();
+	this->ReprocessIfNeeded();
 
 	// Send applied settings message to parent to display in info bar
 	if (ShowMessage) {
+
 		wxCommandEvent evt(PROCESSOR_MESSAGE_EVENT, ID_PROCESSOR_MESSAGE);
-		evt.SetString("Settings Applied");
+		if(overwriteLast){ evt.SetString("Settings Saved"); }
+		else { evt.SetString("Settings Applied"); }
 		wxPostEvent(parWindow, evt);
-		blankMessageTimer->Start(1000, true);
+		blankMessageTimer->Start(2000, true);
 	}
 }
 
@@ -317,18 +322,46 @@ void SettingsWindow::SendBlankMessageTimer(wxTimerEvent& WXUNUSED(event)) {
 	wxPostEvent(parWindow, evt);
 }
 
+void SettingsWindow::SendMessageToParent(wxString message, int displayTime) {
+	wxCommandEvent evt(PROCESSOR_MESSAGE_EVENT, ID_PROCESSOR_MESSAGE);
+	evt.SetString(message);
+	wxPostEvent(parWindow, evt);
+	blankMessageTimer->Start(displayTime, true);
+}
+
+void SettingsWindow::ReprocessIfNeeded() {
+
+	wxCommandEvent reloadEvent(RELOAD_IMAGE_EVENT, ID_RELOAD_IMAGE);
+	wxPostEvent(parWindow, reloadEvent);
+
+}
+
 void SettingsWindow::OnCancel(wxCommandEvent& WXUNUSED(evt)) {
+
+	this->Hide();
+	this->SendMessageToParent("Settings Reverted", 2000);
+	this->ReprocessIfNeeded();
 
 	colorDepth->SetSelection(lastSettings.bitDepth);
 	colorSpace->SetSelection(lastSettings.colorSpace);
 	libraryImagePreview->SetSelection(lastSettings.libraryPreview);
 	numThreads->SetValue(lastSettings.numThreads);
-
-	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(this).Hide();
-	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
 void SettingsWindow::Cleanup() {
 	blankMessageTimer->Stop();
 	delete blankMessageTimer;
+}
+
+void SettingsWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
+
+	this->Hide();
+	this->SendMessageToParent("Settings Reverted", 2000);
+	this->ReprocessIfNeeded();
+
+	colorDepth->SetSelection(lastSettings.bitDepth);
+	colorSpace->SetSelection(lastSettings.colorSpace);
+	libraryImagePreview->SetSelection(lastSettings.libraryPreview);
+	numThreads->SetValue(lastSettings.numThreads);
+	
 }

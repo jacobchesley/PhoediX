@@ -41,7 +41,7 @@ struct Settings{
 
 wxDECLARE_EVENT(RELOAD_IMAGE_EVENT, wxCommandEvent);
 
-class SettingsWindow : public wxScrolledWindow {
+class SettingsWindow : public wxFrame {
 
 public:
 	SettingsWindow(wxWindow * parent, Processor * processor, EditListPanel * editLst);
@@ -56,8 +56,11 @@ private:
 	void OnApply(wxCommandEvent& WXUNUSED(evt));
 	void OnOkay(wxCommandEvent& WXUNUSED(evt));
 	void OnCancel(wxCommandEvent& WXUNUSED(evt));
+	void OnClose(wxCloseEvent& WXUNUSED(evt));
 	void WriteLines(wxTextFile * file);
 	void SendBlankMessageTimer(wxTimerEvent& WXUNUSED(event));
+	void SendMessageToParent(wxString message, int displayTime);
+	void ReprocessIfNeeded();
 
 	wxWindow * parWindow;
 	wxBoxSizer * mainSizer;
