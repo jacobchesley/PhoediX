@@ -36,11 +36,15 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	if (data == NULL) { return; }
 	wxString labelString = Image::exifTags[tag];
 	wxString valueString = "";
+	int textPrec = 2;
+
+	if (tag == 0x829 || 0x9202 || 0x9205) { textPrec = 1; }
+	if (tag == 0x829A) { textPrec = 5; }
+	wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 
 	// Convert data formats to strings
 	int format = Image::exifFormats[tag];
-
-
+	
 	if (format == 1) {
 		valueString << *(uint8_t*)data;
 		delete data;
@@ -88,7 +92,7 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 		}
 		else {
 			double number = (double)uRational->numerator / (double)uRational->denominator;
-			valueString = wxString::Format(wxT("%f"), number);
+			valueString = wxString::Format(formatString, number);
 		}
 		delete uRational;
 		data = NULL;
@@ -129,7 +133,7 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 		}
 		else {
 			double number = (double)rational->numerator / (double)rational->denominator;
-			valueString = wxString::Format(wxT("%f"), number);
+			valueString = wxString::Format(formatString, number);
 		}
 
 		delete rational;
