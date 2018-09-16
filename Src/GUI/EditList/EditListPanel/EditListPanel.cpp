@@ -647,6 +647,7 @@ void EditListPanel::EditListScroll::DeleteEdit(size_t index) {
 	}
 
 	//Destroy and erase the one edit item we no longer want
+	editList.at(index)->GetEditWindow()->DestroyEditWindow();
 	editList.at(index)->DestroyItem();
 	editList.erase(editList.begin() + index);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();

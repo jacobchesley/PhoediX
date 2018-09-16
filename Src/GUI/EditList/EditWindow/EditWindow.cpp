@@ -21,6 +21,10 @@ EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * process
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 }
 
+void EditWindow::DestroyEditWindow() {
+
+}
+
 void EditWindow::DoProcess() {
 
 	if (activated) {

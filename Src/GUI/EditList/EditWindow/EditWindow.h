@@ -34,6 +34,7 @@ wxDECLARE_EVENT(SAVE_NO_REPROCESS, wxCommandEvent);
 class EditWindow : public wxScrolledWindow{
 	public:
 		EditWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * zoomImgPanel = NULL);
+		virtual void DestroyEditWindow();
 
 		void DoProcess();
 		void Process(wxCommandEvent& WXUNUSED(event));
