@@ -34,6 +34,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	colorDepth->SetForegroundColour(Colors::TextLightGrey);
 	colorDepth->Append("8 Bit");
 	colorDepth->Append("16 Bit");
+	colorDepth->SetSelection(1);
 
 	if(processor->GetImage()->GetColorDepth() == 8){ colorDepth->SetSelection(0); }
 	else{ colorDepth->SetSelection(1); }
@@ -197,6 +198,7 @@ void SettingsWindow::ReadSettings() {
 
 	// if settings file does not exist, write settings
 	if (!wxFile::Exists(settingsFilePath)) {
+		colorDepth->SetSelection(1);
 		this->WriteSettings();
 	}
 
