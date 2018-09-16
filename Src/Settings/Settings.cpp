@@ -3,7 +3,7 @@
 
 #include "Settings.h"
 
-int PhoedixSettings::bitDepth = 8;
+int PhoedixSettings::bitDepth = 16;
 int PhoedixSettings::colorSpace = 0;
 int PhoedixSettings::numThreads = 0;
 bool PhoedixSettings::libraryImageUseRaw = false;
