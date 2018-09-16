@@ -20,7 +20,8 @@
 class CropWindow : public EditWindow {
 public:
 	CropWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * imgPanel);
-	
+	void DestroyEditWindow();
+
 	void SetParamsAndFlags(ProcessorEdit * edit);
 	bool CheckCopiedParamsAndFlags();
 	ProcessorEdit * GetParamsAndFlags();

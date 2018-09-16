@@ -137,6 +137,10 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	aspectFlipped = false;
 }
 
+void CropWindow::DestroyEditWindow() {
+	this->EnableBox(false);
+}
+
 void CropWindow::ChangeAspect(bool gridUpdate){
 
 	cropGrid.startX = this->GetZoomImagePanel()->GetGrid().startX;
