@@ -90,7 +90,7 @@ private:
 
 	PhoediXButton * exportButton;
 
-	wxMutex * progressMutex;
+	wxMutex progressMutex;
 	int currentEditNumber;
 	wxString currentEditString;
 

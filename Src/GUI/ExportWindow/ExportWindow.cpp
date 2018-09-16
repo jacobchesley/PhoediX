@@ -93,7 +93,6 @@ ExportWindow::ExportWindow(wxWindow * parent, Processor * processor, EditListPan
 	progressSize = 0;
 	currentEditNumber = 0;
 	currentEditString = "";	
-	progressMutex = new wxMutex();
 }
 
 void ExportWindow::RawImageLoaded(bool isRawImageLoaded){
@@ -168,9 +167,9 @@ void ExportWindow::OnExport(wxCommandEvent & WXUNUSED(event)){
 	while (exportStarted) {
 
 		wxMilliSleep(10);
-		progressMutex->Lock();
+		progressMutex.Lock();
 		progressDialog.Update(currentEditNumber, currentEditString);
-		progressMutex->Unlock();
+		progressMutex.Unlock();
 		wxSafeYield();
 	}
 }
@@ -212,9 +211,9 @@ void ExportWindow::SetProgressEditMsg(wxCommandEvent & evt){
 		return;
 	}
 
-	progressMutex->Lock();
+	progressMutex.Lock();
 	currentEditString = evt.GetString();
-	progressMutex->Unlock();
+	progressMutex.Unlock();
 }
 
 void ExportWindow::SetProgressEditNum(wxCommandEvent & evt){
@@ -224,9 +223,9 @@ void ExportWindow::SetProgressEditNum(wxCommandEvent & evt){
 		return;
 	}
 
-	progressMutex->Lock();
+	progressMutex.Lock();
 	currentEditNumber = evt.GetInt();
-	progressMutex->Unlock();
+	progressMutex.Unlock();
 }
 
 void ExportWindow::SetEditNum(int editNum){
