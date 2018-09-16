@@ -42,6 +42,7 @@ SupportedCamerasWindow::SupportedCamerasWindow(wxWindow * parent) : wxFrame(pare
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&SupportedCamerasWindow::OnOkay, this, ID_OKAY);
 
 	this->Fit();
+	this->SetSize(this->GetSize().GetWidth(), wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) / 2.0);
 	this->CentreOnParent();
 }
 
