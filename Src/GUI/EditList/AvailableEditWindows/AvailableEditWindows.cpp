@@ -14,8 +14,8 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			newEditWindow = new AdjustBrightnessWindow(parent, "Adjust Brightness", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_ADJUST_RGB:
-			newEditWindow = new AdjustRGBWindow(parent, "Adjust RGB", processor);
+		case AvailableEditIDS::EDIT_ID_CONTRAST:
+			newEditWindow = new ContrastWindow(parent, "Adjust Contrast", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_ADJUST_HSL:
@@ -26,48 +26,48 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			newEditWindow = new AdjustLABWindow(parent, "Adjust LAB", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_CONTRAST:
-			newEditWindow = new ContrastWindow(parent, "Adjust Contrast", processor);
+		case AvailableEditIDS::EDIT_ID_ADJUST_RGB:
+			newEditWindow = new AdjustRGBWindow(parent, "Adjust RGB", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_GREYSCALE:
-			newEditWindow = new ConvertGreyscaleWindow(parent, "Convert to Greyscale", processor);
-			break;
-
-		case AvailableEditIDS::EDIT_ID_ROTATE:
-			newEditWindow = new RotationWindow(parent, "Rotate", processor);
+		case AvailableEditIDS::EDIT_ID_BLUR:
+			newEditWindow = new BlurWindow(parent, "Blur Image", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_CHANNEL_MIXER:
 			newEditWindow = new ChannelMixerWindow(parent, "Channel Mixer", processor);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_MIRROR:
-			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
-			break;
-
-		case AvailableEditIDS::EDIT_ID_RGB_CURVES:
-			newEditWindow = new RGBCurvesWindow(parent, "RGB Curves", processor);
-			break;
-
-		case AvailableEditIDS::EDIT_ID_LAB_CURVES:
-			newEditWindow = new LABCurvesWindow(parent, "LAB Curves", processor);
-			break;
-
-		case AvailableEditIDS::EDIT_ID_HSL_CURVES:
-			newEditWindow = new HSLCurvesWindow(parent, "HSL Curves", processor);
-			break;
-
-		case AvailableEditIDS::EDIT_ID_SCALE:
-			newEditWindow = new ScaleWindow(parent, "Scale Image", processor);
-			break;
-
 		case AvailableEditIDS::EDIT_ID_CROP:
 			newEditWindow = new CropWindow(parent, "Crop Image", processor, imgPanel);
 			break;
 
-		case AvailableEditIDS::EDIT_ID_BLUR:
-			newEditWindow = new BlurWindow(parent, "Blur Image", processor);
+		case AvailableEditIDS::EDIT_ID_HSL_CURVES:
+			newEditWindow = new HSLCurvesWindow(parent, "Curves - HSL", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_LAB_CURVES:
+			newEditWindow = new LABCurvesWindow(parent, "Curves - LAB", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_RGB_CURVES:
+			newEditWindow = new RGBCurvesWindow(parent, "Curves - RGB", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_GREYSCALE:
+			newEditWindow = new ConvertGreyscaleWindow(parent, "Greyscale", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_MIRROR:
+			newEditWindow = new MirrorWindow(parent, "Mirror", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_ROTATE:
+			newEditWindow = new RotationWindow(parent, "Rotate", processor);
+			break;
+
+		case AvailableEditIDS::EDIT_ID_SCALE:
+			newEditWindow = new ScaleWindow(parent, "Scale Image", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_RAW:
