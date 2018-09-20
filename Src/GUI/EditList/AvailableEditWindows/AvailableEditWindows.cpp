@@ -31,7 +31,7 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			break;
 
 		case AvailableEditIDS::EDIT_ID_BLUR:
-			newEditWindow = new BlurWindow(parent, "Blur Image", processor);
+			newEditWindow = new BlurWindow(parent, "Blur", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_CHANNEL_MIXER:
@@ -39,7 +39,7 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			break;
 
 		case AvailableEditIDS::EDIT_ID_CROP:
-			newEditWindow = new CropWindow(parent, "Crop Image", processor, imgPanel);
+			newEditWindow = new CropWindow(parent, "Crop", processor, imgPanel);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_HSL_CURVES:
@@ -67,7 +67,7 @@ EditWindow* AvailableEditWindows::GetEditWindow(int editID, wxWindow * parent, P
 			break;
 
 		case AvailableEditIDS::EDIT_ID_SCALE:
-			newEditWindow = new ScaleWindow(parent, "Scale Image", processor);
+			newEditWindow = new ScaleWindow(parent, "Scale", processor);
 			break;
 
 		case AvailableEditIDS::EDIT_ID_RAW:

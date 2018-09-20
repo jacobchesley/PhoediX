@@ -29,16 +29,16 @@ AvailableEdits::AvailableEdits() {
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ADJUST_HSL, "Adjust HSL", "Scale and shift HSL image channels."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ADJUST_LAB, "Adjust LAB", "Scale and shift LAB image channels."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ADJUST_RGB, "Adjust RGB", "Shift RGB image channels."));
-	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_BLUR, "Blur Image", "Blur image horiztontally, vertically, or all directions."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_BLUR, "Blur", "Blur image horiztontally, vertically, or all directions."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CHANNEL_MIXER, "Channel Mixer", "RGB channel mixer."));
-	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CROP, "Crop Image", "Crop image."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_CROP, "Crop", "Crop image."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_HSL_CURVES, "Curves - HSL", "Curves tool in HSL Color Space."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_LAB_CURVES, "Curves - LAB", "Curves tool in LAB Color Space."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_RGB_CURVES, "Curves - RGB", "Curves tool in RGB Color Space."));
 	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_GREYSCALE, "Greyscale", "Convert image to greyscale, choosing one of three defined methods of doing so."));
-	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_MIRROR, "Mirror Image", "Mirror image horizontally or vertically."));
-	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ROTATE, "Rotate Image", "Rotate image 90, 180, 270, or custom degree angle."));
-	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_SCALE, "Scale Image", "Resize image to any size."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_MIRROR, "Mirror", "Mirror image horizontally or vertically."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_ROTATE, "Rotate", "Rotate image 90, 180, 270, or custom degree angle."));
+	editVector.push_back(Edit(AvailableEditIDS::EDIT_ID_SCALE, "Scale", "Resize image to any size."));
 }
 
 wxVector<Edit> AvailableEdits::GetAvailableEdits() {
