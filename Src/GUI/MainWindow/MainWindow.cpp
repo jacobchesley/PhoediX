@@ -84,6 +84,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	histogramDisplay = new HistogramDisplay(this, processor);
 	wxAuiPaneInfo histogramPaneInfo = wxAuiPaneInfo();
 	histogramPaneInfo.Right();
+	histogramPaneInfo.Position(0);
 	histogramPaneInfo.Caption("Histogram");
 	histogramPaneInfo.Name("Histogram");
 	histogramPaneInfo.CloseButton(true);
@@ -125,6 +126,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	editList = new EditListPanel(this, processor, imagePanel);
 	wxAuiPaneInfo editListInfo = wxAuiPaneInfo();
 	editListInfo.Right();
+	editListInfo.Position(1);
 	editListInfo.Caption("Edit Pipeline");
 	editListInfo.Name("EditPipeline");
 	editListInfo.CloseButton(true);
