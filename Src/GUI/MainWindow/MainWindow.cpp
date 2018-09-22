@@ -76,7 +76,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	processor->SetMultithread(true);
 	processor->SetNumThreads(wxThread::GetCPUCount());
 
-	auiManager = new wxAuiManager(this);
+	auiManager = new wxAuiManager(this, wxAUI_MGR_DEFAULT | wxAUI_MGR_LIVE_RESIZE);
 	auiManager->GetArtProvider()->SetColor(wxAuiPaneDockArtSetting::wxAUI_DOCKART_BACKGROUND_COLOUR, Colors::BackDarkDarkGrey);
 	PhoedixAUIManager::SetPhoedixAUIManager(auiManager);
 	PhoedixAUIManager::SetMainWindow(this);
