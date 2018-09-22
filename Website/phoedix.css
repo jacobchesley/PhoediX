@@ -1,7 +1,7 @@
 *{margin:0}
 html{font-size:16px;overflow-x:hidden;overflow-y:scroll;height:100%;margin:0;background:#000000}
 body{height:100%}
-.BodyWrap{padding-top:3.5em;height:100%}
+.BodyWrap{padding-top:3.0em;height:100%}
 .Nav{list-style-type:none;padding:0;overflow:hidden;width:100%;background-color:rgba(60,60,60,1.0);position:fixed;z-index:10000}
 li{float:left}
 .NavButton{display:inline-block;width:100%;color:#FFF;font-family:"Arial";font-size:1.2em;text-align:center;text-decoration:none;padding-top:.5em;padding-bottom:.5em;padding-right:2em;height:auto}
@@ -142,7 +142,7 @@ to{max-height:15em}
 .Content{
 	font-family:"Arial";
 	font-size:1.1em;
-	line-height: 1.4em;
+	line-height: 1.5em;
 	color:#DDDDDD;
 	text-align: left;
 }
@@ -202,7 +202,7 @@ to{max-height:15em}
 .AboutContent{
 	font-family:"Arial";
 	font-size:1.1em;
-	line-height: 1.4em;
+	line-height: 1.5em;
 	color:#DDDDDD;
 	text-align: left;
 }
@@ -235,7 +235,7 @@ to{max-height:15em}
 	color:#DDDDDD;
 	font-family:"Arial";
 	font-size:1.0em;
-	line-height: 1.4em;
+	line-height: 1.5em;
 }
 .LibraryDescriptionLink{
 	color:#DDDDDD;
@@ -298,7 +298,7 @@ to{max-height:15em}
 	color:#DDDDDD;
 	font-family:"Arial";
 	font-size:1.1em;
-	line-height: 1.4em;
+	line-height: 1.5em;
 }
 @media screen and (max-width: 800px) {
 	.FeatureWrap{
@@ -361,7 +361,7 @@ to{max-height:15em}
 	font-size:1.1em;
 }
 .PhoediXDownloadLarge{
-	margin-top:0.4em;
+	margin-top:1.0em;
 	margin-bottom:0.4em;
 	font-style:bold;
 	padding-left:1em;
@@ -421,7 +421,7 @@ table {
     margin-top:1em;
 }
 table td {
-    padding: 0.3em 0.4em 0.3em 0.4em;
+    padding: 0.5em 0.4em 0.5em 0.4em;
 }
 table .absorbing-column {
     width: 100%;
