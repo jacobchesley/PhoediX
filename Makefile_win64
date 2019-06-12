@@ -1,6 +1,6 @@
-WX_PATH = C:\Development\wxWidgets-3.0.4
-LIBRAW_PATH = C:\Development\LibRaw-0.19.0
-LIBTIFF_PATH = C:\Development\tiff-4.0.9
+WX_PATH = C:\Development\wxWidgets-3.1.2
+LIBRAW_PATH = C:\Development\LibRaw-0.19.2
+LIBTIFF_PATH = C:\Development\tiff-4.0.10
 
 WX_INCLUDE_PATH=$(WX_PATH)/include
 WX_INCLUDE_PATH_LIB=$(WX_PATH)/lib\vc_lib\mswu
@@ -25,7 +25,7 @@ LIBRAW_LIB_PATH=$(LIBRAW_PATH)/lib/x64
 LIBTIFF_LIB_PATH=$(WX_PATH)/lib/x64
 
 LL=LINK.exe
-LINKER_INCLUDE = /LIBPATH:$(WX_LIB_PATH) /LIBPATH:$(LIBRAW_LIB_PATH) /LIBPATH:$(LIBTIFF_LIB_PATH) "wxmsw30u_core.lib" "wxbase30u.lib" "wxmsw30u_adv.lib" "wxmsw30u_aui.lib" "wxbase30u_xml.lib" "wxtiff.lib" "wxjpeg.lib" "wxpng.lib" "wxzlib.lib" "wxregexu.lib" "wxexpat.lib" "libraw.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "winspool.lib" "winmm.lib" "shell32.lib" "comctl32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "rpcrt4.lib" "advapi32.lib" "wsock32.lib" "wininet.lib" "odbc32.lib" "odbccp32.lib"
+LINKER_INCLUDE = /LIBPATH:$(WX_LIB_PATH) /LIBPATH:$(LIBRAW_LIB_PATH) /LIBPATH:$(LIBTIFF_LIB_PATH) "wxmsw31u_core.lib" "wxbase31u.lib" "wxmsw31u_adv.lib" "wxmsw31u_aui.lib" "wxbase31u_xml.lib" "wxtiff.lib" "wxjpeg.lib" "wxpng.lib" "wxzlib.lib" "wxregexu.lib" "wxexpat.lib" "libraw.lib" "kernel32.lib" "user32.lib" "gdi32.lib" "comdlg32.lib" "winspool.lib" "winmm.lib" "shell32.lib" "comctl32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "rpcrt4.lib" "advapi32.lib" "wsock32.lib" "wininet.lib" "odbc32.lib" "odbccp32.lib"
 LINK_FLAG=/MACHINE:X64 /NXCOMPAT /DYNAMICBASE /MANIFEST:EMBED $(LINKER_INCLUDE)
 
 RC=RC.exe
