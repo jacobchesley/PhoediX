@@ -19,7 +19,7 @@ class RawWindow : public EditWindow {
 		RawWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * imgPanel);
 		void Process();
 		void ProcessEvt(wxCommandEvent& WXUNUSED(event));
-		void SetParamsAndFlags(ProcessorEdit * edit);
+		void SetParamsAndFlags(ProcessorEdit * edit, bool reprocess = true);
 		ProcessorEdit * GetParamsAndFlags();
 		bool CheckCopiedParamsAndFlags();
 

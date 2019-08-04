@@ -89,7 +89,7 @@ void EditWindow::AddEditToProcessor() {
 	}
 }
 
-void EditWindow::SetParamsAndFlags(ProcessorEdit * WXUNUSED(edit)) {
+void EditWindow::SetParamsAndFlags(ProcessorEdit * WXUNUSED(edit), bool WXUNUSED(reprocess)) {
 
 }
 

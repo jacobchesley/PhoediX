@@ -324,11 +324,8 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
-	if(hasRaw){
-		this->ReprocessImageRaw();
-	}
-	else{
-		this->ReprocessImageRaw();
+	if (!hasRaw) {
+		this->ReprocessImage();
 	}
 
 	this->Thaw();
@@ -514,7 +511,7 @@ void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 	// Add new raw processor edit panel to list
 	EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(AvailableEditIDS::EDIT_ID_RAW, this, proc, imagePanel);
 	this->AddEditWindowToPanel(newEditWindow, AvailableEditIDS::EDIT_ID_RAW, false, true);
-	newEditWindow->SetParamsAndFlags(editForParams);
+	newEditWindow->SetParamsAndFlags(editForParams, false);
 
 	//Move raw processor edit to top
 	int rawEditIdx = numEdits;

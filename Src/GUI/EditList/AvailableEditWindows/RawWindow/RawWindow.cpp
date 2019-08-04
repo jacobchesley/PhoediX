@@ -705,7 +705,7 @@ void RawWindow::Process() {
 	this->SetUpdated(false);
 }
 
-void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
+void RawWindow::SetParamsAndFlags(ProcessorEdit * edit, bool reprocess) {
 
 	if(edit == NULL){ return;}
 
@@ -736,7 +736,9 @@ void RawWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE) == 1) { noisePanelCollapse->Open(); } else { noisePanelCollapse->Collapse(); } }
 		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_INFO)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_INFO) == 1) { infoPanelCollapse->Open(); } else { infoPanelCollapse->Collapse(); } }
 
-		this->Process();
+		if (reprocess) {
+			this->Process();
+		}
 	}
 }
 
