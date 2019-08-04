@@ -7588,7 +7588,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	processor->rawPrcoessor.set_progress_handler(&Processor::RawCallback, NULL);
 	processor->rawErrorCode = processor->rawPrcoessor.dcraw_process();
 	processor->rawPrcoessor.set_progress_handler(NULL, NULL);
-	processor->SendMessageToParent("RAW Image Done Processing");
+	processor->SendMessageToParent("RAW Image Processing Complete");
 
 	// Exit method before creating raw image from bad data
 	if(processor->rawErrorCode != LIBRAW_SUCCESS){
@@ -7637,13 +7637,11 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	}
 
 	// Create the raw image
-	processor->SendMessageToParent("Creating RAW Image for display");
 	processor->rawImage = processor->rawPrcoessor.dcraw_make_mem_image(&processor->rawErrorCode);
 
 	// Set rawImageGood on processor if success
 	if(processor->rawErrorCode == LIBRAW_SUCCESS){
 
-		processor->SendMessageToParent("Updating Display");
 		processor->rawImageGood = true;
 		
 		while(processor->GetLocked()){
@@ -7661,7 +7659,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		// If there are no edits after raw procesing, set updated.  We don't want to show the raw image without
 		// following edits, if those edits exist
 		if(!processor->GetHasEdits()){
-			//processor->SetUpdated(true);
+			processor->SetUpdated(true);
 			wxCommandEvent evt(UPDATE_IMAGE_EVENT, ID_UPDATE_IMAGE);
 			wxPostEvent(processor->GetParentWindow(), evt);
 		}

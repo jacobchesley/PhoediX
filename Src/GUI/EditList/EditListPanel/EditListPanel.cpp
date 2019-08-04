@@ -754,9 +754,9 @@ wxThread::ExitCode EditListPanel::StartEditsThread::Entry() {
 	else {
 
 		// Maximum wait for force stop to complete, 0.5 seconds.
-		// After 0.5 seconds, process anyway
+		// After 0.05 seconds, process anyway
 		int count = 0;
-		int maxCount = 500;
+		int maxCount = 25;
 
 		while (proc->ProcessEdits() < 0) {
 
