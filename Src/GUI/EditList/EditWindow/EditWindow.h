@@ -42,7 +42,8 @@ class EditWindow : public wxScrolledWindow{
 		wxString GetName();
 		void SetName(wxString editName);
 
-		virtual void SetParamsAndFlags(ProcessorEdit * edit, bool reprocess = true);
+		virtual void SetParamsAndFlags(ProcessorEdit* edit);
+		virtual void SetParamsAndFlags(ProcessorEdit * edit, bool reprocess);
 		virtual ProcessorEdit * GetParamsAndFlags();
 		virtual bool CheckCopiedParamsAndFlags();
 
