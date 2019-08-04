@@ -152,6 +152,8 @@ Image::~Image() {
 
 void Image::Destroy() {
 
+	exifMap.clear();
+
 	if (width < 1 || height < 1) { return; }
 
 	// Delete current 16 bit image data if it exists
