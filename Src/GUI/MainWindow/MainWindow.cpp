@@ -641,6 +641,8 @@ void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
 
 void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 
+	if (imagePath == "") { return; }
+
 	processor->GetImage()->Destroy();
 	processor->GetOriginalImage()->Destroy();
 
