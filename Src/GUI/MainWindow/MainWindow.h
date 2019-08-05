@@ -74,7 +74,8 @@ private:
 	void OnImagePanelMouse(wxMouseEvent & evt);
 	void OnReprocess(wxCommandEvent& WXUNUSED(event));
 	void OnForceReprocess(wxCommandEvent& WXUNUSED(event));
-
+	void OnDropFiles(wxDropFilesEvent& evt);
+	
 	void CreateNewProject(wxString projectFile, bool rawProject);
 	void OpenImage(wxString imagePath, bool checkForProject = true);
 	void ShowImageRelatedWindows();

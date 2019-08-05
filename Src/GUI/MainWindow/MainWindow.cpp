@@ -249,6 +249,10 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->Bind(UPDATE_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnUpdateImage, this, ID_UPDATE_IMAGE);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&MainWindow::OnReprocess, this, ID_REPROCESS_IMAGE);
 	this->Bind(SAVE_PROJECT_EVENT, (wxObjectEventFunction)&MainWindow::SaveProject, this, ID_SAVE_PROJECT);
+	this->Bind(wxEVT_DROP_FILES, (wxObjectEventFunction)&MainWindow::OnDropFiles, this);
+
+	this->DragAcceptFiles(true);
+
 
 	emptyImage = new wxImage(0, 0);
 	emptyPhxImage = new Image();
@@ -293,6 +297,15 @@ void MainWindow::OpenFiles(wxArrayString files) {
 			this->OpenImage(files.Item(i));
 		}
 	}
+}
+
+void MainWindow::OnDropFiles(wxDropFilesEvent& evt){
+
+	wxArrayString files;
+	for(int i = 0; i < evt.GetNumberOfFiles(); i++){
+		files.Add(evt.GetFiles()[i]);
+	}
+	this->OpenFiles(files);
 }
 
 void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
