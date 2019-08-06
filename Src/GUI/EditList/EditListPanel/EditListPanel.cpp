@@ -565,6 +565,26 @@ void EditListPanel::OnEditDrag(wxCommandEvent& evt) {
 				scroller->SetEditDragCursor(-1);
 				lastDragPos = -1;
 			}
+
+			// Handle case where top edit exists
+			else if (scroller->GetNumTopEdits() > 0) {
+				if (editItem->GetSequence() < scroller->GetNumTopEdits()) {
+					continue;
+				}
+				else {
+					// Mouse is in the top half, draw cursor above
+					if (editListItemRectTop.Contains(mouse.GetX(), mouse.GetY())) {
+						scroller->SetEditDragCursor(i);
+						lastDragPos = i;
+					}
+
+					// Mouse is in the bottom half, draw cursor below
+					else {
+						scroller->SetEditDragCursor(i + 1);
+						lastDragPos = i + 1;
+					}
+				}
+			}
 			else {
 				// Mouse is in the top half, draw cursor above
 				if (editListItemRectTop.Contains(mouse.GetX(), mouse.GetY())) {

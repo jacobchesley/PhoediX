@@ -31,6 +31,8 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 	textSizer->AddSpacer(5);
 	textSizer->Add(titleText, 0, wxALIGN_CENTER, 1);
 	textSizer->AddSpacer(5);
+
+	fixedItem = disableButtons;
 		
 	// Add control buttons when there is an edit that must remain in the exact place (RAW edit must be at top)
 	if(!disableButtons){
@@ -262,6 +264,9 @@ void EditListItem::SetSequence(size_t sequence) {
 
 void EditListItem::SetHighlighted(bool highlight){
 
+	// Can't drag item that is fixed to top (RAW Processor)
+	if (fixedItem) { return; }
+
 	if(highlight == isHighlighted){return;}
 
 	isHighlighted = highlight;
@@ -296,6 +301,9 @@ void EditListItem::OnDragStart(wxMouseEvent & evt){
 }
 
 bool EditListItem::CheckDrag(){
+
+	// Can't drag item that is fixed to top (RAW Processor)
+	if (fixedItem) { return false; }
 
 	bool didDrag = false;
 

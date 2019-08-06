@@ -74,8 +74,7 @@ private:
 	void OnDragStart(wxMouseEvent & evt);
 	void OnTimerFire(wxTimerEvent& WXUNUSED(event));
 	bool CheckDrag();
-
-
+	
 	wxWindow * parWindow;
 	wxBoxSizer * sizer;
 	wxBoxSizer * textSizer;
@@ -93,6 +92,7 @@ private:
 	bool isDisabled;
 	bool isHighlighted;
 	bool highlightTimerFired;
+	bool fixedItem;
 
 	enum Buttons{
 		OPEN_EDIT_BUTTON,
