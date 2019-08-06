@@ -62,6 +62,8 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListPanel::OnRightClick, this);
 	this->Bind(START_EDITS_COMPLETE, (wxObjectEventFunction)&EditListPanel::StartEditsComplete, this, ID_START_EDITS_COMPLETE);
 	this->Bind(SAVE_NO_REPROCESS, (wxObjectEventFunction)&EditListPanel::OnSaveNoReprocess, this, ID_SAVE_NO_REPROCESS);
+	this->Bind(EDIT_DRAG_EVENT, (wxObjectEventFunction)& EditListPanel::OnEditDrag, this, ID_EDIT_DRAG);
+	this->Bind(EDIT_DRAG_COMPLETE_EVENT, (wxObjectEventFunction)& EditListPanel::OnEditDragComplete, this, ID_EDIT_DRAG_COMPLETE);
 
 	proc = processor;
 	hasRaw = false;
@@ -538,6 +540,56 @@ bool EditListPanel::GetRawWindowOpen(){
 	return hasRaw;
 }
 
+void EditListPanel::OnEditDrag(wxCommandEvent& evt) {
+
+	wxMouseState mouse(wxGetMouseState());
+
+	for (int i = 0; i < scroller->GetEditList().size(); i++) {
+		
+		EditListItem* editItem = scroller->GetEditList().at(i);
+
+
+		if (evt.GetInt() == editItem->GetId()) {
+			highlightedItem = editItem;
+		}
+		
+		wxRect editListItemRect = editItem->GetScreenRect();
+		wxRect editListItemRectTop = editListItemRect;
+		editListItemRectTop.SetHeight(editListItemRect.GetHeight() / 2);
+
+		// Mouse is in this edit list item
+		if (editListItemRect.Contains(mouse.GetX(), mouse.GetY())) {
+
+			// Mouse is in same edit that is highlighted, hide cursor
+			if (evt.GetInt() == editItem->GetId()) {
+				scroller->SetEditDragCursor(-1);
+				lastDragPos = -1;
+			}
+			else {
+				// Mouse is in the top half, draw cursor above
+				if (editListItemRectTop.Contains(mouse.GetX(), mouse.GetY())) {
+					scroller->SetEditDragCursor(i);
+					lastDragPos = i;
+				}
+
+				// Mouse is in the bottom half, draw cursor below
+				else {
+					scroller->SetEditDragCursor(i + 1);
+					lastDragPos = i + 1;
+				}
+			}
+		}
+	}
+}
+
+void EditListPanel::OnEditDragComplete(wxCommandEvent& WXUNUSED(evt)) {
+	if (lastDragPos > -1) {
+		scroller->CompleteDrag(highlightedItem, lastDragPos);
+	}
+	lastDragPos = -1;
+	this->ReprocessImage();
+}
+
 EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWindow(parent) {
 
 	parWindow = parent;
@@ -546,6 +598,18 @@ EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWin
 	this->FitInside();
 	this->SetScrollRate(5, 5);
 	topEdits = 0;
+
+	// Setup cursor for edit item dragging position
+	dragCursor = new wxPanel(this);
+	dragCursor->SetMinClientSize(wxSize(4, 4));
+	this->GetSizer()->Add(dragCursor, 0, wxRIGHT | wxEXPAND);
+	wxColor cursorColor = Colors::BackGrey;
+	int red = cursorColor.Red();
+	int green = cursorColor.Green();
+	int blue = cursorColor.Blue();
+	cursorColor.Set(red + 40, green + 40, blue + 40);
+	dragCursor->SetBackgroundColour(cursorColor);
+	dragCursor->Hide();
 }
 
 void EditListPanel::EditListScroll::SetNumTopEdits(size_t numTop){
@@ -676,13 +740,29 @@ void EditListPanel::EditListScroll::DeleteAllEdits() {
 
 void EditListPanel::EditListScroll::RedrawEdits() {
 
-	// Iterate and reset the sequence of all edit items, and add them back to the sizer with a spacer
-	for (size_t i = 0; i < editList.size(); i++) {
-		editList.at(i)->SetSequence(i);
-		this->GetSizer()->Add(editList.at(i), 0, wxALL | wxEXPAND);
-		this->GetSizer()->AddSpacer(12);
-	}
+	int seq = 0;
+	int plusDragCursor = dragCursorPos > -1 ? 1 : 0;
 
+	// Iterate and reset the sequence of all edit items, and add them back to the sizer with a spacer
+	for (size_t i = 0; i < editList.size() + plusDragCursor; i++) {
+
+		// Draw cursor
+		if (i == dragCursorPos) {
+			this->GetSizer()->AddSpacer(2);
+			this->GetSizer()->Add(dragCursor, 0, wxALL | wxEXPAND);
+			this->GetSizer()->AddSpacer(2);
+		}
+
+		// Draw edit list item
+		else {
+			editList.at(seq)->SetSequence(seq);
+			this->GetSizer()->AddSpacer(6);
+			this->GetSizer()->Add(editList.at(seq), 0, wxALL | wxEXPAND);
+			this->GetSizer()->AddSpacer(6);
+			seq += 1;
+		}
+	}
+	
 	// Fit inside the scroll bars
 	this->FitInside();
 }
@@ -700,6 +780,53 @@ void EditListPanel::EditListScroll::OnCropActivate(wxCommandEvent& evt) {
 }
 void EditListPanel::EditListScroll::OnCropDeactivate(wxCommandEvent& evt) {
 	wxPostEvent(parWindow, evt);
+}
+
+void EditListPanel::EditListScroll::SetEditDragCursor(int index) {
+	if (index < 0) {
+		dragCursor->Hide();
+	}
+	else {
+		dragCursor->Show();
+	}
+	dragCursorPos = index;
+
+	this->GetSizer()->Clear();
+	this->RedrawEdits();
+}
+
+void EditListPanel::EditListScroll::CompleteDrag(EditListItem* item, int newIndex) {
+
+	// Hide drag cursor
+	dragCursor->Hide();
+
+	// Get index of highlighted item
+	int highlightIndex = -1;
+	for (int i = 0; i < editList.size(); i++) {
+		if (editList.at(i) == item) {
+			highlightIndex = i;
+			break;
+		}
+	}
+
+	// If highlight item is indexed properly
+	if (highlightIndex > -1) {
+
+		// Get offset incase moving item below
+		int offset = 0;
+		if (newIndex > highlightIndex) {
+			offset = -1;
+		}
+
+		// Erase highlighted item, and reinsert it in new position
+		editList.erase(editList.begin() + highlightIndex);
+		editList.insert(editList.begin() + newIndex + offset, item);
+	}
+
+	// Redraw edit list
+	dragCursorPos = -1;
+	this->GetSizer()->Clear();
+	this->RedrawEdits();
 }
 
 EditListPanel::StartEditsThread::StartEditsThread(EditListPanel * parent, Processor * processor, bool processRaw, bool unpack) : wxThread(wxTHREAD_DETACHED) {

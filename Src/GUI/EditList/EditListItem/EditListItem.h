@@ -26,7 +26,9 @@ enum {
 	ID_EDIT_DELETE,
 	ID_EDIT_DISABLE,
 	ID_EDIT_COPY,
-	ID_EDIT_PASTE
+	ID_EDIT_PASTE,
+	ID_EDIT_DRAG,
+	ID_EDIT_DRAG_COMPLETE
 };
 
 wxDECLARE_EVENT(EDIT_UP_EVENT, wxCommandEvent);
@@ -35,6 +37,9 @@ wxDECLARE_EVENT(EDIT_DELETE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_DISABLE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_COPY_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(EDIT_PASTE_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(EDIT_DRAG_EVENT, wxCommandEvent);
+wxDECLARE_EVENT(EDIT_DRAG_COMPLETE_EVENT, wxCommandEvent);
+
 
 class EditListItem : public wxPanel {
 public:
@@ -54,6 +59,9 @@ public:
 	void SetDisabled(bool disable);
 	bool GetDisabled();
 
+	void SetHighlighted(bool highlight);
+	bool GetHighlighted();
+
 private:
 
 	void OnRightClick(wxMouseEvent& WXUNUSED(event));
@@ -63,6 +71,10 @@ private:
 	void OnDelete(wxCommandEvent& WXUNUSED(event));
 	void OnOpenEdit(wxCommandEvent& WXUNUSED(event));
 	void OnDisable(wxCommandEvent& WXUNUSED(event));
+	void OnDragStart(wxMouseEvent & evt);
+	void OnTimerFire(wxTimerEvent& WXUNUSED(event));
+	bool CheckDrag();
+
 
 	wxWindow * parWindow;
 	wxBoxSizer * sizer;
@@ -79,6 +91,8 @@ private:
 
 	size_t seq;
 	bool isDisabled;
+	bool isHighlighted;
+	bool highlightTimerFired;
 
 	enum Buttons{
 		OPEN_EDIT_BUTTON,

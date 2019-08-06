@@ -9,6 +9,8 @@ wxDEFINE_EVENT(EDIT_DELETE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EDIT_DISABLE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EDIT_COPY_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(EDIT_PASTE_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(EDIT_DRAG_EVENT, wxCommandEvent);
+wxDEFINE_EVENT(EDIT_DRAG_COMPLETE_EVENT, wxCommandEvent);
 
 EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, EditWindow * editWindow, bool disableButtons) : wxPanel(parent) {
 
@@ -97,8 +99,14 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditListItem::OnDelete, this, EditListItem::Buttons::DELETE_BUTTON);
 	this->Bind(wxEVT_BUTTON, (wxObjectEventFunction)&EditListItem::OnDisable, this, EditListItem::Buttons::DISABLE_BUTTON);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListItem::OnRightClick, this);
+	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&EditListItem::OnDragStart, this);
+	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&EditListItem::OnDragStart, this, EditListItem::Buttons::OPEN_EDIT_BUTTON);
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&EditListItem::OnTimerFire, this);
 	seq = Sequence;
 	isDisabled = false;
+
+	isHighlighted = true;
+	highlightTimerFired = false;
 }
 
 // Destroy the edit window
@@ -144,6 +152,11 @@ void EditListItem::SetDisabled(bool disabled){
 }
 
 void EditListItem::OnOpenEdit(wxCommandEvent& WXUNUSED(event)) {
+
+	// Item was dragged, not meant to have edit window opened
+	if(this->CheckDrag()){
+		return;
+	}
 
 	// Show the edit window
 	if (editWin != NULL) {
@@ -245,4 +258,87 @@ int EditListItem::GetSequence() {
 
 void EditListItem::SetSequence(size_t sequence) {
 	seq = sequence;
+}
+
+void EditListItem::SetHighlighted(bool highlight){
+
+	if(highlight == isHighlighted){return;}
+
+	isHighlighted = highlight;
+
+	wxColor backgroundColor = Colors::BackGrey;
+	int red = backgroundColor.Red();
+	int green = backgroundColor.Green();
+	int blue =  backgroundColor.Blue();
+
+	if(highlight){
+		backgroundColor.Set(red + 40, green + 40, blue + 40);
+	}
+	
+	this->SetBackgroundColour(backgroundColor);
+
+	upButton->SetBackgroundColour(this->GetBackgroundColour());
+	downButton->SetBackgroundColour(this->GetBackgroundColour());
+	deleteButton->SetBackgroundColour(this->GetBackgroundColour());
+	disableButton->SetBackgroundColour(this->GetBackgroundColour());
+	titleText->SetBackgroundColour(this->GetBackgroundColour());
+	this->Refresh();
+	this->Update();
+}
+
+bool EditListItem::GetHighlighted(){
+	return isHighlighted;
+}
+
+void EditListItem::OnDragStart(wxMouseEvent & evt){
+
+	this->CheckDrag();
+}
+
+bool EditListItem::CheckDrag(){
+
+	bool didDrag = false;
+
+	// Set half second timer to highlight and consider drag
+	wxTimer timer;
+	timer.SetOwner(this);
+	timer.Start(500);
+	bool mouseLeftWindow = false;
+
+	// While mouse is left button down
+	wxMouseState mouse(wxGetMouseState());
+	while(mouse.LeftIsDown()){
+		
+		// Mouse has left window
+		if(!this->GetScreenRect().Contains(mouse.GetX(), mouse.GetY())){
+			mouseLeftWindow  = true;
+		}
+
+		// Edit in list was held down for a while, or mouse left window.  This is a drag event now
+		if(highlightTimerFired || mouseLeftWindow){
+			this->SetHighlighted(true);
+			didDrag = true;
+			
+			wxCommandEvent evt(EDIT_DRAG_EVENT, ID_EDIT_DRAG);
+			evt.SetInt(this->GetId());
+			wxPostEvent(this->GetParent(), evt);
+		}
+		
+		// Get current mouse state
+		mouse.SetState(wxGetMouseState());
+		wxSafeYield();
+	}
+
+	// Reset drag / highlight
+	highlightTimerFired = false;
+	mouseLeftWindow = false;
+	this->SetHighlighted(false);
+	wxCommandEvent evt(EDIT_DRAG_COMPLETE_EVENT, ID_EDIT_DRAG_COMPLETE);
+	wxPostEvent(this->GetParent(), evt);
+
+	return didDrag;
+}
+
+void EditListItem::OnTimerFire(wxTimerEvent& WXUNUSED(evt)){
+	highlightTimerFired = true;
 }

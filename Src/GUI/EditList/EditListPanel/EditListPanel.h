@@ -75,6 +75,9 @@ private:
 	void CopyEdit(wxCommandEvent& copyEvt);
 	void PasteEdit(wxCommandEvent& pasteEvt);
 
+	void OnEditDrag(wxCommandEvent& evt);
+	void OnEditDragComplete(wxCommandEvent& WXUNUSED(evt));
+
 	void StartEditsComplete();
 	void InformParentReprocess();
 
@@ -91,6 +94,8 @@ private:
 
 	ZoomImagePanel * imagePanel;
 	PhoediXSession * currentSession;
+	EditListItem* highlightedItem;
+	int lastDragPos;
 
 	enum Buttons {
 		ADD_EDIT_BUTTON = 100
@@ -114,7 +119,8 @@ private:
 		int GetNextID();
 		void SetNumTopEdits(size_t numTop);
 		size_t GetNumTopEdits();
-
+		void SetEditDragCursor(int index);
+		void CompleteDrag(EditListItem* item, int newIndex);
 		wxVector<EditListItem*> GetEditList();
 
 	private:
@@ -127,6 +133,8 @@ private:
 		wxBoxSizer * sizer;
 		wxVector<EditListItem*> editList;
 		size_t topEdits;
+		wxPanel* dragCursor;
+		int dragCursorPos;
 	};
 	
 	EditListScroll * scroller;
