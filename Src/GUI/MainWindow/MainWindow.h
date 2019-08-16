@@ -80,7 +80,7 @@ private:
 	void OpenImage(wxString imagePath, bool checkForProject = true);
 	void ShowImageRelatedWindows();
 	void ReloadImage(wxCommandEvent& WXUNUSED(evt));
-	void LoadProject(wxString projectPath);
+	void LoadProject(wxString projectPath, bool openSession = true);
 	void OnImportImageNewProject(wxCommandEvent& evt);
 
 	void OpenSession(PhoediXSession * session);

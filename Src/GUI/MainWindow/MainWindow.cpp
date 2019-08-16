@@ -279,23 +279,107 @@ void MainWindow::SetSizeProperties(){
 
 void MainWindow::OpenFiles(wxArrayString files) {
 
+	bool openSession = false;
 	for (size_t i = 0; i < files.size(); i++) {
 
+		openSession = i == files.size() - 1 ? true : false;
+
+		wxString file = files.Item(i);
 		// Check if PhoediX project
-		if (PhoediXSession::CheckIfSession(files.Item(i))) {
+		if (PhoediXSession::CheckIfSession(file)) {
 
 			// Get project name and path
-			wxString projectName = wxFileName(files.Item(i)).GetName();
-			wxString projectPath = wxFileName(files.Item(i)).GetPath();
+			wxString projectName = wxFileName(file).GetName();
+			wxString projectPath = wxFileName(file).GetPath();
 
 			// Get image path from project path and name (image is one directory above)
 			wxString imagePath = projectPath + wxFileName::GetPathSeparator() + "..";
 			wxString fullImagePath = imagePath + wxFileName::GetPathSeparator() + projectName;
-			this->OpenImage(fullImagePath);
+			
+			file = fullImagePath;
+
+		}		
+
+		// Make sure file name is correct and exists
+		wxFileName imageFile(file);
+		if (!imageFile.FileExists() || !imageFile.IsOk()) {
+			continue;
 		}
-		else{
-			this->OpenImage(files.Item(i));
+
+		imageInfoPanel->ClearExif();
+
+		emptyPhxImage->Destroy();
+		if (editList->GetRawWindowOpen()) { editList->RemoveRawWindow(); }
+
+		processor->SetFilePath(file);
+		processor->SetFileName(imageFile.GetFullName());
+		this->SetTitle("PhoediX - " + imageFile.GetFullName());
+
+		bool rawProject = false;
+
+		if (openSession) {
+
+			// Handle Raw Image
+			if (ImageHandler::CheckRaw(file)) {
+				exportWindow->RawImageLoaded(true);
+				rawProject = true;
+
+				LibRaw* imageInfoRaw = new LibRaw();
+
+				#ifdef __WXMSW__
+				imageInfoRaw->open_file(file.wc_str());
+				#else
+				imageInfoRaw->open_file(file.c_str());
+				#endif
+				ImageHandler::ReadExifFromRaw(imageInfoRaw, processor->GetImage());
+				imageInfoPanel->AddExif(processor->GetImage());
+
+			}
+
+			// Handle JPEG, PNG, BMP and TIFF images
+			else if (ImageHandler::CheckImage(file)) {
+				processor->Lock();
+				ImageHandler::LoadImageFromFile(file, processor->GetImage());
+				processor->SetOriginalImage(processor->GetImage());
+				originalImagePanel->ChangeImage(processor->GetOriginalImage());
+				processor->SetUpdated(true);
+				processor->Unlock();
+
+				if (ImageHandler::CheckExif(file)) {
+					ImageHandler::ReadExif(file, processor->GetImage());
+					imageInfoPanel->AddExif(processor->GetImage());
+				}
+			}
+
+			else {
+				imagePanel->NoImage();
+				processor->SetOriginalImage(emptyPhxImage);
+				processor->SetFilePath("");
+				this->SetTitle("PhoediX");
+				wxMessageDialog imageErrorDialog(this, "Error opening image: " + file, "Error Opening Image", wxICON_ERROR);
+				imageErrorDialog.ShowModal();
+				return;
+			}
+			this->ShowImageRelatedWindows();
 		}
+
+
+		wxString pathSep = imageFile.GetPathSeparator();
+		wxFileName phoedixProject(imageFile.GetPath() + pathSep + ".PhoediX" + pathSep + imageFile.GetFullName() + ".phx");
+		if (phoedixProject.FileExists() && phoedixProject.IsOk()) {
+			this->LoadProject(phoedixProject.GetFullPath(), openSession);
+		}
+		else {
+			bool createRawProject = false;
+			if (ImageHandler::CheckRaw(file)) {
+				createRawProject = true;
+			}
+			this->CreateNewProject(phoedixProject.GetFullPath(), createRawProject);
+				
+		}
+		currentSession->SetImageFilePath(file);
+			
+		
 	}
 }
 
@@ -370,6 +454,7 @@ void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 	wxFileName phoedixProject(projectFile);
 	newSession->SetName(phoedixProject.GetName());
 	newSession->SetProjectPath(projectFile);
+	newSession->SetFitImage(true);
 
 	if(rawProject){
 		wxVector<ProcessorEdit*>  rawEditList;
@@ -561,13 +646,13 @@ void MainWindow::SaveCurrentSession() {
 	currentSession->SaveSessionToFile(currentSession->GetProjectPath());
 }
 
-void MainWindow::LoadProject(wxString projectPath) {
+void MainWindow::LoadProject(wxString projectPath, bool openSession) {
 
 	// Check for already loaded images in session
 	for(int i = 0; i < allSessions.size(); i++){
 
 		// Open existing session (if it is not already the active session)
-		if(allSessions[i]->GetProjectPath() == projectPath){
+		if(allSessions[i]->GetProjectPath() == projectPath && openSession){
 
 			// Open the image, then open the session to go along with image
 			this->OpenImage(allSessions[i]->GetImageFilePath(), false);
@@ -594,7 +679,9 @@ void MainWindow::LoadProject(wxString projectPath) {
 	// Add new session to all session vector, set current session and open
 	allSessions.push_back(session);
 	currentSession = session;
-	this->OpenSession(currentSession);
+	if (openSession) {
+		this->OpenSession(currentSession);
+	}
 }
 
 void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {
@@ -713,8 +800,13 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 	}
 
 	else{
+		imagePanel->NoImage();
+		processor->SetOriginalImage(emptyPhxImage);
+		processor->SetFilePath("");
+		this->SetTitle("PhoediX");
 		wxMessageDialog imageErrorDialog(this, "Error opening image: " + imagePath, "Error Opening Image", wxICON_ERROR);
 		imageErrorDialog.ShowModal();
+		return;
 	}
 	this->ShowImageRelatedWindows();
 
