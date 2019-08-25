@@ -282,8 +282,15 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 
 	int curProcesseedWidth = 0;
 	int curProcesseedHeight = 0;
-	this->GetProcessor()->CalcualteWidthHeightEdits(this->GetPreviousEdits(), &curProcesseedWidth, &curProcesseedHeight);
 
+	wxVector<ProcessorEdit*> editList;
+	for (int i = 0; i < this->GetIndex(); i++) {
+		editList.push_back(this->GetProcessor()->GetEditVector().at(i));
+	}
+	
+	this->GetProcessor()->CalcualteWidthHeightEdits(editList, &curProcesseedWidth, &curProcesseedHeight);
+
+	int size = this->GetPreviousEdits().size();
 	// Nearest Nieghbor selection
 	if (scaleInterpolation->GetSelection() == 0) {
 	

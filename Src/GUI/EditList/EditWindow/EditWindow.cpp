@@ -17,6 +17,7 @@ EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * process
 	activated = false;
 	proc = processor;
 	imgPanel = zoomImgPanel;
+	index = -1;
 
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
 }
@@ -180,4 +181,12 @@ wxThread::ExitCode EditWindow::WatchForUpdateThread::Entry(){
 
 void EditWindow::WatchForUpdateThread::Stop(){
 	contin = false;
+}
+
+void EditWindow::SetIndex(int i) {
+	index = i;
+}
+
+int EditWindow::GetIndex() {
+	return index;
 }

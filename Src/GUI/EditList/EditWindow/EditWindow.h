@@ -61,6 +61,9 @@ class EditWindow : public wxScrolledWindow{
 		wxVector<ProcessorEdit*> GetPreviousEdits();
 		void DestroyPreviousEdits();
 
+		void SetIndex(int i);
+		int GetIndex();
+
 		void SaveNoReprocess();
 		enum {
 			ID_PROCESS_EDITS
@@ -82,6 +85,7 @@ class EditWindow : public wxScrolledWindow{
 		Processor * proc;
 		ZoomImagePanel * imgPanel;
 		wxVector<ProcessorEdit*> previousEdits;
+		int index;
 
 		class WatchForUpdateThread : public wxThread {
 
