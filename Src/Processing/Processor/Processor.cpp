@@ -6073,7 +6073,7 @@ void Processor::CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * 
 			curEdit->GetEditType() == ProcessorEdit::EditType::SCALE_BICUBIC) {
 
 			// Set width and height to scale width and height
-				if (curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT) ) {
+			if (curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT) ) {
 				*width = (int)curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
 				*height = (int)curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
 			}
