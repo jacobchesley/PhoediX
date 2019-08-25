@@ -107,7 +107,7 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 	seq = Sequence;
 	isDisabled = false;
 
-	isHighlighted = true;
+	isHighlighted = false;
 	highlightTimerFired = false;
 }
 
