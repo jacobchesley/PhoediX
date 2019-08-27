@@ -3,7 +3,7 @@ cd ..
 cd ..
 phoedixDir="$(pwd)"
 
-cd /Users/jacob/Development/tiff-4.0.9
+cd /Users/jacob/Development/tiff-4.0.10
 
 # Clean LibTiff builds
 rm -rf build-release_64

@@ -3,7 +3,7 @@ cd ..
 cd ..
 phoedixDir="$(pwd)"
 
-cd /Users/jacob/Development/LibRaw-0.19.0
+cd /Users/jacob/Development/LibRaw-0.19.5
 
 # Clean LibRaw builds
 rm -rf build-release_64

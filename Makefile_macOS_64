@@ -1,6 +1,6 @@
-WX_PATH = /Users/jacob/Development/wxWidgets-3.0.4
-LIBRAW_PATH = /Users/jacob/Development/LibRaw-0.19.0
-LIBTIFF_PATH = /Users/jacob/Development/tiff-4.0.9
+WX_PATH = /Users/jacob/Development/wxWidgets-3.1.2
+LIBRAW_PATH = /Users/jacob/Development/LibRaw-0.19.5
+LIBTIFF_PATH = /Users/jacob/Development/tiff-4.0.10
 
 # No need to modify any lines below.
 
@@ -16,7 +16,7 @@ LIBRAW_LINK_PATH = $(LIBRAW_PATH)/$(LIB_BUILD_PATH)/lib/.libs
 LIBTIFF_LINK_PATH = $(LIBTIFF_PATH)/$(LIB_BUILD_PATH)/libtiff/.libs
 
 CC = clang++
-COMPILE_FLAG = -w -c -O2 -arch x86_64 -mmacosx-version-min=10.7
+COMPILE_FLAG = -w -c -O2 -arch x86_64 -mmacosx-version-min=10.9
 
 WX_CXXFLAGS = $(shell $(WX_PATH)/$(LIB_BUILD_PATH)/./wx-config --cxxflags)
 WX_LFALGS = $(shell $(WX_PATH)/$(LIB_BUILD_PATH)/./wx-config --libs all)
@@ -28,7 +28,7 @@ INCLUDE_ALL = -I$(SRC) $(WX_CXXFLAGS) -I$(LIBRAW_INCLUDE_PATH) -I$(LIBTIFF_INCLU
 LL = clang++
 LINK_FLAG = -arch x86_64 -o
 LIB_PATH = $(BUILD_DIR)/lib
-LINK_ALL = $(WX_LFALGS)	$(LIB_PATH)/libraw_r.19.dylib $(LIB_PATH)/libtiff.5.dylib -mmacosx-version-min=10.7
+LINK_ALL = $(WX_LFALGS)	$(LIB_PATH)/libraw_r.19.dylib $(LIB_PATH)/libtiff.5.dylib -mmacosx-version-min=10.9
 
 SRC=./Src
 
