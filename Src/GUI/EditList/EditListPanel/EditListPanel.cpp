@@ -659,6 +659,7 @@ EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWin
 	cursorColor.Set(red + 40, green + 40, blue + 40);
 	dragCursor->SetBackgroundColour(cursorColor);
 	dragCursor->Hide();
+    dragCursorPos = -1;
 }
 
 void EditListPanel::EditListScroll::SetNumTopEdits(size_t numTop){
