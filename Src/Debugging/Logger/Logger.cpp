@@ -117,9 +117,14 @@ void Logger::SetLogFileName(){
 	wxString minute = wxString::Format("%d ", now.GetMinute()) + "_";
 	wxString second = wxString::Format("%d ", now.GetSecond()) + "_";
 
+    
 	wxFileName executable = wxFileName(wxStandardPaths::Get().GetExecutablePath());
 
+#if defined(__WXMAC__)
+    logName = executable.GetPathWithSep() +  "../../Logs/PhoediX_Log_" + month + day + year + "_" + hour + minute + second + ".log";
+#else
 	logName = executable.GetPathWithSep() +  "PhoediX_Log_" + month + day + year + "_" + hour + minute + second + ".log";
+#endif
 }
 
 void Logger::LogToWindow(wxString message){

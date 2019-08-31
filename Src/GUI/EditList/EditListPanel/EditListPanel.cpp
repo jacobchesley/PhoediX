@@ -2,6 +2,7 @@
 // See LICENSE.TXT in root of project for license information.
 
 #include "EditListPanel.h"
+#include "Debugging/Logger/Logger.h"
 
 wxDEFINE_EVENT(START_EDITS_COMPLETE, wxThreadEvent);
 
@@ -303,28 +304,42 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	
+    Logger::Log("PhoediX EditListPanel::AddEditWindows - Called", Logger::LogLevel::LOG_VERBOSE);
 	this->Freeze();
+    
+    Logger::Log("PhoediX EditListPanel::AddEditWindows - Removing all windows", Logger::LogLevel::LOG_VERBOSE);
 	this->RemoveAllWindows();
-	
+	Logger::Log("PhoediX EditListPanel::AddEditWindows - Windows removed", Logger::LogLevel::LOG_VERBOSE);
 	for (size_t i = 0; i < inEdits.size(); i++) {
+        
 		if (inEdits.at(i) != NULL) {
 
 			// Add a raw window properly
 			if(inEdits.at(i)->GetEditType() == ProcessorEdit::EditType::RAW){
+                
+                Logger::Log("PhoediX EditListPanel::AddEditWindows - Adding RAW Window", Logger::LogLevel::LOG_VERBOSE);
 				this->AddRawWindow(inEdits.at(i));
+                Logger::Log("PhoediX EditListPanel::AddEditWindows - RAW window added", Logger::LogLevel::LOG_VERBOSE);
 			}
 
 			// Add the correct type of window, and set parameter for window based on edit
 			else{
+                
+                Logger::Log("PhoediX EditListPanel::AddEditWindows - Adding edit window", Logger::LogLevel::LOG_VERBOSE);
 				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc, imagePanel);
 				//newEditWindow->Hide();
 				if (newEditWindow != NULL) {
+                    
+                    Logger::Log("PhoediX EditListPanel::AddEditWindows - Edit window exists, adding edit item to panel", Logger::LogLevel::LOG_VERBOSE);
 					this->AddEditWindowToPanel(newEditWindow, AvailableEditWindows::GetEditIDFromEdit(inEdits.at(i)), inEdits.at(i)->GetDisabled(), false);
+                    
+                    Logger::Log("PhoediX EditListPanel::AddEditWindows - Setting edit windows disabled and params/flags", Logger::LogLevel::LOG_VERBOSE);
 					newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
 					newEditWindow->SetParamsAndFlags(inEdits.at(i));
 				}
 			}
 		}
+        Logger::Log("PhoediX EditListPanel::AddEditWindows - returning", Logger::LogLevel::LOG_VERBOSE);
 	}
 
 	for(size_t i = 0; i < scroller->GetEditList().size(); i++){
@@ -342,10 +357,17 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 
 void EditListPanel::RemoveAllWindows() {
 
+    Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Stopping processing", Logger::LogLevel::LOG_VERBOSE);
 	proc->KillCurrentProcessing();
+    
+    Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Removing RAW window (if it exists)", Logger::LogLevel::LOG_VERBOSE);
 	this->RemoveRawWindow();
 	hasRaw = false;
+    
+    Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Removing edits from edit list", Logger::LogLevel::LOG_VERBOSE);
 	scroller->DeleteAllEdits();
+    
+    Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Removing edits from processor", Logger::LogLevel::LOG_VERBOSE);
 	proc->DeleteEdits();
 }
 
@@ -746,27 +768,40 @@ void EditListPanel::EditListScroll::DeleteEdit(size_t index) {
 void EditListPanel::EditListScroll::DeleteAllEdits() {
 
 	// Remove all edit items from the sizer, but do not destroy them
+    
+    Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Called", Logger::LogLevel::LOG_VERBOSE);
 	this->GetSizer()->Clear();
 
 	// Remove all edit windows from list
 	for (size_t i = 0; i < editList.size(); i++){
 
+        Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Removing edit", Logger::LogLevel::LOG_VERBOSE);
 		// Remove the edit window from AUI Manager if it exists
 		if (editList.at(i)->GetEditWindow() != NULL) {
+            
+            Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Detaching edit from AUI manager", Logger::LogLevel::LOG_VERBOSE);
 			PhoedixAUIManager::GetPhoedixAUIManager()->DetachPane(editList.at(i)->GetEditWindow());
 		}
 
+        Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Destroying edit", Logger::LogLevel::LOG_VERBOSE);
 		//Destroy and erase the one edit item we no longer want
 		editList.at(i)->DestroyItem();
+        
+        Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Updating AUI Manager", Logger::LogLevel::LOG_VERBOSE);
 		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 	}
 
+    Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Clearing edit list vector", Logger::LogLevel::LOG_VERBOSE);
 	editList.clear();
+    
+    Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Redrawing edits", Logger::LogLevel::LOG_VERBOSE);
 	this->RedrawEdits();
+    Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void EditListPanel::EditListScroll::RedrawEdits() {
 
+    Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Called", Logger::LogLevel::LOG_VERBOSE);
 	int seq = 0;
 	int plusDragCursor = dragCursorPos > -1 ? 1 : 0;
 
@@ -775,23 +810,31 @@ void EditListPanel::EditListScroll::RedrawEdits() {
 
 		// Draw cursor
 		if (i == dragCursorPos) {
+            
+            Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Drawing cursor (dragging edit)", Logger::LogLevel::LOG_VERBOSE);
 			this->GetSizer()->AddSpacer(2);
 			this->GetSizer()->Add(dragCursor, 0, wxALL | wxEXPAND);
 			this->GetSizer()->AddSpacer(2);
+            Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Cursor drawn", Logger::LogLevel::LOG_VERBOSE);
 		}
 
 		// Draw edit list item
 		else {
+            
+            Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Drawing edit item", Logger::LogLevel::LOG_VERBOSE);
 			editList.at(seq)->SetSequence(seq);
 			this->GetSizer()->AddSpacer(6);
 			this->GetSizer()->Add(editList.at(seq), 0, wxALL | wxEXPAND);
 			this->GetSizer()->AddSpacer(6);
 			seq += 1;
+            Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Edit item drawn", Logger::LogLevel::LOG_VERBOSE);
 		}
 	}
 	
 	// Fit inside the scroll bars
+    Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Fitting sizer", Logger::LogLevel::LOG_VERBOSE);
 	this->FitInside();
+    Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 int EditListPanel::EditListScroll::GetNextID() {

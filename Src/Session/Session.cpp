@@ -3,6 +3,7 @@
 
 #include "Session.h"
 #include "App/PhoediX.h"
+#include "Debugging/Logger/Logger.h"
 
 #if defined(__WXMSW__) || defined(__WXGTK__)
 #include <random>
@@ -290,10 +291,19 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 		}
 		sessionInfo = sessionInfo->GetNext();
 	}
+    
+    Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Session loaded, returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void PhoediXSession::SaveSessionToFile(wxString filePath) {
 
+    Logger::Log("PhoediX PhoediXSession::SaveSessionToFile - Saving session: " + filePath, Logger::LogLevel::LOG_VERBOSE);
+    // Backup the file before saving
+    if(wxFileExists(filePath)){
+        Logger::Log("PhoediX PhoediXSession::SaveSessionToFile - Backing up session file", Logger::LogLevel::LOG_VERBOSE);
+        wxCopyFile(filePath, filePath +".bak");
+    }
+    
 	// Create root XML Doc
 	wxXmlDocument session;
 	wxXmlNode * sessionInfo = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "PhoediXProject");
@@ -403,9 +413,13 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
 	wxFileName sessionDir(sessionFile.GetPath());
 
 	if(!sessionDir.IsDir()){
+        Logger::Log("PhoediX PhoediXSession::SaveSessionToFile - Creating subdirectory for file", Logger::LogLevel::LOG_VERBOSE);
 		wxMkDir(sessionFile.GetPath(), wxS_DIR_DEFAULT);
 	}
+    Logger::Log("PhoediX PhoediXSession::SaveSessionToFile - Saving session...", Logger::LogLevel::LOG_VERBOSE);
 	session.Save(filePath);
+    Logger::Log("PhoediX PhoediXSession::SaveSessionToFile - Session saved, returning", Logger::LogLevel::LOG_VERBOSE);
+    
 }
 
 void PhoediXSession::SetImageFilePath(wxString filePath) {

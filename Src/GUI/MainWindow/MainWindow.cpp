@@ -279,15 +279,19 @@ void MainWindow::SetSizeProperties(){
 
 void MainWindow::OpenFiles(wxArrayString files) {
 
+    Logger::Log("PhoediX MainWindow::OpenFiles - Opening files...", Logger::LogLevel::LOG_VERBOSE);
 	bool openSession = false;
 	for (size_t i = 0; i < files.size(); i++) {
 
 		openSession = i == files.size() - 1 ? true : false;
 
 		wxString file = files.Item(i);
+        
+        Logger::Log("PhoediX MainWindow::OpenFiles - Opening file: " + file, Logger::LogLevel::LOG_VERBOSE);
 		// Check if PhoediX project
 		if (PhoediXSession::CheckIfSession(file)) {
 
+            Logger::Log("PhoediX MainWindow::OpenFiles - This is PhoediX Session File", Logger::LogLevel::LOG_VERBOSE);
 			// Get project name and path
 			wxString projectName = wxFileName(file).GetName();
 			wxString projectPath = wxFileName(file).GetPath();
@@ -303,9 +307,11 @@ void MainWindow::OpenFiles(wxArrayString files) {
 		// Make sure file name is correct and exists
 		wxFileName imageFile(file);
 		if (!imageFile.FileExists() || !imageFile.IsOk()) {
+            Logger::Log("PhoediX MainWindow::OpenFiles - File is not okay, going to next file.", Logger::LogLevel::LOG_VERBOSE);
 			continue;
 		}
 
+        Logger::Log("PhoediX MainWindow::OpenFiles - Opening file.", Logger::LogLevel::LOG_VERBOSE);
 		imageInfoPanel->ClearExif();
 
 		emptyPhxImage->Destroy();
@@ -321,6 +327,8 @@ void MainWindow::OpenFiles(wxArrayString files) {
 
 			// Handle Raw Image
 			if (ImageHandler::CheckRaw(file)) {
+                
+                Logger::Log("PhoediX MainWindow::OpenFiles - Importing raw image", Logger::LogLevel::LOG_VERBOSE);
 				exportWindow->RawImageLoaded(true);
 				rawProject = true;
 
@@ -338,6 +346,8 @@ void MainWindow::OpenFiles(wxArrayString files) {
 
 			// Handle JPEG, PNG, BMP and TIFF images
 			else if (ImageHandler::CheckImage(file)) {
+                
+                Logger::Log("PhoediX MainWindow::OpenFiles - Importing image", Logger::LogLevel::LOG_VERBOSE);
 				processor->Lock();
 				ImageHandler::LoadImageFromFile(file, processor->GetImage());
 				processor->SetOriginalImage(processor->GetImage());
@@ -352,6 +362,9 @@ void MainWindow::OpenFiles(wxArrayString files) {
 			}
 
 			else {
+                
+                Logger::Log("PhoediX MainWindow::OpenFiles - no image", Logger::LogLevel::LOG_VERBOSE);
+                
 				imagePanel->NoImage();
 				processor->SetOriginalImage(emptyPhxImage);
 				processor->SetFilePath("");
@@ -367,9 +380,13 @@ void MainWindow::OpenFiles(wxArrayString files) {
 		wxString pathSep = imageFile.GetPathSeparator();
 		wxFileName phoedixProject(imageFile.GetPath() + pathSep + ".PhoediX" + pathSep + imageFile.GetFullName() + ".phx");
 		if (phoedixProject.FileExists() && phoedixProject.IsOk()) {
+            
+            Logger::Log("PhoediX MainWindow::OpenFiles - Loading project file", Logger::LogLevel::LOG_VERBOSE);
 			this->LoadProject(phoedixProject.GetFullPath(), openSession);
 		}
 		else {
+            
+            Logger::Log("PhoediX MainWindow::OpenFiles - Creating project file", Logger::LogLevel::LOG_VERBOSE);
 			bool createRawProject = false;
 			if (ImageHandler::CheckRaw(file)) {
 				createRawProject = true;
@@ -378,9 +395,8 @@ void MainWindow::OpenFiles(wxArrayString files) {
 				
 		}
 		currentSession->SetImageFilePath(file);
-			
-		
 	}
+    Logger::Log("PhoediX MainWindow::OpenFiles - returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void MainWindow::OnDropFiles(wxDropFilesEvent& evt){
@@ -473,6 +489,8 @@ void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 
 void MainWindow::OpenSession(PhoediXSession * session) {
 
+    Logger::Log("PhoediX MainWindow::OpenSession - called", Logger::LogLevel::LOG_VERBOSE);
+
 	processor->KillRawProcessing();
 	imagePanel->ChangeImage(emptyImage);
 	histogramDisplay->ZeroOutHistograms();
@@ -480,43 +498,56 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	imagePanel->DeactivateGuidelines();
 		
 	if(session->GetImageScrollWidth() > 0 && session->GetImageScrollHeight() > 0) {
+        
+        Logger::Log("PhoediX MainWindow::OpenSession - Setting temporary blank image", Logger::LogLevel::LOG_VERBOSE);
 		wxImage * tempImage = new wxImage(session->GetImageScrollWidth(), session->GetImageScrollHeight());
 		imagePanel->ChangeImage(tempImage);
 		tempImage->Destroy();
 		delete tempImage;
 	}
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Calling check uncheck session...", Logger::LogLevel::LOG_VERBOSE);
 	// Check the current session in the window, and uncheck all other sessions
 	this->CheckUncheckSession(session->GetID());
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting histogram display selection", Logger::LogLevel::LOG_VERBOSE);
 	histogramDisplay->SetHistogramDisplay(session->GetHistogramDisplaySelect());
 	
 	// Populate the panel with the edits
 	if(session->GetEditList() != NULL){
 
+        Logger::Log("PhoediX MainWindow::OpenSession - Getting edit windows", Logger::LogLevel::LOG_VERBOSE);
 		wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
+        
+        Logger::Log("PhoediX MainWindow::OpenSession - Adding edit windows to edit list", Logger::LogLevel::LOG_VERBOSE);
 		editList->AddEditWindows(editLayers);
 	}
+    
+    Logger::Log("PhoediX MainWindow::OpenSession - Loading snapshots", Logger::LogLevel::LOG_VERBOSE);
 	// Load snapshots
 	snapshotWindow->DeleteAllSnapshots();
 	snapshotWindow->AddSnapshots(session->GetSnapshots());
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting perspective", Logger::LogLevel::LOG_VERBOSE);
 	// Load perspective after edits are loaded
 	PhoedixAUIManager::GetPhoedixAUIManager()->LoadPerspective(session->GetPerspective(), true);
 	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(imagePanel).Caption("Working Image");
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting zoom and drag", Logger::LogLevel::LOG_VERBOSE);
 	// Set zoom and drag after window has been positioned
 	imagePanel->SetZoom(session->GetImageZoomLevel());
 	imagePanel->SetDrag(session->GetImageScrollX(), session->GetImageScrollY());
 	imagePanel->SetFitImage(session->GetFitImage());
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting export options", Logger::LogLevel::LOG_VERBOSE);
 	// Set export controls
 	exportWindow->SetImageType(session->GetExportImageType());
 	exportWindow->SetJPEGQuality(session->GetExportJPEGQuality());
 	exportWindow->SetExportFolder(session->GetExportFolder());
 	exportWindow->SetExportName(session->GetExportName());
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting guideline colors", Logger::LogLevel::LOG_VERBOSE);
 	// Set Guide Colors
 	guidelinesWindow->SetGuidelineType(session->GetGuidelineType());
 	guidelinesWindow->SetGuideColor(session->GetGuidelineColor());
@@ -525,23 +556,30 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	if (session->GetGuidelinesShown()) { imagePanel->ActivateGuidelines(); }
 	else { imagePanel->DeactivateGuidelines(); }
 
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting menu checks", Logger::LogLevel::LOG_VERBOSE);
 	this->SetMenuChecks();
 
 	// At least one session exists now, enable menu items related to sessions
 	this->EnableDisableMenuItemsNoProject(true);
 
 	if (session->GetFastProcess()) {
+        
+        Logger::Log("PhoediX MainWindow::OpenSession - Setting fast process editing", Logger::LogLevel::LOG_VERBOSE);
 		menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Check(true);
 		processor->EnableFastEdit();
 		imagePanel->EnableHalfSize();
 	}
 	else {
+        
+        Logger::Log("PhoediX MainWindow::OpenSession - Setting standard process editing", Logger::LogLevel::LOG_VERBOSE);
 		menuTools->FindItem(MainWindow::MenuBar::ID_ENABLE_FAST_EDIT)->Check(false);
 		processor->DisableFastEdit();
 		imagePanel->DisableHalfSize();
 	}
-
+    
+    Logger::Log("PhoediX MainWindow::OpenSession - Setting session to edit list", Logger::LogLevel::LOG_VERBOSE);
 	editList->SetSession(session);
+    Logger::Log("PhoediX MainWindow::OpenSession - returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {
@@ -648,21 +686,25 @@ void MainWindow::SaveCurrentSession() {
 
 void MainWindow::LoadProject(wxString projectPath, bool openSession) {
 
+    Logger::Log("PhoediX MainWindow::LoadProject - Loading project: " + projectPath, Logger::LogLevel::LOG_VERBOSE);
+    
 	// Check for already loaded images in session
 	for(int i = 0; i < allSessions.size(); i++){
 
 		// Open existing session (if it is not already the active session)
 		if(allSessions[i]->GetProjectPath() == projectPath && openSession){
 
+            Logger::Log("PhoediX MainWindow::LoadProject - Project already loaded, making active session", Logger::LogLevel::LOG_VERBOSE);
 			// Open the image, then open the session to go along with image
 			this->OpenImage(allSessions[i]->GetImageFilePath(), false);
 			this->OpenSession(allSessions[i]);
 			currentSession = allSessions[i];
+            Logger::Log("PhoediX MainWindow::LoadProject - Made active session, returning", Logger::LogLevel::LOG_VERBOSE);
 			return;
-		
 		}
 	}
 
+    Logger::Log("PhoediX MainWindow::LoadProject - Loading session from file", Logger::LogLevel::LOG_VERBOSE);
 	// Load the new session from file
 	PhoediXSession * session = new PhoediXSession();
 	session->LoadSessionFromFile(projectPath);
@@ -672,6 +714,7 @@ void MainWindow::LoadProject(wxString projectPath, bool openSession) {
 	session->SetProjectPath(projectFile.GetFullPath());
 	this->SetUniqueID(session);
 
+    Logger::Log("PhoediX MainWindow::LoadProject - Adding new session to menu window", Logger::LogLevel::LOG_VERBOSE);
 	// Append the session to the menu bar
 	menuWindow->AppendCheckItem(session->GetID(), _(session->GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, session->GetID());
@@ -680,8 +723,11 @@ void MainWindow::LoadProject(wxString projectPath, bool openSession) {
 	allSessions.push_back(session);
 	currentSession = session;
 	if (openSession) {
+        
+        Logger::Log("PhoediX MainWindow::LoadProject - Opening session", Logger::LogLevel::LOG_VERBOSE);
 		this->OpenSession(currentSession);
 	}
+    Logger::Log("PhoediX MainWindow::LoadProject - returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {

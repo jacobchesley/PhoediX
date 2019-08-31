@@ -385,6 +385,7 @@ MacApp:
 	SetFile -t APPL $(BUILD_DIR)/App/PhoediX
 	rm -rf $(BUILD_DIR)/$(APP_NAME)
 	mkdir $(BUILD_DIR)/$(APP_NAME)
+	mkdir $(BUILD_DIR)/$(APP_NAME)/Logs
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/lib
 	mkdir $(BUILD_DIR)/$(APP_NAME)/Contents/MacOS
