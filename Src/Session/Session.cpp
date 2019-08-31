@@ -67,7 +67,25 @@ void PhoediXSession::LoadSessionFromFile(wxString filePath) {
     Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Loading file: " + filePath, Logger::LogLevel::LOG_VERBOSE);
 	// Load the project, return if it fails
 	wxXmlDocument session; 
-	if (!session.Load(filePath)) { return; }
+	if (!session.Load(filePath)) {
+        
+        Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Failed to load, checking for backup", Logger::LogLevel::LOG_WARNING);
+        // Try loading backup
+        if(wxFileExists(filePath + ".bak")){
+            wxCopyFile(filePath + ".bak", filePath);
+            if (!session.Load(filePath)) {
+                Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Backup file failed to load, returning", Logger::LogLevel::LOG_ERROR);
+                return;
+            }
+            else{
+                Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Successfully loaded backup file", Logger::LogLevel::LOG_VERBOSE);
+            }
+        }
+        else{
+            Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - no backup file, returning", Logger::LogLevel::LOG_ERROR);
+            return;
+        }
+    }
 
 	// Verify root node
 	if (session.GetRoot()->GetName() != "PhoediXProject") {
