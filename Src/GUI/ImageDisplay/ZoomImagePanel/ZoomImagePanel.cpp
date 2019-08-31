@@ -490,6 +490,10 @@ void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 	if (thisWidth > imgWidth) { xShift = ((thisWidth - imgWidth)/ 2) / zoom; }
 	if (thisHeight > imgHeight) { yShift = ((thisHeight - imgHeight) / 2) / zoom; }
 
+	// Clear and set background color
+	dc.Clear();
+	dc.SetBrush(wxBrush(this->GetBackgroundColour()));
+	dc.DrawRectangle(0, 0, (thisWidth / zoom)+1, (thisHeight / zoom)+1);
 	dc.GetGraphicsContext()->SetInterpolationQuality(quality);
 	dc.DrawBitmap(bitmapDraw, wxPoint(xShift/tempScalar, yShift/tempScalar));
 
