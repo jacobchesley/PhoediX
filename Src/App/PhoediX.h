@@ -37,9 +37,14 @@ public:
 	virtual bool OnInit();
 	virtual void OnInitCmdLine(wxCmdLineParser& parser);
 	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+    
+#if defined(__WXMAC__)
+    virtual void MacOpenFiles(const wxArrayString & fileNames);
+#endif
 
 private:
 	wxArrayString filesToOpen;
+    MainWindow * mainWindow;
 };
 
 static const wxCmdLineEntryDesc cmdLineDesc[] =

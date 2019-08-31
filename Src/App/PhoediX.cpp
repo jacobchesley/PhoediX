@@ -30,7 +30,7 @@ bool PhoediX::OnInit(){
 
     // Create and show the main window
 	Logger::Log("PhoediX App - Creating and Showing Main Window", Logger::LogLevel::LOG_VERBOSE);
-	MainWindow * mainWindow = new MainWindow(this);
+	mainWindow = new MainWindow(this);
 	mainWindow->Show();
 	mainWindow->OpenFiles(filesToOpen);
     return true;
@@ -43,8 +43,15 @@ void PhoediX::OnInitCmdLine(wxCmdLineParser& parser) {
 }
 
 bool PhoediX::OnCmdLineParsed(wxCmdLineParser& parser) {
+    
 	for (int i = 0; i < parser.GetParamCount(); i++){
 		filesToOpen.Add(parser.GetParam(i));
 	}
 	return true;
 }
+
+#if defined(__WXMAC__)
+void PhoediX::MacOpenFiles(const wxArrayString & fileNames){
+    mainWindow->OpenFiles(fileNames);
+}
+#endif
