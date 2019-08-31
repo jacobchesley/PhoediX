@@ -37,31 +37,47 @@ PhoediXSession::~PhoediXSession() {
 }
 
 void PhoediXSession::Destroy(){
+    
+    Logger::Log("PhoediX PhoediXSession::Destroy - Called destroy", Logger::LogLevel::LOG_VERBOSE);
+    
 	if (editList != NULL) {
+        
+        Logger::Log("PhoediX PhoediXSession::Destroy - deleting edit list", Logger::LogLevel::LOG_VERBOSE);
 		delete editList;
 		editList = NULL;
 	}
+    
+    Logger::Log("PhoediX PhoediXSession::Destroy - deleting snapshots...", Logger::LogLevel::LOG_VERBOSE);
 	// Delete all snapshot edit lists
 	for (size_t i = 0; i < snapshotsList.size(); i++) {
 		for (size_t j = 0; j < snapshotsList.at(i)->editList.size(); j++) {
+             Logger::Log("     PhoediX PhoediXSession::Destroy - deleting snapshot edit list", Logger::LogLevel::LOG_VERBOSE);
 			delete snapshotsList.at(i)->editList.at(j);
 		}
+        
+        Logger::Log("     PhoediX PhoediXSession::Destroy - deleting snapshot", Logger::LogLevel::LOG_VERBOSE);
 		delete snapshotsList.at(i);
 	}
+    Logger::Log("PhoediX PhoediXSession::Destroy - returning", Logger::LogLevel::LOG_VERBOSE);
 	id = -1;
 }
 
 void PhoediXSession::LoadSessionFromFile(wxString filePath) {
 
+    Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Loading file: " + filePath, Logger::LogLevel::LOG_VERBOSE);
 	// Load the project, return if it fails
 	wxXmlDocument session; 
 	if (!session.Load(filePath)) { return; }
 
 	// Verify root node
-	if (session.GetRoot()->GetName() != "PhoediXProject") { return; }
+	if (session.GetRoot()->GetName() != "PhoediXProject") {
+        Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Not a PhoediX Project, returning", Logger::LogLevel::LOG_ERROR);
+        return;
+    }
 
 	wxXmlNode * sessionInfo = session.GetRoot()->GetChildren();
 
+    Logger::Log("PhoediX PhoediXSession::LoadSessionFromFile - Loading session...", Logger::LogLevel::LOG_VERBOSE);
 	while (sessionInfo) {
 
 		// Get Histogram display selection
