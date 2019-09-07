@@ -8,8 +8,8 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	parWindow = parent;
 	proc = processor;
 
-	defaultSat = proc->rawPrcoessor.imgdata.rawdata.color.maximum > 0 ? proc->rawPrcoessor.imgdata.rawdata.color.maximum : 1;
-	defaultBlack = proc->rawPrcoessor.imgdata.rawdata.color.black;
+	defaultSat = proc->rawProcessor->imgdata.rawdata.color.maximum > 0 ? proc->rawProcessor->imgdata.rawdata.color.maximum : 1;
+	defaultBlack = proc->rawProcessor->imgdata.rawdata.color.black;
 
 	this->SetBackgroundColour(parent->GetBackgroundColour());
 
@@ -304,64 +304,64 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 
 void RawWindow::PopulateRawInfo(){
 	this->AddRawInfo("File Name", proc->GetFileName());
-	this->AddRawInfo("Date Time", ctime(&proc->rawPrcoessor.imgdata.other.timestamp));
-	this->AddRawInfo("Artist", wxString(proc->rawPrcoessor.imgdata.other.artist));
-	this->AddRawInfo("Description", wxString(proc->rawPrcoessor.imgdata.other.desc));
-	this->AddRawInfo("Shot Order (Image Serial)", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.other.shot_order));
+	this->AddRawInfo("Date Time", ctime(&proc->rawProcessor->imgdata.other.timestamp));
+	this->AddRawInfo("Artist", wxString(proc->rawProcessor->imgdata.other.artist));
+	this->AddRawInfo("Description", wxString(proc->rawProcessor->imgdata.other.desc));
+	this->AddRawInfo("Shot Order (Image Serial)", wxString::Format(wxT("%i"), proc->rawProcessor->imgdata.other.shot_order));
 
 	this->AddRawInfo("", "");
 	// 90 degree rotation clockwise or counter clockwise.  Flip width and height
-	if (proc->rawPrcoessor.imgdata.sizes.flip == 5 || proc->rawPrcoessor.imgdata.sizes.flip == 6) {
-		this->AddRawInfo("Width", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iheight));
-		this->AddRawInfo("Height", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iwidth));
+	if (proc->rawProcessor->imgdata.sizes.flip == 5 || proc->rawProcessor->imgdata.sizes.flip == 6) {
+		this->AddRawInfo("Width", wxString::Format(wxT("%i"), proc->rawProcessor->imgdata.sizes.iheight));
+		this->AddRawInfo("Height", wxString::Format(wxT("%i"), proc->rawProcessor->imgdata.sizes.iwidth));
 	}
 	else {
-		this->AddRawInfo("Width", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iwidth));
-		this->AddRawInfo("Height", wxString::Format(wxT("%i"), proc->rawPrcoessor.imgdata.sizes.iheight));
+		this->AddRawInfo("Width", wxString::Format(wxT("%i"), proc->rawProcessor->imgdata.sizes.iwidth));
+		this->AddRawInfo("Height", wxString::Format(wxT("%i"), proc->rawProcessor->imgdata.sizes.iheight));
 	}
 	this->AddRawInfo("", "");
-	this->AddRawInfo("Shutter Speed", this->GetShutterSpeedStr(proc->rawPrcoessor.imgdata.other.shutter) + " sec");
-	this->AddRawInfo("Aperature", "f / " + wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.other.aperture));
-	this->AddRawInfo("ISO", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.other.iso_speed));
-	this->AddRawInfo("Focal Length", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.other.focal_len) + " mm");
+	this->AddRawInfo("Shutter Speed", this->GetShutterSpeedStr(proc->rawProcessor->imgdata.other.shutter) + " sec");
+	this->AddRawInfo("Aperature", "f / " + wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.other.aperture));
+	this->AddRawInfo("ISO", wxString::Format(wxT("%.0f"), proc->rawProcessor->imgdata.other.iso_speed));
+	this->AddRawInfo("Focal Length", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.other.focal_len) + " mm");
 
 	wxString flashFired = "No";
-	if(proc->rawPrcoessor.imgdata.color.flash_used > 0.0){
+	if(proc->rawProcessor->imgdata.color.flash_used > 0.0){
 		flashFired = "Yes";
 	}
 	this->AddRawInfo("Flash Fired?", flashFired);
 
 	this->AddRawInfo("", "");
-	this->AddRawInfo("Camera Make", wxString(proc->rawPrcoessor.imgdata.idata.make));
-	this->AddRawInfo("Camera Model", wxString(proc->rawPrcoessor.imgdata.idata.model));
-	this->AddRawInfo("Software", wxString(proc->rawPrcoessor.imgdata.idata.software));
+	this->AddRawInfo("Camera Make", wxString(proc->rawProcessor->imgdata.idata.make));
+	this->AddRawInfo("Camera Model", wxString(proc->rawProcessor->imgdata.idata.model));
+	this->AddRawInfo("Software", wxString(proc->rawProcessor->imgdata.idata.software));
 
 	this->AddRawInfo("", "");
-	this->AddRawInfo("Lens Make", wxString(proc->rawPrcoessor.imgdata.lens.LensMake), true);
-	this->AddRawInfo("Lens Model", wxString(proc->rawPrcoessor.imgdata.lens.Lens), true);
+	this->AddRawInfo("Lens Make", wxString(proc->rawProcessor->imgdata.lens.LensMake), true);
+	this->AddRawInfo("Lens Model", wxString(proc->rawProcessor->imgdata.lens.Lens), true);
 
-	if(!this->AddRawInfo("Lens Min Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinFocal), true)){
-		this->AddRawInfo("Lens Min Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.MinFocal), true);
+	if(!this->AddRawInfo("Lens Min Focal Length", wxString::Format(wxT("%.0f"), proc->rawProcessor->imgdata.lens.makernotes.MinFocal), true)){
+		this->AddRawInfo("Lens Min Focal Length", wxString::Format(wxT("%.0f"), proc->rawProcessor->imgdata.lens.MinFocal), true);
 	}
 
-	if(!this->AddRawInfo("Lens Max Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxFocal), true)){
-		this->AddRawInfo("Lens Max Focal Length", wxString::Format(wxT("%.0f"), proc->rawPrcoessor.imgdata.lens.MaxFocal), true);
+	if(!this->AddRawInfo("Lens Max Focal Length", wxString::Format(wxT("%.0f"), proc->rawProcessor->imgdata.lens.makernotes.MaxFocal), true)){
+		this->AddRawInfo("Lens Max Focal Length", wxString::Format(wxT("%.0f"), proc->rawProcessor->imgdata.lens.MaxFocal), true);
 	}
 
-	if(!this->AddRawInfo("Lens Max Aperature", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp), true)){}
-	if(!this->AddRawInfo("Lens Min Aperature", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp), true)){}
+	if(!this->AddRawInfo("Lens Max Aperature", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MaxAp), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MinAp), true)){}
 
-	if(!this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4MinFocal), true)){
-		this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.MaxAp4MinFocal), true);
+	if(!this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MaxAp4MinFocal), true)){
+		this->AddRawInfo("Lens Max Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.MaxAp4MinFocal), true);
 	}
-	if(!this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4MaxFocal), true)){
-		this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.MaxAp4MaxFocal), true);
+	if(!this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MaxAp4MaxFocal), true)){
+		this->AddRawInfo("Lens Max Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.MaxAp4MaxFocal), true);
 	}
 
-	if(!this->AddRawInfo("Lens Max Aperature / Cur Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MaxAp4CurFocal), true)){}
-	if(!this->AddRawInfo("Lens Min Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp4MinFocal), true)){}
-	if(!this->AddRawInfo("Lens Min Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp4MaxFocal), true)){}
-	if(!this->AddRawInfo("Lens Min Aperature / Cur Focal", wxString::Format(wxT("%.1f"), proc->rawPrcoessor.imgdata.lens.makernotes.MinAp4CurFocal), true)){}
+	if(!this->AddRawInfo("Lens Max Aperature / Cur Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MaxAp4CurFocal), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature / Min Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MinAp4MinFocal), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature / Max Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MinAp4MaxFocal), true)){}
+	if(!this->AddRawInfo("Lens Min Aperature / Cur Focal", wxString::Format(wxT("%.1f"), proc->rawProcessor->imgdata.lens.makernotes.MinAp4CurFocal), true)){}
 
 }
 
@@ -473,9 +473,9 @@ void RawWindow::OnCombo(wxCommandEvent& checkEvent) {
 			// Camera WB
 			case 0:{
 
-				double redMult = proc->rawPrcoessor.imgdata.color.cam_mul[0];
-				double greenMult = proc->rawPrcoessor.imgdata.color.cam_mul[1];
-				double blueMult = proc->rawPrcoessor.imgdata.color.cam_mul[2];
+				double redMult = proc->rawProcessor->imgdata.color.cam_mul[0];
+				double greenMult = proc->rawProcessor->imgdata.color.cam_mul[1];
+				double blueMult = proc->rawProcessor->imgdata.color.cam_mul[2];
 
 				redMultiplierControl->SetValue(redMult / greenMult);
 				greenMultiplierControl->SetValue(1.0);
@@ -607,94 +607,94 @@ void RawWindow::ProcessEvt(wxCommandEvent& WXUNUSED(event)) {
 void RawWindow::Process() {
 	
 	// Set Params
-	proc->rawPrcoessor.imgdata.params.bright = (float) brightnessControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.highlight = highlightControl->GetSelection();
-	proc->rawPrcoessor.imgdata.params.user_sat = (int)satLevelControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.auto_bright_thr = (float)autoBrightThrControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.adjust_maximum_thr = (float)maxThrControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.gamm[0] = (float)(1.0f/(float)gammaLevelControl->GetValue());
-	proc->rawPrcoessor.imgdata.params.gamm[1] = (float)gammaSlopeControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_qual = interpolationControl->GetSelection();
-	proc->rawPrcoessor.imgdata.params.green_matching = greenMatchingControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_mul[0] = redMultiplierControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_mul[1] = greenMultiplierControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_mul[2] = blueMultiplierControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.user_mul[3] = greenMultiplierControl->GetValue();
-	proc->rawPrcoessor.imgdata.params.threshold = (float)waveletNoiseControl->GetValue();
+	proc->rawProcessor->imgdata.params.bright = (float) brightnessControl->GetValue();
+	proc->rawProcessor->imgdata.params.highlight = highlightControl->GetSelection();
+	proc->rawProcessor->imgdata.params.user_sat = (int)satLevelControl->GetValue();
+	proc->rawProcessor->imgdata.params.auto_bright_thr = (float)autoBrightThrControl->GetValue();
+	proc->rawProcessor->imgdata.params.adjust_maximum_thr = (float)maxThrControl->GetValue();
+	proc->rawProcessor->imgdata.params.gamm[0] = (float)(1.0f/(float)gammaLevelControl->GetValue());
+	proc->rawProcessor->imgdata.params.gamm[1] = (float)gammaSlopeControl->GetValue();
+	proc->rawProcessor->imgdata.params.user_qual = interpolationControl->GetSelection();
+	proc->rawProcessor->imgdata.params.green_matching = greenMatchingControl->GetValue();
+	proc->rawProcessor->imgdata.params.user_mul[0] = redMultiplierControl->GetValue();
+	proc->rawProcessor->imgdata.params.user_mul[1] = greenMultiplierControl->GetValue();
+	proc->rawProcessor->imgdata.params.user_mul[2] = blueMultiplierControl->GetValue();
+	proc->rawProcessor->imgdata.params.user_mul[3] = greenMultiplierControl->GetValue();
+	proc->rawProcessor->imgdata.params.threshold = (float)waveletNoiseControl->GetValue();
 
 	// Get bit depth of processor image, and set output bps to this
 	if(proc->GetImage() != NULL && proc->GetImage()->GetWidth() > 0 && proc->GetImage()->GetHeight() > 0){
-		proc->rawPrcoessor.imgdata.params.output_bps = proc->GetImage()->GetColorDepth();
+		proc->rawProcessor->imgdata.params.output_bps = proc->GetImage()->GetColorDepth();
 	}
 
 	// White Balance
 
 	// Camera White Balance
 	if(whiteBalancePresetsControl->GetSelection() == 0){
-		proc->rawPrcoessor.imgdata.params.use_camera_wb = 1;
-		proc->rawPrcoessor.imgdata.params.use_auto_wb = 0;
+		proc->rawProcessor->imgdata.params.use_camera_wb = 1;
+		proc->rawProcessor->imgdata.params.use_auto_wb = 0;
 
 	}
 	else if(whiteBalancePresetsControl->GetSelection() == 1) {
-		proc->rawPrcoessor.imgdata.params.use_camera_wb = 0;
-		proc->rawPrcoessor.imgdata.params.use_auto_wb = 1;
+		proc->rawProcessor->imgdata.params.use_camera_wb = 0;
+		proc->rawProcessor->imgdata.params.use_auto_wb = 1;
 
 	}
 	else {
-		proc->rawPrcoessor.imgdata.params.use_camera_wb = 0;
-		proc->rawPrcoessor.imgdata.params.use_auto_wb = 0;
+		proc->rawProcessor->imgdata.params.use_camera_wb = 0;
+		proc->rawProcessor->imgdata.params.use_auto_wb = 0;
 	}
 	
 	// Auto Bright
-	if (!autoBrightControl->GetValue()) { proc->rawPrcoessor.imgdata.params.no_auto_bright = true; }
-	else { proc->rawPrcoessor.imgdata.params.no_auto_bright = false; }
+	if (!autoBrightControl->GetValue()) { proc->rawProcessor->imgdata.params.no_auto_bright = true; }
+	else { proc->rawProcessor->imgdata.params.no_auto_bright = false; }
 
 	// Exposure Correction
 	if(exposureControl->GetValue() != 0.0){
-		proc->rawPrcoessor.imgdata.params.exp_correc = 1;
+		proc->rawProcessor->imgdata.params.exp_correc = 1;
 
 		// Calculate stops to float value for exposure
 		float exposeCorrect = (float) pow(2.0, exposureControl->GetValue());
-		proc->rawPrcoessor.imgdata.params.exp_shift = exposeCorrect;
+		proc->rawProcessor->imgdata.params.exp_shift = exposeCorrect;
 
-		proc->rawPrcoessor.imgdata.params.exp_preser = (float)exposurePreserveControl->GetValue();
+		proc->rawProcessor->imgdata.params.exp_preser = (float)exposurePreserveControl->GetValue();
 	}
 	else{
-		proc->rawPrcoessor.imgdata.params.exp_correc = 0;
+		proc->rawProcessor->imgdata.params.exp_correc = 0;
 	}
 
 	// Choose Color Space
 	switch (proc->GetColorSpace()) {
 		case ColorSpaceENUM::sRGB:
-			proc->rawPrcoessor.imgdata.params.output_color = 1;
+			proc->rawProcessor->imgdata.params.output_color = 1;
 			break;
 		case ColorSpaceENUM::ADOBE_RGB:
-			proc->rawPrcoessor.imgdata.params.output_color = 2;
+			proc->rawProcessor->imgdata.params.output_color = 2;
 			break;
 		case ColorSpaceENUM::WIDE_GAMUT_RGB:
-			proc->rawPrcoessor.imgdata.params.output_color = 3;
+			proc->rawProcessor->imgdata.params.output_color = 3;
 			break;
 		case ColorSpaceENUM::PROPHOTO_RGB:
-			proc->rawPrcoessor.imgdata.params.output_color = 4;
+			proc->rawProcessor->imgdata.params.output_color = 4;
 			break;
 	}
 	
 	// Choose Image Flip
 	switch (flipControl->GetSelection()) {
 	case 0:
-		proc->rawPrcoessor.imgdata.params.user_flip = -1;
+		proc->rawProcessor->imgdata.params.user_flip = -1;
 		break;
 	case 1:
-		proc->rawPrcoessor.imgdata.params.user_flip = 0;
+		proc->rawProcessor->imgdata.params.user_flip = 0;
 		break;
 	case 2:
-		proc->rawPrcoessor.imgdata.params.user_flip = 6;
+		proc->rawProcessor->imgdata.params.user_flip = 6;
 		break;
 	case 3:
-		proc->rawPrcoessor.imgdata.params.user_flip = 3;
+		proc->rawProcessor->imgdata.params.user_flip = 3;
 		break;
 	case 4:
-		proc->rawPrcoessor.imgdata.params.user_flip = 5;
+		proc->rawProcessor->imgdata.params.user_flip = 5;
 		break;
 	}
 	

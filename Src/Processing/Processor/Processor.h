@@ -161,7 +161,7 @@ public:
 		SHADOWS_AND_HIGHLIGHTS
 	};
 
-	LibRaw rawPrcoessor;
+	LibRaw * rawProcessor;
 	static void * rawProcessorData;
 	static enum LibRaw_progress rawProcessorProgress;
 	static int rawIteration;

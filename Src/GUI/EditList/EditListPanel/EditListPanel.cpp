@@ -498,11 +498,11 @@ void EditListPanel::AddRawWindow(){
 
 	if (!proc->GetLockedRaw()) {
 		#ifdef __WXMSW__
-			proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+			proc->rawProcessor->open_file(proc->GetFilePath().wc_str());
 		#else
-			proc->rawPrcoessor.open_file(proc->GetFilePath().c_str());
+			proc->rawProcessor->open_file(proc->GetFilePath().c_str());
 		#endif
-		proc->rawPrcoessor.unpack();
+		proc->rawProcessor->unpack();
 	}
 	// Get number of edits already in list
 	size_t numEdits = scroller->GetNextID();
@@ -530,11 +530,11 @@ void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 
 	if (!proc->GetLockedRaw()) {
 		#ifdef __WXMSW__
-			proc->rawPrcoessor.open_file(proc->GetFilePath().wc_str());
+			proc->rawProcessor->open_file(proc->GetFilePath().wc_str());
 		#else
-			proc->rawPrcoessor.open_file(proc->GetFilePath().c_str());
+			proc->rawProcessor->open_file(proc->GetFilePath().c_str());
 		#endif
-		proc->rawPrcoessor.unpack();
+		proc->rawProcessor->unpack();
 	}
 	// Get number of edits already in list
 	size_t numEdits = scroller->GetNextID();

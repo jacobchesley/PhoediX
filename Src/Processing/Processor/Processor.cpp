@@ -46,17 +46,20 @@ Processor::Processor(wxWindow * parent) {
 	fastEdit = false;
 
 	colorSpace = ColorSpaceENUM::sRGB;
+
+	rawProcessor = new LibRaw();
 }
 
 Processor::~Processor() {
 	delete img;
 	delete originalImg;
 	this->DeleteEdits();
-	rawPrcoessor.dcraw_clear_mem(rawImage);
+	rawProcessor->dcraw_clear_mem(rawImage);
 	delete rawImage;
 	if(copiedEdit != NULL){
 		delete copiedEdit;
 	}
+	delete rawProcessor;
 }
 
 void Processor::DestroyAll(){
@@ -250,7 +253,7 @@ int Processor::GetLastNumEdits(){
 
 void Processor::DeleteRawImage(){
 	rawImageGood = false;
-	rawPrcoessor.dcraw_clear_mem(rawImage);
+	rawProcessor->dcraw_clear_mem(rawImage);
 	rawImage = NULL;
 }
 
@@ -7520,11 +7523,11 @@ Processor::RawProcessThread::RawProcessThread(Processor * processorPar, bool unp
 	
 	// If fast edit, set half size and turn off denoising for performance
 	if(fastProcessRaw){
-		processor->rawPrcoessor.imgdata.params.half_size = 1;
-		processor->rawPrcoessor.imgdata.params.threshold = 0.0;
+		processor->rawProcessor->imgdata.params.half_size = 1;
+		processor->rawProcessor->imgdata.params.threshold = 0.0;
 	}
 	else {
-		processor->rawPrcoessor.imgdata.params.half_size = 0;
+		processor->rawProcessor->imgdata.params.half_size = 0;
 	}
 
 	// Open and unpack data if there is a change in fast process.
@@ -7546,12 +7549,12 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		processor->LockRaw();
 
 		processor->SendMessageToParent("Opening Raw File");
-		processor->rawPrcoessor.recycle();
+		processor->rawProcessor->recycle();
 
 		#ifdef __WXMSW__
-			processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
+			processor->rawErrorCode = processor->rawProcessor->open_file(processor->GetFilePath().wc_str());
 		#else
-			processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().c_str());
+			processor->rawErrorCode = processor->rawProcessor->open_file(processor->GetFilePath().c_str());
 		#endif
 			// Open failed, present error and return
 			if(processor->rawErrorCode != 0){
@@ -7563,7 +7566,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			}
 
 			processor->SendMessageToParent("Unpacking Raw File");
-			processor->rawErrorCode = processor->rawPrcoessor.unpack();
+			processor->rawErrorCode = processor->rawProcessor->unpack();
 
 			// Unpack failed, present error and return
 			if(processor->rawErrorCode != 0){
@@ -7585,9 +7588,9 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 
 	// process the raw image
 	processor->SendMessageToParent("RAW Image Processing");
-	processor->rawPrcoessor.set_progress_handler(&Processor::RawCallback, NULL);
-	processor->rawErrorCode = processor->rawPrcoessor.dcraw_process();
-	processor->rawPrcoessor.set_progress_handler(NULL, NULL);
+	processor->rawProcessor->set_progress_handler(&Processor::RawCallback, NULL);
+	processor->rawErrorCode = processor->rawProcessor->dcraw_process();
+	processor->rawProcessor->set_progress_handler(NULL, NULL);
 	processor->SendMessageToParent("RAW Image Processing Complete");
 
 	// Exit method before creating raw image from bad data
@@ -7599,9 +7602,9 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 			processor->forceStopRaw = false;
 
 			#ifdef __WXMSW__
-				processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().wc_str());
+				processor->rawErrorCode = processor->rawProcessor->open_file(processor->GetFilePath().wc_str());
 			#else
-				processor->rawErrorCode = processor->rawPrcoessor.open_file(processor->GetFilePath().c_str());
+				processor->rawErrorCode = processor->rawProcessor->open_file(processor->GetFilePath().c_str());
 			#endif
 			// Open failed, present error and return
 			if(processor->rawErrorCode != 0){
@@ -7612,7 +7615,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 				return 0;
 			}
 
-			processor->rawErrorCode = processor->rawPrcoessor.unpack();
+			processor->rawErrorCode = processor->rawProcessor->unpack();
 			// Unpack failed, present error and return
 			if(processor->rawErrorCode != 0){
 
@@ -7637,7 +7640,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 	}
 
 	// Create the raw image
-	processor->rawImage = processor->rawPrcoessor.dcraw_make_mem_image(&processor->rawErrorCode);
+	processor->rawImage = processor->rawProcessor->dcraw_make_mem_image(&processor->rawErrorCode);
 
 	// Set rawImageGood on processor if success
 	if(processor->rawErrorCode == LIBRAW_SUCCESS){
@@ -7665,7 +7668,7 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		}
 
 		// Populate image exif information
-		ImageHandler::ReadExifFromRaw(&processor->rawPrcoessor, processor->GetImage());
+		ImageHandler::ReadExifFromRaw(processor->rawProcessor, processor->GetImage());
 
 		processor->Unlock();
 		processor->ProcessEdits();
