@@ -269,6 +269,12 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	this->EnableDisableMenuItemsNoProject(false);
 }
 
+MainWindow::~MainWindow(){
+
+	auiManager->UnInit();
+	delete auiManager;
+}
+
 void MainWindow::SetSizeProperties(){
 
 	// Set the size to the screen size, and position at point 0, 0.  Then enable maximize the screen.
@@ -1314,8 +1320,6 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	snapshotWindow->DeleteAllSnapshots();
 
 	settingsWindow->Cleanup();
-	auiManager->UnInit();
-	delete auiManager;
 	
 	delete processor;
 	delete emptyImage;

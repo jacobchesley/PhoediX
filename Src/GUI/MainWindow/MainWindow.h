@@ -46,6 +46,7 @@ public:
 		Constructor for the main window.
 	*/
 	MainWindow(wxApp * application);
+    ~MainWindow();
 	bool OriginalImageDispalyed();
 	void OpenFiles(wxArrayString files);
 	void OnOpenWindow(wxCommandEvent& evt);
