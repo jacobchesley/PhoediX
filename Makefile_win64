@@ -1,5 +1,5 @@
 WX_PATH = C:\Development\wxWidgets-3.1.2
-LIBRAW_PATH = C:\Development\LibRaw-0.19.2
+LIBRAW_PATH = C:\Development\LibRaw-0.19.5
 LIBTIFF_PATH = C:\Development\tiff-4.0.10
 
 WX_INCLUDE_PATH=$(WX_PATH)/include
