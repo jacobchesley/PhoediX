@@ -28,6 +28,11 @@ bool PhoediX::OnInit(){
 
 	wxInitAllImageHandlers();
 	Image::InitExif();
+    
+    wxString configDirectory = wxStandardPaths::Get().GetUserDataDir() + wxFileName::GetPathSeparator();
+    if (!wxDir::Exists(configDirectory)) {
+        wxMkDir(configDirectory, wxS_DIR_DEFAULT);
+    }
 
     // Create and show the main window
 	Logger::Log("PhoediX App - Creating and Showing Main Window", Logger::LogLevel::LOG_VERBOSE);
