@@ -1,5 +1,6 @@
 // Copyright 2018 Jacob Chesley.
 // See LICENSE.TXT in root of project for license information.
+#include "Debugging/Logger/Logger.h"
 
 #include "SettingsWindow.h"
 
@@ -52,6 +53,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	colorSpace->Append("Pro Photo RGB");
 	colorSpace->SetSelection(0);
 
+	// Library image preview setting
 	libraryImagePreviewLabel = new wxStaticText(this, -1, "Library Image Preview");
 	libraryImagePreviewLabel->SetForegroundColour(Colors::TextLightGrey);
 	libraryImagePreview = new PhoediXComboBox(this, -1);
@@ -68,6 +70,19 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	numThreads = new DoubleSlider(this, (double)maxThreads, 1.0, (double)maxThreads, (double)maxThreads - 1.0, 0);
 	numThreads->SetForegroundColour(Colors::TextLightGrey);
 	numThreads->SetBackgroundColour(this->GetBackgroundColour());
+
+	// Logging label
+	loggingLabel = new wxStaticText(this, -1, "Log Level");
+	loggingLabel->SetForegroundColour(Colors::TextLightGrey);
+	logging = new PhoediXComboBox(this, -1);
+	logging->SetBackgroundColour(Colors::BackDarkDarkGrey);
+	logging->SetForegroundColour(Colors::TextLightGrey);
+	logging->Append("Disable Logging");
+	logging->Append("Fatal Errors");
+	logging->Append("Warnings");
+	logging->Append("Messages");
+	logging->Append("Verbose");
+	logging->SetSelection(0);
 
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
@@ -94,7 +109,9 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	gridSizer->Add(libraryImagePreview);
 	gridSizer->Add(numThreadsLabel);
 	gridSizer->Add(numThreads);
-	
+	gridSizer->Add(loggingLabel);
+	gridSizer->Add(logging);
+
 	buttonSizer->Add(okSettingsButton);
 	buttonSizer->AddSpacer(20);
 	buttonSizer->Add(cancelButton);
@@ -171,6 +188,14 @@ void SettingsWindow::ApplySettings(bool ShowMessage, bool overwriteLast){
 	if (libraryImagePreview->GetSelection() == 0) { PhoedixSettings::SetLibraryImageUseRaw(false); }
 	else{ PhoedixSettings::SetLibraryImageUseRaw(true); }
 
+	// Logging
+	if(logging->GetSelection() == 0){ Logger::LogToFile(false); }
+	else{ Logger::LogToFile(true); }
+	if (logging->GetSelection() == 1) { Logger::SetLogLevel(Logger::LogLevel::LOG_FATAL); }
+	if (logging->GetSelection() == 2) { Logger::SetLogLevel(Logger::LogLevel::LOG_ERROR); }
+	if (logging->GetSelection() == 3) { Logger::SetLogLevel(Logger::LogLevel::LOG_WARNING); }
+	if (logging->GetSelection() == 4) { Logger::SetLogLevel(Logger::LogLevel::LOG_VERBOSE); }
+
 	if (overwriteLast) {
 		lastSettings.bitDepth = colorDepth->GetSelection();
 		lastSettings.colorSpace = colorSpace->GetSelection();
@@ -244,6 +269,14 @@ void SettingsWindow::ReadSettings() {
 					if (value == "USE_EMBEDDED_THUMBNAIL") { libraryImagePreview->SetSelection(0); }
 					if (value == "USE_RAW_IMAGE") { libraryImagePreview->SetSelection(1); }
 				}
+
+				if (key == "LOG_LEVEL") {
+					if (value == "DISABLE") { logging->SetSelection(0); }
+					if (value == "FATAL") { logging->SetSelection(1); }
+					if (value == "WARNING") { logging->SetSelection(2); }
+					if (value == "MESSAGE") { logging->SetSelection(3); }
+					if (value == "VERBOSE") { logging->SetSelection(4); }
+				}
 			}
 		}
 	}
@@ -297,6 +330,15 @@ void SettingsWindow::WriteLines(wxTextFile * file) {
 	numThreadsSettingsStr += wxString::Format(wxT("%i"),(int) numThreads->GetValue());
 	file->AddLine(numThreadsSettingsStr);
 
+	// Logging
+	wxString logStr = "LOG_LEVEL=";
+	if (logging->GetSelection() == 0) { logStr += "DISABLE"; }
+	if (logging->GetSelection() == 1) { logStr += "FATAL"; }
+	if (logging->GetSelection() == 2) { logStr += "WARNING"; }
+	if (logging->GetSelection() == 3) { logStr += "MESSAGE"; }
+	if (logging->GetSelection() == 4) { logStr += "VERBOSE"; }
+	file->AddLine(logStr);
+
 	file->Write();
 }
 
@@ -309,7 +351,7 @@ wxString SettingsWindow::GetSettingsFile() {
 	#endif
 
 
-	wxString configDirectory = wxStandardPaths::Get().GetUserConfigDir() + wxFileName::GetPathSeparator() + appDir;
+	wxString configDirectory = wxStandardPaths::Get().GetUserDataDir() + wxFileName::GetPathSeparator() + appDir;
 	wxString settingsFilePath = configDirectory + wxFileName::GetPathSeparator() + "settings.ini";
 
 	if (!wxDir::Exists(configDirectory)) {

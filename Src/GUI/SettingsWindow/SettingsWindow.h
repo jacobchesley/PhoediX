@@ -81,6 +81,9 @@ private:
 	wxStaticText * numThreadsLabel;
 	DoubleSlider * numThreads;
 
+	wxStaticText* loggingLabel;
+	PhoediXComboBox* logging;
+
 	wxBoxSizer * buttonSizer;
 	PhoediXButton * okSettingsButton;
 	PhoediXButton * applySettingsButton;

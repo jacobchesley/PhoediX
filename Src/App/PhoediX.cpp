@@ -18,13 +18,14 @@ bool PhoediX::OnInit(){
 		return false;
 	}
 
-#ifdef COMMAND_LOG
 	Logger::SetApp(this);
 	Logger::SetLogFileName();
+
+#ifdef COMMAND_LOG
 	Logger::SetLogLevel(Logger::LogLevel::LOG_VERBOSE);
 	Logger::LogToConsole(true);
-	Logger::LogToFile(true);
 #endif
+
 	wxInitAllImageHandlers();
 	Image::InitExif();
 
