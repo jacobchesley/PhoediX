@@ -22,6 +22,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 
 	// 2 Columns, 15 pixel vertical gap, 15 pixel horizontal gap
 	gridSizer = new wxFlexGridSizer(2, 15, 15);
+    gridSizer->AddGrowableCol(1);
 
 	settingsLabel = new wxStaticText(this, -1, "PhoediX Settings");
 	settingsLabel->SetForegroundColour(Colors::TextWhite);
@@ -84,6 +85,15 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	logging->Append("Verbose");
 	logging->SetSelection(0);
 
+    // Data Directory Location
+    directoryLabel = new wxStaticText(this, -1, "Settings and Log File Location");
+    directoryLabel->SetForegroundColour(Colors::TextLightGrey);
+    
+    wxString configDirectory = wxStandardPaths::Get().GetUserDataDir() + wxFileName::GetPathSeparator();
+    directory = new wxTextCtrl(this, -1, configDirectory, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    directory->SetForegroundColour(Colors::TextLightGrey);
+    directory->SetBackgroundColour(this->GetBackgroundColour());
+    
 	buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	okSettingsButton = new PhoediXButton(this, SettingsWindow::ID_OK_SETTINGS, "OK");
@@ -111,7 +121,9 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 	gridSizer->Add(numThreads);
 	gridSizer->Add(loggingLabel);
 	gridSizer->Add(logging);
-
+    gridSizer->Add(directoryLabel);
+    gridSizer->Add(directory, 0, wxEXPAND);
+    
 	buttonSizer->Add(okSettingsButton);
 	buttonSizer->AddSpacer(20);
 	buttonSizer->Add(cancelButton);
@@ -120,7 +132,7 @@ SettingsWindow::SettingsWindow(wxWindow * parent, Processor * processor, EditLis
 
 	mainSizer->Add(settingsLabel);
 	mainSizer->AddSpacer(10);
-	mainSizer->Add(gridSizer);
+	mainSizer->Add(gridSizer, 0, wxEXPAND);
 	mainSizer->AddSpacer(15);
 	mainSizer->Add(buttonSizer, 0, wxALIGN_RIGHT);
 
@@ -344,14 +356,7 @@ void SettingsWindow::WriteLines(wxTextFile * file) {
 
 wxString SettingsWindow::GetSettingsFile() {
 
-	#if defined(__WXGTK__)
-		wxString appDir = ".PhoediX";
-	#else
-		wxString appDir = "PhoediX";
-	#endif
-
-
-	wxString configDirectory = wxStandardPaths::Get().GetUserDataDir() + wxFileName::GetPathSeparator() + appDir;
+	wxString configDirectory = wxStandardPaths::Get().GetUserDataDir() + wxFileName::GetPathSeparator();
 	wxString settingsFilePath = configDirectory + wxFileName::GetPathSeparator() + "settings.ini";
 
 	if (!wxDir::Exists(configDirectory)) {
