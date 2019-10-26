@@ -55,7 +55,6 @@ void DoubleSlider::SetBackgroundColour(wxColor newColor) {
 	minText->SetBackgroundColour(newColor);
 	maxText->SetBackgroundColour(newColor);
 	valText->SetBackgroundColour(newColor);
-	slide->SetBackgroundColour(newColor);
 }
 
 void DoubleSlider::SetForegroundColour(wxColor newColor) {
