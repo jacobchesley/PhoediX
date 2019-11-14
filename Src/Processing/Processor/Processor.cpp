@@ -493,6 +493,7 @@ void Processor::Get8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outp
 
 void Processor::Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey) {
 
+	if(img == NULL){ return; }
 	int dataSize = img->GetWidth() * img->GetHeight();
 
 	// Get pointers to 16 bit data
@@ -525,6 +526,100 @@ void Processor::Get16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * out
 	}
 }
 
+void Processor::GetOriginal8BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey) {
+	
+	if(originalImg == NULL){ return; }
+	int dataSize = originalImg->GetWidth() * originalImg->GetHeight();
+
+	// Initialize the histrogram to 0
+	for (int i = 0; i < 256; i++) {
+		outputHistogramRed[i] = 0;
+		outputHistogramGreen[i] = 0;
+		outputHistogramBlue[i] = 0;
+		outputHistogramGrey[i] = 0;
+	}
+
+	int grey = 0;
+
+	// Compute the histogram for red, green, blue and grey
+
+	if(originalImg->GetColorDepth() == 8){
+
+		// Get pointers to 8 bit data
+		uint8_t * redData8 = originalImg->Get8BitDataRed();
+		uint8_t * greenData8 = originalImg->Get8BitDataGreen();
+		uint8_t * blueData8 = originalImg->Get8BitDataBlue();
+
+		for (int i = 0; i < dataSize; i++) {
+
+			if (forceStop) { return; }
+
+			outputHistogramRed[redData8[i]] += 1;
+			outputHistogramGreen[greenData8[i]] += 1;
+			outputHistogramBlue[blueData8[i]] += 1;
+
+			grey = (0.2126 * (redData8[i])) + (0.7152 * (greenData8[i])) + (0.0722 * (blueData8[i]));
+			grey = grey > 255 ? 255 : grey;
+			grey = grey < 0 ? 0 : grey;
+			outputHistogramGrey[grey] += 1;
+		}
+	}
+	else{
+
+		// Get pointers to 16 bit data
+		uint16_t * redData16 = originalImg->Get16BitDataRed();
+		uint16_t * greenData16 = originalImg->Get16BitDataGreen();
+		uint16_t * blueData16 = originalImg->Get16BitDataBlue();
+		for (int i = 0; i < dataSize; i++) {
+
+			if (forceStop) { return; }
+
+			outputHistogramRed[(uint16_t)(redData16[i]/256.0)] += 1;
+			outputHistogramGreen[(uint16_t)(greenData16[i]/256.0)] += 1;
+			outputHistogramBlue[(uint16_t)(blueData16[i]/256.0)] += 1;
+
+			grey = (0.2126 * (uint16_t)(redData16[i]/256.0)) + (0.7152 * (uint16_t)(greenData16[i]/256.0))+ (0.0722 * (uint16_t)(blueData16[i]/256.0));
+			grey = grey > 255 ? 255 : grey;
+			grey = grey < 0 ? 0 : grey;
+			outputHistogramGrey[grey] += 1;
+		}
+	}
+}
+
+void Processor::GetOriginal16BitHistrogram(uint32_t * outputHistogramRed, uint32_t * outputHistogramGreen, uint32_t * outputHistogramBlue, uint32_t * outputHistogramGrey) {
+
+	if(originalImg == NULL){ return; }
+	int dataSize = originalImg->GetWidth() * originalImg->GetHeight();
+
+	// Get pointers to 16 bit data
+	uint16_t * redData16 = originalImg->Get16BitDataRed();
+	uint16_t * greenData16 = originalImg->Get16BitDataGreen();
+	uint16_t * blueData16 = originalImg->Get16BitDataBlue();
+
+	// Initialize the histrogram to 0
+	for (int i = 0; i < 65536; i++) {
+		outputHistogramRed[i] = 0;
+		outputHistogramGreen[i] = 0;
+		outputHistogramBlue[i] = 0;
+	}
+
+	int grey = 0;
+
+	// Compute the histogram for red, green, blue and grey
+	for (int i = 0; i < dataSize; i++) {
+
+		if (forceStop) { return; }
+		outputHistogramRed[redData16[i]] += 1;
+		outputHistogramGreen[greenData16[i]] += 1;
+		outputHistogramBlue[blueData16[i]] += 1;
+
+		// Compute grey scale level
+		grey = (int)((redData16[i] * 0.2126) + (greenData16[i] * 0.7152) + (blueData16[i] * 0.0722));
+		grey = grey > 255 ? 255 : grey;
+		grey = grey < 0 ? 0 : grey;
+		outputHistogramGrey[grey] += 1;
+	}
+}
 
 void Processor::AdjustRGB(double all, double red, double green, double blue, int dataStart, int dataEnd) {
 	

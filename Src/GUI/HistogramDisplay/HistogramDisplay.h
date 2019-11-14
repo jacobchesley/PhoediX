@@ -26,7 +26,7 @@
 class HistogramDisplay : public wxPanel {
 public:
 	HistogramDisplay(wxWindow * parent, Processor * processor);
-	void UpdateHistograms();
+	void UpdateHistograms(bool originalImage);
 	void SetHistogramDisplay(int selection);
 	int GetHistogramDisplay();
 	void DestroyHistograms();
@@ -50,7 +50,7 @@ private:
 
 	public:
 		HistogramScrolled(wxWindow * parent, Processor * processor);
-		void UpdateHistograms();
+		void UpdateHistograms(bool originalImage);
 		
 		void HideRed();
 		void ShowRed();
@@ -69,7 +69,7 @@ private:
 		void ZeroDisplay();
 	private:
 
-		void GenerateHistograms();
+		void GenerateHistograms(bool originalImage);
 
 		Processor * proc;
 

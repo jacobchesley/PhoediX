@@ -1002,7 +1002,7 @@ void MainWindow::ShowOriginal(wxCommandEvent& evt) {
 		}
 		imagePanel->ChangeImage(processor->GetOriginalImage());
 		pixelPeepWindow->UpdateImage(processor->GetOriginalImage());
-		histogramDisplay->UpdateHistograms();
+		histogramDisplay->UpdateHistograms(true);
 		if (processor->GetDoFitImage()) {
 			imagePanel->FitImage();
 		}
@@ -1022,7 +1022,7 @@ void MainWindow::ShowOriginal(wxCommandEvent& evt) {
 		}
 		imagePanel->ChangeImage(processor->GetImage());
 		pixelPeepWindow->UpdateImage(processor->GetImage());
-		histogramDisplay->UpdateHistograms();
+		histogramDisplay->UpdateHistograms(false);
 		if (processor->GetDoFitImage()) {
 			imagePanel->FitImage();
 		}
@@ -1259,10 +1259,20 @@ void MainWindow::OnUpdateImage(wxCommandEvent& WXUNUSED(event)) {
 		processor->Unlock();
 		return;
 	}
-	ChangeImageThread * changeImage = new ChangeImageThread(imagePanel, processor, processor->GetDoFitImage());
+
+	bool showOrigialImg = menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL)->IsChecked();
+	ChangeImageThread * changeImage = new ChangeImageThread(imagePanel, processor, processor->GetDoFitImage(), showOrigialImg);
 	changeImage->Run();
-	pixelPeepWindow->UpdateImage(processor->GetImage());
-	histogramDisplay->UpdateHistograms();
+
+	if(showOrigialImg){
+		pixelPeepWindow->UpdateImage(processor->GetOriginalImage());
+		histogramDisplay->UpdateHistograms(showOrigialImg);
+	}
+	else{
+		pixelPeepWindow->UpdateImage(processor->GetImage());
+		histogramDisplay->UpdateHistograms(showOrigialImg);
+	}
+	
 	if (processor->GetDoFitImage()) {
 
 		currentSession->SetImageZoomLevel(imagePanel->GetZoom());
@@ -1329,14 +1339,21 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	this->Destroy();
 }
 
-MainWindow::ChangeImageThread::ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor, bool fitImage) : wxThread(wxTHREAD_DETACHED){
+MainWindow::ChangeImageThread::ChangeImageThread(ZoomImagePanel * imagePanel, Processor * processor, bool fitImage, bool originalImage) : wxThread(wxTHREAD_DETACHED){
 	imgPanel = imagePanel;
 	proc = processor;
 	fit = fitImage;
+	orig = originalImage;
 }
 
 wxThread::ExitCode MainWindow::ChangeImageThread::Entry(){
-	imgPanel->ChangeImage(proc->GetImage());
+
+	if(orig){
+		imgPanel->ChangeImage(proc->GetOriginalImage());
+	}
+	else{
+		imgPanel->ChangeImage(proc->GetImage());
+	}
 	if (fit) { imgPanel->FitImage(); }
 	proc->SetDoFitImage(false);
 	return (wxThread::ExitCode)0;

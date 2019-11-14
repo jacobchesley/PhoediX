@@ -89,8 +89,8 @@ void HistogramDisplay::ProcessComboChange() {
 	histograms->RedrawHistograms();
 }
 
-void HistogramDisplay::UpdateHistograms() {
-	histograms->UpdateHistograms();
+void HistogramDisplay::UpdateHistograms(bool originalImage) {
+	histograms->UpdateHistograms(originalImage);
 }
 
 void HistogramDisplay::ZeroOutHistograms(){
@@ -223,9 +223,9 @@ void HistogramDisplay::HistogramScrolled::RedrawHistograms() {
 
 }
 
-void HistogramDisplay::HistogramScrolled::UpdateHistograms() {
+void HistogramDisplay::HistogramScrolled::UpdateHistograms(bool originalImage) {
 	
-	this->GenerateHistograms();
+	this->GenerateHistograms(originalImage);
 
 	redHistogramPanel->Redraw();
 	greenHistogramPanel->Redraw();
@@ -235,7 +235,7 @@ void HistogramDisplay::HistogramScrolled::UpdateHistograms() {
 	
 }
 
-void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
+void HistogramDisplay::HistogramScrolled::GenerateHistograms(bool originalImage) {
 
 	if (redHistogram == NULL || greenHistogram == NULL || blueHistogram == NULL ||
 		greyHistogram == NULL || allHistogram == NULL) {
@@ -249,7 +249,12 @@ void HistogramDisplay::HistogramScrolled::GenerateHistograms() {
 	uint32_t greyHistogram8[256];
 
 	// Get histogram data for red, green, blue and grey level (8 bit)
-	proc->Get8BitHistrogram(redHistogram8, greenHistogram8, blueHistogram8, greyHistogram8);
+	if(originalImage){
+		proc->GetOriginal8BitHistrogram(redHistogram8, greenHistogram8, blueHistogram8, greyHistogram8);
+	}
+	else{
+		proc->Get8BitHistrogram(redHistogram8, greenHistogram8, blueHistogram8, greyHistogram8);
+	}
 
 	// Get number of pixels in image
 	uint32_t maxRedCount = 0;
