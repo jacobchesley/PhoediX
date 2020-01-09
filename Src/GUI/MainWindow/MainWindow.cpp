@@ -516,6 +516,8 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 	// Check the current session in the window, and uncheck all other sessions
 	this->CheckUncheckSession(session->GetID());
 
+	menuTools->FindItem(MainWindow::MenuBar::ID_SHOW_ORIGINAL)->Check(false);
+
     Logger::Log("PhoediX MainWindow::OpenSession - Setting histogram display selection", Logger::LogLevel::LOG_VERBOSE);
 	histogramDisplay->SetHistogramDisplay(session->GetHistogramDisplaySelect());
 	
