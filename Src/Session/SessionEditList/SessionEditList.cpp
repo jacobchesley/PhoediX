@@ -162,7 +162,7 @@ void PhoediXSessionEditList::LoadSessionEditList(wxXmlNode * editListNode) {
 						doubleArrayName = editNodeDoubleArrays->GetName();
 						
 						// Count number of elements in array
-						if(!editNodeDoubleArrays->GetContent() != NULL){
+						if(!editNodeDoubleArrays->GetContent() != NULL && editNodeDoubleArrays->GetChildren() != NULL){
 							wxString arrayStr = editNodeDoubleArrays->GetChildren()[0].GetContent();
 							wxStringTokenizer arrayTokens(arrayStr, ",");
 							size_t numElements = arrayTokens.CountTokens();
