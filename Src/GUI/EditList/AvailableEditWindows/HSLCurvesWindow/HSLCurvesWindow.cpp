@@ -91,6 +91,17 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	int sArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_S_CURVE);
 	int lArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_L_CURVE);
 
+	Point defaultPoint1;
+	Point defaultPoint2;
+
+	defaultPoint1.x = 0.0;
+	defaultPoint1.y = 1.0;
+	defaultPoint1.id = 0;
+
+	defaultPoint2.x = 1.0;
+	defaultPoint2.y = 0.0;
+	defaultPoint2.id = 1;
+
 	// H Array has at least 4 points and is an even number (each point has x and y)
 	if(hArraySize >= 4 || hArraySize %2 == 0){
 
@@ -117,6 +128,14 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			hControlPoints.push_back(defaultPoint1);
+			hControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		hControlPoints.push_back(defaultPoint1);
+		hControlPoints.push_back(defaultPoint2);
 	}
 
 	// S Array has at least 4 points and is an even number (each point has x and y)
@@ -145,6 +164,14 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			sControlPoints.push_back(defaultPoint1);
+			sControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		sControlPoints.push_back(defaultPoint1);
+		sControlPoints.push_back(defaultPoint2);
 	}
 
 	// L Array has at least 4 points and is an even number (each point has x and y)
@@ -173,6 +200,14 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			lControlPoints.push_back(defaultPoint1);
+			lControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		lControlPoints.push_back(defaultPoint1);
+		lControlPoints.push_back(defaultPoint2);
 	}
 
 	// Set curves

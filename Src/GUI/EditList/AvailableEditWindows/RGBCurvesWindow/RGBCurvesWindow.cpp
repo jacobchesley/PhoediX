@@ -55,8 +55,19 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	int gArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_G_CURVE);
 	int bArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_B_CURVE);
 
+	Point defaultPoint1;
+	Point defaultPoint2;
+
+	defaultPoint1.x = 0.0;
+	defaultPoint1.y = 1.0;
+	defaultPoint1.id = 0;
+
+	defaultPoint2.x = 1.0;
+	defaultPoint2.y = 0.0;
+	defaultPoint2.id = 1;
+
 	// Bright Array has at least 4 points and is an even number (each point has x and y)
-	if(brightArraySize >= 4 || brightArraySize %2 == 0){
+	if(brightArraySize >= 4 && brightArraySize %2 == 0){
 
 		bool brightArrayValid = true;
 
@@ -81,10 +92,18 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			brightControlPoints.push_back(defaultPoint1);
+			brightControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		brightControlPoints.push_back(defaultPoint1);
+		brightControlPoints.push_back(defaultPoint2);
 	}
 
 	// R Array has at least 4 points and is an even number (each point has x and y)
-	if(rArraySize >= 4 || rArraySize %2 == 0){
+	if(rArraySize >= 4 && rArraySize %2 == 0){
 
 		bool rArrayValid = true;
 
@@ -109,10 +128,18 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			redControlPoints.push_back(defaultPoint1);
+			redControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		redControlPoints.push_back(defaultPoint1);
+		redControlPoints.push_back(defaultPoint2);
 	}
 
 	// G Array has at least 4 points and is an even number (each point has x and y)
-	if(gArraySize >= 4 || gArraySize %2 == 0){
+	if(gArraySize >= 4 && gArraySize %2 == 0){
 
 		bool gArrayValid = true;
 
@@ -133,14 +160,22 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				gPoint.x = gArray[i];
 				gPoint.y = gArray[i + 1];
 				gPoint.id = curID;
-				blueControlPoints.push_back(gPoint);
+				greenControlPoints.push_back(gPoint);
 				curID += 1;
 			}
 		}
+		else {
+			greenControlPoints.push_back(defaultPoint1);
+			greenControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		greenControlPoints.push_back(defaultPoint1);
+		greenControlPoints.push_back(defaultPoint2);
 	}
 
 	// B Array has at least 4 points and is an even number (each point has x and y)
-	if(bArraySize >= 4 || bArraySize %2 == 0){
+	if(bArraySize >= 4 && bArraySize %2 == 0){
 
 		bool bArrayValid = true;
 
@@ -165,6 +200,14 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			blueControlPoints.push_back(defaultPoint1);
+			blueControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		blueControlPoints.push_back(defaultPoint1);
+		blueControlPoints.push_back(defaultPoint2);
 	}
 
 	// Set curves

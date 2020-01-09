@@ -89,21 +89,32 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	int aArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_A_CURVE);
 	int bArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_B_CURVE);
 
-	// L Array has at least 4 points and is an even number (each point has x and y)
-	if(lArraySize >= 4 || lArraySize %2 == 0){
+	Point defaultPoint1;
+	Point defaultPoint2;
 
-		bool hArrayValid = true;
+	defaultPoint1.x = 0.0;
+	defaultPoint1.y = 1.0;
+	defaultPoint1.id = 0;
+
+	defaultPoint2.x = 1.0;
+	defaultPoint2.y = 0.0;
+	defaultPoint2.id = 1;
+
+	// L Array has at least 4 points and is an even number (each point has x and y)
+	if(lArraySize >= 4 && lArraySize %2 == 0){
+
+		bool lArrayValid = true;
 
 		// Check each element in array to verify it is between 0 and 1
 		for(int i = 0; i < lArraySize; i++){
 			if(lArray[i] < 0.0 || lArray[i] > 1.0){
-				hArrayValid = false;
+				lArrayValid = false;
 				break;
 			}
 		}
 
 		// Push points from array to control point vector
-		if(hArrayValid){
+		if(lArrayValid){
 			int curID = 0;
 			for(size_t i = 0; i < lArraySize; i+=2){
 
@@ -115,6 +126,14 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			lControlPoints.push_back(defaultPoint1);
+			lControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		lControlPoints.push_back(defaultPoint1);
+		lControlPoints.push_back(defaultPoint2);
 	}
 
 	// A Array has at least 4 points and is an even number (each point has x and y)
@@ -143,6 +162,14 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			aControlPoints.push_back(defaultPoint1);
+			aControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		aControlPoints.push_back(defaultPoint1);
+		aControlPoints.push_back(defaultPoint2);
 	}
 
 	// B Array has at least 4 points and is an even number (each point has x and y)
@@ -171,6 +198,14 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 				curID += 1;
 			}
 		}
+		else {
+			bControlPoints.push_back(defaultPoint1);
+			bControlPoints.push_back(defaultPoint2);
+		}
+	}
+	else {
+		bControlPoints.push_back(defaultPoint1);
+		bControlPoints.push_back(defaultPoint2);
 	}
 
 	// Set curves
