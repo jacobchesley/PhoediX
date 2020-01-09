@@ -490,6 +490,8 @@ void CurvePanel::GetColorCurveMap(int numSteps, int * outCurve, float scale) {
 	}
 
 	wxVector<Point> SplinePoints = splineCurve->GetCurve(0.5, CATMULL_ROM_SPLINE);
+	if (SplinePoints.size() <= 0) { return; }
+
 	for (int i = 0; i < (int)SplinePoints.size(); i++) {
 		SplinePoints[i].x *= scale;
 		SplinePoints[i].y *= scale;
