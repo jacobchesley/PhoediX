@@ -290,7 +290,6 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 	
 	this->GetProcessor()->CalcualteWidthHeightEdits(editList, &curProcesseedWidth, &curProcesseedHeight);
 
-	int size = this->GetPreviousEdits().size();
 	// Nearest Nieghbor selection
 	if (scaleInterpolation->GetSelection() == 0) {
 	

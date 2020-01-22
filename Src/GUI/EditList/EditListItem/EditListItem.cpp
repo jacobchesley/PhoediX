@@ -295,7 +295,7 @@ bool EditListItem::GetHighlighted(){
 	return isHighlighted;
 }
 
-void EditListItem::OnDragStart(wxMouseEvent & evt){
+void EditListItem::OnDragStart(wxMouseEvent & WXUNUSED(evt)){
 
 	this->CheckDrag();
 }

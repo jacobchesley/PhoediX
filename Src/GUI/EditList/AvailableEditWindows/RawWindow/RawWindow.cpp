@@ -372,8 +372,8 @@ bool RawWindow::AddRawInfo(wxString tag, wxString value, bool doNotAddZero){
 			return false;
 		}
 	}
-	long index = infoList->InsertItem(infoList->GetItemCount(), tag);
-	infoList->SetItem(index, 1, value);
+	long idx = infoList->InsertItem(infoList->GetItemCount(), tag);
+	infoList->SetItem(idx, 1, value);
 
 	// Size each column to the max size needed to show all the text
 	infoList->SetColumnWidth(0, wxLIST_AUTOSIZE);

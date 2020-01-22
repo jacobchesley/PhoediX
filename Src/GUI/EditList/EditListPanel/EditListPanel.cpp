@@ -212,16 +212,12 @@ void EditListPanel::AddEditsToProcessor() {
 	// Create a vector of Edit list Items that are displayed on the panel
 	wxVector<EditListItem*> editList = scroller->GetEditList();
 	int idx = 0;
-	if (editList.size() > 2) {
-		OutputDebugStringA("1");
-	}
+
 	for (size_t i = 0; i < editList.size(); i++) {
 
 		// Add each edit from the edit window, to the processor
 		if (editList.at(i)->GetEditWindow() != NULL) {
 
-			int editType = editList.at(i)->GetEditWindow()->GetParamsAndFlags()->GetEditType();
-			int rawType = ProcessorEdit::EditType::RAW;
 			if (editList.at(i)->GetEditWindow()->GetParamsAndFlags()->GetEditType() != ProcessorEdit::EditType::RAW) {
 				editList.at(i)->GetEditWindow()->SetIndex(idx);
 				idx += 1;
@@ -230,10 +226,6 @@ void EditListPanel::AddEditsToProcessor() {
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
 			wxYield();
 		}
-	}
-
-	if (proc->GetEditVector().size() > 2) {
-		OutputDebugStringA("2");
 	}
 }
 
