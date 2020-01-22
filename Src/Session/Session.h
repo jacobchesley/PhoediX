@@ -29,9 +29,6 @@ public:
 	void LoadSessionFromFile(wxString filePath);
 	void SaveSessionToFile(wxString filePath);
 	
-	wxString GetImageFilePath();
-	void SetImageFilePath(wxString imageFilePath);
-
 	PhoediXSessionEditList *GetEditList();
 
 	wxVector<Snapshot*> GetSnapshots();
@@ -86,6 +83,7 @@ public:
 
 	static bool CompareSessions(PhoediXSession * sessionOne, PhoediXSession * sessionTwo);
 	static bool CheckIfSession(wxString filePath);
+	static wxString GetImagePathFromProjectPath(wxString projectFile);
 
 	wxColour GetGuidelineColor();
 	void SetGuidelineColor(wxColour color);

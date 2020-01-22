@@ -456,12 +456,12 @@ void PhoediXSession::SaveSessionToFile(wxString filePath) {
     
 }
 
-void PhoediXSession::SetImageFilePath(wxString filePath) {
-	imgFile = filePath;
+void PhoediXSession::SetProjectPath(wxString path) {
+	projectPath = path;
 }
 
-wxString PhoediXSession::GetImageFilePath() {
-	return imgFile;
+wxString PhoediXSession::GetProjectPath() {
+	return projectPath;
 }
 
 PhoediXSessionEditList * PhoediXSession::GetEditList() {
@@ -639,15 +639,6 @@ wxString PhoediXSession::GetName() {
 	return name;
 }
 
-void PhoediXSession::SetProjectPath(wxString path) {
-	projectPath = path;
-}
-
-wxString PhoediXSession::GetProjectPath() {
-	return projectPath;
-}
-
-
 wxVector<Snapshot*> PhoediXSession::GetSnapshots() {
 	return snapshotsList;
 }
@@ -691,7 +682,6 @@ void PhoediXSession::SetSnapshots(wxVector<Snapshot*> snapshots) {
 bool PhoediXSession::CompareSessions(PhoediXSession * sessionOne, PhoediXSession * sessionTwo) {
 
 	if (sessionOne->GetName() != sessionTwo->GetName()) { return false; }
-	if (sessionOne->GetImageFilePath() != sessionTwo->GetImageFilePath()) { return false; }
 
 	wxVector<ProcessorEdit*> editListOne = sessionOne->GetEditList()->GetSessionEditList();
 	wxVector<ProcessorEdit*> editListTwo = sessionTwo->GetEditList()->GetSessionEditList();
@@ -748,4 +738,15 @@ bool PhoediXSession::CheckIfSession(wxString filePath) {
 	if (session.GetRoot()->GetName() != "PhoediXProject") { return false; }
 
 	return true;
+}
+
+wxString PhoediXSession::GetImagePathFromProjectPath(wxString projectFile) {
+	// Get project name and path
+	wxString projectName = wxFileName(projectFile).GetName();
+	wxString projectPath = wxFileName(projectFile).GetPath();
+
+	// Get image path from project path and name (image is one directory above)
+	wxString imagePath = projectPath + wxFileName::GetPathSeparator() + "..";
+	wxString fullImagePath = imagePath + wxFileName::GetPathSeparator() + projectName;
+	return fullImagePath;
 }

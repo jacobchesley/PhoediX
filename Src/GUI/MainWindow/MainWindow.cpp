@@ -400,7 +400,6 @@ void MainWindow::OpenFiles(wxArrayString files) {
 			this->CreateNewProject(phoedixProject.GetFullPath(), createRawProject);
 				
 		}
-		currentSession->SetImageFilePath(file);
 	}
     Logger::Log("PhoediX MainWindow::OpenFiles - returning", Logger::LogLevel::LOG_VERBOSE);
 }
@@ -440,7 +439,8 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 	if (allSessions.size() > 0) {
 		currentSession = allSessions.at(allSessions.size() - 1);
 		// Open the image, then open the session to go along with image
-		this->OpenImage(currentSession->GetImageFilePath(), false);
+		wxString imgFilePath = PhoediXSession::GetImagePathFromProjectPath(currentSession->GetProjectPath());
+		this->OpenImage(imgFilePath, false);
 		this->OpenSession(currentSession);
 	}
 
@@ -521,6 +521,10 @@ void MainWindow::OpenSession(PhoediXSession * session) {
     Logger::Log("PhoediX MainWindow::OpenSession - Setting histogram display selection", Logger::LogLevel::LOG_VERBOSE);
 	histogramDisplay->SetHistogramDisplay(session->GetHistogramDisplaySelect());
 	
+	Logger::Log("PhoediX MainWindow::OpenSession - Setting session to edit list", Logger::LogLevel::LOG_VERBOSE);
+	editList->SetSession(session);
+	Logger::Log("PhoediX MainWindow::OpenSession - returning", Logger::LogLevel::LOG_VERBOSE);
+
 	// Populate the panel with the edits
 	if(session->GetEditList() != NULL){
 
@@ -584,10 +588,6 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 		processor->DisableFastEdit();
 		imagePanel->DisableHalfSize();
 	}
-    
-    Logger::Log("PhoediX MainWindow::OpenSession - Setting session to edit list", Logger::LogLevel::LOG_VERBOSE);
-	editList->SetSession(session);
-    Logger::Log("PhoediX MainWindow::OpenSession - returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {
@@ -626,10 +626,19 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 	
 	this->SaveCurrentSession();
+
 	// If the session to open is the same as the one currently opened, keep open
 	if (evt.GetId() == currentSession->GetID()) {
 		menuWindow->FindChildItem(evt.GetId())->Check();
 		return;
+	}
+
+	// Replace existing session in all sessions, with updated session
+	for (size_t i = 0; i < allSessions.size(); i++) {
+		if (allSessions[i]->GetID() == currentSession->GetID()) {
+			allSessions[i] = currentSession;
+			break;
+		}
 	}
 
 	// Find the session to open
@@ -637,10 +646,11 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 
 		if (allSessions[i]->GetID() == evt.GetId() && currentSession->GetID() != allSessions[i]->GetID()) {
 
-			// Open the image, then open the session to go along with image
-			this->OpenImage(allSessions[i]->GetImageFilePath(), false);
-			this->OpenSession(allSessions[i]);
+			// Open the image, then open the session
 			currentSession = allSessions[i];
+			wxString imgFilePath = PhoediXSession::GetImagePathFromProjectPath(currentSession->GetProjectPath());
+			this->OpenImage(imgFilePath, false);
+			this->OpenSession(currentSession);
 			return;
 		}
 	}
@@ -656,8 +666,9 @@ void MainWindow::SaveCurrentSession() {
 	if(currentSession == NULL){
 		return;
 	}
+
 	// Save all infomation about the current session
-	currentSession->SetImageFilePath(processor->GetFilePath());
+	//currentSession->SetImageFilePath(processor->GetFilePath());
 	currentSession->GetEditList()->SetSessionEditList(processor->GetEditVector());
 	currentSession->SetHistogramDisplaySelect(histogramDisplay->GetHistogramDisplay());
 	currentSession->SetImageZoomLevel(imagePanel->GetZoom());
@@ -682,14 +693,8 @@ void MainWindow::SaveCurrentSession() {
 	currentSession->SetCropgridColor2(guidelinesWindow->GetGridColor2());
 	currentSession->SetGuidelinesShown(imagePanel->GetGuidelinesActive());
 
-	// Replace existing session in all sessions, with updated session
-	for(size_t i = 0; i < allSessions.size(); i++){
-		if(allSessions[i]->GetID() == currentSession->GetID()){
-			allSessions[i] = currentSession;
-		}
-	}
-
 	currentSession->SaveSessionToFile(currentSession->GetProjectPath());
+	currentSession->SetProjectPath(currentSession->GetProjectPath());
 }
 
 void MainWindow::LoadProject(wxString projectPath, bool openSession) {
@@ -704,7 +709,8 @@ void MainWindow::LoadProject(wxString projectPath, bool openSession) {
 
             Logger::Log("PhoediX MainWindow::LoadProject - Project already loaded, making active session", Logger::LogLevel::LOG_VERBOSE);
 			// Open the image, then open the session to go along with image
-			this->OpenImage(allSessions[i]->GetImageFilePath(), false);
+			wxString imgFilePath = PhoediXSession::GetImagePathFromProjectPath(allSessions[i]->GetProjectPath());
+			this->OpenImage(imgFilePath, false);
 			this->OpenSession(allSessions[i]);
 			currentSession = allSessions[i];
             Logger::Log("PhoediX MainWindow::LoadProject - Made active session, returning", Logger::LogLevel::LOG_VERBOSE);
@@ -790,7 +796,8 @@ void MainWindow::ShowLoadImage(wxCommandEvent& WXUNUSED(event)) {
 void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
 
 	if(currentSession == NULL){return;}
-	this->OpenImage(currentSession->GetImageFilePath());
+	wxString imgFilePath = PhoediXSession::GetImagePathFromProjectPath(currentSession->GetProjectPath());
+	this->OpenImage(imgFilePath);
 }
 
 void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
