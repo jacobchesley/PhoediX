@@ -41,7 +41,7 @@ public:
 	void AddRawWindow(ProcessorEdit* editForParams);
 	void RemoveRawWindow();
 	bool GetRawWindowOpen();
-	void RemoveAllWindows();
+	void RemoveAllWindows(bool removeRawWindow = true);
 	void AddEditsToProcessor();
 	void AddEditWindows(wxVector<ProcessorEdit*> edits);
 	void ReprocessImage();
@@ -105,7 +105,8 @@ private:
 		COPY_EDIT_LIST = 1,
 		PASTE_EDIT_LIST,
 		ENABLE_ALL_EDITS,
-		DISABLE_ALL_EDITS
+		DISABLE_ALL_EDITS,
+		DELETE_ALL_EDITS
 	};
 
 	class EditListScroll : public wxScrolledWindow {
@@ -114,6 +115,7 @@ private:
 		void AddEdit(EditListItem * item);
 		void DeleteEdit(size_t index);
 		void DeleteAllEdits();
+		void DeleteNonTopEdits();
 		void MoveEditUp(size_t index);
 		void MoveEditDown(size_t index);
 		int GetNextID();

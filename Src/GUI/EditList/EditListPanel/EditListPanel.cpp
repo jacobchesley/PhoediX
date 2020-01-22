@@ -98,6 +98,8 @@ void EditListPanel::OnRightClick(wxMouseEvent& WXUNUSED(event)){
 	popupMenu.AppendSeparator();
 	popupMenu.Append(EditListPanel::PopupMenuActions::ENABLE_ALL_EDITS, "Enable All Edits");
 	popupMenu.Append(EditListPanel::PopupMenuActions::DISABLE_ALL_EDITS, "Disable All Edits");
+	popupMenu.AppendSeparator();
+	popupMenu.Append(EditListPanel::PopupMenuActions::DELETE_ALL_EDITS, "Delete All Edits");
 
 	// No copied edit list, disable paste action
 	if(proc->GetEditListForCopyPaste().size() <= 0){ popupMenu.GetMenuItems()[1]->Enable(false); }
@@ -139,6 +141,11 @@ void EditListPanel::OnPopupMenuClick(wxCommandEvent& inEvt) {
 
 		case EditListPanel::PopupMenuActions::DISABLE_ALL_EDITS:{
 			this->DisableAllEdits();
+			break;
+		}
+		case EditListPanel::PopupMenuActions::DELETE_ALL_EDITS: {
+			this->RemoveAllWindows(false);
+			this->ReprocessImage();
 			break;
 		}
 	}
@@ -205,6 +212,9 @@ void EditListPanel::AddEditsToProcessor() {
 	// Create a vector of Edit list Items that are displayed on the panel
 	wxVector<EditListItem*> editList = scroller->GetEditList();
 	int idx = 0;
+	if (editList.size() > 2) {
+		OutputDebugStringA("1");
+	}
 	for (size_t i = 0; i < editList.size(); i++) {
 
 		// Add each edit from the edit window, to the processor
@@ -217,21 +227,25 @@ void EditListPanel::AddEditsToProcessor() {
 				idx += 1;
 			}
 			editList.at(i)->GetEditWindow()->SetDisabled(editList.at(i)->GetDisabled());
-
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
+			wxYield();
 		}
+	}
+
+	if (proc->GetEditVector().size() > 2) {
+		OutputDebugStringA("2");
 	}
 }
 
 void EditListPanel::ReprocessImage() {
-	
+
+	// Delete the current list of internally stored edits in the processor
+	proc->DeleteEdits();
+
 	if (editsStarted) {
 		startEdits->Stop();
 	}
 
-	// Delete the current list of internally stored edits in the processor
-	proc->DeleteEdits();
-	
 	// Add all edits to processor
 	this->AddEditsToProcessor();
 
@@ -246,6 +260,9 @@ void EditListPanel::ReprocessImage() {
 }
 
 void EditListPanel::ReprocessImageRaw(bool unpack) {
+
+	// Delete the current list of internally stored edits in the processor
+	proc->DeleteEdits();
 
 	// Process Raw if needed
 	if (hasRaw) {
@@ -309,6 +326,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
     
     Logger::Log("PhoediX EditListPanel::AddEditWindows - Removing all windows", Logger::LogLevel::LOG_VERBOSE);
 	this->RemoveAllWindows();
+	proc->DeleteEdits();
 	Logger::Log("PhoediX EditListPanel::AddEditWindows - Windows removed", Logger::LogLevel::LOG_VERBOSE);
 	for (size_t i = 0; i < inEdits.size(); i++) {
         
@@ -336,6 +354,9 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
                     Logger::Log("PhoediX EditListPanel::AddEditWindows - Setting edit windows disabled and params/flags", Logger::LogLevel::LOG_VERBOSE);
 					newEditWindow->SetDisabled(inEdits.at(i)->GetDisabled());
 					newEditWindow->SetParamsAndFlags(inEdits.at(i));
+					this->Refresh();
+					this->Update();
+					wxYield();
 				}
 			}
 		}
@@ -355,17 +376,23 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	this->Thaw();
 }
 
-void EditListPanel::RemoveAllWindows() {
+void EditListPanel::RemoveAllWindows(bool removeRawWindow) {
 
     Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Stopping processing", Logger::LogLevel::LOG_VERBOSE);
 	proc->KillCurrentProcessing();
     
     Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Removing RAW window (if it exists)", Logger::LogLevel::LOG_VERBOSE);
-	this->RemoveRawWindow();
-	hasRaw = false;
+
+	if (removeRawWindow) {
+		this->RemoveRawWindow();
+		scroller->DeleteAllEdits();
+		hasRaw = false;
+	}
+	else {
+		scroller->DeleteNonTopEdits();
+	}
     
     Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Removing edits from edit list", Logger::LogLevel::LOG_VERBOSE);
-	scroller->DeleteAllEdits();
     
     Logger::Log("PhoediX EditListPanel::RemoveAllWindows - Removing edits from processor", Logger::LogLevel::LOG_VERBOSE);
 	proc->DeleteEdits();
@@ -798,6 +825,41 @@ void EditListPanel::EditListScroll::DeleteAllEdits() {
     Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Redrawing edits", Logger::LogLevel::LOG_VERBOSE);
 	this->RedrawEdits();
     Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteAllEdits - Returning", Logger::LogLevel::LOG_VERBOSE);
+}
+
+void EditListPanel::EditListScroll::DeleteNonTopEdits() {
+
+	if (editList.size() == this->GetNumTopEdits()) { return; }
+
+	// Remove all edit items from the sizer, but do not destroy them
+	Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Called", Logger::LogLevel::LOG_VERBOSE);
+	this->GetSizer()->Clear();
+
+	// Remove all edit windows from list
+	for (size_t i = this->GetNumTopEdits(); i < editList.size(); i++) {
+
+		Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Removing edit", Logger::LogLevel::LOG_VERBOSE);
+		// Remove the edit window from AUI Manager if it exists
+		if (editList.at(i)->GetEditWindow() != NULL) {
+
+			Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Detaching edit from AUI manager", Logger::LogLevel::LOG_VERBOSE);
+			PhoedixAUIManager::GetPhoedixAUIManager()->DetachPane(editList.at(i)->GetEditWindow());
+		}
+
+		Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Destroying edit", Logger::LogLevel::LOG_VERBOSE);
+		//Destroy and erase the one edit item we no longer want
+		editList.at(i)->DestroyItem();
+
+		Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Updating AUI Manager", Logger::LogLevel::LOG_VERBOSE);
+		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+	}
+
+	Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Clearing edit list vector", Logger::LogLevel::LOG_VERBOSE);
+	editList.erase(editList.begin() + this->GetNumTopEdits(), editList.end());
+
+	Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Redrawing edits", Logger::LogLevel::LOG_VERBOSE);
+	this->RedrawEdits();
+	Logger::Log("PhoediX EditListPanel::EditListScroll::DeleteNonTopEdits - Returning", Logger::LogLevel::LOG_VERBOSE);
 }
 
 void EditListPanel::EditListScroll::RedrawEdits() {
