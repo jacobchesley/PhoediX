@@ -58,6 +58,7 @@ void PhoediXSession::Destroy(){
         Logger::Log("     PhoediX PhoediXSession::Destroy - deleting snapshot", Logger::LogLevel::LOG_VERBOSE);
 		delete snapshotsList.at(i);
 	}
+	snapshotsList.clear();
     Logger::Log("PhoediX PhoediXSession::Destroy - returning", Logger::LogLevel::LOG_VERBOSE);
 	id = -1;
 }

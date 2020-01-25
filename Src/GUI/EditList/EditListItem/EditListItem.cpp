@@ -114,15 +114,16 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 // Destroy the edit window
 EditListItem::~EditListItem() {
 	if (editWin != NULL) {
-		editWin->StopWatchdog();
+		editWin->DestroyEditWindow();
 		editWin->Destroy();
+		editWin = NULL;
 	}
 }
 
 // Destroy this and edit window
 void EditListItem::DestroyItem() {
 	if (editWin != NULL) {
-		editWin->StopWatchdog();
+		editWin->DestroyEditWindow();
 		editWin->Destroy();
 		editWin = NULL;
 	}

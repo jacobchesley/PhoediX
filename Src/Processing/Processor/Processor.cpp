@@ -122,6 +122,8 @@ void Processor::DeleteEdits() {
 	for (size_t i = 0; i < editListInternal.size(); i++) {
 		editListInternal.at(i)->ClearIntArray();
 		editListInternal.at(i)->ClearDoubleArray();
+		editListInternal.at(i)->ClearParams();
+		editListInternal.at(i)->ClearFlags();
 		delete editListInternal.at(i);
 	}
 

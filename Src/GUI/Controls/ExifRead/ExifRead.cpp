@@ -15,19 +15,18 @@ ExifRead::ExifRead(wxWindow * parent) : wxPanel(parent) {
 void ExifRead::AddExifData(Image * image) {
 
 	sizer->Clear(true);
-	this->AddExifData(*image->GetExifMap());
-
+	this->AddExifData(image->GetExifMap());
 	if (labels.size() == 0) { this->AddNoExifMessage(); }
 }
 
-void ExifRead::AddExifData(std::map<size_t, void*> exifData) {
+void ExifRead::AddExifData(std::map<size_t, void*> * exifData) {
 
 	sizer->Clear(true);
 	// Add all exif data
-	for (std::map<size_t, void*>::const_iterator it = exifData.begin(); it != exifData.end(); it++) {
+	for (std::map<size_t, void*>::const_iterator it = exifData->begin(); it != exifData->end(); it++) {
 		this->AddExifRow(it->first, it->second);
 	}
-
+	exifData->clear();
 	if (labels.size() == 0) { this->AddNoExifMessage(); }
 }
 

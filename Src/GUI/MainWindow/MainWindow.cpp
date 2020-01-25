@@ -478,9 +478,10 @@ void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 	newSession->SetProjectPath(projectFile);
 	newSession->SetFitImage(true);
 
+	ProcessorEdit* rawEdit = new ProcessorEdit(ProcessorEdit::EditType::RAW);
 	if(rawProject){
 		wxVector<ProcessorEdit*>  rawEditList;
-		rawEditList.push_back(new ProcessorEdit(ProcessorEdit::EditType::RAW));
+		rawEditList.push_back(rawEdit);
 		newSession->GetEditList()->SetSessionEditList(rawEditList);
 	}
 
@@ -491,6 +492,7 @@ void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 	currentSession = newSession;
 	processor->SetDoFitImage(true);
 	this->OpenSession(currentSession);	
+	delete rawEdit;
 }
 
 void MainWindow::OpenSession(PhoediXSession * session) {
@@ -842,7 +844,7 @@ void MainWindow::OpenImage(wxString imagePath, bool checkForProject){
 		#endif
 		ImageHandler::ReadExifFromRaw(imageInfoRaw, processor->GetImage());
 		imageInfoPanel->AddExif(processor->GetImage());
-
+		delete imageInfoRaw;
 	}
 
 	// Handle JPEG, PNG, BMP and TIFF images

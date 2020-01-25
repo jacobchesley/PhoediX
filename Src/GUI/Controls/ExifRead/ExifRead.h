@@ -22,7 +22,7 @@ class ExifRead : public wxPanel {
 public:
 	ExifRead(wxWindow * parent);
 	void AddExifData(Image * image);
-	void AddExifData(std::map<size_t, void*> exifData);
+	void AddExifData(std::map<size_t, void*> * exifData);
 	void AddExifRow(size_t tag, void * data);
 	void ClearExif();
 
