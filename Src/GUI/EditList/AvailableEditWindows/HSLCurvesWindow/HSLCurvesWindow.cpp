@@ -102,7 +102,7 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	defaultPoint2.id = 1;
 
 	// H Array has at least 4 points and is an even number (each point has x and y)
-	if(hArraySize >= 4 || hArraySize %2 == 0){
+	if(hArraySize >= 4 && hArraySize %2 == 0){
 
 		bool hArrayValid = true;
 
@@ -138,7 +138,7 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	}
 
 	// S Array has at least 4 points and is an even number (each point has x and y)
-	if(sArraySize >= 4 || sArraySize %2 == 0){
+	if(sArraySize >= 4 && sArraySize %2 == 0){
 
 		bool sArrayValid = true;
 
@@ -174,7 +174,7 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	}
 
 	// L Array has at least 4 points and is an even number (each point has x and y)
-	if(sArraySize >= 4 || sArraySize %2 == 0){
+	if(sArraySize >= 4 && sArraySize %2 == 0){
 
 		bool lArrayValid = true;
 

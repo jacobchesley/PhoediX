@@ -136,7 +136,7 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	}
 
 	// A Array has at least 4 points and is an even number (each point has x and y)
-	if(aArraySize >= 4 || aArraySize %2 == 0){
+	if(aArraySize >= 4 && aArraySize %2 == 0){
 
 		bool aArrayValid = true;
 
@@ -172,7 +172,7 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	}
 
 	// B Array has at least 4 points and is an even number (each point has x and y)
-	if(bArraySize >= 4 || bArraySize %2 == 0){
+	if(bArraySize >= 4 && bArraySize %2 == 0){
 
 		bool bArrayValid = true;
 
