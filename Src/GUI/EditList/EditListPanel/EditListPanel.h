@@ -91,6 +91,7 @@ private:
 	Processor * proc;
 	bool hasRaw;
 	wxWindow * par;
+	bool preventProcessing;
 
 	ZoomImagePanel * imagePanel;
 	PhoediXSession * currentSession;

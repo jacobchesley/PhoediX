@@ -71,6 +71,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	startEdits = NULL;
 	editsStarted = false;
 	imagePanel = imgPanel;
+	preventProcessing = false;
 
 	this->InitializeEdits();
 }
@@ -152,19 +153,20 @@ void EditListPanel::OnPopupMenuClick(wxCommandEvent& inEvt) {
 }
 
 void EditListPanel::ReprocessImageEvt(wxCommandEvent& WXUNUSED(event)) {
+	if (preventProcessing) { return; }
 	this->ReprocessImage();
 	this->InformParentReprocess();
 }
 
 void EditListPanel::ReprocessImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
-
+	if (preventProcessing) { return; }
 	// Reprocess raw with no unpacking
 	this->ReprocessImageRaw(false);
 	this->InformParentReprocess();
 }
 
 void EditListPanel::ReprocessUnpackImageRawEvt(wxCommandEvent& WXUNUSED(event)) {
-
+	if (preventProcessing) { return; }
 	// Reprocess raw with unpack
 	this->ReprocessImageRaw(true);
 	this->InformParentReprocess();
@@ -175,16 +177,18 @@ void EditListPanel::SetSession(PhoediXSession * newSession) {
 }
 
 void EditListPanel::InformParentReprocess(){
+	if (preventProcessing) { return; }
 	wxCommandEvent evt(REPROCESS_IMAGE_EVENT, ID_REPROCESS_IMAGE);
 	wxPostEvent(PhoedixAUIManager::GetMainWindow(), evt);
 }
 
 void EditListPanel::OnSaveNoReprocess(wxMouseEvent& WXUNUSED(event)) {
+	if (preventProcessing) { return; }
 	this->SaveNoReprocess();
 }
 
 void EditListPanel::SaveNoReprocess() {
-
+	if (preventProcessing) { return; }
 	if (currentSession != NULL) {
 		this->AddEditsToProcessor();
 		currentSession->SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
@@ -194,7 +198,7 @@ void EditListPanel::SaveNoReprocess() {
 }
 
 void EditListPanel::SaveNoReprocessWithSnapshots(wxVector<Snapshot*> snapshots) {
-
+	if (preventProcessing) { return; }
 	if (currentSession != NULL) {
 		this->AddEditsToProcessor();
 		currentSession->SetPerspective(PhoedixAUIManager::GetPhoedixAUIManager()->SavePerspective());
@@ -205,7 +209,7 @@ void EditListPanel::SaveNoReprocessWithSnapshots(wxVector<Snapshot*> snapshots) 
 }
 
 void EditListPanel::AddEditsToProcessor() {
-
+	if (preventProcessing) { return; }
 	// Delete the current list of internally stored edits in the processor
 	proc->DeleteEdits();
 
@@ -232,7 +236,7 @@ void EditListPanel::AddEditsToProcessor() {
 }
 
 void EditListPanel::ReprocessImage() {
-
+	if (preventProcessing) { return; }
 	// Delete the current list of internally stored edits in the processor
 	proc->DeleteEdits();
 
@@ -254,7 +258,7 @@ void EditListPanel::ReprocessImage() {
 }
 
 void EditListPanel::ReprocessImageRaw(bool unpack) {
-
+	if (preventProcessing) { return; }
 	// Delete the current list of internally stored edits in the processor
 	proc->DeleteEdits();
 
@@ -315,6 +319,7 @@ void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
 void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	
+	preventProcessing = true;
     Logger::Log("PhoediX EditListPanel::AddEditWindows - Called", Logger::LogLevel::LOG_VERBOSE);
 	this->Freeze();
     
@@ -363,10 +368,7 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
 	
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 
-	if (!hasRaw) {
-		this->ReprocessImage();
-	}
-
+	preventProcessing = false;
 	this->Thaw();
 }
 
