@@ -87,8 +87,6 @@ RotationWindow::RotationWindow(wxWindow * parent, wxString editName, Processor *
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
-
-	this->StartWatchdog();
 }
 
 void RotationWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {

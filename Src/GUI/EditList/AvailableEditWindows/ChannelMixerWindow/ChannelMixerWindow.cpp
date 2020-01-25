@@ -142,8 +142,6 @@ ChannelMixerWindow::ChannelMixerWindow(wxWindow * parent, wxString editName, Pro
 
 	this->PopulateIntialPresets();
 	presetBox->SetValue(presetList.at(0).GetName());
-
-	this->StartWatchdog();
 }
 
 void ChannelMixerWindow::PopulateIntialPresets() {

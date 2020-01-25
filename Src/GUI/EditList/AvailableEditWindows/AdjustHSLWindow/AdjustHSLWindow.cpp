@@ -88,7 +88,6 @@ AdjustHSLWindow::AdjustHSLWindow(wxWindow * parent, wxString editName, Processor
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
-	this->StartWatchdog();
 }
 
 void AdjustHSLWindow::SetParamsAndFlags(ProcessorEdit * edit){

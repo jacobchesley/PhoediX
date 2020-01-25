@@ -34,8 +34,6 @@ RGBCurvesWindow::RGBCurvesWindow(wxWindow * parent, wxString editName, Processor
 	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&RGBCurvesWindow::OnUpdate, this);
 
 	this->SetSize(350, 350);
-
-	this->StartWatchdog();
 }
 
 void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){

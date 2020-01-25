@@ -7,6 +7,7 @@ wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(SAVE_NO_REPROCESS, wxCommandEvent);
+wxDEFINE_EVENT(WATCHDOG_TERMINATED_EVENT, wxThreadEvent);
 
 EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * zoomImgPanel) : wxScrolledWindow(parent) {
 	editNme = editName;
@@ -20,10 +21,11 @@ EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * process
 	index = -1;
 
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&EditWindow::Process, this, EditWindow::ID_PROCESS_EDITS);
+	this->Bind(WATCHDOG_TERMINATED_EVENT, (wxObjectEventFunction)& EditWindow::OnWatchdogTerminated, this);
 }
 
 void EditWindow::DestroyEditWindow() {
-
+	this->StopWatchdog();
 }
 
 void EditWindow::DoProcess() {
@@ -56,10 +58,16 @@ wxString EditWindow::GetName() {
 
 void EditWindow::Activate(){
 	activated = true;
+	this->StartWatchdog();
 }
 
 void EditWindow::Deactivate(){
 	activated = false;
+	this->StopWatchdog();
+}
+
+bool EditWindow::GetActivated() {
+	return activated;
 }
 
 void EditWindow::SetName(wxString editName) {
@@ -84,6 +92,7 @@ bool EditWindow::GetDisabled() {
 
 void EditWindow::AddEditToProcessor() {
 
+	if (!activated) { return; }
 	ProcessorEdit * edit = this->GetParamsAndFlags();
 	if(edit != NULL){
 		proc->AddEdit(edit);
@@ -110,16 +119,25 @@ void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 	updated = true;
 }
 
-
 void EditWindow::StartWatchdog(){
+	if (watchdog != NULL) { return; }
 	watchdog = new WatchForUpdateThread(this, 50);
 	watchdog->Run();
 }
 
 void EditWindow::StopWatchdog(){
 	if(watchdog != NULL){
+		activated = false;
 		watchdog->Stop();
+		while (watchdog != NULL) {
+			wxYield();
+		}
 	}
+}
+
+void EditWindow::OnWatchdogTerminated(wxThreadEvent& WXUNUSED(event)) {
+	watchdog = NULL;
+	this->GetEventHandler()->DeletePendingEvents();
 }
 
 ZoomImagePanel * EditWindow::GetZoomImagePanel() {
@@ -159,8 +177,12 @@ EditWindow::WatchForUpdateThread::WatchForUpdateThread(EditWindow * windowPar, i
 }
 
 wxThread::ExitCode EditWindow::WatchForUpdateThread::Entry(){
+
+	wxString test = window->GetName();
+
 	while(contin){
-		if(window->GetUpdated()){
+
+		if(window->GetUpdated() && window->GetActivated()){
 
 			// Set window to not updated, wait to see if it is updated again
 			window->SetUpdated(false);
@@ -169,13 +191,16 @@ wxThread::ExitCode EditWindow::WatchForUpdateThread::Entry(){
 			// If window still has not been updated, go ahead and and fire the process edits
 			// This will prevent the window from processing several similar edits when the
 			// sliders change quickly during movement.
-			if(!window->GetUpdated()){
+			if(!window->GetUpdated() && window != NULL){
 				wxCommandEvent evt(REPROCESS_IMAGE_EVENT, EditWindow::ID_PROCESS_EDITS);
 				wxPostEvent(window, evt);
 			}
 		}
 		this->Sleep(20);
 	}
+	
+	wxThreadEvent endEvt(WATCHDOG_TERMINATED_EVENT, ID_WATCHDOG_TERMINATED);
+	wxPostEvent(window, endEvt);
 	return (wxThread::ExitCode)0;
 }
 

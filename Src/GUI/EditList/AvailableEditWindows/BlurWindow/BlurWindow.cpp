@@ -70,8 +70,6 @@ BlurWindow::BlurWindow(wxWindow * parent, wxString editName, Processor * process
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
-
-	this->StartWatchdog();
 }
 
 void BlurWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {

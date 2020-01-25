@@ -72,7 +72,6 @@ AdjustBrightnessWindow::AdjustBrightnessWindow(wxWindow * parent, wxString editN
 	this->SetScrollRate(5, 5);
 
 	this->SetClientSize(this->GetVirtualSize());
-	this->StartWatchdog();
 }
 
 void AdjustBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){

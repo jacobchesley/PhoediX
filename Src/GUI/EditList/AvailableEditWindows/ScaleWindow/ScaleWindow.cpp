@@ -99,8 +99,6 @@ ScaleWindow::ScaleWindow(wxWindow * parent, wxString editName, Processor * proce
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
-
-	this->StartWatchdog();
 }
 
 void ScaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {

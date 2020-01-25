@@ -296,8 +296,6 @@ RawWindow::RawWindow(wxWindow * parent, wxString editName, Processor * processor
 	this->Bind(COLLAPSE_PANE_OPEN_CLOSE, (wxObjectEventFunction)&RawWindow::OnCollapseOpenClose, this, ID_COLLAPSE_PANE_OPEN_CLOSE);
 	this->Bind(REPROCESS_IMAGE_EVENT, (wxObjectEventFunction)&RawWindow::ProcessEvt, this, EditWindow::ID_PROCESS_EDITS);
 	
-	this->StartWatchdog();
-
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, ID_WHITE_BALANCE_COMBO);
 	wxPostEvent(this, comboEvt);
 }

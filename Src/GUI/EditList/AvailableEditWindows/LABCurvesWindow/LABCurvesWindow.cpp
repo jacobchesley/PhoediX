@@ -70,7 +70,6 @@ LABCurvesWindow::LABCurvesWindow(wxWindow * parent, wxString editName, Processor
 	this->Bind(CURVE_CHANGED_EVENT, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
 	this->Bind(wxEVT_SCROLL_THUMBRELEASE, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
 	this->Bind(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&LABCurvesWindow::OnUpdate, this);
-	this->StartWatchdog();
 }
 
 void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){

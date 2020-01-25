@@ -76,8 +76,6 @@ ConvertGreyscaleWindow::ConvertGreyscaleWindow(wxWindow * parent, wxString editN
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
-
-	this->StartWatchdog();
 }
 
 void ConvertGreyscaleWindow::OnCombo(wxCommandEvent& WXUNUSED(event)) {

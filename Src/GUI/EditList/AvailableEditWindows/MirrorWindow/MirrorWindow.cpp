@@ -49,7 +49,6 @@ MirrorWindow::MirrorWindow(wxWindow * parent, wxString editName, Processor * pro
 
 	wxCommandEvent comboEvt(wxEVT_COMBOBOX, 0);
 	wxPostEvent(this, comboEvt);
-	this->StartWatchdog();
 }
 
 void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
