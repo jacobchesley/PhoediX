@@ -535,6 +535,32 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 		wxVector<ProcessorEdit*> editLayers = session->GetEditList()->GetSessionEditList();
         
         Logger::Log("PhoediX MainWindow::OpenSession - Adding edit windows to edit list", Logger::LogLevel::LOG_VERBOSE);
+
+		// If raw image is detected but raw edit is not located in correct place, fix
+		if (ImageHandler::CheckRaw(processor->GetFilePath())) {
+
+			// No edits, need RAW edit at top
+			if (editLayers.size() < 1) {
+				editLayers.push_back(new ProcessorEdit(ProcessorEdit::EditType::RAW));
+			}
+
+			// There are edits, make sure only one RAW edit is at top
+			else{
+				// Insert new top RAW edit
+				if (editLayers.at(0)->GetEditType() != ProcessorEdit::EditType::RAW) {
+					editLayers.insert(editLayers.begin(), new ProcessorEdit(ProcessorEdit::EditType::RAW));
+				}
+
+				// Remove any extra RAW edits from corrupt project
+				int numRemoved = 0;
+				for (size_t i = 1; i < editLayers.size(); i++) {
+					if (editLayers.at(i)->GetEditType() == ProcessorEdit::EditType::RAW) {
+						editLayers.erase(editLayers.begin() + i - numRemoved);
+						numRemoved += 1;
+					}
+				}
+			}
+		}
 		editList->AddEditWindows(editLayers);
 	}
     
