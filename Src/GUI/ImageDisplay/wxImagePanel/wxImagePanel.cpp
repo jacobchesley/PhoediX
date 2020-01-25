@@ -157,6 +157,9 @@ void WXImagePanel::OnPaint(wxPaintEvent& event) {
 }
 
 void WXImagePanel::OnSize(wxSizeEvent& event) {
+
+	if (doDraw == false) { return; }
+
 	if (staticImage) {
 		this->SetSize(bitmapDraw.GetWidth(), bitmapDraw.GetHeight());
 		return;
