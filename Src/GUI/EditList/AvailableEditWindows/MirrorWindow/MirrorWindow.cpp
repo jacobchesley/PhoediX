@@ -60,7 +60,7 @@ void MirrorWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_VERTICAL ||
 		edit->GetEditType() == ProcessorEdit::EditType::MIRROR_NONE) {
 
-		if (edit->CheckForFlag(PHOEDIX_PARAMETER_MIRROR_SELECT)) { mirrorMethod->SetSelection(edit->GetFlag(PHOEDIX_PARAMETER_MIRROR_SELECT)); }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_MIRROR_SELECT)) { mirrorMethod->SetSelection(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_MIRROR_SELECT)); }
 	}
 }
 
@@ -80,7 +80,7 @@ ProcessorEdit * MirrorWindow::GetParamsAndFlags(){
 		mirrorEdit = new ProcessorEdit(ProcessorEdit::EditType::MIRROR_NONE);
 	}
 
-	mirrorEdit->AddFlag(PHOEDIX_PARAMETER_MIRROR_SELECT, mirrorSelection);
+	mirrorEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_MIRROR_SELECT, mirrorSelection);
 
 	// Set enabled / disabled
 	mirrorEdit->SetDisabled(isDisabled);

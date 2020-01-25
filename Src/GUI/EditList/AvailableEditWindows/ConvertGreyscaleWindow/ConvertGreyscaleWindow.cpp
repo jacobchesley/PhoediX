@@ -105,9 +105,9 @@ void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	if(edit == NULL){ return; }
 
 	// Choose method based on edit loaded
-	if (edit->CheckForFlag(PHOEDIX_FLAG_GREYTYPE)) {
+	if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_GREYTYPE)) {
 
-		greyscaleMethod->SetSelection(edit->GetFlag(PHOEDIX_FLAG_GREYTYPE));
+		greyscaleMethod->SetSelection(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_GREYTYPE));
 
 		// Fire combo box event to show / hide sliders
 		wxCommandEvent comboEvt(wxEVT_COMBOBOX);
@@ -116,9 +116,9 @@ void ConvertGreyscaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 
 	// Populate sliders based on edit loaded
 	if (edit->GetEditType() == ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM){
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { redBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { greenBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { blueBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)) { redBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)) { greenBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)) { blueBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)); }
 	}
 }
 
@@ -137,9 +137,9 @@ ProcessorEdit * ConvertGreyscaleWindow::GetParamsAndFlags(){
 
 	else if (greyscaleSelection == 2) {
 		greyEdit = new ProcessorEdit(ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM);
-		greyEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, redBrightSlider->GetValue());
-		greyEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, greenBrightSlider->GetValue());
-		greyEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, blueBrightSlider->GetValue());
+		greyEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE, redBrightSlider->GetValue());
+		greyEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE, greenBrightSlider->GetValue());
+		greyEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE, blueBrightSlider->GetValue());
 	}
 	else {
 		return NULL;
@@ -147,7 +147,7 @@ ProcessorEdit * ConvertGreyscaleWindow::GetParamsAndFlags(){
 	// Set enabled / disabled
 	greyEdit->SetDisabled(isDisabled);
 
-	greyEdit->AddFlag(PHOEDIX_FLAG_GREYTYPE, greyscaleSelection);
+	greyEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_GREYTYPE, greyscaleSelection);
 	return greyEdit;
 }
 

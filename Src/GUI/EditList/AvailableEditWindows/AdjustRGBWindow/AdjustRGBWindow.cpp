@@ -75,20 +75,20 @@ void AdjustRGBWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	if(edit == NULL){ return; }
 	// Populate sliders based on edit loaded
 	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_RGB) {
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_ALL)) { allBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ALL)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED)) { redBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN)) { greenBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE)) { blueBrightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL)) { allBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED)) { redBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN)) { greenBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE)) { blueBrightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE)); }
 	}
 }
 
 ProcessorEdit * AdjustRGBWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * AdjustRgbEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_RGB);
-	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_ALL, allBrightSlider->GetValue());
-	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_RED, redBrightSlider->GetValue());
-	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_GREEN, greenBrightSlider->GetValue());
-	AdjustRgbEdit->AddParam(PHOEDIX_PARAMETER_BLUE, blueBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL, allBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED, redBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN, greenBrightSlider->GetValue());
+	AdjustRgbEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE, blueBrightSlider->GetValue());
 
 	AdjustRgbEdit->SetDisabled(isDisabled);
 

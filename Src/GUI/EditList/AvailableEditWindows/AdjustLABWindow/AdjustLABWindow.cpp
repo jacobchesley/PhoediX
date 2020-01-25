@@ -97,24 +97,24 @@ void AdjustLABWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	if(edit == NULL){ return;}
 
 	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_LAB) {
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_LUMINACE)) { lSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_LUMINACE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_A)) { aSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_A)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_B)) { bSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_B)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE)) { lSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A)) { aSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B)) { bSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)) { bScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)) { gScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)); }
 	}
 }
 
 ProcessorEdit * AdjustLABWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * LABEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_LAB);
-	LABEdit->AddParam(PHOEDIX_PARAMETER_LUMINACE, lSlider->GetValue());
-	LABEdit->AddParam(PHOEDIX_PARAMETER_A, aSlider->GetValue());
-	LABEdit->AddParam(PHOEDIX_PARAMETER_B, bSlider->GetValue());
-	LABEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
-	LABEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
-	LABEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
+	LABEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE, lSlider->GetValue());
+	LABEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A, aSlider->GetValue());
+	LABEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B, bSlider->GetValue());
+	LABEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	LABEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	LABEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	LABEdit->SetDisabled(isDisabled);

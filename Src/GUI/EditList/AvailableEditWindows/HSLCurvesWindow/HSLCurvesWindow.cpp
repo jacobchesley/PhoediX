@@ -82,13 +82,13 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	wxVector<Point> sControlPoints;
 	wxVector<Point> lControlPoints;
 
-	double * hArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_H_CURVE);
-	double * sArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_S_CURVE);
-	double * lArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_L_CURVE);
+	double * hArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE);
+	double * sArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE);
+	double * lArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
 
-	int hArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_H_CURVE);
-	int sArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_S_CURVE);
-	int lArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_L_CURVE);
+	int hArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE);
+	int sArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE);
+	int lArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
 
 	Point defaultPoint1;
 	Point defaultPoint2;
@@ -214,9 +214,9 @@ void HSLCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	sCurve->SetControlPoints(sControlPoints);
 	lCurve->SetControlPoints(lControlPoints);
 
-	if(edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
-	if(edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
-	if(edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
+	if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)); }
+	if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)); }
+	if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)); }
 }
 
 ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
@@ -277,19 +277,19 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 		wait.Wait();
 		mutexLock.Unlock();
 
-		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_H_CURVE, hCurve16, numSteps16);
-		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_S_CURVE, sCurve16, numSteps16);
-		HSLCurveEdit->AddIntArray(PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE, hCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE, sCurve16, numSteps16);
+		HSLCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
 		
 	}
 
 	// Add control points double arrays to edit
-	HSLCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_H_CURVE, hPoints, hControlPoints.size() * 2);
-	HSLCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_S_CURVE, sPoints, sControlPoints.size() * 2);
-	HSLCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_L_CURVE, lPoints, lControlPoints.size() * 2);
-	HSLCurveEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
-	HSLCurveEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
-	HSLCurveEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
+	HSLCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE, hPoints, hControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE, sPoints, sControlPoints.size() * 2);
+	HSLCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE, lPoints, lControlPoints.size() * 2);
+	HSLCurveEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	HSLCurveEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	HSLCurveEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	HSLCurveEdit->SetDisabled(isDisabled);

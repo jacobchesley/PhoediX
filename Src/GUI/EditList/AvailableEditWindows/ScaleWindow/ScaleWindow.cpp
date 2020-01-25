@@ -168,17 +168,17 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 			scaleInterpolation->SetSelection(0);
 
 			// Scale based on percentage
-			if(edit->GetFlag(PHOEDIX_FLAG_SCALE_TYPE) == 0){
+			if(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE) == 0){
 
 				scaleMethod->SetSelection(0);
-				if(edit->GetFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
+				if(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
 
 				// Fire combo box event to show / hide sliders
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
 				wxPostEvent(this, comboEvt);
 
-				if(edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH)){
-					double scaleWidth = (double)edit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH)){
+					double scaleWidth = (double)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
 					double percentage = 100.0 * scaleWidth / (double)proc->GetOriginalImage()->GetWidth();
 					scalePercentage->SetValue(percentage);
 				}
@@ -190,9 +190,9 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
 				wxPostEvent(this, comboEvt);
 
-				if(edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT)){
-					widthCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH)));
-					heightCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT)));
+				if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH) && edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT)){
+					widthCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH)));
+					heightCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT)));
 				}
 			}
 
@@ -205,17 +205,17 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 			scaleInterpolation->SetSelection(1);
 
 			// Scale based on percentage
-			if(edit->GetFlag(PHOEDIX_FLAG_SCALE_TYPE) == 0){
+			if(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE) == 0){
 
 				scaleMethod->SetSelection(0);
-				if(edit->GetFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
+				if(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
 
 				// Fire combo box event to show / hide sliders
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
 				wxPostEvent(this, comboEvt);
 
-				if(edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH)){
-					double scaleWidth = (double)edit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH)){
+					double scaleWidth = (double)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
 					double percentage = 100.0 * scaleWidth / (double)proc->GetOriginalImage()->GetWidth();
 					scalePercentage->SetValue(percentage);
 				}
@@ -228,9 +228,9 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
 				wxPostEvent(this, comboEvt);
 
-				if(edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT)){
-					widthCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH)));
-					heightCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT)));
+				if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH) && edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT)){
+					widthCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH)));
+					heightCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT)));
 				}
 			}
 
@@ -243,17 +243,17 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 			scaleInterpolation->SetSelection(2);
 
 			// Scale based on percentage
-			if(edit->GetFlag(PHOEDIX_FLAG_SCALE_TYPE) == 0){
+			if(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE) == 0){
 
 				scaleMethod->SetSelection(0);
-				if(edit->GetFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
+				if(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT) == 1){ keepAspect->SetValue(true); } else { keepAspect->SetValue(false); }
 
 				// Fire combo box event to show / hide sliders
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
 				wxPostEvent(this, comboEvt);
 
-				if(edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH)){
-					double scaleWidth = (double)edit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
+				if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH)){
+					double scaleWidth = (double)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
 					double percentage = 100.0 * scaleWidth / (double)proc->GetOriginalImage()->GetWidth();
 					scalePercentage->SetValue(percentage);
 				}
@@ -266,9 +266,9 @@ void ScaleWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 				wxCommandEvent comboEvt(wxEVT_COMBOBOX);
 				wxPostEvent(this, comboEvt);
 
-				if(edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && edit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT)){
-					widthCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH)));
-					heightCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT)));
+				if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH) && edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT)){
+					widthCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH)));
+					heightCtrl->SetValue(wxString::Format(wxT("%i"),(int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT)));
 				}
 			}
 
@@ -296,10 +296,10 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 		// Use a percentage to scale width and height
 		if(scaleMethod->GetSelection() == 0){
 			double scaleVal = scalePercentage->GetValue() / 100.0;
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, curProcesseedWidth * scaleVal);
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT,curProcesseedHeight * scaleVal);
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, curProcesseedWidth * scaleVal);
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT,curProcesseedHeight * scaleVal);
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
 
 			// Set enabled / disabled
 			scaleEdit->SetDisabled(isDisabled);
@@ -309,10 +309,10 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 
 		// Use custom width and height values
 		else{
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, (double)wxAtoi(widthCtrl->GetValue()));
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, (double)wxAtoi(heightCtrl->GetValue()));
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, (double)wxAtoi(widthCtrl->GetValue()));
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT, (double)wxAtoi(heightCtrl->GetValue()));
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
 
 			// Set enabled / disabled
 			scaleEdit->SetDisabled(isDisabled);
@@ -329,10 +329,10 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 		// Use a percentage to scale width and height
 		if(scaleMethod->GetSelection() == 0){
 			double scaleVal = scalePercentage->GetValue() / 100.0;
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, curProcesseedWidth * scaleVal);
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, curProcesseedHeight * scaleVal);
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, curProcesseedWidth * scaleVal);
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT, curProcesseedHeight * scaleVal);
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
 
 			// Set enabled / disabled
 			scaleEdit->SetDisabled(isDisabled);
@@ -342,10 +342,10 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 
 		// Use custom width and height values
 		else{
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, (double)wxAtoi(widthCtrl->GetValue()));
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, (double)wxAtoi(heightCtrl->GetValue()));
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, (double)wxAtoi(widthCtrl->GetValue()));
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT, (double)wxAtoi(heightCtrl->GetValue()));
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
 
 			// Set enabled / disabled
 			scaleEdit->SetDisabled(isDisabled);
@@ -362,10 +362,10 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 		// Use a percentage to scale width and height
 		if(scaleMethod->GetSelection() == 0){
 			double scaleVal = scalePercentage->GetValue() / 100.0;
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, curProcesseedWidth * scaleVal);
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, curProcesseedHeight * scaleVal);
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, curProcesseedWidth * scaleVal);
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT, curProcesseedHeight * scaleVal);
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
 
 			// Set enabled / disabled
 			scaleEdit->SetDisabled(isDisabled);
@@ -375,10 +375,10 @@ ProcessorEdit * ScaleWindow::GetParamsAndFlags(){
 
 		// Use custom width and height values
 		else{
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, (double)wxAtoi(widthCtrl->GetValue()));
-			scaleEdit->AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, (double)wxAtoi(heightCtrl->GetValue()));
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
-			scaleEdit->AddFlag(PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, (double)wxAtoi(widthCtrl->GetValue()));
+			scaleEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT, (double)wxAtoi(heightCtrl->GetValue()));
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE, scaleMethod->GetSelection());
+			scaleEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT, keepAspect->GetValue());
 
 			// Set enabled / disabled
 			scaleEdit->SetDisabled(isDisabled);

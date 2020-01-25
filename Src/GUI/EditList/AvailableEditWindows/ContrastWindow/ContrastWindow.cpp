@@ -128,14 +128,14 @@ void ContrastWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 		curveSelection->SetValue(1);
 	}
 
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_ALL_CONTRAST)) { allContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_CONTRAST)) { redContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_CONTRAST)) { greenContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_CONTRAST)) { blueContrastSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER)) { allContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER)) { redContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER)) { greenContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER)); }
-	if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER)) { blueContrastCenterSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST)) { allContrastSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST)) { redContrastSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST)) { greenContrastSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST)) { blueContrastSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER)) { allContrastCenterSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER)) { redContrastCenterSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER)) { greenContrastCenterSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER)); }
+	if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER)) { blueContrastCenterSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER)); }
 }
 
 ProcessorEdit * ContrastWindow::GetParamsAndFlags(){
@@ -148,14 +148,14 @@ ProcessorEdit * ContrastWindow::GetParamsAndFlags(){
 	else {
 		contrastEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE);
 	}
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_ALL_CONTRAST, allContrastSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_RED_CONTRAST, redContrastSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_GREEN_CONTRAST, greenContrastSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_BLUE_CONTRAST, blueContrastSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER, allContrastCenterSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER, redContrastCenterSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER, greenContrastCenterSlider->GetValue());
-	contrastEdit->AddParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER, blueContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST, allContrastSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST, redContrastSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST, greenContrastSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST, blueContrastSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER, allContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER, redContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER, greenContrastCenterSlider->GetValue());
+	contrastEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER, blueContrastCenterSlider->GetValue());
 
 	// Set enabled / disabled
 	contrastEdit->SetDisabled(isDisabled);

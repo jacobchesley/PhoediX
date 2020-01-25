@@ -43,15 +43,15 @@ void RGBCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	wxVector<Point> greenControlPoints;
 	wxVector<Point> blueControlPoints;
 
-	double * brightArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_BRIGHT_CURVE);
-	double * rArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_R_CURVE);
-	double * gArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_G_CURVE);
-	double * bArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_B_CURVE);
+	double * brightArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE);
+	double * rArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE);
+	double * gArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE);
+	double * bArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
-	int brightArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_BRIGHT_CURVE);
-	int rArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_R_CURVE);
-	int gArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_G_CURVE);
-	int bArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_B_CURVE);
+	int brightArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE);
+	int rArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE);
+	int gArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE);
+	int bArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
 	Point defaultPoint1;
 	Point defaultPoint2;
@@ -304,23 +304,23 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		mutexLock.Unlock();
 
 		// Add 8 bit map
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE, brightCurve8, numSteps8);
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_R_CURVE, redCurve8, numSteps8);
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_G_CURVE, greenCurve8, numSteps8);
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_B_CURVE, blueCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE, brightCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE, redCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE, greenCurve8, numSteps8);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE, blueCurve8, numSteps8);
 
 		// Add 16 bit map
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE_16, brightCurve16, numSteps16);
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_R_CURVE_16, redCurve16, numSteps16);
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_G_CURVE_16, greenCurve16, numSteps16);
-		rgbCurveEdit->AddIntArray(PHOEDIX_PARAMETER_B_CURVE_16, blueCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE_16, brightCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE_16, redCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE_16, greenCurve16, numSteps16);
+		rgbCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE_16, blueCurve16, numSteps16);
 	}
 
 	// Add control points double arrays to edit
-	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_BRIGHT_CURVE, brightPoints, brightControlPoints.size() * 2);
-	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_R_CURVE, redPoints, redControlPoints.size() * 2);
-	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_G_CURVE, greenPoints, greenControlPoints.size() * 2);
-	rgbCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_B_CURVE, bluePoints, blueControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE, brightPoints, brightControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE, redPoints, redControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE, greenPoints, greenControlPoints.size() * 2);
+	rgbCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE, bluePoints, blueControlPoints.size() * 2);
 
 	// Set enabled / disabled
 	rgbCurveEdit->SetDisabled(isDisabled);

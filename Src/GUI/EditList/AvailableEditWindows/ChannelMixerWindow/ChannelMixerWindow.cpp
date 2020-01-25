@@ -230,17 +230,17 @@ void ChannelMixerWindow::SetParamsAndFlags(ProcessorEdit * edit) {
 	// Populate sliders based on edit loaded
 	if (edit->GetEditType() == ProcessorEdit::EditType::CHANNEL_MIXER) {
 
-		if (edit->CheckForFlag(PHOEDIX_FLAG_PRESET)) { presetBox->SetSelection(edit->GetFlag(PHOEDIX_FLAG_PRESET)); }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESET)) { presetBox->SetSelection(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESET)); }
 
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_RED)) { redRedSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_RED)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_GREEN)) { redGreenSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_GREEN)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_BLUE)) { redBlueSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_BLUE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_RED)) { greenRedSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_RED)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_GREEN)) { greenGreenSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_BLUE)) { greenBlueSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_BLUE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_RED)) { blueRedSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_RED)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_GREEN)) { blueGreenSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_GREEN)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_BLUE)) { blueBlueSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_BLUE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_RED)) { redRedSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_RED)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_GREEN)) { redGreenSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_GREEN)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_BLUE)) { redBlueSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_BLUE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_RED)) { greenRedSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_RED)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_GREEN)) { greenGreenSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_GREEN)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_BLUE)) { greenBlueSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_BLUE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_RED)) { blueRedSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_RED)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_GREEN)) { blueGreenSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_GREEN)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_BLUE)) { blueBlueSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_BLUE)); }
 	}
 }
 
@@ -248,21 +248,21 @@ ProcessorEdit * ChannelMixerWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * mixerEdit = new ProcessorEdit(ProcessorEdit::EditType::CHANNEL_MIXER);
 
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_RED_RED, redRedSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_RED_GREEN, redGreenSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_RED_BLUE, redBlueSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_GREEN_RED, greenRedSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_GREEN_GREEN, greenGreenSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_GREEN_BLUE, greenBlueSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_BLUE_RED, blueRedSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_BLUE_GREEN, blueGreenSlider->GetValue());
-	mixerEdit->AddParam(PHOEDIX_PARAMETER_BLUE_BLUE, blueBlueSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_RED, redRedSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_GREEN, redGreenSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_BLUE, redBlueSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_RED, greenRedSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_GREEN, greenGreenSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_BLUE, greenBlueSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_RED, blueRedSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_GREEN, blueGreenSlider->GetValue());
+	mixerEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_BLUE, blueBlueSlider->GetValue());
 
 	// Set enabled / disabled
 	mixerEdit->SetDisabled(isDisabled);
 
 	// Add preset number
-	mixerEdit->AddFlag(PHOEDIX_FLAG_PRESET, presetBox->GetSelection());
+	mixerEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESET, presetBox->GetSelection());
 
 	return mixerEdit;
 }

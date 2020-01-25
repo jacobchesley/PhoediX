@@ -97,24 +97,24 @@ void AdjustHSLWindow::SetParamsAndFlags(ProcessorEdit * edit){
 
 	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_HSL) {
 
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_HUE)) { hueShiftSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_HUE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_SATURATION)) { saturationScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_SATURATION)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_LUMINACE)) { luminaceScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_LUMINACE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_HUE)) { hueShiftSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_HUE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SATURATION)) { saturationScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SATURATION)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE)) { luminaceScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)); }
 	}
 }
 
 ProcessorEdit * AdjustHSLWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * hslEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_HSL);
-	hslEdit->AddParam(PHOEDIX_PARAMETER_HUE, hueShiftSlider->GetValue());
-	hslEdit->AddParam(PHOEDIX_PARAMETER_SATURATION, saturationScaleSlider->GetValue());
-	hslEdit->AddParam(PHOEDIX_PARAMETER_LUMINACE, luminaceScaleSlider->GetValue());
-	hslEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
-	hslEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
-	hslEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
+	hslEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_HUE, hueShiftSlider->GetValue());
+	hslEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SATURATION, saturationScaleSlider->GetValue());
+	hslEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE, luminaceScaleSlider->GetValue());
+	hslEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	hslEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	hslEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	hslEdit->SetDisabled(isDisabled);

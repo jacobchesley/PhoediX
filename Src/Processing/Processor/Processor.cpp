@@ -6229,9 +6229,9 @@ void Processor::CalculateWidthHeightRotation(ProcessorEdit * rotationEdit, int o
 		rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR ||
 		rotationEdit->GetEditType() == ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST) {
 
-		if (!rotationEdit->CheckForParameter(PHOEDIX_PARAMETER_ROTATE_ANGLE) || !rotationEdit->CheckForFlag(PHOEDIX_FLAG_ROTATE_CROP)) { return; }
-		double angleDegrees = rotationEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
-		int cropFlag = rotationEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+		if (!rotationEdit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE) || !rotationEdit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_CROP)) { return; }
+		double angleDegrees = rotationEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
+		int cropFlag = rotationEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_CROP);
 
 		// Set width and height to maximum size needed to fit whole image in rotation (with black surrounding borders)
 		if (cropFlag == Processor::RotationCropping::EXPAND) {
@@ -6269,9 +6269,9 @@ void Processor::CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * 
 			curEdit->GetEditType() == ProcessorEdit::EditType::SCALE_BICUBIC) {
 
 			// Set width and height to scale width and height
-			if (curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_WIDTH) && curEdit->CheckForParameter(PHOEDIX_PARAMETER_SCALE_HEIGHT) ) {
-				*width = (int)curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
-				*height = (int)curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
+			if (curEdit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH) && curEdit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT) ) {
+				*width = (int)curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
+				*height = (int)curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT);
 			}
 		}
 
@@ -6290,11 +6290,11 @@ void Processor::CalcualteWidthHeightEdits(wxVector<ProcessorEdit*> edits, int * 
 		if (curEdit->GetEditType() == ProcessorEdit::EditType::CROP) {
 			
 			// Set width and height to crop width and height
-			if (curEdit->CheckForParameter(PHOEDIX_PARAMETER_CROP_WIDTH) && curEdit->CheckForParameter(PHOEDIX_PARAMETER_CROP_WIDTH)) {
+			if (curEdit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_WIDTH) && curEdit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_WIDTH)) {
 
 				// Params 0 and 1 are x and y start points
-				*width = (int)(curEdit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH) * (double)*width);
-				*height = (int)(curEdit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH) * (double)*height);
+				*width = (int)(curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_WIDTH) * (double)*width);
+				*height = (int)(curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_WIDTH) * (double)*height);
 			}			
 		}
 	}
@@ -6486,8 +6486,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 		if(halfWidth > 0 && halfHeight > 0.0){
 			
 			ProcessorEdit halfSizeEdit(ProcessorEdit::EditType::SCALE_NEAREST);
-			halfSizeEdit.AddParam(PHOEDIX_PARAMETER_SCALE_WIDTH, halfWidth);
-			halfSizeEdit.AddParam(PHOEDIX_PARAMETER_SCALE_HEIGHT, halfHeight);
+			halfSizeEdit.AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH, halfWidth);
+			halfSizeEdit.AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT, halfHeight);
 
 			// Multithread if needed
 			if(processor->GetMultithread()){
@@ -6556,11 +6556,11 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust Brightness Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double brighnessAmount = curEdit->GetParam(PHOEDIX_PARAMETER_BRIGHTNESS);
-				double detailsPreservation = curEdit->GetParam(PHOEDIX_PARAMETER_PRESERVATION);
-				double toneSetting = curEdit->GetParam(PHOEDIX_PARAMETER_TONE);
+				double brighnessAmount = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHTNESS);
+				double detailsPreservation = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_PRESERVATION);
+				double toneSetting = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_TONE);
 
-				int toneFlag = curEdit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE);
+				int toneFlag = curEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6582,12 +6582,12 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust HSL Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double hueShift = curEdit->GetParam(PHOEDIX_PARAMETER_HUE);
-				double saturationScale = curEdit->GetParam(PHOEDIX_PARAMETER_SATURATION);
-				double luminaceScale = curEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
-				double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-				double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-				double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+				double hueShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_HUE);
+				double saturationScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SATURATION);
+				double luminaceScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE);
+				double rScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+				double bScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6609,12 +6609,12 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust LAB Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double luminaceScale = curEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
-				double aShift = curEdit->GetParam(PHOEDIX_PARAMETER_A);
-				double bShift = curEdit->GetParam(PHOEDIX_PARAMETER_B);
-				double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-				double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-				double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+				double luminaceScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE);
+				double aShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A);
+				double bShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B);
+				double rScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+				double bScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6636,10 +6636,10 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Shift RGB Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double allBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_ALL);
-				double redBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_RED);
-				double greenBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
-				double blueBrightShift = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE);
+				double allBrightShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL);
+				double redBrightShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED);
+				double greenBrightShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN);
+				double blueBrightShift = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6660,8 +6660,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				processor->SendMessageToParent("Processing Blur" + fullEditNumStr);
 
-				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
-				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
+				double blurSize = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE);
+				int numPasses = (int)curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUM_PASSES);
 
 				// No blur, radius too small
 				if (blurSize == 0.0) { break; }
@@ -6673,8 +6673,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 						// Setup temporary edits to break down blur into horizontal and vertical blur edits
 						ProcessorEdit * horizontalBlur = new ProcessorEdit(ProcessorEdit::HORIZONTAL_BLUR);
 						ProcessorEdit * verticalBlur = new ProcessorEdit(ProcessorEdit::VERTICAL_BLUR);
-						horizontalBlur->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSize);
-						verticalBlur->AddParam(PHOEDIX_PARAMETER_BLURSIZE, blurSize);
+						horizontalBlur->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE, blurSize);
+						verticalBlur->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE, blurSize);
 
 						// Blur horiztonally 
 						processor->SetupBlur();
@@ -6721,8 +6721,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				processor->SendMessageToParent("Processing Horizontal Blur" + fullEditNumStr);
 
-				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
-				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
+				double blurSize = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE);
+				int numPasses = (int)curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUM_PASSES);
 
 				// No blur, radius too small
 				if (blurSize * processor->GetImage()->GetWidth() < 1.0) { break; }
@@ -6757,8 +6757,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 
 				processor->SendMessageToParent("Processing Vertical Blur" + fullEditNumStr);
 
-				double blurSize = curEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
-				int numPasses = (int)curEdit->GetParam(PHOEDIX_PARAMETER_NUM_PASSES);
+				double blurSize = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE);
+				int numPasses = (int)curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUM_PASSES);
 
 				// No blur, radius too small
 				if (blurSize * processor->GetImage()->GetHeight() < 1.0) { break; }
@@ -6801,15 +6801,15 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Channel Mixer Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double redRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_RED);
-				double redGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_GREEN);
-				double redBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_BLUE);
-				double greenRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_RED);
-				double greenGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN);
-				double greenBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_BLUE);
-				double blueRedScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_RED);
-				double blueGreenScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_GREEN);
-				double blueBlueScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_BLUE);
+				double redRedScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_RED);
+				double redGreenScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_GREEN);
+				double redBlueScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_BLUE);
+				double greenRedScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_RED);
+				double greenGreenScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_GREEN);
+				double greenBlueScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_BLUE);
+				double blueRedScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_RED);
+				double blueGreenScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_GREEN);
+				double blueBlueScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_BLUE);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6832,14 +6832,14 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double allContrast = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
-				double redContrast = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
-				double greenContrast = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
-				double blueContrast = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
-				double allCenter = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
-				double redCenter = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
-				double greenCenter = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
-				double blueCenter = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
+				double allContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST);
+				double redContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST);
+				double greenContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST);
+				double blueContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST);
+				double allCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+				double redCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+				double greenCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+				double blueCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6861,14 +6861,14 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Adjust Contrast Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double allContrast = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
-				double redContrast = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
-				double greenContrast = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
-				double blueContrast = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
-				double allCenter = curEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
-				double redCenter = curEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
-				double greenCenter = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
-				double blueCenter = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
+				double allContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST);
+				double redContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST);
+				double greenContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST);
+				double blueContrast = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST);
+				double allCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+				double redCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+				double greenCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+				double blueCenter = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6888,15 +6888,15 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 			// Peform Crop edit
 			case ProcessorEdit::EditType::CROP: {
 
-				if (curEdit->GetFlag(PHOEDIX_FLAG_CROP_ENABLED) == 0) { break; }
+				if (curEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_CROP_ENABLED) == 0) { break; }
 
 				processor->SendMessageToParent("Processing crop" + fullEditNumStr);
 
 				// Get crop dimmensions
-				double startX = curEdit->GetParam(PHOEDIX_PARAMETER_STARTX);
-				double startY = curEdit->GetParam(PHOEDIX_PARAMETER_STARTY);
-				double newWidth = curEdit->GetParam(PHOEDIX_PARAMETER_CROP_WIDTH);
-				double newHeight = curEdit->GetParam(PHOEDIX_PARAMETER_CROP_HEIGHT);
+				double startX = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_STARTX);
+				double startY = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_STARTY);
+				double newWidth = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_WIDTH);
+				double newHeight = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_HEIGHT);
 
 				// Multithread if needed
 				if (processor->GetMultithread()) {
@@ -6959,9 +6959,9 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Greyscale (Custom) Edit" + fullEditNumStr);
 
 				// Get all parameters from the edit
-				double redScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-				double greenScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-				double blueScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+				double redScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+				double greenScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+				double blueScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				// Multithread if needed
 				if(processor->GetMultithread()){
@@ -6984,13 +6984,13 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 					processor->SendMessageToParent("Processing HSL Curves Edit" + fullEditNumStr);
 
 					// Get LAB curve data
-					int * hCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_H_CURVE);
-					int * sCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_S_CURVE);
-					int * lCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
+					int * hCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE);
+					int * sCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE);
+					int * lCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
 
-					double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-					double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-					double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+					double rScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+					double gScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+					double bScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 					// Multithread if needed
 					if(processor->GetMultithread()){
@@ -7015,13 +7015,13 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 					processor->SendMessageToParent("Processing LAB Curves Edit" + fullEditNumStr);
 
 					// Get LAB curve data
-					int * lCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
-					int * aCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_A_CURVE);
-					int * bCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
+					int * lCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
+					int * aCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE);
+					int * bCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
-					double rScale = curEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-					double gScale = curEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-					double bScale = curEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+					double rScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+					double gScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+					double bScale = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 					// Multithread if needed
 					if(processor->GetMultithread()){
@@ -7084,16 +7084,16 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 					processor->SendMessageToParent("Processing RGB Curves Edit" + fullEditNumStr);
 
 					// Get 8 bit curve data
-					int * brightCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE);
-					int * redCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE);
-					int * greenCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE);
-					int * blueCurve8 = curEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
+					int * brightCurve8 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE);
+					int * redCurve8 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE);
+					int * greenCurve8 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE);
+					int * blueCurve8 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
 					// Get 16 bit curve data
-					int * brightCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE_16);
-					int * redCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE_16);
-					int * greenCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE_16);
-					int * blueCurve16 = curEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE_16);
+					int * brightCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE_16);
+					int * redCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE_16);
+					int * greenCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE_16);
+					int * blueCurve16 = curEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE_16);
 
 					// Multithread if needed
 					if(processor->GetMultithread()){
@@ -7155,8 +7155,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
 				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
-				int cropFlag = curEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+				double angle = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
+				int cropFlag = curEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_CROP);
 
 				if(angle == 0.0){ break; }
 
@@ -7185,8 +7185,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
 				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
-				int cropFlag = curEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+				double angle = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
+				int cropFlag = curEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_CROP);
 
 				if(angle == 0.0){ break; }
 
@@ -7215,8 +7215,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Rotation Edit" + fullEditNumStr);
 
 				// Perform an edit on the data through the processor
-				double angle = curEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
-				int cropFlag = curEdit->GetFlag(PHOEDIX_FLAG_ROTATE_CROP);
+				double angle = curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
+				int cropFlag = curEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_CROP);
 
 				if(angle == 0.0){ break; }
 
@@ -7245,8 +7245,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
 
 				// Perform an edit on the data through the processor
-				int width = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
-				int height = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
+				int width = (int) curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
+				int height = (int) curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT);
 				
 				// Fast edit, half size
 				if(processor->GetFastEdit()){
@@ -7281,8 +7281,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
 
 				// Perform an edit on the data through the processor
-				int width = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
-				int height = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
+				int width = (int) curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
+				int height = (int) curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT);
 				
 				// Fast edit, half size
 				if(processor->GetFastEdit()){
@@ -7317,8 +7317,8 @@ wxThread::ExitCode Processor::ProcessThread::Entry() {
 				processor->SendMessageToParent("Processing Scale Edit" + fullEditNumStr);
 
 				// Perform an edit on the data through the processor
-				int width = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_WIDTH);
-				int height = (int) curEdit->GetParam(PHOEDIX_PARAMETER_SCALE_HEIGHT);
+				int width = (int) curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH);
+				int height = (int) curEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT);
 				
 				// Fast edit, half size
 				if(processor->GetFastEdit()){
@@ -7390,11 +7390,11 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_BRIGHTNESS: {
 
 			// Get all parameters from the edit
-			double brighnessAmount = procEdit->GetParam(PHOEDIX_PARAMETER_BRIGHTNESS);
-			double detailsPreservation = procEdit->GetParam(PHOEDIX_PARAMETER_PRESERVATION);
-			double toneSetting = procEdit->GetParam(PHOEDIX_PARAMETER_TONE);
+			double brighnessAmount = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHTNESS);
+			double detailsPreservation = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_PRESERVATION);
+			double toneSetting = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_TONE);
 
-			int toneFlag = procEdit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE);
+			int toneFlag = procEdit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE);
 			processor->AdjustBrightness(brighnessAmount, detailsPreservation, toneSetting, toneFlag, start, end);
 		}
 		 break;
@@ -7403,12 +7403,12 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_HSL: {
 
 			// Get all parameters from the edit
-			double hueShift = procEdit->GetParam(PHOEDIX_PARAMETER_HUE);
-			double saturationScale = procEdit->GetParam(PHOEDIX_PARAMETER_SATURATION);
-			double luminaceScale = procEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
-			double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-			double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-			double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+			double hueShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_HUE);
+			double saturationScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SATURATION);
+			double luminaceScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE);
+			double rScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+			double gScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+			double bScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 			processor->AdjustHSL(hueShift, saturationScale, luminaceScale, rScale, gScale, bScale, start, end);
 
@@ -7419,12 +7419,12 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_LAB: {
 
 			// Get all parameters from the edit
-			double luminaceScale = procEdit->GetParam(PHOEDIX_PARAMETER_LUMINACE);
-			double aShift = procEdit->GetParam(PHOEDIX_PARAMETER_A);
-			double bShift = procEdit->GetParam(PHOEDIX_PARAMETER_B);
-			double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-			double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-			double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+			double luminaceScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE);
+			double aShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A);
+			double bShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B);
+			double rScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+			double gScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+			double bScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 			processor->AdjustLAB(luminaceScale, aShift, bShift, rScale, gScale, bScale, start, end);
 
@@ -7435,10 +7435,10 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_RGB: {
 
 			// Get all parameters from the edit
-			double allBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_ALL);
-			double redBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_RED);
-			double greenBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN);
-			double blueBrightShift = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE);
+			double allBrightShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL);
+			double redBrightShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED);
+			double greenBrightShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN);
+			double blueBrightShift = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE);
 
 			processor->AdjustRGB(allBrightShift, redBrightShift, greenBrightShift, blueBrightShift, start, end);
 		}
@@ -7447,14 +7447,14 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		// Peform Horizontal Blur edit
 		case ProcessorEdit::EditType::HORIZONTAL_BLUR: {
 
-			double blurSize = procEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+			double blurSize = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE);
 			processor->BoxBlurHorizontal(processor->CalculateBlurSize(blurSize), start, end);
 		}
 		break;
 
 		// Peform Vertical Blur edit
 		case ProcessorEdit::EditType::VERTICAL_BLUR: {
-			double blurSize = procEdit->GetParam(PHOEDIX_PARAMETER_BLURSIZE);
+			double blurSize = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE);
 			processor->BoxBlurVertical(processor->CalculateBlurSize(blurSize), start, end);
 		}
 		break;
@@ -7463,15 +7463,15 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::CHANNEL_MIXER: {
 
 			// Get all parameters from the edit
-			double redRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_RED);
-			double redGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_GREEN);
-			double redBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_BLUE);
-			double greenRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_RED);
-			double greenGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_GREEN);
-			double greenBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_BLUE);
-			double blueRedScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_RED);
-			double blueGreenScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_GREEN);
-			double blueBlueScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_BLUE);
+			double redRedScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_RED);
+			double redGreenScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_GREEN);
+			double redBlueScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_BLUE);
+			double greenRedScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_RED);
+			double greenGreenScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_GREEN);
+			double greenBlueScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_BLUE);
+			double blueRedScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_RED);
+			double blueGreenScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_GREEN);
+			double blueBlueScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_BLUE);
 
 			processor->ChannelScale(redRedScale, redGreenScale, redBlueScale,
 				greenRedScale, greenGreenScale, greenBlueScale,
@@ -7483,14 +7483,14 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_CONTRAST: {
 
 			// Get all parameters from the edit
-			double allContrast = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
-			double redContrast = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
-			double greenContrast = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
-			double blueContrast = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
-			double allCenter = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
-			double redCenter = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
-			double greenCenter = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
-			double blueCenter = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
+			double allContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST);
+			double redContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST);
+			double greenContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST);
+			double blueContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST);
+			double allCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+			double redCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+			double greenCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+			double blueCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 
 			processor->AdjustContrast(allContrast, redContrast, greenContrast, blueContrast,
@@ -7502,14 +7502,14 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ADJUST_CONTRAST_CURVE: {
 
 			// Get all parameters from the edit
-			double allContrast = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST);
-			double redContrast = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST);
-			double greenContrast = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST);
-			double blueContrast = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST);
-			double allCenter = procEdit->GetParam(PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
-			double redCenter = procEdit->GetParam(PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
-			double greenCenter = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
-			double blueCenter = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
+			double allContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST);
+			double redContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST);
+			double greenContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST);
+			double blueContrast = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST);
+			double allCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER);
+			double redCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER);
+			double greenCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER);
+			double blueCenter = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER);
 
 			processor->AdjustContrastCurve(allContrast, redContrast, greenContrast, blueContrast,
 				allCenter, redCenter, greenCenter, blueCenter, start, end);
@@ -7520,8 +7520,8 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::CROP: {
 
 			// Get crop dimmensions
-			double startX = procEdit->GetParam(PHOEDIX_PARAMETER_STARTX);
-			double startY = procEdit->GetParam(PHOEDIX_PARAMETER_STARTY);
+			double startX = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_STARTX);
+			double startY = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_STARTY);
 
 			processor->Crop(startX, startY, start, end);
 		}
@@ -7545,9 +7545,9 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::CONVERT_GREYSCALE_CUSTOM: {
 
 			// Get all parameters from the edit
-			double redScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-			double greenScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE);
-			double blueScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+			double redScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+			double greenScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE);
+			double blueScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 			processor->ConvertGreyscale(redScale, greenScale, blueScale, start, end);
 		}
@@ -7559,13 +7559,13 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 			if (procEdit->GetNumIntArrays() == 3 && procEdit->GetParamsSize() == 3) {
 
 				// Get LAB curve data
-				int * hCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_H_CURVE);
-				int * sCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_S_CURVE);
-				int * lCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
+				int * hCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE);
+				int * sCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE);
+				int * lCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
 
-				double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-				double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE );
-				double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+				double rScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE );
+				double bScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				processor->HSLCurves(hCurve16, sCurve16, lCurve16, rScale, gScale, bScale, start, end);
 			}
@@ -7578,13 +7578,13 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 			if (procEdit->GetNumIntArrays() == 3 && procEdit->GetParamsSize() == 3) {
 
 				// Get LAB curve data
-				int * lCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_L_CURVE);
-				int * aCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_A_CURVE);
-				int * bCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
+				int * lCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
+				int * aCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE);
+				int * bCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
-				double rScale = procEdit->GetParam(PHOEDIX_PARAMETER_RED_SCALE);
-				double gScale = procEdit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE );
-				double bScale = procEdit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE);
+				double rScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE);
+				double gScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE );
+				double bScale = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE);
 
 				processor->LABCurves(lCurve16, aCurve16, bCurve16, rScale, gScale, bScale, start, end);
 			}
@@ -7628,7 +7628,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		// Peform a custom angle clockwise roctation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_NEAREST: {
 
-			double angle = procEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+			double angle = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
 			processor->RotateCustom(angle, start, end);
 		}
 		break;
@@ -7636,7 +7636,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		// Peform a custom angle clockwise roctation using bilinear interpolation
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_BILINEAR: {
 
-			double angle = procEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+			double angle = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
 			processor->RotateCustomBilinear(angle, start, end);
 		}
 		break;
@@ -7645,7 +7645,7 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 		case ProcessorEdit::EditType::ROTATE_CUSTOM_BICUBIC: {
 
 			// Perform an edit on the data through the processor
-			double angle = procEdit->GetParam(PHOEDIX_PARAMETER_ROTATE_ANGLE);
+			double angle = procEdit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE);
 			processor->RotateCustomBicubic(angle, start, end);
 
 		}
@@ -7678,16 +7678,16 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 			if (procEdit->GetNumIntArrays() == 8) {
 
 				// Get 8 bit curve data
-				int * brightCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE);
-				int * redCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE);
-				int * greenCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE);
-				int * blueCurve8 = procEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE);
+				int * brightCurve8 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE);
+				int * redCurve8 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE);
+				int * greenCurve8 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE);
+				int * blueCurve8 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
 				// Get 16 bit curve data
-				int * brightCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_BRIGHT_CURVE_16);
-				int * redCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_R_CURVE_16);
-				int * greenCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_G_CURVE_16);
-				int * blueCurve16 = procEdit->GetIntArray(PHOEDIX_PARAMETER_B_CURVE_16);
+				int * brightCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE_16);
+				int * redCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE_16);
+				int * greenCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE_16);
+				int * blueCurve16 = procEdit->GetIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE_16);
 
 				processor->RGBCurves(brightCurve8, redCurve8, greenCurve8, blueCurve8,
 					brightCurve16, redCurve16, greenCurve16, blueCurve16, start, end);
@@ -7698,12 +7698,13 @@ wxThread::ExitCode Processor::EditThread::Entry() {
 
 	mutLock->Lock();
 	*complete += 1;
-	mutLock->Unlock();
 
 	// All worker threads have finished, signal condition to continue
 	if (*complete == threads && cond->IsOk()) {
 		cond->Broadcast();
 	}
+
+	mutLock->Unlock();
 
 	return (wxThread::ExitCode)0;
 }
@@ -7861,7 +7862,8 @@ wxThread::ExitCode Processor::RawProcessThread::Entry() {
 		}
 
 		// Populate image exif information
-		ImageHandler::ReadExifFromRaw(processor->rawProcessor, processor->GetImage());
+		//processor->GetImage()->DeleteExif();
+		//ImageHandler::ReadExifFromRaw(processor->rawProcessor, processor->GetImage());
 
 		processor->Unlock();
 		processor->ProcessEdits();

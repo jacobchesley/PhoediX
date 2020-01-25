@@ -81,14 +81,14 @@ void AdjustBrightnessWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	// Populate sliders based on edit loaded
 	if (edit->GetEditType() == ProcessorEdit::EditType::ADJUST_BRIGHTNESS) {
 
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_BRIGHTNESS)) { brightSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BRIGHTNESS)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_PRESERVATION)) { preservationSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_PRESERVATION)); }
-		if (edit->CheckForParameter(PHOEDIX_PARAMETER_TONE)) { toneSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_TONE)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHTNESS)) { brightSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHTNESS)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_PRESERVATION)) { preservationSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_PRESERVATION)); }
+		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_TONE)) { toneSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_TONE)); }
 
-		if (edit->CheckForFlag(PHOEDIX_FLAG_PRESERVATION_TYPE)) {
-			if (edit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS) { detailsSelect->SetSelection(0); }
-			else if (edit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::SHADOWS) { detailsSelect->SetSelection(1); }
-			else if (edit->GetFlag(PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::HIGHLIGHTS) { detailsSelect->SetSelection(2); }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE)) {
+			if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS) { detailsSelect->SetSelection(0); }
+			else if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::SHADOWS) { detailsSelect->SetSelection(1); }
+			else if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE) == Processor::BrightnessPreservation::HIGHLIGHTS) { detailsSelect->SetSelection(2); }
 		}
 	}
 }
@@ -97,14 +97,14 @@ ProcessorEdit * AdjustBrightnessWindow::GetParamsAndFlags(){
 
 	// Add params
 	ProcessorEdit * brightEdit = new ProcessorEdit(ProcessorEdit::EditType::ADJUST_BRIGHTNESS);
-	brightEdit->AddParam(PHOEDIX_PARAMETER_BRIGHTNESS, brightSlider->GetValue());
-	brightEdit->AddParam(PHOEDIX_PARAMETER_PRESERVATION, preservationSlider->GetValue());
-	brightEdit->AddParam(PHOEDIX_PARAMETER_TONE, toneSlider->GetValue());
+	brightEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHTNESS, brightSlider->GetValue());
+	brightEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_PRESERVATION, preservationSlider->GetValue());
+	brightEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_TONE, toneSlider->GetValue());
 	
 	// Add Flag
-	if(detailsSelect->GetSelection() == 0){ brightEdit->AddFlag(PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS); }
-	else if(detailsSelect->GetSelection() == 1){ brightEdit->AddFlag(PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::SHADOWS); }
-	else{ brightEdit->AddFlag(PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::HIGHLIGHTS); }
+	if(detailsSelect->GetSelection() == 0){ brightEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::SHADOWS_AND_HIGHLIGHTS); }
+	else if(detailsSelect->GetSelection() == 1){ brightEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::SHADOWS); }
+	else{ brightEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE, Processor::BrightnessPreservation::HIGHLIGHTS); }
 
 	// Set enabled / disabled
 	brightEdit->SetDisabled(isDisabled);

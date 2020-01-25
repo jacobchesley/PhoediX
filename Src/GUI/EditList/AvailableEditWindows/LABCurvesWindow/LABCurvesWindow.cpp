@@ -80,13 +80,13 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	wxVector<Point> aControlPoints;
 	wxVector<Point> bControlPoints;
 
-	double * lArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_L_CURVE);
-	double * aArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_A_CURVE);
-	double * bArray = edit->GetDoubleArray(PHOEDIX_PARAMETER_B_CURVE);
+	double * lArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
+	double * aArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE);
+	double * bArray = edit->GetDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
-	int lArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_L_CURVE);
-	int aArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_A_CURVE);
-	int bArraySize = edit->GetDoubleArraySize(PHOEDIX_PARAMETER_B_CURVE);
+	int lArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE);
+	int aArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE);
+	int bArraySize = edit->GetDoubleArraySize(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE);
 
 	Point defaultPoint1;
 	Point defaultPoint2;
@@ -212,9 +212,9 @@ void LABCurvesWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	aCurve->SetControlPoints(aControlPoints);
 	bCurve->SetControlPoints(bControlPoints);
 
-	if(edit->CheckForParameter(PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RED_SCALE)); }
-	if(edit->CheckForParameter(PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_GREEN_SCALE)); }
-	if(edit->CheckForParameter(PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(PHOEDIX_PARAMETER_BLUE_SCALE)); }
+	if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)) { rScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE)); }
+	if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)) { gScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE)); }
+	if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)) { bScaleSlider->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE)); }
 }
 
 ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
@@ -275,18 +275,18 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 		wait.Wait();
 		mutexLock.Unlock();
 
-		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
-		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_A_CURVE, aCurve16, numSteps16);
-		labCurveEdit->AddIntArray(PHOEDIX_PARAMETER_B_CURVE, bCurve16, numSteps16);
+		labCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
+		labCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE, aCurve16, numSteps16);
+		labCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE, bCurve16, numSteps16);
 	}
 
 	// Add control points double arrays to edit
-	labCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_L_CURVE, lPoints, lControlPoints.size() * 2);
-	labCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_A_CURVE,aPoints, aControlPoints.size() * 2);
-	labCurveEdit->AddDoubleArray(PHOEDIX_PARAMETER_B_CURVE,bPoints, bControlPoints.size() * 2);
-	labCurveEdit->AddParam(PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
-	labCurveEdit->AddParam(PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
-	labCurveEdit->AddParam(PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
+	labCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE, lPoints, lControlPoints.size() * 2);
+	labCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE,aPoints, aControlPoints.size() * 2);
+	labCurveEdit->AddDoubleArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE,bPoints, bControlPoints.size() * 2);
+	labCurveEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE, rScaleSlider->GetValue());
+	labCurveEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE, gScaleSlider->GetValue());
+	labCurveEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE, bScaleSlider->GetValue());
 
 	// Set enabled / disabled
 	labCurveEdit->SetDisabled(isDisabled);

@@ -709,30 +709,30 @@ void RawWindow::SetParamsAndFlags(ProcessorEdit * edit, bool reprocess) {
 
 	if(edit->GetEditType() == ProcessorEdit::EditType::RAW){
 
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_BRIGHTNESS)) { brightnessControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_BRIGHTNESS)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_HIGHLIGHTS)) {	highlightControl->SetSelection((int)edit->GetParam(PHOEDIX_PARAMETER_RAW_HIGHLIGHTS)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_SATURATION)) {	satLevelControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_SATURATION)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_AUTOBRIGHT)) {if(edit->GetParam(PHOEDIX_PARAMETER_RAW_AUTOBRIGHT) == 1){ autoBrightControl->SetValue(true); } else { autoBrightControl->SetValue(false); } }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH)) { autoBrightThrControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH)) {	maxThrControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_EXPOSURE)) { exposureControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_EXPOSURE)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE)) { exposurePreserveControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL)) { gammaLevelControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE)) { gammaSlopeControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_GREEN_MATCH)) { if(edit->GetParam(PHOEDIX_PARAMETER_RAW_GREEN_MATCH) == 1){ greenMatchingControl->SetValue(true); } else { greenMatchingControl->SetValue(false); } }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_INTERPOLATION)) { interpolationControl->SetSelection((int)edit->GetParam(PHOEDIX_PARAMETER_RAW_INTERPOLATION)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_WB_PRESET)) { whiteBalancePresetsControl->SetSelection((int)edit->GetParam(PHOEDIX_PARAMETER_RAW_WB_PRESET)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_WB_RED)) { redMultiplierControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_WB_RED)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_WB_GREEN)) { greenMultiplierControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_WB_GREEN)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_WB_BLUE)) { blueMultiplierControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_WB_BLUE)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD)) { waveletNoiseControl->SetValue(edit->GetParam(PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD)); }
-		if(edit->CheckForParameter(PHOEDIX_PARAMETER_FLIP)) { flipControl->SetSelection((int)edit->GetParam(PHOEDIX_PARAMETER_FLIP)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_BRIGHTNESS)) { brightnessControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_BRIGHTNESS)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_HIGHLIGHTS)) {	highlightControl->SetSelection((int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_HIGHLIGHTS)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_SATURATION)) {	satLevelControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_SATURATION)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT)) {if(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT) == 1){ autoBrightControl->SetValue(true); } else { autoBrightControl->SetValue(false); } }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH)) { autoBrightThrControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH)) {	maxThrControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE)) { exposureControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE)) { exposurePreserveControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL)) { gammaLevelControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE)) { gammaSlopeControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GREEN_MATCH)) { if(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GREEN_MATCH) == 1){ greenMatchingControl->SetValue(true); } else { greenMatchingControl->SetValue(false); } }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_INTERPOLATION)) { interpolationControl->SetSelection((int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_INTERPOLATION)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_PRESET)) { whiteBalancePresetsControl->SetSelection((int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_PRESET)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_RED)) { redMultiplierControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_RED)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_GREEN)) { greenMultiplierControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_GREEN)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_BLUE)) { blueMultiplierControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_BLUE)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD)) { waveletNoiseControl->SetValue(edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD)); }
+		if(edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_FLIP)) { flipControl->SetSelection((int)edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_FLIP)); }
 		
-		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS) == 1) { settingsPanelCollapse->Open(); } else { settingsPanelCollapse->Collapse(); } }
-		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE) == 1) { exposurePanelCollapse->Open(); } else { exposurePanelCollapse->Collapse(); } }
-		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR) == 1) { colorPanelCollapse->Open(); } else { colorPanelCollapse->Collapse(); } }
-		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE) == 1) { noisePanelCollapse->Open(); } else { noisePanelCollapse->Collapse(); } }
-		if (edit->CheckForFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_INFO)) { if (edit->GetFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_INFO) == 1) { infoPanelCollapse->Open(); } else { infoPanelCollapse->Collapse(); } }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS) == 1) { settingsPanelCollapse->Open(); } else { settingsPanelCollapse->Collapse(); } }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE) == 1) { exposurePanelCollapse->Open(); } else { exposurePanelCollapse->Collapse(); } }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR) == 1) { colorPanelCollapse->Open(); } else { colorPanelCollapse->Collapse(); } }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE) == 1) { noisePanelCollapse->Open(); } else { noisePanelCollapse->Collapse(); } }
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_INFO)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_INFO) == 1) { infoPanelCollapse->Open(); } else { infoPanelCollapse->Collapse(); } }
 
 		if (reprocess) {
 			this->Process();
@@ -744,35 +744,35 @@ ProcessorEdit * RawWindow::GetParamsAndFlags(){
 
 	ProcessorEdit * rawEdit = new ProcessorEdit(ProcessorEdit::EditType::RAW);
 
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_BRIGHTNESS, brightnessControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_HIGHLIGHTS, (double) highlightControl->GetSelection());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_SATURATION, satLevelControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH, autoBrightThrControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH, maxThrControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_BRIGHTNESS, brightnessControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_HIGHLIGHTS, (double) highlightControl->GetSelection());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_SATURATION, satLevelControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH, autoBrightThrControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH, maxThrControl->GetValue());
 
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL, gammaLevelControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE, gammaSlopeControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_INTERPOLATION, (double)interpolationControl->GetSelection());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_GREEN_MATCH, (double)greenMatchingControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL, gammaLevelControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE, gammaSlopeControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_INTERPOLATION, (double)interpolationControl->GetSelection());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GREEN_MATCH, (double)greenMatchingControl->GetValue());
 	
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_WB_PRESET, (double)whiteBalancePresetsControl->GetSelection());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_WB_RED, redMultiplierControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_WB_GREEN, greenMultiplierControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_WB_BLUE, blueMultiplierControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_PRESET, (double)whiteBalancePresetsControl->GetSelection());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_RED, redMultiplierControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_GREEN, greenMultiplierControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_BLUE, blueMultiplierControl->GetValue());
 
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD, waveletNoiseControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD, waveletNoiseControl->GetValue());
 
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_AUTOBRIGHT, (double)autoBrightControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_EXPOSURE, exposureControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE, exposurePreserveControl->GetValue());
-	rawEdit->AddParam(PHOEDIX_PARAMETER_FLIP, (double)flipControl->GetSelection());	
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT, (double)autoBrightControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE, exposureControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE, exposurePreserveControl->GetValue());
+	rawEdit->AddParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_FLIP, (double)flipControl->GetSelection());	
 
-	rawEdit->AddFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS, (int)settingsPanelCollapse->IsOpen());
-	rawEdit->AddFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE, (int)exposurePanelCollapse->IsOpen());
-	rawEdit->AddFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR, (int)colorPanelCollapse->IsOpen());
-	rawEdit->AddFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE, (int)noisePanelCollapse->IsOpen());
-	rawEdit->AddFlag(PHOEDIX_FLAG_RAW_TAB_OPEN_INFO, (int)infoPanelCollapse->IsOpen());
-
+	rawEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS, (int)settingsPanelCollapse->IsOpen());
+	rawEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE, (int)exposurePanelCollapse->IsOpen());
+	rawEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR, (int)colorPanelCollapse->IsOpen());
+	rawEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE, (int)noisePanelCollapse->IsOpen());
+	rawEdit->AddFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_INFO, (int)infoPanelCollapse->IsOpen());
+	
 	return rawEdit;
 }
 

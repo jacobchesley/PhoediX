@@ -492,3 +492,125 @@ void ProcessorEdit::SetEditTypeFromTag(wxString inTag) {
 	else if (inTag == "RAW") { editInt = EditType::RAW; tag = inTag; }
 	else{ editInt = EditType::UNDEFINED; tag = "UNDEFINED"; }
 }
+
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_SCALE = "RedScale";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_SCALE = "GreenScale";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_SCALE = "BlueScale";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_LUMINACE = "Luminace";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_INTERPOLATION = "Interpolation";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE = "RCurve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE = "GCurve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE = "BCurve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE = "LCurve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A_CURVE = "ACurve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE = "HCurve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE = "SCurve";
+
+// Adjust Brightness Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHTNESS = "Brightness";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_PRESERVATION = "Preservation";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_TONE = "Tone";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESERVATION_TYPE = "PreservationType";
+
+// Adjust HSL Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_HUE = "Hue";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SATURATION = "Saturation";
+
+// Adjust LAB Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_A = "A";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B = "B";
+
+// Adjust RGB Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL = "All";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED = "Red";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN = "Green";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE = "Blue";
+
+// Blur Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLURSIZE = "BlurSize";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUM_PASSES = "NumberPasses";
+
+// Channel Mixer Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_PRESET = "Preset";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_RED = "RedRed";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_GREEN = "RedGreen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_BLUE = "RedBlue";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_RED = "GreenRed";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_GREEN = "GreenGreen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_BLUE = "GreenBlue";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_RED = "BlueRed";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_GREEN = "BlueGreen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_BLUE = "BlueBlue";
+
+// Contrast Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST = "AllContrast";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST = "RedContrast";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST = "greenContrast";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST = "BlueContrast";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ALL_CONTRAST_CENTER = "AllContrastCenter";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RED_CONTRAST_CENTER = "RedContrastCenter";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_GREEN_CONTRAST_CENTER = "greenContrastCenter";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BLUE_CONTRAST_CENTER = "BlueContrastCenter";
+
+// Crop Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_STARTX = "StartX";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_STARTY = "StartY";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_WIDTH = "CropWidth";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_CROP_HEIGHT = "CropHeight";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUMERATOR = "Numerator";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_DENOMINATOR = "Denominator";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ASPECT_SELECTION = "AspectSelection";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_CROP_ENABLED = "CropEnabled";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_FLIP_ASPECT = "FlipAspect";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_BOX_ENABLED = "BoxEnabled";
+
+// Greyscale Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_GREYTYPE = "GreyType";
+
+// Mirror Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_MIRROR_SELECT = "MirrorSelection";
+
+// RGB Curve Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE = "BrightCurve";
+
+// RGB 16 Curve Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_BRIGHT_CURVE_16 = "BrightCurve16";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_R_CURVE_16 = "RCurve16";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_G_CURVE_16 = "GCurve16";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_B_CURVE_16 = "BCurve16";
+
+// Rotation Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_ROTATE_ANGLE = "RotationAngle";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_TYPE = "RotationType";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ROTATE_CROP = "RotationCrop";
+
+// Scale Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_WIDTH = "ScaleWidth";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_SCALE_HEIGHT = "ScaleHeight";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_TYPE = "ScaleType";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_SCALE_KEEP_ASPECT = "ScaleKeepAspect";
+
+// Raw Parameter/Flag/Array names
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_BRIGHTNESS = "Brightness";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_HIGHLIGHTS = "Highlights";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_SATURATION = "Saturation";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT = "AutoBright";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_AUTOBRIGHT_THRESH = "AutoBrightThreshold";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE = "Exposure";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_EXPOSURE_PRESERVE = "ExposurePreserve";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_MAXBRIGHT_THRESH = "MaxThreshold";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_LEVEL = "GammaLevel";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GAMMA_SLOPE = "GammaSlope";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_INTERPOLATION = "Interpolation";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_GREEN_MATCH = "GreenMatch";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_PRESET = "WhiteBalancePreset";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_RED = "WhiteBalanceRed";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_GREEN = "WhiteBalanceGreen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WB_BLUE = "WhiteBalanceBlue";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_RAW_WAVELET_NOISE_RD = "WaveletNoiseRD";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_FLIP = "Flip";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_SETTINGS = "SettingsTabOpen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_EXPOSURE = "ExposureTabOpen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_COLOR = "ColorTabOpen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_NOISE = "NoiseTabOpen";
+const wxString ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_RAW_TAB_OPEN_INFO = "InfoTabOpen";
