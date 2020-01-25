@@ -253,7 +253,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 
 	this->DragAcceptFiles(true);
 
-
 	emptyImage = new wxImage(0, 0);
 	emptyPhxImage = new Image();
 	processor->SetOriginalImage(emptyPhxImage);
@@ -617,6 +616,7 @@ void MainWindow::OpenSession(PhoediXSession * session) {
 		processor->DisableFastEdit();
 		imagePanel->DisableHalfSize();
 	}
+	editList->ReprocessImageRaw();
 }
 
 void MainWindow::CloseSession(PhoediXSession * session) {
@@ -1360,6 +1360,8 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	}
 
 	allSessions.clear();
+
+	editList->RemoveAllWindows();
 
 	// Delete histogram display resources
 	histogramDisplay->DestroyHistograms();
