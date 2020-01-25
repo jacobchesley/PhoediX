@@ -48,7 +48,7 @@ void EditWindow::Process(wxCommandEvent& WXUNUSED(event)) {
 
 void EditWindow::SaveNoReprocess() {
 
-	wxCommandEvent evt(SAVE_NO_REPROCESS, ID_SAVE_NO_REPROCESS);
+	wxCommandEvent evt(SAVE_NO_REPROCESS_EVENT, ID_SAVE_NO_REPROCESS);
 	wxPostEvent(parWindow, evt);
 }
 
