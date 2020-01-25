@@ -433,6 +433,8 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 		}
 	}
 	
+	delete currentSession;
+	
 	// Set current session to last opened session (if any sessions are open)
 	if (allSessions.size() > 0) {
 		currentSession = allSessions.at(allSessions.size() - 1);
@@ -458,6 +460,7 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 		// Close and destroy the session
 		this->CloseSession(allSessions.at(i));
 		allSessions.at(i)->Destroy();
+		delete allSessions.at(i);
 	}
 
 	allSessions.clear();
