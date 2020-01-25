@@ -230,7 +230,6 @@ void EditListPanel::AddEditsToProcessor() {
 			delete edit;
 			editList.at(i)->GetEditWindow()->SetDisabled(editList.at(i)->GetDisabled());
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
-			wxYield();
 		}
 	}
 }
@@ -344,7 +343,6 @@ void EditListPanel::AddEditWindows(wxVector<ProcessorEdit*> inEdits) {
                 
                 Logger::Log("PhoediX EditListPanel::AddEditWindows - Adding edit window", Logger::LogLevel::LOG_VERBOSE);
 				EditWindow * newEditWindow = AvailableEditWindows::GetEditWindow(inEdits.at(i), this, proc, imagePanel);
-				//newEditWindow->Hide();
 				if (newEditWindow != NULL) {
                     
                     Logger::Log("PhoediX EditListPanel::AddEditWindows - Edit window exists, adding edit item to panel", Logger::LogLevel::LOG_VERBOSE);
@@ -443,7 +441,9 @@ void EditListPanel::MoveEditUp(wxCommandEvent& upEvt) {
 
 	// Get edit number that is requesting to be moved up
 	int editNum = upEvt.GetInt();
+	scroller->Freeze();
 	scroller->MoveEditUp(editNum);
+	scroller->Thaw();
 	this->ReprocessImage();
 }
 
@@ -451,7 +451,9 @@ void EditListPanel::MoveEditDown(wxCommandEvent& downEvt) {
 
 	// Get edit number that is requesting to be moved down
 	int editNum = downEvt.GetInt();
+	scroller->Freeze();
 	scroller->MoveEditDown(editNum);
+	scroller->Thaw();
 	this->ReprocessImage();
 }
 
@@ -459,7 +461,9 @@ void EditListPanel::DeleteEdit(wxCommandEvent& deleteEvt) {
 
 	// Get edit number that is requesting to be deleted
 	int editNum = deleteEvt.GetInt();
+	scroller->Freeze();
 	scroller->DeleteEdit(editNum);
+	scroller->Thaw();
 	this->ReprocessImage();
 }
 
@@ -718,6 +722,9 @@ void EditListPanel::EditListScroll::AddEdit(EditListItem * edit) {
 	// show scroll bars, but can get smaller now
 	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(parWindow).MinSize(originalParSize);
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+	
+	this->Refresh();
+	this->Update();
 }
 
 void EditListPanel::EditListScroll::MoveEditUp(size_t index) {
