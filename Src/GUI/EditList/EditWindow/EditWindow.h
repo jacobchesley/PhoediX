@@ -24,12 +24,14 @@ enum {
 	ID_REPROCESS_IMAGE_RAW,
 	ID_REPROCESS_UNPACK_IMAGE_RAW,
 	ID_SAVE_NO_REPROCESS
+	ID_WATCHDOG_TERMINATED
 };
 
 wxDECLARE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDECLARE_EVENT(SAVE_NO_REPROCESS, wxCommandEvent);
+wxDECLARE_EVENT(WATCHDOG_TERMINATED_EVENT, wxThreadEvent);
 
 class EditWindow : public wxScrolledWindow{
 	public:
@@ -56,6 +58,7 @@ class EditWindow : public wxScrolledWindow{
 
 		void Activate();
 		void Deactivate();
+		bool GetActivated();
 
 		void SetPreviousEdits(wxVector<ProcessorEdit*> prevEdits);
 		wxVector<ProcessorEdit*> GetPreviousEdits();
@@ -75,8 +78,11 @@ class EditWindow : public wxScrolledWindow{
 		ZoomImagePanel * GetZoomImagePanel();
 		Processor * GetProcessor();
 		bool isDisabled;
+
 		
 	private:
+
+		void OnWatchdogTerminated(wxThreadEvent& WXUNUSED(event));
 
 		wxWindow * parWindow;
 		bool updated;
