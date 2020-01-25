@@ -164,6 +164,9 @@ void EditListItem::OnOpenEdit(wxCommandEvent& WXUNUSED(event)) {
 	// Show the edit window
 	if (editWin != NULL) {
 		PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editWin).Show();
+		PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editWin).Left();
+		PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editWin).Dock();
+		PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editWin).Position(seq);
 		PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 	}
 }
