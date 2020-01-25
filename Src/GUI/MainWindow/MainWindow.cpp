@@ -270,8 +270,6 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 }
 
 MainWindow::~MainWindow(){
-
-	auiManager->UnInit();
 	delete auiManager;
 }
 
@@ -1347,6 +1345,8 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	delete emptyPhxImage;
 	delete clearStatusTimer;
 
+	auiManager->UnInit();
+	this->DestroyChildren();
 	this->Destroy();
 }
 
