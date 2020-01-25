@@ -680,7 +680,7 @@ EditListPanel::EditListScroll::EditListScroll(wxWindow * parent) : wxScrolledWin
 
 	// Setup cursor for edit item dragging position
 	dragCursor = new wxPanel(this);
-	dragCursor->SetMinClientSize(wxSize(4, 4));
+	dragCursor->SetMinClientSize(wxSize(2, 2));
 	this->GetSizer()->Add(dragCursor, 0, wxRIGHT | wxEXPAND);
 	wxColor cursorColor = Colors::BackGrey;
 	int red = cursorColor.Red();
@@ -881,22 +881,29 @@ void EditListPanel::EditListScroll::RedrawEdits() {
 		if (i == dragCursorPos) {
             
             Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Drawing cursor (dragging edit)", Logger::LogLevel::LOG_VERBOSE);
-			this->GetSizer()->AddSpacer(2);
 			this->GetSizer()->Add(dragCursor, 0, wxALL | wxEXPAND);
-			this->GetSizer()->AddSpacer(2);
             Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Cursor drawn", Logger::LogLevel::LOG_VERBOSE);
 		}
 
-		// Draw edit list item
-		else {
+		// Draw edit list item (before and after cursor)
+		else if(i == dragCursorPos - 1 || i == dragCursorPos + 1){
             
             Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Drawing edit item", Logger::LogLevel::LOG_VERBOSE);
+			editList.at(seq)->SetSequence(seq);
+			this->GetSizer()->AddSpacer(5);
+			this->GetSizer()->Add(editList.at(seq), 0, wxALL | wxEXPAND);
+			this->GetSizer()->AddSpacer(5);
+			seq += 1;
+            Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Edit item drawn", Logger::LogLevel::LOG_VERBOSE);
+		}
+		else {
+			Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Drawing edit item", Logger::LogLevel::LOG_VERBOSE);
 			editList.at(seq)->SetSequence(seq);
 			this->GetSizer()->AddSpacer(6);
 			this->GetSizer()->Add(editList.at(seq), 0, wxALL | wxEXPAND);
 			this->GetSizer()->AddSpacer(6);
 			seq += 1;
-            Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Edit item drawn", Logger::LogLevel::LOG_VERBOSE);
+			Logger::Log("PhoediX EditListPanel::EditListScroll::RedrawEdits - Edit item drawn", Logger::LogLevel::LOG_VERBOSE);
 		}
 	}
 	
