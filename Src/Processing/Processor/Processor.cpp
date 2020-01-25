@@ -3178,6 +3178,12 @@ void Processor::RotateCustomBilinear(double angleDegrees, int dataStart, int dat
 				newI3 = point4 * width + point1;
 				newI4 = point4 * width + point2;
 
+				// Set newI to bounds
+				if (newI1 < 0) { newI1 = 0; } if (newI1 >= newDataSize) { newI1 = newDataSize - 1; }
+				if (newI2 < 0) { newI2 = 0; } if (newI2 >= newDataSize) { newI2 = newDataSize - 1; }
+				if (newI3 < 0) { newI3 = 0; } if (newI3 >= newDataSize) { newI3 = newDataSize - 1; }
+				if (newI4 < 0) { newI4 = 0; } if (newI4 >= newDataSize) { newI4 = newDataSize - 1; }
+
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData8[newI1]) + (weight2 * redData8[newI2]) + (weight3 * redData8[newI3]) + (weight4 * redData8[newI4])) / weightSum;
 				tempGreen = ((weight1 * greenData8[newI1]) + (weight2 * greenData8[newI2]) + (weight3 * greenData8[newI3]) + (weight4 * greenData8[newI4])) / weightSum;
@@ -3320,6 +3326,12 @@ void Processor::RotateCustomBilinear(double angleDegrees, int dataStart, int dat
 				newI2 = point3 * width + point2;
 				newI3 = point4 * width + point1;
 				newI4 = point4 * width + point2;
+
+				// Set newI to bounds
+				if (newI1 < 0) { newI1 = 0; } if (newI1 >= newDataSize) { newI1 = newDataSize - 1; }
+				if (newI2 < 0) { newI2 = 0; } if (newI2 >= newDataSize) { newI2 = newDataSize - 1; }
+				if (newI3 < 0) { newI3 = 0; } if (newI3 >= newDataSize) { newI3 = newDataSize - 1; }
+				if (newI4 < 0) { newI4 = 0; } if (newI4 >= newDataSize) { newI4 = newDataSize - 1; }
 
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData16[newI1]) + (weight2 * redData16[newI2]) + (weight3 * redData16[newI3]) + (weight4 * redData16[newI4])) / weightSum;
@@ -3672,6 +3684,24 @@ void Processor::RotateCustomBicubic(double angleDegrees, int dataStart, int data
 				newI9 = point7 * width + point1;  newI10 = point7 * width + point2;  newI11 = point7 * width + point3;  newI12 = point7 * width + point4;
 				newI13 = point8 * width + point1;  newI14 = point8 * width + point2;  newI15 = point8 * width + point3;  newI16 = point8 * width + point4;
 
+				// Set newI to bounds
+				if (newI1 <  0) { newI1  = 0; } if (newI1  >= newDataSize) { newI1  = newDataSize - 1; }
+				if (newI2 <  0) { newI2  = 0; } if (newI2  >= newDataSize) { newI2  = newDataSize - 1; }
+				if (newI3 <  0) { newI3  = 0; } if (newI3  >= newDataSize) { newI3  = newDataSize - 1; }
+				if (newI4 <  0) { newI4  = 0; } if (newI4  >= newDataSize) { newI4  = newDataSize - 1; }
+				if (newI5 <  0) { newI5  = 0; } if (newI5  >= newDataSize) { newI5  = newDataSize - 1; }
+				if (newI6 <  0) { newI6  = 0; } if (newI6  >= newDataSize) { newI6  = newDataSize - 1; }
+				if (newI7 <  0) { newI7  = 0; } if (newI7  >= newDataSize) { newI7  = newDataSize - 1; }
+				if (newI8 <  0) { newI8  = 0; } if (newI8  >= newDataSize) { newI8  = newDataSize - 1; }
+				if (newI9 <  0) { newI9  = 0; } if (newI9  >= newDataSize) { newI9  = newDataSize - 1; }
+				if (newI10 < 0) { newI10 = 0; } if (newI10 >= newDataSize) { newI10 = newDataSize - 1; }
+				if (newI11 < 0) { newI11 = 0; } if (newI11 >= newDataSize) { newI11 = newDataSize - 1; }
+				if (newI12 < 0) { newI12 = 0; } if (newI12 >= newDataSize) { newI12 = newDataSize - 1; }
+				if (newI13 < 0) { newI13 = 0; } if (newI13 >= newDataSize) { newI13 = newDataSize - 1; }
+				if (newI14 < 0) { newI14 = 0; } if (newI14 >= newDataSize) { newI14 = newDataSize - 1; }
+				if (newI15 < 0) { newI15 = 0; } if (newI15 >= newDataSize) { newI15 = newDataSize - 1; }
+				if (newI16 < 0) { newI16 = 0; } if (newI16 >= newDataSize) { newI16 = newDataSize - 1; }
+
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData8[newI1]) + (weight2 * redData8[newI2]) + (weight3 * redData8[newI3]) + (weight4 * redData8[newI4]) +
 					(weight5 * redData8[newI5]) + (weight6 * redData8[newI6]) + (weight7 * redData8[newI7]) + (weight8 * redData8[newI8]) +
@@ -3970,6 +4000,24 @@ void Processor::RotateCustomBicubic(double angleDegrees, int dataStart, int data
 				newI5 = point6 * width + point1;  newI6 = point6 * width + point2;  newI7 = point6 * width + point3;  newI8 = point6 * width + point4;
 				newI9 = point7 * width + point1;  newI10 = point7 * width + point2;  newI11 = point7 * width + point3;  newI12 = point7 * width + point4;
 				newI13 = point8 * width + point1;  newI14 = point8 * width + point2;  newI15 = point8 * width + point3;  newI16 = point8 * width + point4;
+
+				// Set newI to bounds
+				if (newI1 <  0) { newI1 =  0; } if (newI1  >= newDataSize) { newI1  = newDataSize - 1; }
+				if (newI2 <  0) { newI2 =  0; } if (newI2  >= newDataSize) { newI2  = newDataSize - 1; }
+				if (newI3 <  0) { newI3 =  0; } if (newI3  >= newDataSize) { newI3  = newDataSize - 1; }
+				if (newI4 <  0) { newI4 =  0; } if (newI4  >= newDataSize) { newI4  = newDataSize - 1; }
+				if (newI5 <  0) { newI5 =  0; } if (newI5  >= newDataSize) { newI5  = newDataSize - 1; }
+				if (newI6 <  0) { newI6 =  0; } if (newI6  >= newDataSize) { newI6  = newDataSize - 1; }
+				if (newI7 <  0) { newI7 =  0; } if (newI7  >= newDataSize) { newI7  = newDataSize - 1; }
+				if (newI8 <  0) { newI8 =  0; } if (newI8  >= newDataSize) { newI8  = newDataSize - 1; }
+				if (newI9 <  0) { newI9 =  0; } if (newI9  >= newDataSize) { newI9  = newDataSize - 1; }
+				if (newI10 < 0) { newI10 = 0; } if (newI10 >= newDataSize) { newI10 = newDataSize - 1; }
+				if (newI11 < 0) { newI11 = 0; } if (newI11 >= newDataSize) { newI11 = newDataSize - 1; }
+				if (newI12 < 0) { newI12 = 0; } if (newI12 >= newDataSize) { newI12 = newDataSize - 1; }
+				if (newI13 < 0) { newI13 = 0; } if (newI13 >= newDataSize) { newI13 = newDataSize - 1; }
+				if (newI14 < 0) { newI14 = 0; } if (newI14 >= newDataSize) { newI14 = newDataSize - 1; }
+				if (newI15 < 0) { newI15 = 0; } if (newI15 >= newDataSize) { newI15 = newDataSize - 1; }
+				if (newI16 < 0) { newI16 = 0; } if (newI16 >= newDataSize) { newI16 = newDataSize - 1; }
 
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData16[newI1]) + (weight2 * redData16[newI2]) + (weight3 * redData16[newI3]) + (weight4 * redData16[newI4]) +
@@ -4449,6 +4497,12 @@ void Processor::ScaleBilinear(int dataStart, int dataEnd) {
 				newI3 = point4 * width + point1;
 				newI4 = point4 * width + point2;
 
+				// Set newI to bounds
+				if (newI1 < 0) { newI1 = 0; } if (newI1 >= newDataSize) { newI1 = newDataSize - 1; }
+				if (newI2 < 0) { newI2 = 0; } if (newI2 >= newDataSize) { newI2 = newDataSize - 1; }
+				if (newI3 < 0) { newI3 = 0; } if (newI3 >= newDataSize) { newI3 = newDataSize - 1; }
+				if (newI4 < 0) { newI4 = 0; } if (newI4 >= newDataSize) { newI4 = newDataSize - 1; }
+
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData8[newI1]) + (weight2 * redData8[newI2]) + (weight3 * redData8[newI3]) + (weight4 * redData8[newI4])) / weightSum;
 				tempGreen = ((weight1 * greenData8[newI1]) + (weight2 * greenData8[newI2]) + (weight3 * greenData8[newI3]) + (weight4 * greenData8[newI4])) / weightSum;
@@ -4580,6 +4634,12 @@ void Processor::ScaleBilinear(int dataStart, int dataEnd) {
 				newI2 = point3 * width + point2;
 				newI3 = point4 * width + point1;
 				newI4 = point4 * width + point2;
+
+				// Set newI to bounds
+				if (newI1 < 0) { newI1 = 0; } if (newI1 >= newDataSize) { newI1 = newDataSize - 1; }
+				if (newI2 < 0) { newI2 = 0; } if (newI2 >= newDataSize) { newI2 = newDataSize - 1; }
+				if (newI3 < 0) { newI3 = 0; } if (newI3 >= newDataSize) { newI3 = newDataSize - 1; }
+				if (newI4 < 0) { newI4 = 0; } if (newI4 >= newDataSize) { newI4 = newDataSize - 1; }
 
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData16[newI1]) + (weight2 * redData16[newI2]) + (weight3 * redData16[newI3]) + (weight4 * redData16[newI4])) / weightSum;
@@ -4906,6 +4966,24 @@ void Processor::ScaleBicubic(int dataStart, int dataEnd) {
 				newI9 = point7 * width + point1;  newI10 = point7 * width + point2;  newI11 = point7 * width + point3;  newI12 = point7 * width + point4;
 				newI13 = point8 * width + point1;  newI14 = point8 * width + point2;  newI15 = point8 * width + point3;  newI16 = point8 * width + point4;
 
+				// Set newI to bounds
+				if (newI1  < 0) { newI1  = 0; } if (newI1  >= newDataSize) { newI1  = newDataSize - 1; }
+				if (newI2  < 0) { newI2  = 0; } if (newI2  >= newDataSize) { newI2  = newDataSize - 1; }
+				if (newI3  < 0) { newI3  = 0; } if (newI3  >= newDataSize) { newI3  = newDataSize - 1; }
+				if (newI4  < 0) { newI4  = 0; } if (newI4  >= newDataSize) { newI4  = newDataSize - 1; }
+				if (newI5  < 0) { newI5  = 0; } if (newI5  >= newDataSize) { newI5  = newDataSize - 1; }
+				if (newI6  < 0) { newI6  = 0; } if (newI6  >= newDataSize) { newI6  = newDataSize - 1; }
+				if (newI7  < 0) { newI7  = 0; } if (newI7  >= newDataSize) { newI7  = newDataSize - 1; }
+				if (newI8  < 0) { newI8  = 0; } if (newI8  >= newDataSize) { newI8  = newDataSize - 1; }
+				if (newI9  < 0) { newI9  = 0; } if (newI9  >= newDataSize) { newI9  = newDataSize - 1; }
+				if (newI10 < 0) { newI10 = 0; } if (newI10 >= newDataSize) { newI10 = newDataSize - 1; }
+				if (newI11 < 0) { newI11 = 0; } if (newI11 >= newDataSize) { newI11 = newDataSize - 1; }
+				if (newI12 < 0) { newI12 = 0; } if (newI12 >= newDataSize) { newI12 = newDataSize - 1; }
+				if (newI13 < 0) { newI13 = 0; } if (newI13 >= newDataSize) { newI13 = newDataSize - 1; }
+				if (newI14 < 0) { newI14 = 0; } if (newI14 >= newDataSize) { newI14 = newDataSize - 1; }
+				if (newI15 < 0) { newI15 = 0; } if (newI15 >= newDataSize) { newI15 = newDataSize - 1; }
+				if (newI16 < 0) { newI16 = 0; } if (newI16 >= newDataSize) { newI16 = newDataSize - 1; }
+
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData8[newI1]) + (weight2 * redData8[newI2]) + (weight3 * redData8[newI3]) + (weight4 * redData8[newI4]) +
 					(weight5 * redData8[newI5]) + (weight6 * redData8[newI6]) + (weight7 * redData8[newI7]) + (weight8 * redData8[newI8]) +
@@ -5192,6 +5270,24 @@ void Processor::ScaleBicubic(int dataStart, int dataEnd) {
 				newI5 = point6 * width + point1;  newI6 = point6 * width + point2;  newI7 = point6 * width + point3;  newI8 = point6 * width + point4;
 				newI9 = point7 * width + point1;  newI10 = point7 * width + point2;  newI11 = point7 * width + point3;  newI12 = point7 * width + point4;
 				newI13 = point8 * width + point1;  newI14 = point8 * width + point2;  newI15 = point8 * width + point3;  newI16 = point8 * width + point4;
+
+				// Set newI to bounds
+				if (newI1  < 0) { newI1  = 0; } if (newI1  >= newDataSize) { newI1  = newDataSize - 1; }
+				if (newI2  < 0) { newI2  = 0; } if (newI2  >= newDataSize) { newI2  = newDataSize - 1; }
+				if (newI3  < 0) { newI3  = 0; } if (newI3  >= newDataSize) { newI3  = newDataSize - 1; }
+				if (newI4  < 0) { newI4  = 0; } if (newI4  >= newDataSize) { newI4  = newDataSize - 1; }
+				if (newI5  < 0) { newI5  = 0; } if (newI5  >= newDataSize) { newI5  = newDataSize - 1; }
+				if (newI6  < 0) { newI6  = 0; } if (newI6  >= newDataSize) { newI6  = newDataSize - 1; }
+				if (newI7  < 0) { newI7  = 0; } if (newI7  >= newDataSize) { newI7  = newDataSize - 1; }
+				if (newI8  < 0) { newI8  = 0; } if (newI8  >= newDataSize) { newI8  = newDataSize - 1; }
+				if (newI9  < 0) { newI9  = 0; } if (newI9  >= newDataSize) { newI9  = newDataSize - 1; }
+				if (newI10 < 0) { newI10 = 0; } if (newI10 >= newDataSize) { newI10 = newDataSize - 1; }
+				if (newI11 < 0) { newI11 = 0; } if (newI11 >= newDataSize) { newI11 = newDataSize - 1; }
+				if (newI12 < 0) { newI12 = 0; } if (newI12 >= newDataSize) { newI12 = newDataSize - 1; }
+				if (newI13 < 0) { newI13 = 0; } if (newI13 >= newDataSize) { newI13 = newDataSize - 1; }
+				if (newI14 < 0) { newI14 = 0; } if (newI14 >= newDataSize) { newI14 = newDataSize - 1; }
+				if (newI15 < 0) { newI15 = 0; } if (newI15 >= newDataSize) { newI15 = newDataSize - 1; }
+				if (newI16 < 0) { newI16 = 0; } if (newI16 >= newDataSize) { newI16 = newDataSize - 1; }
 
 				// Interpolate the data using weights calculated from distances above
 				tempRed = ((weight1 * redData16[newI1]) + (weight2 * redData16[newI2]) + (weight3 * redData16[newI3]) + (weight4 * redData16[newI4]) +
