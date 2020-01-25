@@ -62,7 +62,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	this->Bind(REPROCESS_IMAGE_RAW_EVENT, (wxObjectEventFunction)&EditListPanel::ReprocessUnpackImageRawEvt, this, ID_REPROCESS_UNPACK_IMAGE_RAW);
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListPanel::OnRightClick, this);
 	this->Bind(START_EDITS_COMPLETE, (wxObjectEventFunction)&EditListPanel::StartEditsComplete, this, ID_START_EDITS_COMPLETE);
-	this->Bind(SAVE_NO_REPROCESS, (wxObjectEventFunction)&EditListPanel::OnSaveNoReprocess, this, ID_SAVE_NO_REPROCESS);
+	this->Bind(SAVE_NO_REPROCESS_EVENT, (wxObjectEventFunction)&EditListPanel::OnSaveNoReprocess, this, ID_SAVE_NO_REPROCESS);
 	this->Bind(EDIT_DRAG_EVENT, (wxObjectEventFunction)& EditListPanel::OnEditDrag, this, ID_EDIT_DRAG);
 	this->Bind(EDIT_DRAG_COMPLETE_EVENT, (wxObjectEventFunction)& EditListPanel::OnEditDragComplete, this, ID_EDIT_DRAG_COMPLETE);
 

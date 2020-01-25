@@ -6,7 +6,7 @@
 wxDEFINE_EVENT(REPROCESS_IMAGE_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_IMAGE_RAW_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(REPROCESS_UNPACK_IMAGE_RAW_EVENT, wxCommandEvent);
-wxDEFINE_EVENT(SAVE_NO_REPROCESS, wxCommandEvent);
+wxDEFINE_EVENT(SAVE_NO_REPROCESS_EVENT, wxCommandEvent);
 wxDEFINE_EVENT(WATCHDOG_TERMINATED_EVENT, wxThreadEvent);
 
 EditWindow::EditWindow(wxWindow * parent, wxString editName, Processor * processor, ZoomImagePanel * zoomImgPanel) : wxScrolledWindow(parent) {
