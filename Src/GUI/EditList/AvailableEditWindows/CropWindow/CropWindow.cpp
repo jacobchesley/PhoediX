@@ -138,6 +138,7 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 
 void CropWindow::DestroyEditWindow() {
 	this->EnableBox(false);
+	EditWindow::DestroyEditWindow();
 }
 
 void CropWindow::ChangeAspect(bool gridUpdate){
