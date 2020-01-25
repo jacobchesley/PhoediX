@@ -555,6 +555,9 @@ void EditListPanel::AddRawWindow(){
 
 void EditListPanel::AddRawWindow(ProcessorEdit * editForParams){
 
+	// RAW edit already exists.  Do not add again
+	if (scroller->GetNumTopEdits() > 0) {return;}
+
 	if (!proc->GetLockedRaw()) {
 		#ifdef __WXMSW__
 			proc->rawProcessor->open_file(proc->GetFilePath().wc_str());
