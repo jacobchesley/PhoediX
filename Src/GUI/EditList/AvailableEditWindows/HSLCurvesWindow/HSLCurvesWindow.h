@@ -55,7 +55,7 @@ private:
 
 	class GetCurveThread : public wxThread{
 	public:
-		GetCurveThread(CurvePanel * curvePanelIn, int curveSize, int * curveOut, int numCurves, int * numCurveComplete, wxMutex * mutLockIn, wxCondition * condition);
+		GetCurveThread(CurvePanel * curvePanelIn, int curveSize, int * curveOut);
 
 	protected:
 		virtual ExitCode Entry();
@@ -64,11 +64,6 @@ private:
 		CurvePanel * curvePanel;
 		int numPoints;
 		int * curve;
-
-		wxMutex * mutLock;
-		wxCondition * cond;
-		int threads;
-		int * complete;
 	};
 };
 

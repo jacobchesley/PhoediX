@@ -260,27 +260,26 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 		
 	if (!isDisabled) {
 
-		int numCurves = 3;
-		int curveComplete = 0;
-		wxMutex mutexLock;
-		wxCondition wait(mutexLock);
-
 		int numSteps16 = 65536;
 		int * hCurve16 = new int[numSteps16];
 		int * sCurve16 = new int[numSteps16];
 		int * lCurve16 = new int[numSteps16];
 
-		GetCurveThread * hCurveThread = new GetCurveThread(hCurve, numSteps16, hCurve16, numCurves, &curveComplete, &mutexLock, &wait); hCurveThread->Run();
-		GetCurveThread * sCurveThread = new GetCurveThread(sCurve, numSteps16, sCurve16, numCurves, &curveComplete, &mutexLock, &wait); sCurveThread->Run();
-		GetCurveThread * lCurveThread = new GetCurveThread(lCurve, numSteps16, lCurve16, numCurves, &curveComplete, &mutexLock, &wait); lCurveThread->Run();
+		GetCurveThread * hCurveThread = new GetCurveThread(hCurve, numSteps16, hCurve16); hCurveThread->Run();
+		GetCurveThread * sCurveThread = new GetCurveThread(sCurve, numSteps16, sCurve16); sCurveThread->Run();
+		GetCurveThread * lCurveThread = new GetCurveThread(lCurve, numSteps16, lCurve16); lCurveThread->Run();
 
-		wait.Wait();
-		mutexLock.Unlock();
+		hCurveThread->Wait(); wxYield();
+		sCurveThread->Wait(); wxYield();
+		lCurveThread->Wait(); wxYield();
+
+		delete hCurveThread;
+		delete sCurveThread;
+		delete lCurveThread;
 
 		HSLCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_H_CURVE, hCurve16, numSteps16);
 		HSLCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_S_CURVE, sCurve16, numSteps16);
 		HSLCurveEdit->AddIntArray(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_L_CURVE, lCurve16, numSteps16);
-		
 	}
 
 	// Add control points double arrays to edit
@@ -307,29 +306,15 @@ bool HSLCurvesWindow::CheckCopiedParamsAndFlags(){
 	return true;
 }
 
-HSLCurvesWindow::GetCurveThread::GetCurveThread(CurvePanel * curvePanelIn, int curveSize, int * curveOut, int numCurves, int * numCurveComplete, wxMutex * mutLockIn, wxCondition * condition) : wxThread(wxTHREAD_DETACHED){
+HSLCurvesWindow::GetCurveThread::GetCurveThread(CurvePanel * curvePanelIn, int curveSize, int * curveOut) : wxThread(wxTHREAD_JOINABLE){
 	curvePanel = curvePanelIn;
 	numPoints = curveSize;
 	curve = curveOut;
-
-	threads = numCurves;
-	complete = numCurveComplete;
-	mutLock = mutLockIn;
-	cond = condition;
 }
 
 wxThread::ExitCode HSLCurvesWindow::GetCurveThread::Entry(){
 
-	curvePanel->GetColorCurveMap(numPoints, curve, (float) numPoints);
-
-	mutLock->Lock();
-	*complete += 1;
-	mutLock->Unlock();
-
-	// All worker threads have finished, signal condition to continue
-	if (*complete == threads) {
-		cond->Broadcast();
-	}
-	
+	if (curvePanel == NULL) { return (wxThread::ExitCode) 0; }
+	curvePanel->GetColorCurveMap(numPoints, curve, (float) numPoints);	
 	return (wxThread::ExitCode) 0;
 }
