@@ -222,12 +222,11 @@ void EditListPanel::AddEditsToProcessor() {
 		// Add each edit from the edit window, to the processor
 		if (editList.at(i)->GetEditWindow() != NULL) {
 
-			ProcessorEdit* edit = editList.at(i)->GetEditWindow()->GetParamsAndFlags();
-			if (edit->GetEditType() != ProcessorEdit::EditType::RAW) {
+			int editType = editList.at(i)->GetEditWindow()->GetEditType();
+			if (editType != ProcessorEdit::EditType::RAW) {
 				editList.at(i)->GetEditWindow()->SetIndex(idx);
 				idx += 1;
 			}
-			delete edit;
 			editList.at(i)->GetEditWindow()->SetDisabled(editList.at(i)->GetDisabled());
 			editList.at(i)->GetEditWindow()->AddEditToProcessor();
 		}

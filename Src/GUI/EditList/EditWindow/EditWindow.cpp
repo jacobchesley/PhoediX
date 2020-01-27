@@ -115,6 +115,10 @@ bool EditWindow::CheckCopiedParamsAndFlags(){
 	return false;
 }
 
+int EditWindow::GetEditType(){
+	return ProcessorEdit::EditType::UNDEFINED;
+}
+
 void EditWindow::OnUpdate(wxCommandEvent& WXUNUSED(event)){
 	updated = true;
 }

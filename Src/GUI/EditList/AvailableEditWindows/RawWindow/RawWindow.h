@@ -22,6 +22,7 @@ class RawWindow : public EditWindow {
 		void SetParamsAndFlags(ProcessorEdit * edit, bool reprocess = true);
 		ProcessorEdit * GetParamsAndFlags();
 		bool CheckCopiedParamsAndFlags();
+		int GetEditType();
 
 	private:
 

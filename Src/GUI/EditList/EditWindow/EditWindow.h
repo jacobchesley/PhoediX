@@ -48,6 +48,7 @@ class EditWindow : public wxScrolledWindow{
 		virtual void SetParamsAndFlags(ProcessorEdit * edit, bool reprocess);
 		virtual ProcessorEdit * GetParamsAndFlags();
 		virtual bool CheckCopiedParamsAndFlags();
+		virtual int GetEditType();
 
 		void OnUpdate(wxCommandEvent& WXUNUSED(event));
 		void StartWatchdog();

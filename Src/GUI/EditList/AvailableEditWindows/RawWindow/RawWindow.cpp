@@ -776,6 +776,10 @@ ProcessorEdit * RawWindow::GetParamsAndFlags(){
 	return rawEdit;
 }
 
+int RawWindow::GetEditType() {
+	return ProcessorEdit::EditType::RAW;
+}
+
 void RawWindow::OnCollapseOpenClose(wxCommandEvent& WXUNUSED(evt)) {
 	this->SaveNoReprocess();
 }
