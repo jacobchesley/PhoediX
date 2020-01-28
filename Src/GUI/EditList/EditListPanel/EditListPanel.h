@@ -51,6 +51,7 @@ public:
 	void EnableAllEdits();
 	void DisableAllEdits();
 	void SetSession(PhoediXSession * newSession);
+	void HideEditSelectionWindow();
 
 private:
 

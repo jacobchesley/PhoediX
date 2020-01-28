@@ -1220,6 +1220,7 @@ void MainWindow::EnableDisableMenuItemsNoProject(bool enable) {
 		auiManager->GetPane(guidelinesWindow).Hide();
 		auiManager->GetPane(editList).Hide();
 		auiManager->GetPane(histogramDisplay).Hide();
+		editList->HideEditSelectionWindow(); 
 
 		auiManager->Update();
 	}

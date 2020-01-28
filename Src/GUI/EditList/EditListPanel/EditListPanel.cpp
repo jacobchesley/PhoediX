@@ -301,6 +301,10 @@ void EditListPanel::OnAddEdit(wxCommandEvent& WXUNUSED(event)) {
 	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
 }
 
+void EditListPanel::HideEditSelectionWindow() {
+	PhoedixAUIManager::GetPhoedixAUIManager()->GetPane(editSelection).Hide();
+	PhoedixAUIManager::GetPhoedixAUIManager()->Update();
+}
 
 void EditListPanel::AddEditToPanel(wxCommandEvent& addEvt) {
 
