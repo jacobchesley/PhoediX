@@ -109,7 +109,7 @@ void Logger::Log(wxString message, int logLevel){
 void Logger::SetLogFileName(){
 
 	wxDateTime now = wxDateTime::Now();
-	wxString month = wxString::Format("%d ", now.GetMonth()) + "_";
+	wxString month = wxString::Format("%d ", now.GetMonth() + 1) + "_";
 	wxString day = wxString::Format("%d ", now.GetDay()) + "_";
 	wxString year = wxString::Format("%d ", now.GetYear()) + "_";
 
