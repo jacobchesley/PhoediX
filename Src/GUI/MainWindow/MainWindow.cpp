@@ -283,6 +283,7 @@ void MainWindow::SetSizeProperties(){
 void MainWindow::OpenFiles(wxArrayString files) {
 
     Logger::Log("PhoediX MainWindow::OpenFiles - Opening files...", Logger::LogLevel::LOG_VERBOSE);
+	this->SaveCurrentSession();
 	bool openSession = false;
 	for (size_t i = 0; i < files.size(); i++) {
 
@@ -452,6 +453,8 @@ void MainWindow::CloseCurrentProject(wxCommandEvent& WXUNUSED(event)) {
 }
 
 void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
+
+	this->SaveCurrentSession();
 
 	// Remove all sessions
 	for (size_t i = 0; i < allSessions.size(); i++) {
@@ -1335,6 +1338,8 @@ bool MainWindow::CheckSessionNeedsSaved(PhoediXSession * session) {
 }
 
 void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
+
+	this->SaveCurrentSession();
 
 	// Kill current raw processing and wait until raw thread is stopped
 	processor->KillRawProcessing();
