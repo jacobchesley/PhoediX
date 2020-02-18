@@ -28,7 +28,9 @@ enum {
 	ID_EDIT_COPY,
 	ID_EDIT_PASTE,
 	ID_EDIT_DRAG,
-	ID_EDIT_DRAG_COMPLETE
+	ID_EDIT_DRAG_COMPLETE,
+	ID_HIGHLIGHT_TIMER,
+	ID_MOUSE_TIMER
 };
 
 wxDECLARE_EVENT(EDIT_UP_EVENT, wxCommandEvent);
@@ -59,7 +61,7 @@ public:
 	void SetDisabled(bool disable);
 	bool GetDisabled();
 
-	void SetHighlighted(bool highlight);
+	void SetHighlighted(bool highlight, bool dimHighlight = false);
 	bool GetHighlighted();
 
 private:
@@ -74,6 +76,10 @@ private:
 	void OnDragStart(wxMouseEvent & evt);
 	void OnTimerFire(wxTimerEvent& WXUNUSED(event));
 	bool CheckDrag();
+	void OnMouseEnter(wxMouseEvent& WXUNUSED(mouseEvent));
+	void OnMouseLeave(wxMouseEvent& WXUNUSED(mouseEvent));
+	void OnMouseCheck(wxTimerEvent& WXUNUSED(event));
+	void SetHighlightIfNeeded();
 	
 	wxWindow * parWindow;
 	wxBoxSizer * sizer;
@@ -85,6 +91,7 @@ private:
 	wxButton * upButton;
 	wxButton * downButton;
 	wxButton * deleteButton;
+	bool upDownDisableDefined;
 
 	EditWindow * editWin;
 
@@ -93,6 +100,9 @@ private:
 	bool isHighlighted;
 	bool highlightTimerFired;
 	bool fixedItem;
+
+	wxTimer mouseTimer;
+	bool mouseHighlightActive;
 
 	enum Buttons{
 		OPEN_EDIT_BUTTON,

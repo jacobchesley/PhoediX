@@ -30,6 +30,7 @@ public:
 	void SetDisableBackgroundColour(wxColor disableColor);
 	void SetDisableForegroundColour(wxColor disableColor);
 	bool GetEnabled();
+	void HighlightWhenEnabled(bool highlight);
 
 private:
 
@@ -38,12 +39,15 @@ private:
 	wxStaticText * text;
 	void LeftDown(wxCommandEvent& WXUNUSED(clickEvent));
 	void RightDown(wxCommandEvent& WXUNUSED(clickEvent));
+	void OnMouseEnter(wxMouseEvent& mouseEvent);
+	void OnMouseLeave(wxMouseEvent& mouseEvent);
 
 	wxColor enableBackground;
 	wxColor enableForeground;
 	wxColor disableBackground;
 	wxColor disableForeground;
 	bool disabled;
+	bool doHighlight;
 };
 
 #endif

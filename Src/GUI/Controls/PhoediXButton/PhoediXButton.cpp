@@ -26,7 +26,15 @@ PhoediXButton::PhoediXButton(wxWindow * parent, wxWindowID id, const wxString& l
 
 	this->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&PhoediXButton::RightDown, this);
 	text->Bind(wxEVT_RIGHT_DOWN, (wxObjectEventFunction)&PhoediXButton::RightDown, this);
+
+	this->Bind(wxEVT_ENTER_WINDOW, (wxMouseEventFunction)& PhoediXButton::OnMouseEnter, this);
+	text->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(PhoediXButton::OnMouseEnter), NULL, this);
+
+	this->Bind(wxEVT_LEAVE_WINDOW, (wxMouseEventFunction)& PhoediXButton::OnMouseLeave, this);
+	text->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(PhoediXButton::OnMouseLeave), NULL, this);
+
 	disabled = false;
+	doHighlight = true;
 }
 
 void PhoediXButton::SetBackgroundColour(wxColor newColor) {
@@ -35,6 +43,8 @@ void PhoediXButton::SetBackgroundColour(wxColor newColor) {
 	enableBackground = newColor;
 	text->Update();
 	text->Refresh();
+	this->Update();
+	this->Refresh();
 }
 
 void PhoediXButton::SetForegroundColour(wxColor newColor) {
@@ -42,6 +52,8 @@ void PhoediXButton::SetForegroundColour(wxColor newColor) {
 	enableForeground = newColor;
 	text->Update();
 	text->Refresh();
+	this->Update();
+	this->Refresh();
 }
 
 void PhoediXButton::SetDisableBackgroundColour(wxColor disableColor) {
@@ -52,6 +64,25 @@ void PhoediXButton::SetDisableForegroundColour(wxColor disableColor) {
 	disableForeground = disableColor;
 }
 
+void PhoediXButton::HighlightWhenEnabled(bool highlight) {
+	doHighlight = highlight;
+
+	if (doHighlight) {
+		this->Bind(wxEVT_ENTER_WINDOW, (wxMouseEventFunction)& PhoediXButton::OnMouseEnter, this);
+		text->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(PhoediXButton::OnMouseEnter), NULL, this);
+
+		this->Bind(wxEVT_LEAVE_WINDOW, (wxMouseEventFunction)& PhoediXButton::OnMouseLeave, this);
+		text->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(PhoediXButton::OnMouseLeave), NULL, this);
+	}
+	else {
+		this->Unbind(wxEVT_ENTER_WINDOW, (wxMouseEventFunction)& PhoediXButton::OnMouseEnter, this);
+		text->Disconnect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(PhoediXButton::OnMouseEnter), NULL, this);
+
+		this->Unbind(wxEVT_LEAVE_WINDOW, (wxMouseEventFunction)& PhoediXButton::OnMouseLeave, this);
+		text->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(PhoediXButton::OnMouseLeave), NULL, this);
+	}
+}
+
 void PhoediXButton::Disable() {
 	disabled = true;
 	text->SetBackgroundColour(disableBackground);
@@ -59,6 +90,8 @@ void PhoediXButton::Disable() {
 	wxPanel::SetBackgroundColour(disableBackground);
 	text->Update();
 	text->Refresh();
+	this->Update();
+	this->Refresh();
 }
 
 void PhoediXButton::Enable() {
@@ -68,6 +101,8 @@ void PhoediXButton::Enable() {
 	wxPanel::SetBackgroundColour(enableBackground);
 	text->Update();
 	text->Refresh();
+	this->Update();
+	this->Refresh();
 }
 
 bool PhoediXButton::GetEnabled() {
@@ -122,4 +157,46 @@ void PhoediXButton::RightDown(wxCommandEvent& WXUNUSED(clickEvent)){
 		wxCommandEvent buttonEvt(wxEVT_RIGHT_DOWN, this->GetId());
 		wxPostEvent(this->GetParent(), buttonEvt);
 	}
+}
+
+void PhoediXButton::OnMouseEnter(wxMouseEvent& mouseEvent) {
+
+	if (doHighlight && !disabled) {
+		wxColor oldColor = text->GetBackgroundColour();
+
+		int newRed = oldColor.Red() + 20;
+		newRed = newRed > 255 ? 255 : newRed;
+
+		int newGreen = oldColor.Green() + 20;
+		newGreen = newGreen > 255 ? 255 : newGreen;
+
+		int newBlue = oldColor.Blue() + 20;
+		newBlue = newBlue > 255 ? 255 : newBlue;
+
+		wxColor highlightColor = wxColor(newRed, newGreen, newBlue);
+
+		this->SetBackgroundColour(highlightColor);
+	}
+	mouseEvent.Skip(true);
+}
+
+void PhoediXButton::OnMouseLeave(wxMouseEvent& mouseEvent) {
+
+	if (doHighlight && !disabled) {
+		wxColor oldColor = text->GetBackgroundColour();
+
+		int newRed = oldColor.Red() - 20;
+		newRed = newRed < 0 ? 0 : newRed;
+
+		int newGreen = oldColor.Green() - 20;
+		newGreen = newGreen < 0 ? 0 : newGreen;
+
+		int newBlue = oldColor.Blue() - 20;
+		newBlue = newBlue < 0 ? 0 : newBlue;
+
+		wxColor highlightColor = wxColor(newRed, newGreen, newBlue);
+
+		this->SetBackgroundColour(highlightColor);
+	}
+	mouseEvent.Skip(true);
 }

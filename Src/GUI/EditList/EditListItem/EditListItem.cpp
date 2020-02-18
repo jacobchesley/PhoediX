@@ -28,14 +28,19 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 	titleText->SetForegroundColour(Colors::TextWhite);
 	titleText->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	titleText->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(EditListItem::OnRightClick), NULL, this);
+	titleText->HighlightWhenEnabled(false);
 	textSizer->AddSpacer(5);
 	textSizer->Add(titleText, 0, wxALIGN_CENTER, 1);
 	textSizer->AddSpacer(5);
 
 	fixedItem = disableButtons;
-		
+			
+	upDownDisableDefined = false;
+
 	// Add control buttons when there is an edit that must remain in the exact place (RAW edit must be at top)
 	if(!disableButtons){
+
+		upDownDisableDefined = true;
 
 		// Add size to keep up and down button in
 		upDownButtonSizer = new wxBoxSizer(wxVERTICAL);
@@ -103,12 +108,29 @@ EditListItem::EditListItem(wxWindow * parent, wxString title, int Sequence, Edit
 	this->Bind(wxEVT_RIGHT_DOWN, (wxMouseEventFunction)&EditListItem::OnRightClick, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&EditListItem::OnDragStart, this);
 	this->Bind(wxEVT_LEFT_DOWN, (wxObjectEventFunction)&EditListItem::OnDragStart, this, EditListItem::Buttons::OPEN_EDIT_BUTTON);
-	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&EditListItem::OnTimerFire, this);
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)&EditListItem::OnTimerFire, this, ID_HIGHLIGHT_TIMER);
+	this->Bind(wxEVT_TIMER, (wxObjectEventFunction)& EditListItem::OnMouseCheck, this, ID_MOUSE_TIMER);
+
+	this->Bind(wxEVT_ENTER_WINDOW, (wxMouseEventFunction)& EditListItem::OnMouseEnter, this);
+	this->Bind(wxEVT_LEAVE_WINDOW, (wxMouseEventFunction)& EditListItem::OnMouseLeave, this);
+
+	wxWindowListNode * child = this->GetChildren().GetFirst();
+	while (child){
+		wxWindow* childWin = child->GetData();
+		childWin->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(EditListItem::OnMouseLeave), NULL, this);
+		childWin->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(EditListItem::OnMouseEnter), NULL, this);
+		child = child->GetNext();
+	}
+
 	seq = Sequence;
 	isDisabled = false;
 
 	isHighlighted = false;
 	highlightTimerFired = false;
+
+	mouseTimer.SetOwner(this, ID_MOUSE_TIMER);
+	mouseTimer.Start(50, false);
+	mouseHighlightActive = false;
 }
 
 // Destroy the edit window
@@ -266,7 +288,7 @@ void EditListItem::SetSequence(size_t sequence) {
 	seq = sequence;
 }
 
-void EditListItem::SetHighlighted(bool highlight){
+void EditListItem::SetHighlighted(bool highlight, bool dimHighlight){
 
 	// Can't drag item that is fixed to top (RAW Processor)
 	if (fixedItem) { return; }
@@ -313,7 +335,7 @@ bool EditListItem::CheckDrag(){
 
 	// Set half second timer to highlight and consider drag
 	wxTimer timer;
-	timer.SetOwner(this);
+	timer.SetOwner(this, ID_HIGHLIGHT_TIMER);
 	timer.Start(500);
 	bool mouseLeftWindow = false;
 
@@ -353,4 +375,52 @@ bool EditListItem::CheckDrag(){
 
 void EditListItem::OnTimerFire(wxTimerEvent& WXUNUSED(evt)){
 	highlightTimerFired = true;
+}
+
+void EditListItem::OnMouseEnter(wxMouseEvent& WXUNUSED(mouseEvent)) {
+	this->SetHighlightIfNeeded();
+}
+
+void EditListItem::OnMouseLeave(wxMouseEvent& WXUNUSED(mouseEvent)) {
+	this->SetHighlightIfNeeded();
+}
+
+void EditListItem::OnMouseCheck(wxTimerEvent& WXUNUSED(event)) {
+	this->SetHighlightIfNeeded();
+}
+
+void EditListItem::SetHighlightIfNeeded() {
+
+	// Do not change highlight if drag and drop is in progress
+	if (isHighlighted) { return; }
+
+	wxColor backgroundColor = Colors::BackGrey;
+	int red = backgroundColor.Red();
+	int green = backgroundColor.Green();
+	int blue = backgroundColor.Blue();
+
+	bool oldMouseHighlight = mouseHighlightActive;
+	// highlight if mouse is inside
+	if (this->GetClientRect().Contains(this->ScreenToClient(wxGetMousePosition()))) {
+		backgroundColor.Set(red + 20, green + 20, blue + 20);
+		mouseHighlightActive = true;
+	}
+	else {
+		mouseHighlightActive = false;
+	}
+
+	// Only update if needed to avoid flicker
+	if (mouseHighlightActive != oldMouseHighlight) {
+		this->SetBackgroundColour(backgroundColor);
+
+		if (upDownDisableDefined) {
+			upButton->SetBackgroundColour(this->GetBackgroundColour());
+			downButton->SetBackgroundColour(this->GetBackgroundColour());
+			deleteButton->SetBackgroundColour(this->GetBackgroundColour());
+			disableButton->SetBackgroundColour(this->GetBackgroundColour());
+		}
+		titleText->SetBackgroundColour(this->GetBackgroundColour());
+		this->Refresh();
+		this->Update();
+	}
 }
