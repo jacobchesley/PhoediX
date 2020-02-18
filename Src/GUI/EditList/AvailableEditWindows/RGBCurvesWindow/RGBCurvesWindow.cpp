@@ -288,10 +288,10 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * gCurveThread8 = new GetCurveThread(greenCurve, numSteps8, greenCurve8); gCurveThread8->Run();
 		GetCurveThread * bCurveThread8 = new GetCurveThread(blueCurve, numSteps8, blueCurve8); bCurveThread8->Run();
 
-		lCurveThread8->Wait(); wxYield();
-		rCurveThread8->Wait(); wxYield();
-		gCurveThread8->Wait(); wxYield();
-		bCurveThread8->Wait(); wxYield();
+		lCurveThread8->Wait();
+		rCurveThread8->Wait();
+		gCurveThread8->Wait();
+		bCurveThread8->Wait();
 
 		delete lCurveThread8;
 		delete rCurveThread8;
@@ -303,10 +303,10 @@ ProcessorEdit * RGBCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * gCurveThread16 = new GetCurveThread(greenCurve, numSteps16, greenCurve16); gCurveThread16->Run();
 		GetCurveThread * bCurveThread16 = new GetCurveThread(blueCurve, numSteps16, blueCurve16); bCurveThread16->Run();
 
-		lCurveThread16->Wait(); wxYield();
-		rCurveThread16->Wait(); wxYield();
-		gCurveThread16->Wait(); wxYield();
-		bCurveThread16->Wait(); wxYield();
+		lCurveThread16->Wait();
+		rCurveThread16->Wait();
+		gCurveThread16->Wait();
+		bCurveThread16->Wait();
 
 		delete lCurveThread16;
 		delete rCurveThread16;

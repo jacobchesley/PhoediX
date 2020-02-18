@@ -269,9 +269,9 @@ ProcessorEdit * HSLCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * sCurveThread = new GetCurveThread(sCurve, numSteps16, sCurve16); sCurveThread->Run();
 		GetCurveThread * lCurveThread = new GetCurveThread(lCurve, numSteps16, lCurve16); lCurveThread->Run();
 
-		hCurveThread->Wait(); wxYield();
-		sCurveThread->Wait(); wxYield();
-		lCurveThread->Wait(); wxYield();
+		hCurveThread->Wait();
+		sCurveThread->Wait(); 
+		lCurveThread->Wait();
 
 		delete hCurveThread;
 		delete sCurveThread;

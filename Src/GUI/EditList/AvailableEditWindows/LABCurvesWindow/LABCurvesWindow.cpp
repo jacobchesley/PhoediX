@@ -267,9 +267,9 @@ ProcessorEdit * LABCurvesWindow::GetParamsAndFlags(){
 		GetCurveThread * aCurveThread = new GetCurveThread(aCurve, numSteps16, aCurve16); aCurveThread->Run();
 		GetCurveThread * bCurveThread = new GetCurveThread(bCurve, numSteps16, bCurve16); bCurveThread->Run();
 
-		lCurveThread->Wait(); wxYield();
-		aCurveThread->Wait(); wxYield();
-		bCurveThread->Wait(); wxYield();
+		lCurveThread->Wait();
+		aCurveThread->Wait();
+		bCurveThread->Wait();
 
 		delete lCurveThread;
 		delete aCurveThread;
