@@ -218,6 +218,10 @@ void CropWindow::ChangeAspect(bool gridUpdate){
 			}
 		}
 	}
+	this->SetClientSize(this->GetVirtualSize());
+	this->Refresh();
+	this->Update();
+	
 }
 
 Grid CropWindow::GetNewAspectGrid(double aspectRatio) {
