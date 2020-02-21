@@ -132,12 +132,14 @@ private:
 		TOP,
 		BOTTOM,
 		LEFT,
-		RIGHT
+		RIGHT,
+		INSIDE
 	};
 
 	enum GridMoveDirection {
 		GRID_MOVE_WIDTH,
-		GRID_MOVE_HEIGHT
+		GRID_MOVE_HEIGHT,
+		GRID_MOVE_ALL
 	};
 
 	wxTimer * reguardScrollCountdown;
@@ -196,6 +198,7 @@ private:
 		bool GetGridMoving();
 		void OnScroll(wxCommandEvent & evt);
 		wxBitmap bitmapDraw;
+		wxBitmap bitmapDrawDisable;
 	
 		double zoom;
 		bool keepAspect;
