@@ -21,6 +21,7 @@ CropWindow::CropWindow(wxWindow * parent, wxString editName, Processor * process
 	customAspectSizer = new wxBoxSizer(wxHORIZONTAL);
 	defaultAspects = new PhoediXComboBox(this, -1);
 	defaultAspects->AppendString("No Aspect Constraint");
+	defaultAspects->AppendString("1 X 1");
 	defaultAspects->AppendString("4 X 6");
 	defaultAspects->AppendString("5 X 7");
 	defaultAspects->AppendString("6 X 8");
