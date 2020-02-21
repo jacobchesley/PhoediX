@@ -665,7 +665,6 @@ void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 
 void ZoomImagePanel::ImageScroll::OnScroll(wxCommandEvent & WXUNUSED(evt)){
 	quality = wxINTERPOLATION_NONE;
-
 }
 
 void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
@@ -783,6 +782,14 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 		}
 		if (hitTarget > -1) { break; }
 	}
+
+	// Check if mouse is inside grid
+	if (!(hitTarget > -1) && gridActive) {
+		if (gridStartXShift < dragStartXScale && gridEndXShift > dragStartXScale && gridStartYShift < dragStartYScale && gridEndYShift > dragStartYScale) {
+			hitTarget = ZoomImagePanel::GridHitTaget::INSIDE;
+			gridMoveDirection = ZoomImagePanel::GridMoveDirection::GRID_MOVE_ALL;
+		}
+	}
 	
 	wxMouseState mouse(wxGetMouseState());
 
@@ -795,6 +802,12 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 
 		int x = 0;
 		int y = 0;
+
+		Grid originalDrawGrid;
+		originalDrawGrid.startX = drawGrid.startX;
+		originalDrawGrid.endX = drawGrid.endX;
+		originalDrawGrid.startY = drawGrid.startY;
+		originalDrawGrid.endY = drawGrid.endY;
 				
 		while (mouse.LeftIsDown()) {
 			
@@ -858,6 +871,15 @@ void ZoomImagePanel::ImageScroll::OnDragStart(wxMouseEvent& evt) {
 			// Move right
 			else if (hitTarget == ZoomImagePanel::GridHitTaget::RIGHT) {
 				drawGrid.endX = dragScaleShiftX;
+			}
+
+			// Move All Lines
+			else if (hitTarget == ZoomImagePanel::GridHitTaget::INSIDE) {
+				
+				drawGrid.startX = originalDrawGrid.startX + dxScale;
+				drawGrid.startY = originalDrawGrid.startY + dyScale;
+				drawGrid.endX = originalDrawGrid.endX + dxScale;
+				drawGrid.endY = originalDrawGrid.endY + dyScale;
 			}
 
 			if (enforceGridAspect) {
