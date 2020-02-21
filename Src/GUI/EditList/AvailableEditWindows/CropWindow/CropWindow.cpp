@@ -160,8 +160,8 @@ void CropWindow::ChangeAspect(bool gridUpdate){
 		customAspectHeight->Hide();
 	}
 
-	// Custom constraint
-	else if (defaultAspects->GetSelection() == 13) {
+	// Custom constraint (last selection)
+	else if (defaultAspects->GetSelection() == defaultAspects->GetStrings().GetCount() - 1) {
 
 		customAspectHeight->Show();
 		customAspectX->Show();
