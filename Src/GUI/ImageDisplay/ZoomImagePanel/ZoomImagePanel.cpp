@@ -495,7 +495,13 @@ void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 	dc.SetBrush(wxBrush(this->GetBackgroundColour()));
 	dc.DrawRectangle(0, 0, (thisWidth / zoom)+1, (thisHeight / zoom)+1);
 	dc.GetGraphicsContext()->SetInterpolationQuality(quality);
-	dc.DrawBitmap(bitmapDraw, wxPoint(xShift/tempScalar, yShift/tempScalar));
+
+	if (!gridActive) {
+		dc.DrawBitmap(bitmapDraw, wxPoint(xShift / tempScalar, yShift / tempScalar));
+	}
+	else {
+		dc.DrawBitmap(bitmapDrawDisable, wxPoint(xShift / tempScalar, yShift / tempScalar));
+	}
 
 	xShift /= tempScalar;
 	yShift /= tempScalar;
@@ -516,13 +522,18 @@ void ZoomImagePanel::ImageScroll::Render(wxGCDC& dc) {
 
 		wxPen pen1(drawGrid.color2, lineWidth, wxPENSTYLE_SOLID);
 
-		// Draw solid black line
-		dc.SetPen(pen1);
-
 		int startXShift = (int)drawGrid.startX + xShift;
 		int startYShift = (int)drawGrid.startY + yShift;
 		int endXShift = (int)drawGrid.endX + xShift;
 		int endYShift = (int)drawGrid.endY + yShift;
+		int focusedWidth = endXShift - startXShift;
+		int focusedHeight = endYShift - startYShift;
+
+		//  Draw enabled image
+		dc.DrawBitmap(bitmapDraw.GetSubBitmap(wxRect(startXShift - xShift, startYShift - yShift, focusedWidth, focusedHeight)), startXShift, startYShift);
+
+		// Draw solid black line
+		dc.SetPen(pen1);
 
 		// Top Line and Bottom Line (solid black)
 		dc.DrawLine(startXShift, startYShift, endXShift, startYShift);
@@ -629,6 +640,8 @@ void ZoomImagePanel::ImageScroll::ChangeImage(Image * newImage) {
 			bitmapDraw = wxBitmap(wxImage(1, 1));
 	}
 
+	bitmapDrawDisable = bitmapDraw.ConvertToDisabled(255);
+
 	if(doFit){
 		// No need to refresh, this will be taken care of during rendering.
 		// Just need to set zoom factor
@@ -655,6 +668,8 @@ void ZoomImagePanel::ImageScroll::ChangeImage(wxImage * newImage) {
 	else {
 		bitmapDraw = wxBitmap(1, 1);
 	}
+
+	bitmapDrawDisable = bitmapDraw.ConvertToDisabled(255);
 
 	if(doFit){
 		// No need to refresh, this will be taken care of during rendering.
