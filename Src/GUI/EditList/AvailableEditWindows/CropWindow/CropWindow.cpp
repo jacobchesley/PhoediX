@@ -367,9 +367,9 @@ void CropWindow::SetParamsAndFlags(ProcessorEdit * edit){
 	if(edit == NULL){ return;}
 	if(edit->GetEditType() == ProcessorEdit::EditType::CROP){
 
+		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_FLIP_ASPECT)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_FLIP_ASPECT) == 1) { this->FlipAspect(); } }
 		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUMERATOR)) { customAspectWidth->SetValue(wxString::Format(wxT("%f"), edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_NUMERATOR))); }
 		if (edit->CheckForParameter(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_DENOMINATOR)) { customAspectHeight->SetValue(wxString::Format(wxT("%f"), edit->GetParam(ProcessorEdit::ParametersFlags::PHOEDIX_PARAMETER_DENOMINATOR))); }
-		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_FLIP_ASPECT)) { if (edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_FLIP_ASPECT) == 1) { this->FlipAspect(); } }
 		if (edit->CheckForFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ASPECT_SELECTION)) { defaultAspects->SetSelection(edit->GetFlag(ProcessorEdit::ParametersFlags::PHOEDIX_FLAG_ASPECT_SELECTION)); this->ChangeAspect(); }
 
 		// Get start and end positions
