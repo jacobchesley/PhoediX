@@ -793,6 +793,6 @@ bool Image::exifIsGPSCoordinate(size_t tag) {
 }
 
 bool Image::KeepRationalAsFraction(size_t tag) {
-	if (tag == 0x9201) { return true; }
+	if (tag == 0x9201 || tag == 0x829A) { return true; }
 	return false;
 }

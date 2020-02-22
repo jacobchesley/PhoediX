@@ -37,7 +37,7 @@ void ExifRead::AddExifRow(size_t tag, void * data) {
 	wxString valueString = "";
 	int textPrec = 2;
 
-	if (tag == 0x829 || 0x9202 || 0x9205) { textPrec = 1; }
+	if (tag == 0x8829 || tag == 0x9202 || tag == 0x9205) { textPrec = 1; }
 	if (tag == 0x829A) { textPrec = 5; }
 	wxString formatString = "%." + wxString::Format(wxT("%d"), textPrec) + "f";
 
