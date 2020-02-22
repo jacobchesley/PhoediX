@@ -1,14 +1,14 @@
 ACKNOWLEDGEMENTS
 
-PhoediX uses wxWidgets 3.1.0 library, LibRaw 0.18 (beta 2) library, and LibTIFF library.
+PhoediX uses wxWidgets library, LibRaw library, and LibTIFF library.
 All trademarks mentioned in this manual are the property of their owners.
 
 wxWidgets
-Copyright (c) 1992-2016 Julian Smart, Vadim Zeitlin, Stefan Csomor, Robert Roebling, and other members of the wxWidgets team, please see the acknowledgements section below.
+Copyright (c) 1992-2020 Julian Smart, Vadim Zeitlin, Stefan Csomor, Robert Roebling, and other members of the wxWidgets team, please see the acknowledgements section below.
 Portions (c) 1996 Artificial Intelligence Applications Institute
 
 LibRaw 
-Copyright (C) 2008-2013 LibRaw LLC (http://www.libraw.org, info@libraw.org)
+Copyright (C) 2008-2020 LibRaw LLC (http://www.libraw.org, info@libraw.org)
 
 LibTIFF
 Copyright (c) 1988-1997 Sam Leffler

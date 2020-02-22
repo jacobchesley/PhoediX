@@ -22,7 +22,7 @@ cd $debDir/PhoediX/DEBIAN
 
 touch control
 echo Package: PhoediX >> control
-echo Version: 1.0.0 >> control
+echo Version: 1.0.0-alpha.1 >> control
 echo Section: base >> control
 echo Priority: optional >> control
 echo Architecture: amd64 >> control
@@ -40,12 +40,12 @@ echo Upstream-Contact: Jacob Chesley >> copyright
 echo Source: http://www.github.com/jacobchesley/phoedix >> copyright
 echo >> copyright
 echo Files: * >> copyright
-echo Copyright: 2018 Jacob Chesley >> copyright
+echo Copyright: 2020 Jacob Chesley >> copyright
 echo License: MIT >> copyright
 echo " For more information, see /usr/share/doc/phoedix/Copyrights.txt" >> copyright
 echo >> copyright
 echo Files: usr/lib/libraw_r.so.19 >> copyright
-echo Copyright: 2008-2018 LibRaw LLC >> copyright
+echo Copyright: 2008-2020 LibRaw LLC >> copyright
 echo License: LGPL >> copyright
 echo " For more information, see /usr/share/doc/phoedix/Copyrights.txt" >> copyright
 echo >> copyright
