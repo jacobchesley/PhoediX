@@ -3,7 +3,7 @@ cd ..
 cd ..
 phoedixDir="$(pwd)"
 
-cd /Users/jacob/Development/wxWidgets-3.1.2
+cd /Users/jacob/Development/wxWidgets-3.1.3
 
 # Clean wxWidgets builds
 rm -rf build-release_64
@@ -12,7 +12,7 @@ rm -rf build-release_64
 mkdir build-release_64
 cd build-release_64
 
-../configure CC="clang -arch x86_64" CXX="clang++ -arch x86_64" --disable-shared --enable-unicode --prefix="$(pwd)" --with-cxx=14 --enable-stl
+../configure CC="clang -arch x86_64" CXX="clang++ -arch x86_64" --disable-shared --enable-unicode --prefix="$(pwd)" --with-cxx=14
 
 sudo make -j 4
 
