@@ -9,7 +9,7 @@ PhoediXButton::PhoediXButton(wxWindow * parent, wxWindowID id, const wxString& l
 	outerSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	text = new wxStaticText(this, -1, label, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
-	text->SetMinSize(text->GetTextExtent(text->GetLabel()));
+	text->SetMinSize(text->GetTextExtent(text->GetLabel() + "  ") + wxSize(0, 5));
 
 	sizer->AddSpacer(8);
 	sizer->Add(text);
@@ -115,7 +115,7 @@ wxString PhoediXButton::GetLabel() {
 
 void PhoediXButton::SetLabel(wxString label) {
 	text->SetLabel(label);
-	text->SetMinSize(text->GetTextExtent(text->GetLabel()));
+    text->SetMinSize(text->GetTextExtent(text->GetLabel() + "  ") + wxSize(0, 5));
 }
 
 void PhoediXButton::SetBorder(int xBorder, int yBorder) {
@@ -139,7 +139,7 @@ void PhoediXButton::SetBorder(int xBorder, int yBorder) {
 
 bool PhoediXButton::SetFont(const wxFont& font) {
 	bool setFontRet = text->SetFont(font);	
-	text->SetMinSize(text->GetTextExtent(text->GetLabel()));
+	text->SetMinSize(text->GetTextExtent(text->GetLabel() + "  ") + wxSize(0, 5));
 	return setFontRet;
 }
 

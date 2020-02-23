@@ -17,7 +17,7 @@ EditListPanel::EditListPanel(wxWindow * parent, Processor * processor, ZoomImage
 	titleText = new wxStaticText(this, -1, "Edit Pipeline", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
 	titleText->SetForegroundColour(Colors::TextLightGrey);
 	titleText->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	titleText->SetMinSize(titleText->GetTextExtent(titleText->GetLabel()));
+	titleText->SetMinSize(titleText->GetTextExtent(titleText->GetLabel()) + wxSize(0, 5));
 
 	scroller = new EditListScroll(this);
 	scroller->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(EditListPanel::OnRightClick), NULL, this);
