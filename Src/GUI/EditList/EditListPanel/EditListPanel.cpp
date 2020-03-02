@@ -708,8 +708,9 @@ void EditListPanel::EditListScroll::AddEdit(EditListItem * edit) {
 
 	// Add the edit to the sizer, and push onto the editList
 	editList.push_back(edit);
+	this->GetSizer()->AddSpacer(6);
 	this->GetSizer()->Add(edit, 0, wxALL| wxEXPAND);
-	this->GetSizer()->AddSpacer(12);
+	this->GetSizer()->AddSpacer(6);
 
 	// Fit inside the scroll bars
 	this->FitInside();
