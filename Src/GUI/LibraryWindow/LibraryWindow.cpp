@@ -397,8 +397,14 @@ bool LibraryWindow::CheckIfImageInDisplay(wxString imagePath){
 void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxString filePath) {
 	
 	if (populationCanceled) {
+
+		// Clean up image and return
+		newImage->Destroy();
+		delete newImage;
+		newImage = NULL;
 		return;
 	}
+
 	locker.Enter();
 	LibraryImage * newLibImage = new LibraryImage(imageScroll, this, newImage, fileName, filePath);
 	newLibImage->SetMinSize(this->GetLibraryImageSize());
@@ -469,6 +475,11 @@ LibraryWindow::LoadImagesThread::LoadImagesThread(LibraryWindow * parent) : wxTh
 
 void LibraryWindow::LoadImagesThread::Cancel() {
 	canceled = true;
+	for (int i = 0; i < subThreads.size(); i++) {
+		if (subThreads.at(i) != NULL) {
+			subThreads.at(i)->Cancel();
+		}
+	}
 }
 
 wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
@@ -526,6 +537,7 @@ wxThread::ExitCode LibraryWindow::LoadImagesThread::Entry(){
 		}
 
 		LoadSubsetImagesThread * imageThread = new LoadSubsetImagesThread(par, subFiles, &mutexLock, &wait, totalThreads, &threadComplete);
+		subThreads.push_back(imageThread);
 		imageThread->Run();
 	}
 
@@ -563,7 +575,9 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 
 	for (int file = 0; file < toLoad.size(); file++) {
 
-		if (canceled) { break; }
+		if (canceled) {
+			break; 
+		}
 
 		// Get filename from vector and check if already displayed in library window.  Skip if already displayed
 		wxString fileName = toLoad[file];
@@ -607,7 +621,8 @@ wxThread::ExitCode LibraryWindow::LoadSubsetImagesThread::Entry(){
 				if (flip == 3) { displayImage = new wxImage(tempImage->Rotate180()); }
 				else if (flip == 5) { displayImage = new wxImage(tempImage->Rotate90(false)); }
 				else if (flip == 6) { displayImage = new wxImage(tempImage->Rotate90(true)); }
-				else { displayImage = tempImage; }
+				else { displayImage = new wxImage(*tempImage); }
+				delete tempImage;
 			}
 
 			// Free raw image and processor memory
