@@ -388,8 +388,7 @@ void SettingsWindow::ReprocessIfNeeded() {
 void SettingsWindow::OnCancel(wxCommandEvent& WXUNUSED(evt)) {
 
 	this->Hide();
-	this->SendMessageToParent("Settings Reverted", 2000);
-	this->ReprocessIfNeeded();
+	this->SendMessageToParent("Settings Reverted", 5000);
 
 	colorDepth->SetSelection(lastSettings.bitDepth);
 	colorSpace->SetSelection(lastSettings.colorSpace);
@@ -405,8 +404,7 @@ void SettingsWindow::Cleanup() {
 void SettingsWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 
 	this->Hide();
-	this->SendMessageToParent("Settings Reverted", 2000);
-	this->ReprocessIfNeeded();
+	this->SendMessageToParent("Settings Reverted", 5000);
 
 	colorDepth->SetSelection(lastSettings.bitDepth);
 	colorSpace->SetSelection(lastSettings.colorSpace);
