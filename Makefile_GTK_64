@@ -1,6 +1,6 @@
-WX_PATH = /home/ne/Development/wxWidgets-3.0.4
-LIBRAW_PATH = /home/ne/Development/LibRaw-0.19.0
-LIBTIFF_PATH = /home/ne/Development/tiff-4.0.9
+WX_PATH = /home/jacob/Development/wxWidgets-3.1.3
+LIBRAW_PATH = /home/jacob/Development/LibRaw-0.19.5
+LIBTIFF_PATH = /home/jacob/Development/tiff-4.0.10
 
 # No need to modify any lines below.
 
