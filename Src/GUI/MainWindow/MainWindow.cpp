@@ -653,6 +653,17 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 
 	}
 
+	// Itterate over all sessions and look for current session
+	for (size_t i = 0; i < allSessions.size(); i++) {
+
+		// Remove current session from all session and break once complete
+		if (currentSession->GetID() == allSessions.at(i)->GetID()) {
+			allSessions.at(i)->Destroy();
+			allSessions.erase(allSessions.begin() + i);
+			break;
+		}
+	}
+
 	if (allSessions.size() > 0) {
 		// At least one session exists now, enable menu items related to sessions
 		this->EnableDisableMenuItemsNoProject(true);
