@@ -70,6 +70,7 @@ private:
 
 	wxVector<wxString> GetSelectedFileNames();
 
+	wxWindow* parWindow;
 	wxBoxSizer * mainLayout;
 
 	wxBoxSizer * toolbarLayout;
@@ -89,6 +90,8 @@ private:
 	wxCriticalSection locker;
 	bool populationStarted;
 	bool populationCanceled;
+	int totalNumberFiles;
+	int numberFilesAdded;
 
 	enum MenuBar{
 		ID_SHOW_DIRECTORY_LIST = 1,
@@ -123,19 +126,6 @@ private:
 		bool doDelete;
 	};
 
-	class LoadImagesThread : public wxThread {
-	public:
-		LoadImagesThread(LibraryWindow * parent);
-		void Cancel();
-	protected:
-
-		virtual ExitCode Entry();
-	private:
-		LibraryWindow * par;
-		bool canceled;
-
-	};
-
 	class LoadSubsetImagesThread : public wxThread {
 	public:
 		LoadSubsetImagesThread (LibraryWindow * parent, wxArrayString imagesToLoad, wxMutex * mutLockIn, wxCondition * condition, int numThreads, int * threadsComplete);
@@ -151,6 +141,20 @@ private:
 		wxCondition * cond;
 		int threads;
 		int * complete;
+
+	};
+
+	class LoadImagesThread : public wxThread {
+	public:
+		LoadImagesThread(LibraryWindow* parent);
+		void Cancel();
+	protected:
+
+		virtual ExitCode Entry();
+	private:
+		LibraryWindow* par;
+		bool canceled;
+		wxVector<LoadSubsetImagesThread*> subThreads;
 
 	};
 

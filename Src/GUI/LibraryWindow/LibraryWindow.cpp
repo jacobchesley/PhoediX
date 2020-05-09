@@ -8,6 +8,7 @@ wxDEFINE_EVENT(POPULATION_COMPLETE_EVENT, wxCommandEvent);
 
 LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 
+	parWindow = parent;
 	populationStarted = false;
 	populationCanceled = false;
 
@@ -97,6 +98,9 @@ LibraryWindow::LibraryWindow(wxWindow * parent) : wxScrolledWindow(parent){
 	this->Bind(DIR_EXISTS, (wxObjectEventFunction)&LibraryWindow::OnDirExists, this);
 	this->Bind(NO_DIR_EXISTS, (wxObjectEventFunction)&LibraryWindow::OnNoDirExists, this);
 	this->Bind(LIBRARY_IMAGE_CHECK_EVENT, (wxObjectEventFunction)&LibraryWindow::OnLibraryImageCheck, this);
+
+	totalNumberFiles = -1;
+	numberFilesAdded = -1;
 }
 
 void LibraryWindow::OnShowDirectories(wxCommandEvent& WXUNUSED(evt)){
@@ -346,11 +350,39 @@ void LibraryWindow::OnAddImage(AddLibraryImageEvent & evt){
 
 void LibraryWindow::OnPopulationStart(wxSizeEvent & WXUNUSED(evt)) {
 	populationStarted = true;
+
+	// Get all directories to check
+	wxVector<wxString> allDirectories = directorySelections->GetDirectoryList();
+
+	int totalFiles = 0;
+	// Go through all directories
+	for (size_t dir = 0; dir < allDirectories.size(); dir++) {
+
+		wxString dirName = allDirectories[dir];
+		// Check directory, and continue if it does not exist
+		if (!wxDir::Exists(allDirectories[dir])) { continue; }
+
+		// Get all file names
+		wxArrayString allFileNames;
+		wxDir::GetAllFiles(allDirectories[dir], &allFileNames, wxEmptyString, wxDIR_FILES);
+		
+		// Add to total number of files
+		totalFiles += allFileNames.size();
+	}
+	totalNumberFiles = totalFiles;
+	numberFilesAdded = 0;
 }
 
 void LibraryWindow::OnPopulationComplete(wxSizeEvent & WXUNUSED(evt)) {
 	populationStarted = false;
 	populationCanceled = false;
+
+	totalNumberFiles = -1;
+	numberFilesAdded = -1;
+
+	wxCommandEvent evt(PROCESSOR_MESSAGE_EVENT, ID_PROCESSOR_MESSAGE);
+	evt.SetString("");
+	wxPostEvent(parWindow, evt);
 }
 
 bool LibraryWindow::CheckIfImageInDisplay(wxString imagePath){
@@ -383,6 +415,21 @@ void LibraryWindow::AddLibraryImage(wxImage * newImage, wxString fileName, wxStr
 
 	if (libraryImages.size() > 0) { clearButton->Enable(); }
 	else { clearButton->Disable(); }
+
+	numberFilesAdded += 1;
+	// Send message to display in parent status on progress of loading
+	if (totalNumberFiles > -1 && numberFilesAdded > -1) {
+
+		wxCommandEvent evt(PROCESSOR_MESSAGE_EVENT, ID_PROCESSOR_MESSAGE);
+		wxString curFileStr;
+		curFileStr << numberFilesAdded;
+		wxString numFileStr;
+		numFileStr << totalNumberFiles;
+
+		wxString fullImageNumStr = "Loading " + fileName + " (" + curFileStr + "/" + numFileStr + ")";
+		evt.SetString(fullImageNumStr);
+		wxPostEvent(parWindow, evt);
+	}
 
 	locker.Leave();
 }
