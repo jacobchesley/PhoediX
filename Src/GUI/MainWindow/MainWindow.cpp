@@ -829,6 +829,7 @@ void MainWindow::ReloadImage(wxCommandEvent& WXUNUSED(evt)) {
 
 	if(currentSession == NULL){return;}
 	wxString imgFilePath = PhoediXSession::GetImagePathFromProjectPath(currentSession->GetProjectPath());
+	this->CloseSession(currentSession);
 	this->OpenImage(imgFilePath);
 }
 
