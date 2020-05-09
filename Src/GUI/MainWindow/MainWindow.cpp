@@ -22,7 +22,7 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuCloseProjects = new wxMenu();
 	menuView = new wxMenu();
 	menuTools = new wxMenu();
-	menuWindow = new wxMenu();
+	menuProjects = new wxMenu();
 	menuHelp = new wxMenu();
 
 	menuFile->Append(MainWindow::MenuBar::ID_SHOW_LOAD_FILE, _("Open Image\tCtrl+O"));
@@ -60,9 +60,8 @@ MainWindow::MainWindow(wxApp * application) : wxFrame(NULL, -1, "PhoediX", wxDef
 	menuBar->Append(menuFile, _("&File"));
 	menuBar->Append(menuView, _("&View"));
 	menuBar->Append(menuTools, _("&Tools"));
-	menuBar->Append(menuWindow, _("&Windows"));
 	menuBar->Append(menuHelp, _("&Help"));
-
+	
 	// Set the menu bar
 	this->SetMenuBar(menuBar);
 
@@ -473,6 +472,11 @@ void MainWindow::CloseAllProjects(wxCommandEvent& WXUNUSED(event)) {
 
 void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 
+	// Show projects menu if not shown
+	if (menuProjects->GetMenuItemCount() < 1) {
+		menuBar->Insert(3, menuProjects, _("&Projects"));
+	}
+
 	PhoediXSession * newSession = new PhoediXSession();
 	this->SetUniqueID(newSession);
 
@@ -488,7 +492,7 @@ void MainWindow::CreateNewProject(wxString projectFile, bool rawProject){
 		newSession->GetEditList()->SetSessionEditList(rawEditList);
 	}
 
-	menuWindow->AppendCheckItem(newSession->GetID(), _(newSession->GetName()));
+	menuProjects->AppendCheckItem(newSession->GetID(), _(newSession->GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, newSession->GetID());
     
 	allSessions.push_back(newSession);
@@ -628,8 +632,12 @@ void MainWindow::CloseSession(PhoediXSession * session) {
 	imagePanel->ChangeImage(emptyImage);
 
 	// Check the current session in the window, and uncheck all other sessions
-	if (menuWindow->FindItem(session->GetID())) {
-		menuWindow->Delete(session->GetID());
+	if (menuProjects->FindItem(session->GetID())) {
+		menuProjects->Delete(session->GetID());
+	}
+
+	if (menuProjects->GetMenuItemCount() < 1) {
+		menuBar->Remove(3);
 	}
 
 	// Remove all edits from panel and snapshots
@@ -661,7 +669,7 @@ void MainWindow::OnOpenWindow(wxCommandEvent& evt) {
 
 	// If the session to open is the same as the one currently opened, keep open
 	if (evt.GetId() == currentSession->GetID()) {
-		menuWindow->FindChildItem(evt.GetId())->Check();
+		menuProjects->FindChildItem(evt.GetId())->Check();
 		return;
 	}
 
@@ -761,8 +769,14 @@ void MainWindow::LoadProject(wxString projectPath, bool openSession) {
 	this->SetUniqueID(session);
 
     Logger::Log("PhoediX MainWindow::LoadProject - Adding new session to menu window", Logger::LogLevel::LOG_VERBOSE);
+
+	// Show projects menu if not shown
+	if (menuProjects->GetMenuItemCount() < 1) {
+		menuBar->Insert(3, menuProjects, _("&Projects"));
+	}
+
 	// Append the session to the menu bar
-	menuWindow->AppendCheckItem(session->GetID(), _(session->GetName()));
+	menuProjects->AppendCheckItem(session->GetID(), _(session->GetName()));
 	this->Bind(wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&MainWindow::OnOpenWindow, this, session->GetID());
 
 	// Add new session to all session vector, set current session and open
@@ -783,13 +797,15 @@ void MainWindow::OnImportImageNewProject(wxCommandEvent& evt) {
 
 void MainWindow::CheckUncheckSession(int sessionID){
 
-	size_t numWindowMenuItems = menuWindow->GetMenuItems().size();
+	size_t numWindowMenuItems = menuProjects->GetMenuItems().size();
+
+
 	for(size_t i = 0; i < numWindowMenuItems; i++){
-		if(sessionID == menuWindow->GetMenuItems()[i]->GetId()){
-			menuWindow->GetMenuItems()[i]->Check(true);
+		if(sessionID == menuProjects->GetMenuItems()[i]->GetId()){
+			menuProjects->GetMenuItems()[i]->Check(true);
 		}
 		else{
-			menuWindow->GetMenuItems()[i]->Check(false);
+			menuProjects->GetMenuItems()[i]->Check(false);
 		}
 	}
 }
@@ -1383,6 +1399,9 @@ void MainWindow::OnClose(wxCloseEvent& WXUNUSED(evt)) {
 	delete emptyPhxImage;
 	delete clearStatusTimer;
 
+	if(menuBar->GetMenuCount() == 4){
+		menuBar->Insert(3, menuProjects, _("&Projects"));
+	}
 	auiManager->UnInit();
 	this->DestroyChildren();
 	this->Destroy();

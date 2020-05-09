@@ -114,7 +114,7 @@ private:
 	wxMenu * menuCloseProjects;
 	wxMenu * menuView;
 	wxMenu * menuTools;
-	wxMenu * menuWindow;
+	wxMenu * menuProjects;
 	wxMenu * menuHelp;
 	wxStaticText * statusBarText;
 
